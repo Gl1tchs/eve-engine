@@ -1,6 +1,6 @@
 function(expose_headers TARGET SOURCE_DIR)
     # Get headers to expose
-    file(GLOB_RECURSE HEADERS "${SOURCE_DIR}/*.h" "${SOURCE_DIR}/*.inc")
+    file(GLOB_RECURSE HEADERS "${SOURCE_DIR}/*.h" "${SOURCE_DIR}/*.inl")
 
     # Set destination directory
     get_filename_component(DIRECTORY_NAME ${SOURCE_DIR} NAME)

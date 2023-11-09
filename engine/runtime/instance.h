@@ -1,10 +1,10 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_RUNTIME_INSTANCE_H_
-#define EVE_RUNTIME_INSTANCE_H_
+#pragma once
 
 #include "core/core_minimal.h"
 #include "core/window.h"
+#include "graphics/renderer.h"
 
 class Instance {
  public:
@@ -17,6 +17,5 @@ class Instance {
   bool is_running_{true};
 
   Ref<Window> window_;
+  Ref<Renderer> renderer_;
 };
-
-#endif  // EVE_RUNTIME_INSTANCE_H_

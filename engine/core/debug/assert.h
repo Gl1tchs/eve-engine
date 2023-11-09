@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_DEBUG_ASSERT_H_
-#define EVE_CORE_DEBUG_ASSERT_H_
+#pragma once
 
 #include <filesystem>
 
@@ -50,5 +49,3 @@
 #define ASSERT(...)
 #define ENGINE_ASSERT(...)
 #endif
-
-#endif  // EVE_CORE_DEBUG_ASSERT_H_

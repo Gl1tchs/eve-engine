@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_DEBUG_INSTRUMENTOR_H_
-#define EVE_CORE_DEBUG_INSTRUMENTOR_H_
+#pragma once
 
 #include <chrono>
 #include <fstream>
@@ -122,6 +121,4 @@ constexpr auto CleanupOutputString(const char (&expr)[N],
 #define PROFILE_FUNCTION()
 #endif
 
-#include "core/debug/instrumentor.inc"
-
-#endif  // EVE_CORE_DEBUG_INSTRUMENTOR_H_
+#include "core/debug/instrumentor.inl"

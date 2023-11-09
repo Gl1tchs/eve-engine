@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_WINDOW_H_
-#define EVE_CORE_WINDOW_H_
+#pragma once
 
 #include <string>
 
@@ -59,5 +58,3 @@ class Window final {
   bool vsync_;
   WindowMode mode_;
 };
-
-#endif  // EVE_CORE_WINDOW_H_

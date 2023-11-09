@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_EVENT_EVENT_HANDLER_H_
-#define EVE_CORE_EVENT_EVENT_HANDLER_H_
+#pragma once
 
 #include <functional>
 #include <type_traits>
@@ -37,6 +36,4 @@ void PopEvent();
 template <EventDerived T>
 void NotifyEvent(T& event);
 
-#include "core/event/event_handler.inc"
-
-#endif  // EVE_CORE_EVENT_EVENT_HANDLER_H_
+#include "core/event/event_handler.inl"

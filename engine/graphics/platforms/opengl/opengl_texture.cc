@@ -1,0 +1,163 @@
+// Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
+
+#include "graphics/platforms/opengl/opengl_texture.h"
+
+#include <glad/glad.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include "core/debug/assert.h"
+#include "opengl_texture.h"
+
+int DeserializeTextureFormat(TextureFormat format) {
+  switch (format) {
+    case TextureFormat::kRed:
+      return GL_RED;
+    case TextureFormat::kRG:
+      return GL_RG;
+    case TextureFormat::kRGB:
+      return GL_RGB;
+    case TextureFormat::kBGR:
+      return GL_BGR;
+    case TextureFormat::kRGBA:
+      return GL_RGBA;
+    case TextureFormat::kBGRA:
+      return GL_BGRA;
+    default:
+      return -1;
+  }
+}
+
+int DeserializeTextureFilteringMode(TextureFilteringMode mode) {
+  switch (mode) {
+    case TextureFilteringMode::kLinear:
+      return GL_LINEAR;
+    case TextureFilteringMode::kNearest:
+      return GL_NEAREST;
+    default:
+      return -1;
+  }
+}
+
+int DeserializeTextureWrappingMode(TextureWrappingMode mode) {
+  switch (mode) {
+    case TextureWrappingMode::kRepeat:
+      return GL_REPEAT;
+    case TextureWrappingMode::kMirroredRepeat:
+      return GL_MIRRORED_REPEAT;
+    case TextureWrappingMode::kClampToEdge:
+      return GL_CLAMP_TO_EDGE;
+    case TextureWrappingMode::kClampToBorder:
+      return GL_CLAMP_TO_BORDER;
+    default:
+      return -1;
+  }
+}
+
+OpenGLTexture2D::OpenGLTexture2D(const TextureMetadata& metadata,
+                                 const void* pixels)
+    : metadata_(metadata) {
+  glGenTextures(1, &texture_id_);
+  glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  DeserializeTextureFilteringMode(metadata_.min_filter));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                  DeserializeTextureFilteringMode(metadata_.mag_filter));
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                  DeserializeTextureWrappingMode(metadata_.wrap_s));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                  DeserializeTextureWrappingMode(metadata_.wrap_t));
+
+  glTexImage2D(GL_TEXTURE_2D, 0, DeserializeTextureFormat(metadata_.format),
+               metadata_.size.x, metadata_.size.y, 0,
+               DeserializeTextureFormat(metadata_.format), GL_UNSIGNED_BYTE,
+               pixels);
+
+  if (metadata_.generate_mipmaps) {
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+}
+
+OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path,
+                                 bool generate_mipmaps) {
+  int width, height, channels;
+  stbi_set_flip_vertically_on_load(true);
+  stbi_uc* data =
+      stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+
+  ENGINE_ASSERT(data, "Failed to load texture!");
+
+  TextureFormat format = TextureFormat::kRGBA;
+
+  if (channels == 1)
+    format = TextureFormat::kRed;
+  else if (channels == 2)
+    format = TextureFormat::kRG;
+  else if (channels == 3)
+    format = TextureFormat::kRGB;
+  else if (channels == 4)
+    format = TextureFormat::kRGBA;
+
+  metadata_.size = {static_cast<uint32_t>(width),
+                    static_cast<uint32_t>(height)};
+  metadata_.format = format;
+  metadata_.min_filter = TextureFilteringMode::kLinear;
+  metadata_.mag_filter = TextureFilteringMode::kLinear;
+  metadata_.wrap_s = TextureWrappingMode::kClampToEdge;
+  metadata_.wrap_t = TextureWrappingMode::kClampToEdge;
+  metadata_.generate_mipmaps = generate_mipmaps;
+
+  glGenTextures(1, &texture_id_);
+  glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, DeserializeTextureFormat(metadata_.format),
+               metadata_.size.x, metadata_.size.y, 0,
+               DeserializeTextureFormat(metadata_.format), GL_UNSIGNED_BYTE,
+               data);
+
+  if (metadata_.generate_mipmaps) {
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+
+  stbi_image_free(data);
+}
+
+OpenGLTexture2D::~OpenGLTexture2D() {
+  glDeleteTextures(1, &texture_id_);
+}
+
+const TextureMetadata& OpenGLTexture2D::GetMetadata() const {
+  return metadata_;
+}
+
+uint32_t OpenGLTexture2D::GetTextureID() const {
+  return texture_id_;
+}
+
+void OpenGLTexture2D::SetData(void* data, uint32_t size) {
+
+  int format = DeserializeTextureFormat(metadata_.format);
+
+  uint32_t bpp = format == GL_RGBA ? 4 : 3;
+  ENGINE_ASSERT(size == metadata_.size.x * metadata_.size.y * bpp,
+                "Data must be entire texture!")
+
+  glTextureSubImage2D(texture_id_, 0, 0, 0, metadata_.size.x, metadata_.size.y,
+                      format, GL_UNSIGNED_BYTE, data);
+}
+
+void OpenGLTexture2D::Bind(uint16_t slot) const {
+  glBindTextureUnit(slot, texture_id_);
+}
+
+bool OpenGLTexture2D::operator==(const Texture& other) const {
+  return texture_id_ == other.GetTextureID();
+}

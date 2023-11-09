@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_UTILS_MEMORY_H_
-#define EVE_CORE_UTILS_MEMORY_H_
+#pragma once
 
 #include <memory>
 
@@ -17,6 +16,4 @@ using Ref = std::shared_ptr<T>;
 template <typename T, typename... Args>
 constexpr Ref<T> CreateRef(Args&&... args);
 
-#include "core/utils/memory.inc"
-
-#endif  // EVE_CORE_UTILS_MEMORY_H_
+#include "core/utils/memory.inl"

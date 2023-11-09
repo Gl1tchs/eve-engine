@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_EVENT_MOUSE_CODE_H_
-#define EVE_EVENT_MOUSE_CODE_H_
+#pragma once
 
 #include <cstdint>
 
@@ -18,5 +17,3 @@ enum class MouseCode : uint32_t {
   kRight = k2,
   kMiddle = k3,
 };
-
-#endif  // EVE_EVENT_MOUSE_CODE_H_

@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_EVENT_MOUSE_EVENT_H_
-#define EVE_EVENT_MOUSE_EVENT_H_
+#pragma once
 
 #include <cstdint>
 
@@ -60,5 +59,3 @@ class MouseButtonReleaseEvent final : public MouseButtonEvent {
   explicit MouseButtonReleaseEvent(const int button_code)
       : MouseButtonEvent(button_code) {}
 };
-
-#endif  // EVE_EVENT_MOUSE_EVENT_H_

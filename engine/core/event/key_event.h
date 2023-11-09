@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_EVENT_KEY_EVENT_H_
-#define EVE_EVENT_KEY_EVENT_H_
+#pragma once
 
 #include <cstdint>
 
@@ -40,5 +39,3 @@ class KeyTypeEvent final : public KeyEvent {
  public:
   explicit KeyTypeEvent(const uint32_t key_code) : KeyEvent(key_code) {}
 };
-
-#endif  // EVE_EVENT_KEY_EVENT_H_

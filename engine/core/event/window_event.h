@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_EVENT_WINDOW_EVENT_H_
-#define EVE_EVENT_WINDOW_EVENT_H_
+#pragma once
 
 #include <glm/glm.hpp>
 
@@ -19,5 +18,3 @@ class WindowResizeEvent final : public Event {
 };
 
 class WindowCloseEvent final : public Event {};
-
-#endif  // EVE_EVENT_WINDOW_EVENT_H_

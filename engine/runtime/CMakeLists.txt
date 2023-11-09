@@ -1,6 +1,5 @@
 set(SOURCES
   launch/guarded_main.cc
-  launch/guarded_main.h
   instance.cc
   instance.h
   prelude.h
@@ -22,9 +21,9 @@ add_library(eve_runtime STATIC ${SOURCES})
 add_library(eve::runtime ALIAS eve_runtime)
 
 target_include_directories(eve_runtime PRIVATE
-${CMAKE_SOURCE_DIR}/engine/
+  ${CMAKE_SOURCE_DIR}/engine/
 )
 
-target_link_libraries(eve_runtime PRIVATE eve::core)
+target_link_libraries(eve_runtime PRIVATE eve::core eve::graphics)
 
 expose_headers(eve_runtime ${CMAKE_CURRENT_LIST_DIR})

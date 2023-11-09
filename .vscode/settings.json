@@ -76,9 +76,18 @@
     "fstream": "cpp",
     "span": "cpp",
     "variant": "cpp",
-    "*.inc": "cpp",
+    "*.inl": "cpp",
     "*.prf": "json",
     "random": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "numeric": "cpp",
+    "deque": "cpp",
+    "map": "cpp",
+    "set": "cpp",
+    "unordered_set": "cpp",
+    "memory_resource": "cpp",
+    "queue": "cpp",
+    "ranges": "cpp",
+    "xtree": "cpp"
   },
 }

@@ -1,19 +1,21 @@
 set(SOURCES
   debug/instrumentor.cc
   debug/instrumentor.h
-  debug/instrumentor.inc
+  debug/instrumentor.inl
   debug/log.cc
   debug/log.h
   event/event_handler.h
-  event/event_handler.inc
+  event/event_handler.inl
   event/events.h
   event/key_code.h
   event/key_event.h
   event/mouse_code.h
   event/mouse_event.h
   event/window_event.h
+  math/transform.cc
+  math/transform.h
   utils/memory.h
-  utils/memory.inc
+  utils/memory.inl
   utils/timer.cc
   utils/timer.h
   core_minimal.h
@@ -30,10 +32,16 @@ target_include_directories(eve_core PUBLIC
 )
 
 target_include_directories(eve_core PRIVATE
-  ${glfw_IncludeDirs}
-  ${spdlog_IncludeDirectories}
+  ${VENDOR_DIR}/glfw/include/
+  ${VENDOR_DIR}/spdlog/include/
 )
 
-target_link_libraries(eve_core PRIVATE glfw glm spdlog)
+target_link_libraries(eve_core PRIVATE
+  glfw
+  glm
+  spdlog
+)
+
+target_compile_definitions(eve_core PRIVATE GLFW_INCLUDE_NONE)
 
 expose_headers(eve_core ${CMAKE_CURRENT_LIST_DIR})

@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_EVENT_KEY_CODE_H_
-#define EVE_EVENT_KEY_CODE_H_
+#pragma once
 
 #include <cstdint>
 
@@ -128,5 +127,3 @@ enum class KeyCode : uint32_t {
   kRightSuper = 347,
   kMenu = 348,
 };
-
-#endif  // EVE_EVENT_KEY_CODE_H_

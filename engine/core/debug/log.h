@@ -1,7 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef EVE_CORE_DEBUG_LOG_H_
-#define EVE_CORE_DEBUG_LOG_H_
+#pragma once
 
 #include <filesystem>
 #include <format>
@@ -51,5 +50,3 @@ class LoggerManager final {
 #define LOG_ERROR(instance, ...) instance->Error(std::format(__VA_ARGS__));
 #define LOG_CRITICAL(instance, ...) \
   instance->Critical(std::format(__VA_ARGS__));
-
-#endif  // EVE_CORE_DEBUG_LOG_H_

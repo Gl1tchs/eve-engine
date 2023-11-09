@@ -51,8 +51,6 @@ Window::Window(WindowProps props) {
 
   SetVsync(props.vsync);
 
-  // TODO load graphics api
-
   InitEvents();
 }
 
