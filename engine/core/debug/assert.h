@@ -3,9 +3,9 @@
 #ifndef EVE_CORE_DEBUG_ASSERT_H_
 #define EVE_CORE_DEBUG_ASSERT_H_
 
-#include "core/debug/log.h"
-
 #include <filesystem>
+
+#include "core/debug/log.h"
 
 #if defined(EVE_PLATFORM_WIN32)
 #define DEBUGBREAK() __debugbreak()

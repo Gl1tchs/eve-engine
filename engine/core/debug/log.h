@@ -3,11 +3,11 @@
 #ifndef EVE_CORE_DEBUG_LOG_H_
 #define EVE_CORE_DEBUG_LOG_H_
 
-#include "core/utils/memory.h"
-
 #include <filesystem>
 #include <format>
 #include <string>
+
+#include "core/utils/memory.h"
 
 struct LogInstance final {
   std::string target;
