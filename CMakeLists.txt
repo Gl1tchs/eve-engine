@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(eve_engine)
+project(eve)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -29,6 +29,31 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DEVE_DEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DEVE_RELEASE -O2")
 set(CMAKE_CXX_FLAGS_DIST "${CMAKE_CXX_FLAGS_DIST} -DEVE_DIST -O2")
+
+# Set definitions
+
+if(WIN32)
+    set(EVE_PLATFORM "WIN32")
+    
+    # Definitions for Windows
+    add_compile_definitions(EVE_PLATFORM_WIN32)
+elseif(UNIX AND NOT APPLE)
+    set(EVE_PLATFORM "LINUX")
+
+    # Definitions for Linux
+    add_compile_definitions(EVE_PLATFORM_LINUX)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "debug")
+    add_compile_definitions(EVE_DEBUG)
+    add_compile_definitions(EVE_ENABLE_PROFILING)
+elseif(CMAKE_BUILD_TYPE STREQUAL "release")
+    add_compile_definitions(EVE_DEBUG)
+elseif(CMAKE_BUILD_TYPE STREQUAL "dist")
+    add_compile_definitions(EVE_DIST)
+endif()
+
+set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
 
 # Define the targets
 add_subdirectory(editor)

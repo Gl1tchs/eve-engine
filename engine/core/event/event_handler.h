@@ -1,0 +1,42 @@
+// Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
+
+#ifndef EVE_CORE_EVENT_EVENT_HANDLER_H_
+#define EVE_CORE_EVENT_EVENT_HANDLER_H_
+
+#include <functional>
+#include <type_traits>
+
+#define BIND_EVENT_FN(fn)                                   \
+  [this](auto&&... args) -> decltype(auto) {                \
+    return this->fn(std::forward<decltype(args)>(args)...); \
+  }
+
+class Event {
+ protected:
+  Event() = default;
+};
+
+template <typename T>
+concept EventDerived = std::is_base_of_v<Event, T>;
+
+template <EventDerived T>
+using EventCallbackFn = std::function<void(const T&)>;
+
+template <typename T>
+auto event_callbacks = std::vector<EventCallbackFn<T>>();
+
+template <EventDerived T>
+void SubscribeEvent(const EventCallbackFn<T>& callback);
+
+template <EventDerived T>
+void UnsubscribeEvent();
+
+template <EventDerived T>
+void PopEvent();
+
+template <EventDerived T>
+void NotifyEvent(T& event);
+
+#include "core/event/event_handler.inc"
+
+#endif  // EVE_CORE_EVENT_EVENT_HANDLER_H_
