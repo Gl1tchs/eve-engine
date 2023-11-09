@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "graphics/shader.h"
 
 [[nodiscard]] std::string SerializeShaderType(ShaderType type);
@@ -36,7 +38,7 @@ class OpenGLShader final : public Shader {
   [[nodiscard]] uint32_t GetProgramID() const { return program_; }
 
  private:
-  [[nodiscard]] static std::string LoadShaderSource(
+  [[nodiscard]] static std::vector<uint32_t> LoadSPIRV(
       const std::filesystem::path& path);
 
   [[nodiscard]] int GetUniformLocation(const std::string& name) const;
@@ -47,5 +49,6 @@ class OpenGLShader final : public Shader {
   [[nodiscard]] static uint32_t CompileShader(const std::string& source,
                                               ShaderType type);
 
+ private:
   uint32_t program_;
 };

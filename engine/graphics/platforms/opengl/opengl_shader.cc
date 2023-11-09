@@ -31,7 +31,7 @@ ShaderType DeserializeShaderType(const std::string& value) {
     return ShaderType::kNone;
 }
 
-int32_t GetOpenGLShaderType(ShaderType type) {
+int GetOpenGLShaderType(ShaderType type) {
   switch (type) {
     case ShaderType::kVertex:
       return GL_VERTEX_SHADER;
@@ -77,20 +77,32 @@ OpenGLShader::OpenGLShader(const std::filesystem::path& vs_path,
                            const std::filesystem::path& gs_path) {
   program_ = glCreateProgram();
 
-  const std::string vertex_source = LoadShaderSource(vs_path);
-  const uint32_t vertex_shader =
-      CompileShader(vertex_source, ShaderType::kVertex);
+  // Load Vulkan SPIR-V shader files
+  const std::vector<uint32_t> vertex_spirv = LoadSPIRV(vs_path);
+  const std::vector<uint32_t> fragment_spirv = LoadSPIRV(fs_path);
+  const std::vector<uint32_t> geometry_spirv =
+      (!gs_path.empty()) ? LoadSPIRV(gs_path) : std::vector<uint32_t>();
+
+  uint32_t vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderBinary(1, &vertex_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+                 vertex_spirv.data(), vertex_spirv.size() * sizeof(uint32_t));
+  glSpecializeShaderARB(vertex_shader, "main", 0, nullptr, nullptr);
   glAttachShader(program_, vertex_shader);
 
-  const std::string fragment_source = LoadShaderSource(fs_path);
-  const uint32_t fragment_shader =
-      CompileShader(fragment_source, ShaderType::kFragment);
+  uint32_t fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderBinary(1, &fragment_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+                 fragment_spirv.data(),
+                 fragment_spirv.size() * sizeof(uint32_t));
+  glSpecializeShaderARB(fragment_shader, "main", 0, nullptr, nullptr);
   glAttachShader(program_, fragment_shader);
 
-  uint32_t geometry_shader{0};
+  uint32_t geometry_shader = 0;
   if (!gs_path.empty()) {
-    const std::string geometry_source = LoadShaderSource(gs_path);
-    geometry_shader = CompileShader(geometry_source, ShaderType::kGeometry);
+    geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderBinary(1, &geometry_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+                   geometry_spirv.data(),
+                   geometry_spirv.size() * sizeof(uint32_t));
+    glSpecializeShaderARB(geometry_shader, "main", 0, nullptr, nullptr);
     glAttachShader(program_, geometry_shader);
   }
 
@@ -115,57 +127,34 @@ void OpenGLShader::Unbind() const {
   glUseProgram(0);
 }
 
-std::string OpenGLShader::LoadShaderSource(const std::filesystem::path& path) {
+std::vector<uint32_t> OpenGLShader::LoadSPIRV(
+    const std::filesystem::path& path) {
   if (!std::filesystem::exists(path)) {
     LOG_ENGINE_ERROR("Shader file not found at: {0}", path.string());
-    return "";
+    return {};
   }
 
-  const std::string include_identifier = "#include ";
-  static bool is_recursive_call = false;
-
-  std::string full_source_code;
-  std::ifstream file(path);
-
+  std::ifstream file(path, std::ios::ate | std::ios::binary);
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Could not open the shader at: {0}", path.string());
-    return full_source_code;
+    LOG_ENGINE_ERROR("Failed to open SPIR-V file: {0}", path.string());
+    return {};
   }
 
-  std::string line_buffer;
-  while (std::getline(file, line_buffer)) {
-    if (line_buffer.find(include_identifier) != std::string::npos) {
-      line_buffer.erase(0, include_identifier.size());
+  size_t file_size = static_cast<size_t>(file.tellg());
+  std::vector<uint32_t> buffer(file_size / sizeof(uint32_t));
 
-      line_buffer.erase(0, 1);
-      line_buffer.erase(line_buffer.size() - 1);
-
-      std::filesystem::path p = path.parent_path();
-      line_buffer.insert(0, p.string() + "/");
-
-      is_recursive_call = true;
-      full_source_code += LoadShaderSource(line_buffer);
-
-      continue;
-    }
-
-    full_source_code += line_buffer + '\n';
-  }
-
-  if (!is_recursive_call)
-    full_source_code += '\0';
-
+  file.seekg(0);
+  file.read(reinterpret_cast<char*>(buffer.data()), file_size);
   file.close();
 
-  return full_source_code;
+  return buffer;
 }
 
 int OpenGLShader::GetUniformLocation(const std::string& name) const {
   return glGetUniformLocation(program_, name.c_str());
 }
 
-void OpenGLShader::SetUniform(const std::string& name,
-                              const int32_t value) const {
+void OpenGLShader::SetUniform(const std::string& name, const int value) const {
   glUniform1i(GetUniformLocation(name), value);
 }
 
@@ -194,12 +183,12 @@ void OpenGLShader::SetUniform(const std::string& name,
   glUniformMatrix4fv(GetUniformLocation(name), 1, false, glm::value_ptr(value));
 }
 
-void OpenGLShader::SetUniform(const std::string& name, int32_t count,
+void OpenGLShader::SetUniform(const std::string& name, int count,
                               int* value) const {
   glUniform1iv(GetUniformLocation(name), count, value);
 }
 
-void OpenGLShader::SetUniform(const std::string& name, int32_t count,
+void OpenGLShader::SetUniform(const std::string& name, int count,
                               float* value) const {
   glUniform1fv(GetUniformLocation(name), count, value);
 }

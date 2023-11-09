@@ -27,13 +27,13 @@ add_library(eve_core STATIC ${SOURCES})
 add_library(eve::core ALIAS eve_core)
 
 target_include_directories(eve_core PUBLIC
-  ${CMAKE_SOURCE_DIR}/engine/
-  ${VENDOR_DIR}/glm/
+  ${CMAKE_SOURCE_DIR}/engine
+  ${VENDOR_DIR}/glm
 )
 
 target_include_directories(eve_core PRIVATE
-  ${VENDOR_DIR}/glfw/include/
-  ${VENDOR_DIR}/spdlog/include/
+  ${VENDOR_DIR}/glfw/include
+  ${VENDOR_DIR}/spdlog/include
 )
 
 target_link_libraries(eve_core PRIVATE

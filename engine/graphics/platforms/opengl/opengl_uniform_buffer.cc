@@ -2,7 +2,7 @@
 
 #include "graphics/platforms/opengl/opengl_uniform_buffer.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t binding) {
   glCreateBuffers(1, &ubo_);

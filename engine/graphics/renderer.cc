@@ -16,43 +16,8 @@ Renderer::Renderer() {
 
   RenderCommand::Init();
 
-  // initialize shader
-  std::string vs_string = R"(
-      #version 450 core
-      layout(location = 0) in vec4 a_pos;
-      layout(location = 1) in vec4 a_color;
-      layout(location = 2) in vec2 a_tex_coords;
-      layout(location = 3) in float a_tex_index;
-      out vec4 v_color;
-      out vec2 v_tex_coords;
-      out float v_tex_index;
-      layout(std140, binding = 0) uniform Camera {
-      mat4 view;
-      mat4 proj;
-      } u_camera;
-       void main() {
-         v_color = a_color;
-         v_tex_coords = a_tex_coords;
-         v_tex_index = a_tex_index;
-         gl_Position = u_camera.proj * u_camera.view * a_pos;
-      }
-  )";
-
-  std::string fs_string = R"(
-      #version 450 core
-      layout(location = 0) out vec4 o_color;
-      in vec4 v_color;
-      in vec2 v_tex_coords;
-      in float v_tex_index;
-      uniform sampler2D u_textures[32];
-      void main() {
-         int index = int(v_tex_index);
-         vec4 sampled = texture(u_textures[index], v_tex_coords);
-         o_color = sampled * v_color;
-      }
-  )";
-
-  shader_ = Shader::Create(vs_string, fs_string);
+  shader_ = Shader::Create(std::filesystem::path("shaders/default.vert.spirv"),
+                           std::filesystem::path("shaders/default.frag.spirv"));
 
   shader_->Bind();
 

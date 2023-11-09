@@ -59,13 +59,14 @@ add_library(eve_graphics STATIC ${SOURCES})
 add_library(eve::graphics ALIAS eve_graphics)
 
 target_include_directories(eve_graphics PUBLIC
-  ${CMAKE_SOURCE_DIR}/engine/
-  ${VENDOR_DIR}/glm/
+  ${CMAKE_SOURCE_DIR}/engine
+  ${VENDOR_DIR}/glm
 )
   
 target_include_directories(eve_graphics PRIVATE
-  ${VENDOR_DIR}/glfw/include/
-  ${VENDOR_DIR}/include/
+  ${VENDOR_DIR}/glad/include/
+  ${VENDOR_DIR}/glfw/include
+  ${VENDOR_DIR}/include
 )
 
 target_link_libraries(eve_graphics PRIVATE
@@ -78,3 +79,14 @@ target_link_libraries(eve_graphics PRIVATE
 target_compile_definitions(eve_graphics PRIVATE GLFW_INCLUDE_NONE)
 
 expose_headers(eve_graphics ${CMAKE_CURRENT_LIST_DIR})
+
+set(SHADER_SOURCES
+  # shaders/camera.glsl
+  shaders/default.frag
+  shaders/default.vert
+)
+
+compile_shader(eve_graphics
+  INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders
+  SOURCES ${SHADER_SOURCES}
+)

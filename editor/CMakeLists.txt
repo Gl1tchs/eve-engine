@@ -11,8 +11,8 @@ else()
 endif()
 
 target_include_directories(eve_editor PRIVATE
-  ${CMAKE_SOURCE_DIR}/editor/
-  ${CMAKE_SOURCE_DIR}/engine/
+  ${CMAKE_SOURCE_DIR}/editor
+  ${CMAKE_SOURCE_DIR}/engine
 )
 
 target_link_libraries(eve_editor PRIVATE eve::all)

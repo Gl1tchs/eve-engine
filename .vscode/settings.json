@@ -1,6 +1,7 @@
 {
   "licenser.license": "Custom",
   "licenser.customHeader": "Copyright (c) 2023 Berke Umut Biricik All Rights Reserved",
+  "licenser.disableAutoHeaderInsertion": true,
   "editor.tabSize": 2,
   "files.associations": {
     "*.h": "cpp",
@@ -88,6 +89,7 @@
     "memory_resource": "cpp",
     "queue": "cpp",
     "ranges": "cpp",
-    "xtree": "cpp"
+    "xtree": "cpp",
+    "stack": "cpp"
   },
 }
