@@ -45,7 +45,7 @@ void Instance::StartEventLoop() {
   packet.indices = {0, 1, 2, 2, 3, 0};
 
   // TODO add proper asset system and use res:// thing.
-  Ref<Texture> texture = Texture::Create("resources/textures/checkerboard.png");
+  Ref<Texture> texture = Texture::Create("assets/textures/checkerboard.png");
 
   Timer timer;
   while (is_running_) {
