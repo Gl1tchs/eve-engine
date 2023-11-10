@@ -4,9 +4,6 @@ project(eve)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# include(glslc-compiler)
-include(header-expose)
-
 # Options
 option(ENABLE_TESTING "Should enable testing?" ON)
 set(ENABLE_TESTING ${ENABLE_TESTING} CACHE BOOL "Should enable testing?" FORCE)

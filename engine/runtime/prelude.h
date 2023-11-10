@@ -7,3 +7,5 @@
 #elif defined(EVE_PLATFORM_LINUX)
 #include "runtime/launch/linux_main.h"
 #endif
+
+#include "core/instance.h"

@@ -20,14 +20,14 @@
 
 #ifdef EVE_DEBUG
 #define INTERNAL_ASSERT_IMPL(type, check, msg, ...) \
-  {                                                 \
-    if (!(check)) {                                 \
-      LOG##type##ERROR(msg, __VA_ARGS__);           \
-      DEBUGBREAK();                                 \
-    }                                               \
+  if (!(check)) {                                   \
+    LOG##type##ERROR(msg, __VA_ARGS__);             \
+    DEBUGBREAK();                                   \
   }
+
 #define INTERNAL_ASSERT_WITH_MSG(type, check, ...) \
   INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
+
 #define INTERNAL_ASSERT_NO_MSG(type, check)                                 \
   INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}",    \
                        STRINGIFY_MACRO(check),                              \
@@ -35,6 +35,7 @@
                        __LINE__)
 
 #define INTERNAL_ASSERT_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
+
 #define INTERNAL_ASSERT_GET_MACRO(...)         \
   EXPAND_MACRO(INTERNAL_ASSERT_GET_MACRO_NAME( \
       __VA_ARGS__, INTERNAL_ASSERT_WITH_MSG, INTERNAL_ASSERT_NO_MSG))

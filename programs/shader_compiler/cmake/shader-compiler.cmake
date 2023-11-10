@@ -1,7 +1,7 @@
 find_program(shader_compiler_executable NAMES shader_compiler HINTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 if(NOT shader_compiler_executable)
-    message(FATAL_ERROR "ShaderCompiler executable not found. Please build the ShaderCompiler target first.")
+    message(ERROR "ShaderCompiler executable not found. Please build the ShaderCompiler target first.")
 endif()
 
 function(compile_shader TARGET)

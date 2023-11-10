@@ -30,9 +30,6 @@ class LoggerManager final {
   static Ref<LogInstance> engine_logger_;
 };
 
-#define NEW_LOG_INSTANCE(name) \
-  const Ref<LogInstance> name = LoggerManager::AddLogger(#name);
-
 #define LOG_ENGINE_TRACE(...) \
   LoggerManager::GetEngineLogger()->Trace(std::format(__VA_ARGS__));
 #define LOG_ENGINE_INFO(...) \

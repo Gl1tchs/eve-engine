@@ -8,11 +8,8 @@ class Timer final {
  public:
   Timer();
 
-  void Tick();
-
-  [[nodiscard]] float GetDeltaTime() const;
+  [[nodiscard]] float Tick();
 
  private:
-  float delta_time_;
   std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time_;
 };

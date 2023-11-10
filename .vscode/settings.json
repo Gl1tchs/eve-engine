@@ -90,6 +90,8 @@
     "queue": "cpp",
     "ranges": "cpp",
     "xtree": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "any": "cpp",
+    "valarray": "cpp"
   },
 }

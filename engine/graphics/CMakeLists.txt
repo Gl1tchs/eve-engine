@@ -78,15 +78,12 @@ target_link_libraries(eve_graphics PRIVATE
 
 target_compile_definitions(eve_graphics PRIVATE GLFW_INCLUDE_NONE)
 
-expose_headers(eve_graphics ${CMAKE_CURRENT_LIST_DIR})
-
 compile_shader(eve_graphics  
   ENV opengl # todo make it dynamic
   KIND vertex
   DEFINITIONS OPENGL
   SOURCES shaders/default.vert
 )
-
 
 compile_shader(eve_graphics
   ENV opengl # todo make it dynamic

@@ -1,13 +1,15 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
 #include "core/core_minimal.h"
-#include "runtime/instance.h"
+#include "core/instance.h"
 
-int GuardedMain() {
+extern Instance* CreateInstance(CommandLineArguments args);
+
+int GuardedMain(CommandLineArguments args) {
   LoggerManager::Init("intermediate/engine.log");
 
   PROFILE_BEGIN_SESSION("Startup", "intermediate/eve-profiler-startup.prf");
-  Instance* instance = new Instance();
+  Instance* instance = CreateInstance(args);
   PROFILE_END_SESSION();
 
   PROFILE_BEGIN_SESSION("Runtime", "intermediate/eve-profiler-runtime.prf");

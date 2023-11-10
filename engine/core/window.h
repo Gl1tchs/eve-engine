@@ -17,11 +17,12 @@ enum class WindowMode {
 };
 
 struct WindowProps {
-  std::string title;
-  glm::ivec2 size;
-  WindowMode mode;
-  bool vsync;
-  // TODO icon
+  std::string title =
+      "Eve Project";  // TODO add the rendering api to the title ex: "Eve Project | OpenGL"
+  glm::ivec2 size = {800, 600};
+  WindowMode mode = WindowMode::kWindowed;
+  bool vsync = true;
+  // TODO get icon by res://icon.ico if not use default
 };
 
 class Window final {

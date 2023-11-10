@@ -18,7 +18,15 @@ set(SOURCES
   utils/memory.inl
   utils/timer.cc
   utils/timer.h
+  utils/uuid.cc
+  utils/uuid.h
   core_minimal.h
+  instance.cc
+  instance.h
+  layer_stack.cc
+  layer_stack.h
+  layer.h
+  state.h
   window.cc
   window.h
 )
@@ -43,5 +51,3 @@ target_link_libraries(eve_core PRIVATE
 )
 
 target_compile_definitions(eve_core PRIVATE GLFW_INCLUDE_NONE)
-
-expose_headers(eve_core ${CMAKE_CURRENT_LIST_DIR})

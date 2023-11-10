@@ -6,3 +6,8 @@
 #include "core/debug/instrumentor.h"
 #include "core/debug/log.h"
 #include "core/utils/memory.h"
+
+struct CommandLineArguments {
+  int argc;
+  char** argv;
+};

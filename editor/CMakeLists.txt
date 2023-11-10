@@ -1,4 +1,6 @@
 set(SOURCES
+  layers/editor_layer.cc
+  layers/editor_layer.h
   editor.cc
 )
 

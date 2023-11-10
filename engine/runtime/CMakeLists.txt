@@ -1,7 +1,5 @@
 set(SOURCES
   launch/guarded_main.cc
-  instance.cc
-  instance.h
   prelude.h
 )
 
@@ -24,6 +22,7 @@ target_include_directories(eve_runtime PRIVATE
   ${CMAKE_SOURCE_DIR}/engine
 )
 
-target_link_libraries(eve_runtime PRIVATE eve::core eve::graphics)
-
-expose_headers(eve_runtime ${CMAKE_CURRENT_LIST_DIR})
+target_link_libraries(eve_runtime PRIVATE
+  eve::core
+  eve::graphics
+)
