@@ -166,7 +166,7 @@ void Renderer::Flush() {
   vertex_buffer_->SetData(vertices_, vertex_count_ * sizeof(Vertex));
 
   RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-  RenderCommand::Clear(BUFFER_BITS_COLOR | BUFFER_BITS_DEPTH);
+  RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
 
   if (!index_count_) {
     return;

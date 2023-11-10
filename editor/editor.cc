@@ -8,7 +8,7 @@
 class EditorInstance : public Instance {
  public:
   EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
-    PushLayer<EditorLayer>();
+    PushLayer<EditorLayer>(GetState());
   }
 };
 

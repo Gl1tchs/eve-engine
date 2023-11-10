@@ -29,11 +29,11 @@ void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
 void OpenGLRendererAPI::Clear(uint16_t bits) {
   uint16_t flags = 0;
 
-  if (HasFlag(bits, BUFFER_BITS_COLOR)) {
+  if (HasFlag(bits, BufferBits_kColor)) {
     flags |= GL_COLOR_BUFFER_BIT;
   }
 
-  if (HasFlag(bits, BUFFER_BITS_DEPTH)) {
+  if (HasFlag(bits, BufferBits_kDepth)) {
     flags |= GL_DEPTH_BUFFER_BIT;
   }
 

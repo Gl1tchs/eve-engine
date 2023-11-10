@@ -4,11 +4,11 @@
 
 #include <cstdint>
 
-class UUID {
+class GUUID {
  public:
-  UUID();
-  UUID(uint64_t uuid);
-  UUID(const UUID&) = default;
+  GUUID();
+  GUUID(uint64_t uuid);
+  GUUID(const GUUID&) = default;
 
   operator uint64_t() const { return uuid_; }
 
@@ -21,8 +21,8 @@ template <typename T>
 struct hash;
 
 template <>
-struct hash<UUID> {
-  size_t operator()(const UUID& uuid) const { return (uint64_t)uuid; }
+struct hash<GUUID> {
+  size_t operator()(const GUUID& uuid) const { return (uint64_t)uuid; }
 };
 
 }  // namespace std

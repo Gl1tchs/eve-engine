@@ -1,7 +1,9 @@
 add_subdirectory("cxxopts")
+add_subdirectory("entt")
 add_subdirectory("glad")
 add_subdirectory("glfw")
 add_subdirectory("glm")
+add_subdirectory("imgui")
 add_subdirectory("spdlog")
 
 set(SPIRV_CROSS_CLI OFF)

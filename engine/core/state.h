@@ -8,4 +8,5 @@
 struct State {
   Ref<Window> window;
   Ref<Renderer> renderer;
+  bool running{true};
 };

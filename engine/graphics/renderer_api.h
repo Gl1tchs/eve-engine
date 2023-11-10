@@ -12,8 +12,8 @@
 enum class GraphicsAPI { kNone = 0, kOpenGL, kVulkan };
 
 enum BufferBits : uint16_t {
-  BUFFER_BITS_DEPTH = BIT(0),
-  BUFFER_BITS_COLOR = BIT(1),
+  BufferBits_kDepth = BIT(0),
+  BufferBits_kColor = BIT(1),
 };
 
 class RendererAPI {
@@ -24,7 +24,7 @@ class RendererAPI {
 
   virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) = 0;
   virtual void SetClearColor(const glm::vec4& color) = 0;
-  virtual void Clear(uint16_t bits = BUFFER_BITS_COLOR) = 0;
+  virtual void Clear(uint16_t bits = BufferBits_kColor) = 0;
 
   virtual void DrawIndexed(const Ref<VertexArray>& vertex_array,
                            uint32_t index_count = 0) = 0;

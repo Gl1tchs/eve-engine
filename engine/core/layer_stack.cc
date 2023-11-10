@@ -1,6 +1,7 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
 #include "core/layer_stack.h"
+
 #include "core/debug/instrumentor.h"
 
 LayerStack::~LayerStack() {
@@ -9,22 +10,6 @@ LayerStack::~LayerStack() {
   for (Layer* layer : layers_) {
     layer->OnDestroy();
     delete layer;
-  }
-}
-
-void LayerStack::UpdateLayers(float ds) {
-  PROFILE_FUNCTION();
-
-  for (Layer* layer : layers_) {
-    layer->OnUpdate(ds);
-  }
-}
-
-void LayerStack::UpdateGUI(float ds) {
-  PROFILE_FUNCTION();
-
-  for (Layer* layer : layers_) {
-    layer->OnGUI(ds);
   }
 }
 

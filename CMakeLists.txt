@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.25)
 
 project(eve)
 
+set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+include(imgui-extras)
 
 # Options
 option(ENABLE_TESTING "Should enable testing?" ON)
@@ -49,8 +53,6 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "dist")
     add_compile_definitions(EVE_DIST)
 endif()
-
-set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
 
 # Build helper programs
 add_subdirectory("programs")

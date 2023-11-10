@@ -9,6 +9,7 @@
 #include "core/layer_stack.h"
 #include "core/state.h"
 #include "core/utils/memory.h"
+#include "ui/imgui_layer.h"
 
 struct InstanceSpecifications {
   std::string name;
@@ -33,7 +34,7 @@ class Instance {
   template <typename T, typename... Args>
     requires std::is_base_of_v<Layer, T>
   void PushLayer(Args&&... args) {
-    PushLayer(new T(std::forward<Args>(args)...));
+    PushLayer(new T(args...));
   }
 
   void PushOverlay(Layer* overlay);
@@ -41,7 +42,7 @@ class Instance {
   template <typename T, typename... Args>
     requires std::is_base_of_v<Layer, T>
   void PushOverlay(Args&&... args) {
-    PushOverlay(new T(std::forward<Args>(args)...));
+    PushOverlay(new T(args...));
   }
 
   void PopLayer(Layer* layer);
@@ -51,8 +52,9 @@ class Instance {
   static Instance* instance_;
 
   Ref<State> state_;
-  LayerStack layers_;
 
-  bool is_running_{true};
+  LayerStack layers_;
+  ImGuiLayer* imgui_layer_;
+
   InstanceSpecifications specs_;
 };

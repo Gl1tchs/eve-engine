@@ -7,6 +7,7 @@
 #include "core/core_minimal.h"
 #include "core/event/event_handler.h"
 #include "core/event/events.h"
+#include "core/event/input.h"
 
 void GlfwErrorCallback(int error, const char* description);
 
@@ -52,6 +53,7 @@ Window::Window(WindowProps props) {
   SetVsync(props.vsync);
 
   InitEvents();
+  Input::Init();
 }
 
 Window::~Window() {
@@ -142,7 +144,7 @@ void Window::SetTitle(const std::string& value) {
   title_ = value;
 }
 
-void* Window::GetNativeWindow() {
+GLFWwindow* Window::GetNativeWindow() {
   return window_;
 }
 

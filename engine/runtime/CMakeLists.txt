@@ -18,7 +18,7 @@ endif()
 add_library(eve_runtime STATIC ${SOURCES})
 add_library(eve::runtime ALIAS eve_runtime)
 
-target_include_directories(eve_runtime PRIVATE
+target_include_directories(eve_runtime PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
 )
 

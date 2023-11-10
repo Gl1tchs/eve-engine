@@ -25,9 +25,12 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   state_->window = CreateRef<Window>(props);
 
   SubscribeEvent<WindowCloseEvent>(
-      [this](const WindowCloseEvent& event) { is_running_ = false; });
+      [this](const WindowCloseEvent& event) { state_->running = false; });
 
   state_->renderer = CreateRef<Renderer>();
+
+  imgui_layer_ = new ImGuiLayer(state_);
+  PushOverlay(imgui_layer_);
 }
 
 Instance::~Instance() {
@@ -38,12 +41,25 @@ void Instance::StartEventLoop() {
   PROFILE_FUNCTION();
 
   Timer timer;
-  while (is_running_) {
+  while (state_->running) {
     PROFILE_SCOPE("EventLoop");
 
     float ds = timer.Tick();
 
-    layers_.UpdateLayers(ds);
+    PROFILE_SCOPE("LayerStack OnUpdate");
+    for (Layer* layer : layers_) {
+      layer->OnUpdate(ds);
+    }
+
+    imgui_layer_->Begin();
+    {
+      PROFILE_SCOPE("LayerStack OnGUI");
+
+      for (Layer* layer : layers_) {
+        layer->OnGUI(ds);
+      }
+    }
+    imgui_layer_->End();
 
     state_->window->SwapBuffers();
   }

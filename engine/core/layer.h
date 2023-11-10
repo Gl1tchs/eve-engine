@@ -7,6 +7,7 @@
 
 class Layer {
  public:
+  Layer(Ref<State>& state);
   virtual ~Layer() = default;
 
  private:

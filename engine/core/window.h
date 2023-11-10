@@ -6,9 +6,7 @@
 
 #include <glm/glm.hpp>
 
-namespace {
 struct GLFWwindow;
-}  // namespace
 
 enum class WindowMode {
   kWindowed,
@@ -48,7 +46,7 @@ class Window final {
   [[nodiscard]] std::string GetTitle();
   void SetTitle(const std::string& value);
 
-  [[nodiscard]] void* GetNativeWindow();
+  [[nodiscard]] GLFWwindow* GetNativeWindow();
 
  private:
   void InitEvents();

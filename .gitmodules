@@ -13,3 +13,10 @@
 [submodule "thirdparty/SPIRV-Cross"]
 	path = thirdparty/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
+[submodule "thirdparty/entt"]
+	path = thirdparty/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "thirdparty/imgui"]
+	path = thirdparty/imgui
+	url = https://github.com/Gl1tchs/imgui.git
+	branch = docking

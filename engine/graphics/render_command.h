@@ -10,7 +10,7 @@ class RenderCommand final {
 
   static void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
   static void SetClearColor(const glm::vec4& color);
-  static void Clear(uint16_t bits = BUFFER_BITS_COLOR);
+  static void Clear(uint16_t bits = BufferBits_kColor);
 
   static void DrawIndexed(const Ref<VertexArray>& vertex_array,
                           uint32_t index_count);
