@@ -80,13 +80,17 @@ target_compile_definitions(eve_graphics PRIVATE GLFW_INCLUDE_NONE)
 
 expose_headers(eve_graphics ${CMAKE_CURRENT_LIST_DIR})
 
-set(SHADER_SOURCES
-  # shaders/camera.glsl
-  shaders/default.frag
-  shaders/default.vert
+compile_shader(eve_graphics  
+  ENV opengl # todo make it dynamic
+  KIND vertex
+  DEFINITIONS OPENGL
+  SOURCES shaders/default.vert
 )
 
+
 compile_shader(eve_graphics
-  INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders
-  SOURCES ${SHADER_SOURCES}
+  ENV opengl # todo make it dynamic
+  KIND fragment
+  DEFINITIONS OPENGL
+  SOURCES shaders/default.frag
 )

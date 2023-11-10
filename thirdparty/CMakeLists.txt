@@ -1,4 +1,12 @@
+add_subdirectory("cxxopts")
 add_subdirectory("glad")
 add_subdirectory("glfw")
 add_subdirectory("glm")
 add_subdirectory("spdlog")
+
+set(SPIRV_CROSS_CLI OFF)
+set(SPIRV_CROSS_ENABLE_TESTS OFF)
+set(SPIRV_CROSS_ENABLE_HLSL OFF)
+set(SPIRV_CROSS_ENABLE_MSL OFF)
+set(SPIRV_CROSS_ENABLE_C_API OFF)
+add_subdirectory("SPIRV-Cross")

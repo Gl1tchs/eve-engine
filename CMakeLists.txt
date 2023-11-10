@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 
 project(eve)
 
-find_package(Vulkan REQUIRED COMPONENTS glslc shaderc_combined)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-include(glslc-compiler)
+# include(glslc-compiler)
 include(header-expose)
 
 # Options
@@ -57,7 +55,10 @@ endif()
 
 set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
 
+# Build helper programs
+add_subdirectory("programs")
+
 # Define the targets
-add_subdirectory(editor)
-add_subdirectory(engine)
-add_subdirectory(thirdparty)
+add_subdirectory("editor")
+add_subdirectory("engine")
+add_subdirectory("thirdparty")

@@ -7,6 +7,9 @@
 [submodule "thirdparty/glm"]
 	path = thirdparty/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "thirdparty/cxxopts"]
+	path = thirdparty/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
 [submodule "thirdparty/SPIRV-Cross"]
 	path = thirdparty/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
