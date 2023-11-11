@@ -17,4 +17,6 @@ class ImGuiLayer : public Layer {
   void OnStart() override;
 
   void OnDestroy() override;
+
+  void SetDarkThemeColors();
 };

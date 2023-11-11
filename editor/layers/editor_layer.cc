@@ -82,6 +82,8 @@ void EditorLayer::OnUpdate(float ds) {
   frame_buffer_->Bind();
   frame_buffer_->Refresh();
 
+  RenderCommand::SetViewport(0, 0, (uint32_t)viewport_size.x,
+                             (uint32_t)viewport_size.y);
   RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
   RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
 
