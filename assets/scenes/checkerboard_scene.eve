@@ -1,0 +1,35 @@
+scene: checkerboard_scene
+entities:
+  - id: 453953480392206736
+    tag_component:
+      tag: My Entity
+    transform:
+      position: [0, 0, 0]
+      rotation: [0, 0, 0]
+      scale: [1, 1, 1]
+    drawable_component:
+      vertices:
+        - position: [-0.5, -0.5, 0, 1]
+          color: [1, 1, 1, 1]
+          tex_coords: [0, 0]
+          tex_index: 0
+        - position: [-0.5, 0.5, 0, 1]
+          color: [1, 1, 1, 1]
+          tex_coords: [0, 1]
+          tex_index: 0
+        - position: [0.5, 0.5, 0, 1]
+          color: [1, 1, 1, 1]
+          tex_coords: [1, 1]
+          tex_index: 0
+        - position: [0.5, -0.5, 0, 1]
+          color: [1, 1, 1, 1]
+          tex_coords: [1, 0]
+          tex_index: 0
+      indices:
+        - 0
+        - 1
+        - 2
+        - 2
+        - 3
+        - 0
+      texture: assets/textures/checkerboard.png.meta

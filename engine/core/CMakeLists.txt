@@ -48,10 +48,11 @@ target_include_directories(eve_core PRIVATE
 )
 
 target_link_libraries(eve_core PRIVATE
+  eve::asset
+  eve::ui
   glfw
   glm
   spdlog
-  eve::ui
 )
 
 target_compile_definitions(eve_core PRIVATE GLFW_INCLUDE_NONE)

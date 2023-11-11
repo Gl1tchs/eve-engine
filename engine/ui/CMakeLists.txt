@@ -21,7 +21,7 @@ target_include_directories(eve_ui PRIVATE
 )
 
 target_link_libraries(eve_ui PRIVATE
+  eve::core
   ImGui
   glfw
-  eve::core
 )

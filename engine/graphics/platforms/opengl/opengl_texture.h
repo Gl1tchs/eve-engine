@@ -8,8 +8,6 @@ class OpenGLTexture2D final : public Texture {
  public:
   OpenGLTexture2D(const TextureMetadata& metadata,
                   const void* pixels = nullptr);
-  OpenGLTexture2D(const std::filesystem::path& path,
-                  bool generate_mipmaps = true);
   ~OpenGLTexture2D();
 
   const TextureMetadata& GetMetadata() const override;

@@ -92,6 +92,8 @@
     "xtree": "cpp",
     "stack": "cpp",
     "any": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "cinttypes": "cpp",
+    "coroutine": "cpp"
   },
 }

@@ -3,8 +3,6 @@
 #include "graphics/platforms/opengl/opengl_texture.h"
 
 #include <glad/glad.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include "core/debug/assert.h"
 #include "opengl_texture.h"
@@ -60,58 +58,6 @@ OpenGLTexture2D::OpenGLTexture2D(const TextureMetadata& metadata,
   glGenTextures(1, &texture_id_);
   glBindTexture(GL_TEXTURE_2D, texture_id_);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  DeserializeTextureFilteringMode(metadata_.min_filter));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                  DeserializeTextureFilteringMode(metadata_.mag_filter));
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                  DeserializeTextureWrappingMode(metadata_.wrap_s));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                  DeserializeTextureWrappingMode(metadata_.wrap_t));
-
-  glTexImage2D(GL_TEXTURE_2D, 0, DeserializeTextureFormat(metadata_.format),
-               metadata_.size.x, metadata_.size.y, 0,
-               DeserializeTextureFormat(metadata_.format), GL_UNSIGNED_BYTE,
-               pixels);
-
-  if (metadata_.generate_mipmaps) {
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-}
-
-OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path,
-                                 bool generate_mipmaps) {
-  int width, height, channels;
-  stbi_set_flip_vertically_on_load(true);
-  stbi_uc* data =
-      stbi_load(path.string().c_str(), &width, &height, &channels, 0);
-
-  ENGINE_ASSERT(data, "Failed to load texture!");
-
-  TextureFormat format = TextureFormat::kRGBA;
-
-  if (channels == 1)
-    format = TextureFormat::kRed;
-  else if (channels == 2)
-    format = TextureFormat::kRG;
-  else if (channels == 3)
-    format = TextureFormat::kRGB;
-  else if (channels == 4)
-    format = TextureFormat::kRGBA;
-
-  metadata_.size = {static_cast<uint32_t>(width),
-                    static_cast<uint32_t>(height)};
-  metadata_.format = format;
-  metadata_.min_filter = TextureFilteringMode::kLinear;
-  metadata_.mag_filter = TextureFilteringMode::kLinear;
-  metadata_.wrap_s = TextureWrappingMode::kClampToEdge;
-  metadata_.wrap_t = TextureWrappingMode::kClampToEdge;
-  metadata_.generate_mipmaps = generate_mipmaps;
-
-  glGenTextures(1, &texture_id_);
-  glBindTexture(GL_TEXTURE_2D, texture_id_);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -121,13 +67,11 @@ OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path,
   glTexImage2D(GL_TEXTURE_2D, 0, DeserializeTextureFormat(metadata_.format),
                metadata_.size.x, metadata_.size.y, 0,
                DeserializeTextureFormat(metadata_.format), GL_UNSIGNED_BYTE,
-               data);
+               pixels);
 
   if (metadata_.generate_mipmaps) {
     glGenerateMipmap(GL_TEXTURE_2D);
   }
-
-  stbi_image_free(data);
 }
 
 OpenGLTexture2D::~OpenGLTexture2D() {

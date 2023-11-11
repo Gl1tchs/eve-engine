@@ -4,17 +4,84 @@
 
 #include "core/math/transform.h"
 #include "graphics/camera.h"
+#include "scene.h"
 #include "scene/entity.h"
 
-Scene::Scene(Ref<State>& state) : state_(state) {}
+Scene::Scene(Ref<State>& state, std::string name)
+    : state_(state), name_(name) {}
 
+template <typename... Component>
+static void CopyComponent(
+    entt::registry& dst, entt::registry& src,
+    const std::unordered_map<GUUID, entt::entity>& entt_map) {
+  (
+      [&]() {
+        auto view = src.view<Component>();
+        for (auto src_entity : view) {
+          entt::entity dst_entity =
+              entt_map.at(src.get<IdComponent>(src_entity).id);
+
+          auto& src_component = src.get<Component>(src_entity);
+          dst.emplace_or_replace<Component>(dst_entity, src_component);
+        }
+      }(),
+      ...);
+}
+
+template <typename... Component>
+static void CopyComponent(
+    ComponentGroup<Component...>, entt::registry& dst, entt::registry& src,
+    const std::unordered_map<GUUID, entt::entity>& entt_map) {
+  CopyComponent<Component...>(dst, src, entt_map);
+}
+
+template <typename... Component>
+static void CopyComponentIfExists(Entity dst, Entity src) {
+  (
+      [&]() {
+        if (src.HasComponent<Component>())
+          dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+      }(),
+      ...);
+}
+
+template <typename... Component>
+static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst,
+                                  Entity src) {
+  CopyComponentIfExists<Component...>(dst, src);
+}
+
+Ref<Scene> Scene::Copy(Ref<Scene> other) {
+  Ref<Scene> new_scene = CreateRef<Scene>(other->state_, other->name_);
+
+  new_scene->viewport_size_ = other->viewport_size_;
+
+  auto& src_scene_registry = other->registry_;
+  auto& st_scene_registry = new_scene->registry_;
+  std::unordered_map<GUUID, entt::entity> entt_map;
+
+  // Create entities in new scene
+  auto idView = src_scene_registry.view<IdComponent>();
+  for (auto e : idView) {
+    GUUID uuid = src_scene_registry.get<IdComponent>(e).id;
+    const auto& name = src_scene_registry.get<TagComponent>(e).tag;
+    Entity newEntity = new_scene->CreateEntityWithUUID(uuid, name);
+    entt_map[uuid] = (entt::entity)newEntity;
+  }
+
+  // Copy components (except IdComponent and TagComponent)
+  CopyComponent(AllComponents{}, st_scene_registry, src_scene_registry,
+                entt_map);
+
+  return new_scene;
+}
 Entity Scene::CreateEntity(const std::string& name) {
   return CreateEntityWithUUID(GUUID(), name);
 }
 
 Entity Scene::CreateEntityWithUUID(GUUID uuid, const std::string& name) {
   Entity entity = {registry_.create(), this};
-  entity.AddComponent<IDComponent>(uuid);
+  entity.AddComponent<IdComponent>(uuid);
   entity.AddComponent<Transform>();
   auto& tag = entity.AddComponent<TagComponent>();
   tag.tag = name.empty() ? "Entity" : name;
@@ -52,8 +119,12 @@ void Scene::OnUpdateRuntime(float ds) {
   for (auto entity : view) {
     auto [transform, camera] = view.get<Transform, CameraComponent>(entity);
 
-    if (camera.primary) {
-      main_camera = camera.camera;
+    if (camera.is_primary) {
+      if (camera.is_orthographic) {
+        main_camera = &camera.ortho_camera;
+      } else {
+        main_camera = &camera.persp_camera;
+      }
       camera_transform = &transform;
       break;
     }
@@ -73,7 +144,7 @@ void Scene::OnUpdateRuntime(float ds) {
           }
 
           if (dc.texture) {
-            renderer->Draw(dc.packet, dc.texture);
+            renderer->Draw(dc.packet, dc.texture->asset);
           } else {
             renderer->Draw(dc.packet);
           }
@@ -97,8 +168,10 @@ void Scene::OnViewportResize(glm::uvec2 size) {
   // Resize our non-FixedAspectRatio cameras
   registry_.view<CameraComponent>().each(
       [size](entt::entity, CameraComponent cc) {
-        if (!cc.fixed_aspect_ratio)
-          cc.camera->SetAspectRatio((float)size.x / (float)size.y);
+        if (!cc.is_fixed_aspect_ratio) {
+          cc.persp_camera.SetAspectRatio((float)size.x / (float)size.y);
+          cc.ortho_camera.SetAspectRatio((float)size.x / (float)size.y);
+        }
       });
 }
 
@@ -123,7 +196,7 @@ std::optional<Entity> Scene::GetPrimaryCameraEntity() {
   auto view = registry_.view<CameraComponent>();
   for (auto entity : view) {
     const auto& camera = view.get<CameraComponent>(entity);
-    if (camera.primary)
+    if (camera.is_primary)
       return std::optional<Entity>(Entity{entity, this});
   }
   return std::optional<Entity>();
@@ -145,7 +218,7 @@ void Scene::RenderScene(EditorCamera& camera) {
         }
 
         if (dc.texture) {
-          renderer->Draw(dc.packet, dc.texture);
+          renderer->Draw(dc.packet, dc.texture->asset);
         } else {
           renderer->Draw(dc.packet);
         }

@@ -4,6 +4,8 @@ set(SOURCES
   editor_camera.h
   entity.cc
   entity.h
+  scene_serializer.cc
+  scene_serializer.h
   scene.cc
   scene.h
 )
@@ -17,9 +19,11 @@ target_include_directories(eve_scene PUBLIC
 
 target_include_directories(eve_scene PRIVATE
   ${VENDOR_DIR}/entt/src
+  ${VENDOR_DIR}/yaml-cpp/include
 )
 
 target_link_libraries(eve_scene PRIVATE
-  EnTT
   eve::core
+  EnTT
+  yaml-cpp
 )

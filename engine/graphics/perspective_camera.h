@@ -13,8 +13,8 @@ class PerspectiveCamera : public Camera {
 
   [[nodiscard]] glm::mat4 GetProjectionMatrix() const override;
 
-  [[nodiscard]] const float& getFov() const { return fov_; }
-  void setFov(float fov) { fov_ = fov; }
+  [[nodiscard]] const float& GetFov() const { return fov_; }
+  void SetFov(float fov) { fov_ = fov; }
 
   [[nodiscard]] const float& GetNearClip() const { return near_clip_; }
   void SetNearClip(float near_clip) { near_clip_ = near_clip; }

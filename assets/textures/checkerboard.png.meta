@@ -1,0 +1,12 @@
+name: checkerboard
+path: assets/textures/checkerboard.png
+type: 0
+id: 574173709551615
+texture_metadata:
+  format: 2
+  size: [216, 216]
+  min_filter: 1
+  mag_filter: 1
+  wrap_s: 2
+  wrap_t: 2
+  generate_mipmaps: true

@@ -55,5 +55,6 @@ class Texture {
   [[nodiscard]] static Ref<Texture> Create(const TextureMetadata& metadata,
                                            const void* pixels);
 
-  [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path, bool generate_mipmaps = true);
+  [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path,
+                                           const TextureMetadata& metadata);
 };

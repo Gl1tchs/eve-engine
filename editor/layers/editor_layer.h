@@ -30,10 +30,26 @@ class EditorLayer : public Layer {
   void OnGUI(float ds) override;
 
  private:
+  void BeginDockspace();
+
+  void EndDockspace();
+
+  void DrawMenubar();
+
+  void NewScene();
+
+  void SaveScene();
+
+  void SaveSceneAs();
+
+  void OpenScene();
+
+ private:
   Ref<LogInstance> editor_logger_;
 
   Ref<Scene> active_scene_;
   SceneState scene_state_ = SceneState::kEdit;
+  std::string active_scene_path_;
 
   EditorCamera editor_camera_;
 

@@ -3,10 +3,13 @@
 #include "layers/editor_layer.h"
 
 #include <imgui.h>
+#include <tinyfiledialogs.h>
 
 #include "core/debug/instrumentor.h"
+#include "editor_layer.h"
 #include "graphics/render_command.h"
 #include "scene/entity.h"
+#include "scene/scene_serializer.h"
 
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   PROFILE_FUNCTION();
@@ -31,22 +34,23 @@ void EditorLayer::OnStart() {
 
   Entity entity = active_scene_->CreateEntity("My Entity");
 
-  RenderPacket packet;
-  packet.vertices = {
-      {{-0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-      {{-0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-      {{0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-      {{0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-  };
-  packet.indices = {0, 1, 2, 2, 3, 0};
+  // RenderPacket packet;
+  // packet.vertices = {
+  //     {{-0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+  //     {{-0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+  //     {{0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+  //     {{0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+  // };
+  // packet.indices = {0, 1, 2, 2, 3, 0};
 
-  // TODO add proper asset system and use res:// thing.
-  Ref<Texture> texture = Texture::Create("assets/textures/checkerboard.png");
+  // // TODO add proper asset system and use res:// thing.
+  // AssetRef<Texture> texture = GetState()->asset_library->LoadFromMeta<Texture>(
+  //     "assets/textures/checkerboard.png.meta");
 
-  DrawableComponent drawable;
-  drawable.packet = packet;
-  drawable.texture = texture;
-  entity.AddComponent<DrawableComponent>(drawable);
+  // DrawableComponent drawable;
+  // drawable.packet = packet;
+  // drawable.texture = texture;
+  // entity.AddComponent<DrawableComponent>(drawable);
 }
 
 void EditorLayer::OnDestroy() {
@@ -100,6 +104,18 @@ void EditorLayer::OnUpdate(float ds) {
 void EditorLayer::OnGUI(float ds) {
   PROFILE_FUNCTION();
 
+  BeginDockspace();
+
+  DrawMenubar();
+
+  // Render panels
+  render_stats_->Render();
+  viewport_->Render();
+
+  EndDockspace();
+}
+
+void EditorLayer::BeginDockspace() {
   static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
   ImGuiWindowFlags window_flags =
@@ -133,9 +149,35 @@ void EditorLayer::OnGUI(float ds) {
   }
 
   style.WindowMinSize.x = min_win_size_x;
+}
 
+void EditorLayer::EndDockspace() {
+  ImGui::End();
+}
+
+void EditorLayer::DrawMenubar() {
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("File")) {
+      if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
+        OpenScene();
+      }
+
+      ImGui::Separator();
+
+      if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
+        NewScene();
+      }
+
+      if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+        SaveScene();
+      }
+
+      if (ImGui::MenuItem("Save Scene As", "Ctrl+Shift+S")) {
+        SaveSceneAs();
+      }
+
+      ImGui::Separator();
+
       if (ImGui::MenuItem("Exit")) {
         GetState()->running = false;
       }
@@ -153,10 +195,55 @@ void EditorLayer::OnGUI(float ds) {
 
     ImGui::EndMenuBar();
   }
+}
 
-  render_stats_->Render();
+void EditorLayer::NewScene() {
+  active_scene_path_ = "";
+  scene_state_ = SceneState::kEdit;
 
-  viewport_->Render();
+  active_scene_ = CreateRef<Scene>(GetState(), "untitled");
+}
 
-  ImGui::End();
+void EditorLayer::SaveScene() {
+  if (!active_scene_path_.empty()) {
+    SceneSerializer serializer(active_scene_, GetState()->asset_library);
+    serializer.Serialize(active_scene_path_);
+  } else {
+    SaveSceneAs();
+  }
+}
+
+void EditorLayer::SaveSceneAs() {
+  const char* filter_patterns[1] = {"*.eve"};
+  std::string result = tinyfd_saveFileDialog(
+      "Save Scene", "scene.eve", 1, filter_patterns, "Eve Scene Files");
+
+  if (result.empty()) {
+    LOG_ENGINE_ERROR("Unable to save scene to path: {0}\n", result);
+    return;
+  }
+
+  active_scene_path_ = result;
+
+  SceneSerializer serializer(active_scene_, GetState()->asset_library);
+  serializer.Serialize(active_scene_path_);
+}
+
+void EditorLayer::OpenScene() {
+  const char* filter_patterns[1] = {"*.eve"};
+  const char* result = tinyfd_openFileDialog(
+      "Open Scene", "", 1, filter_patterns, "Eve Scene Files", 0);
+
+  if (!result) {
+    LOG_ENGINE_ERROR("Unable to open scene from path: {0}\n", result);
+    return;
+  }
+
+  active_scene_path_ = result;
+
+  Ref<Scene> new_scene = CreateRef<Scene>(GetState());
+  SceneSerializer serializer(new_scene, GetState()->asset_library);
+  if (serializer.Deserialize(active_scene_path_)) {
+    active_scene_ = new_scene;
+  }
 }

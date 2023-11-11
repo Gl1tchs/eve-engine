@@ -34,7 +34,13 @@ void Panel::Begin() {
     }
   }
 
-  ImGui::Begin(GetName().c_str(), &is_active_, window_flags_);
+  bool* p_active = nullptr;
+  if (!is_static_) {
+    p_active = &is_active_;
+  }
+
+  ImGui::Begin(GetName().c_str(), p_active, window_flags_);
+
   is_focused_ = ImGui::IsWindowFocused();
   is_hovered_ = ImGui::IsWindowHovered();
 

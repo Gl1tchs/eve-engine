@@ -29,6 +29,8 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 
   state_->renderer = CreateRef<Renderer>();
 
+  state_->asset_library = CreateRef<AssetLibrary>();
+
   imgui_layer_ = new ImGuiLayer(state_);
   PushOverlay(imgui_layer_);
 }

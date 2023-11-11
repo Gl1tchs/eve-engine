@@ -30,6 +30,8 @@ class Panel {
 
   void SetFlags(ImGuiWindowFlags flags);
 
+  void SetStatic(bool value) { is_static_ = value; }
+
   [[nodiscard]] bool IsActive() const { return is_active_; }
   void SetActive(bool active) { is_active_ = active; };
 
@@ -53,6 +55,7 @@ class Panel {
   bool is_active_;
   bool is_hovered_;
   bool is_focused_;
+  bool is_static_ = false;
 
   glm::vec2 panel_size_;
 };

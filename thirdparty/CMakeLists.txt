@@ -6,9 +6,16 @@ add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("spdlog")
 
+option(YAML_CPP_BUILD_CONTRIB OFF)
+option(YAML_CPP_BUILD_TOOLS OFF)
+option(YAML_BUILD_SHARED_LIBS OFF)
+add_subdirectory("yaml-cpp")
+
 set(SPIRV_CROSS_CLI OFF)
 set(SPIRV_CROSS_ENABLE_TESTS OFF)
 set(SPIRV_CROSS_ENABLE_HLSL OFF)
 set(SPIRV_CROSS_ENABLE_MSL OFF)
 set(SPIRV_CROSS_ENABLE_C_API OFF)
 add_subdirectory("SPIRV-Cross")
+
+add_subdirectory("tinyfiledialogs")

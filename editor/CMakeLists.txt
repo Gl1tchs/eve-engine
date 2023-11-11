@@ -26,13 +26,15 @@ target_include_directories(eve_editor PRIVATE
   ${VENDOR_DIR}/imgui
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/entt/src
+  ${VENDOR_DIR}/tinyfiledialogs
 )
 
 target_link_libraries(eve_editor PRIVATE
+  eve::all
   ImGui
   glfw # for imgui
   EnTT
-  eve::all
+  tinyfiledialogs
 )
 
 add_custom_command(TARGET eve_editor PRE_BUILD
