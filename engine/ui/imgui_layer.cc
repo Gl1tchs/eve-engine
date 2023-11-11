@@ -25,8 +25,8 @@ void ImGuiLayer::End() {
   PROFILE_FUNCTION();
 
   ImGuiIO& io = ImGui::GetIO();
-  io.DisplaySize = ImVec2((float)state_->window->GetSize().x,
-                          (float)state_->window->GetSize().y);
+  auto size = GetState()->window->GetSize();
+  io.DisplaySize = ImVec2((float)size.x, (float)size.y);
 
   // Rendering
   ImGui::Render();
@@ -63,7 +63,7 @@ void ImGuiLayer::OnStart() {
   }
 
   // Setup Platform/Renderer bindings
-  ImGui_ImplGlfw_InitForOpenGL(state_->window->GetNativeWindow(), true);
+  ImGui_ImplGlfw_InitForOpenGL(GetState()->window->GetNativeWindow(), true);
   ImGui_ImplOpenGL3_Init("#version 450");
 }
 

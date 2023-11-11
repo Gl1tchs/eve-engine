@@ -10,6 +10,9 @@
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
 
+#include "panels/render_stats_panel.h"
+#include "panels/viewport_panel.h"
+
 enum class SceneState { kEdit, kPlay };
 
 class EditorLayer : public Layer {
@@ -36,9 +39,9 @@ class EditorLayer : public Layer {
 
   Ref<FrameBuffer> frame_buffer_;
 
-  bool viewport_focused_ = false, viewport_hovered_ = false;
-  glm::vec2 viewport_size_ = {0.0f, 0.0f};
-  glm::vec2 viewport_bounds_[2];
+  Scope<ViewportPanel> viewport_;
+
+  Scope<RenderStatsPanel> render_stats_;
 
   bool show_stats_{false};
 };

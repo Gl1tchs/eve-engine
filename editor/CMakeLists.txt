@@ -1,6 +1,12 @@
 set(SOURCES
   layers/editor_layer.cc
   layers/editor_layer.h
+  panels/panel.cc
+  panels/panel.h
+  panels/render_stats_panel.cc
+  panels/render_stats_panel.h
+  panels/viewport_panel.cc
+  panels/viewport_panel.h
   editor.cc
 )
 

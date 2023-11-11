@@ -20,6 +20,10 @@ class Layer {
   virtual void OnGUI(float ds) {}
 
  protected:
+  Ref<State>& GetState() { return state_; }
+  const Ref<State>& GetState() const { return state_; }
+
+ private:
   Ref<State> state_;
 
   friend class Instance;
