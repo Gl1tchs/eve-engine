@@ -15,13 +15,13 @@
   }
 
 struct PanelProperties {
-  bool default_active;
-  glm::vec2 size;
+  bool default_active{true};
+  glm::vec2 size{};
 };
 
 class Panel {
  public:
-  Panel(const PanelProperties& props);
+  Panel(PanelProperties props = PanelProperties());
   virtual ~Panel() = default;
 
   void Render();
@@ -34,6 +34,10 @@ class Panel {
 
   [[nodiscard]] bool IsActive() const { return is_active_; }
   void SetActive(bool active) { is_active_ = active; };
+
+  [[nodiscard]] bool IsFocused() const { return is_focused_; }
+
+  [[nodiscard]] bool IsHovered() const { return is_hovered_; }
 
   [[nodiscard]] const glm::vec2& GetSize() const { return panel_size_; }
 

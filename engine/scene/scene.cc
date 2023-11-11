@@ -212,7 +212,8 @@ void Scene::RenderScene(EditorCamera& camera) {
   renderer->BeginScene({camera.GetViewMatrix(), camera.GetProjectionMatrix()});
 
   registry_.view<Transform, DrawableComponent>().each(
-      [renderer](entt::entity entity_id, Transform& tc, DrawableComponent& dc) {
+      [renderer](entt::entity entity_id, const Transform& tc,
+                 DrawableComponent dc) {
         for (auto& vertex : dc.packet.vertices) {
           vertex.position = tc.GetModelMatrix() * vertex.position;
         }

@@ -1,6 +1,10 @@
 set(SOURCES
   layers/editor_layer.cc
   layers/editor_layer.h
+  panels/hierarchy_panel.cc
+  panels/hierarchy_panel.h
+  panels/inspector_panel.cc
+  panels/inspector_panel.h
   panels/panel.cc
   panels/panel.h
   panels/render_stats_panel.cc

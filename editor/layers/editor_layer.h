@@ -10,6 +10,8 @@
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
 
+#include "panels/hierarchy_panel.h"
+#include "panels/inspector_panel.h"
 #include "panels/render_stats_panel.h"
 #include "panels/viewport_panel.h"
 
@@ -52,6 +54,14 @@ class EditorLayer : public Layer {
 
   void OnScenePause();
 
+  void Exit();
+
+  void OnSceneModify();
+
+  void OnSceneSave();
+
+  void SetSceneTitle();
+
  private:
   Ref<LogInstance> editor_logger_;
 
@@ -64,9 +74,10 @@ class EditorLayer : public Layer {
 
   Ref<FrameBuffer> frame_buffer_;
 
-  Scope<ViewportPanel> viewport_;
+  Scope<ViewportPanel> viewport_panel_;
+  Ref<HierarchyPanel> hierarchy_panel_;
+  Scope<InspectorPanel> inspector_panel_;
+  Scope<RenderStatsPanel> render_stats_panel_;
 
-  Scope<RenderStatsPanel> render_stats_;
-
-  bool show_stats_{false};
+  bool modified_title_updated_{false};
 };

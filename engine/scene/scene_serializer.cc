@@ -217,6 +217,8 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
 
     out << YAML::EndMap;
   }
+
+  out << YAML::EndMap;
 }
 
 void SceneSerializer::Serialize(const std::filesystem::path& file_path) {

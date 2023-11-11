@@ -1,9 +1,8 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
 #include "panels/panel.h"
-#include "panel.h"
 
-Panel::Panel(const PanelProperties& props)
+Panel::Panel(PanelProperties props)
     : is_active_(props.default_active), panel_size_(props.size) {}
 
 void Panel::Render() {

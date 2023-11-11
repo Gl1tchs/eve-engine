@@ -6,6 +6,7 @@
 #include <tinyfiledialogs.h>
 
 #include "core/debug/instrumentor.h"
+#include "core/event/input.h"
 #include "editor_layer.h"
 #include "graphics/render_command.h"
 #include "project/project.h"
@@ -30,9 +31,10 @@ void EditorLayer::OnStart() {
 
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
-  viewport_ = CreateScope<ViewportPanel>(frame_buffer_);
-
-  render_stats_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
+  viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_);
+  hierarchy_panel_ = CreateRef<HierarchyPanel>();
+  inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
+  render_stats_panel_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
 }
 
 void EditorLayer::OnDestroy() {
@@ -42,7 +44,11 @@ void EditorLayer::OnDestroy() {
 void EditorLayer::OnUpdate(float ds) {
   PROFILE_FUNCTION();
 
-  auto viewport_size = viewport_->GetSize();
+  if (inspector_panel_->IsModified() && !modified_title_updated_) {
+    OnSceneModify();
+  }
+
+  auto viewport_size = viewport_panel_->GetSize();
 
   active_scene_->OnViewportResize(
       {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
@@ -88,14 +94,40 @@ void EditorLayer::OnUpdate(float ds) {
 void EditorLayer::OnGUI(float ds) {
   PROFILE_FUNCTION();
 
+  // Shortcuts
+  if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
+    if (Input::IsKeyPressed(KeyCode::kO)) {
+      OpenProject();
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kN)) {
+      NewScene();
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kS)) {
+      SaveScene();
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kLeftShift)) {
+      if (Input::IsKeyPressed(KeyCode::kS)) {
+        SaveSceneAs();
+      }
+
+      if (Input::IsKeyPressed(KeyCode::kQ)) {
+        Exit();
+      }
+    }
+  }
+
   BeginDockspace();
-
-  DrawMenubar();
-
-  // Render panels
-  render_stats_->Render();
-  viewport_->Render();
-
+  {
+    DrawMenubar();
+    // Render panels
+    viewport_panel_->Render();
+    hierarchy_panel_->Render();
+    inspector_panel_->Render();
+    render_stats_panel_->Render();
+  }
   EndDockspace();
 }
 
@@ -162,8 +194,8 @@ void EditorLayer::DrawMenubar() {
 
       ImGui::Separator();
 
-      if (ImGui::MenuItem("Exit")) {
-        GetState()->running = false;
+      if (ImGui::MenuItem("Exit", "Ctrl+Shift+Q")) {
+        Exit();
       }
 
       ImGui::EndMenu();
@@ -171,7 +203,7 @@ void EditorLayer::DrawMenubar() {
 
     if (ImGui::BeginMenu("View")) {
       if (ImGui::MenuItem("Render Stats")) {
-        render_stats_->SetActive(true);
+        render_stats_panel_->SetActive(true);
       }
 
       ImGui::EndMenu();
@@ -196,8 +228,7 @@ void EditorLayer::OpenProject() {
 
     auto& project_config = project->GetConfig();
 
-    GetState()->window->SetTitle(
-        std::format("Eve Editor | {0}", project_config.name));
+    SetSceneTitle();
 
     OpenScene(
         AssetLibrary::GetAssetPath(project_config.default_scene.string()));
@@ -215,6 +246,8 @@ void EditorLayer::SaveScene() {
   if (!editor_scene_path_.empty()) {
     SceneSerializer serializer(active_scene_, GetState()->asset_library);
     serializer.Serialize(editor_scene_path_);
+
+    OnSceneSave();
   } else {
     SaveSceneAs();
   }
@@ -234,6 +267,8 @@ void EditorLayer::SaveSceneAs() {
 
   SceneSerializer serializer(active_scene_, GetState()->asset_library);
   serializer.Serialize(editor_scene_path_);
+
+  OnSceneSave();
 }
 
 void EditorLayer::OpenScene(const std::filesystem::path& path) {
@@ -247,6 +282,8 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
     editor_scene_ = new_scene;
     active_scene_ = editor_scene_;
 
+    hierarchy_panel_->SetScene(active_scene_);
+
     editor_scene_path_ = path.string();
   }
 }
@@ -256,6 +293,8 @@ void EditorLayer::OnScenePlay() {
 
   active_scene_ = Scene::Copy(editor_scene_);
   active_scene_->OnRuntimeStart();
+
+  hierarchy_panel_->SetScene(active_scene_);
 }
 
 void EditorLayer::OnSceneStop() {
@@ -266,6 +305,8 @@ void EditorLayer::OnSceneStop() {
   scene_state_ = SceneState::kEdit;
 
   active_scene_ = editor_scene_;
+
+  hierarchy_panel_->SetScene(active_scene_);
 }
 
 void EditorLayer::OnScenePause() {
@@ -273,4 +314,28 @@ void EditorLayer::OnScenePause() {
     return;
 
   active_scene_->SetPaused(true);
+}
+
+void EditorLayer::Exit() {
+  GetState()->running = false;
+}
+
+void EditorLayer::OnSceneModify() {
+  auto window = GetState()->window;
+  std::string title = window->GetTitle();
+  window->SetTitle(title + " *");
+
+  modified_title_updated_ = true;
+}
+
+void EditorLayer::OnSceneSave() {
+  SetSceneTitle();
+
+  inspector_panel_->ResetModified();
+  modified_title_updated_ = false;
+}
+
+void EditorLayer::SetSceneTitle() {
+  GetState()->window->SetTitle(
+      std::format("Eve Editor | {0}", Project::GetActive()->GetConfig().name));
 }

@@ -1,5 +1,12 @@
 scene: default
 entities:
+  - id: 323468953567323581
+    tag_component:
+      tag: Empty
+    transform:
+      position: [0, 0, 0]
+      rotation: [0, 0, 0]
+      scale: [1, 1, 1]
   - id: 453953480392206736
     tag_component:
       tag: My Entity
