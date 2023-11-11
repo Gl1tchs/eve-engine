@@ -18,5 +18,6 @@ target_include_directories(eve_asset PUBLIC
 target_link_libraries(eve_asset PRIVATE
   eve::core
   eve::graphics
+  eve::project
   yaml-cpp
 )

@@ -9,5 +9,5 @@
 #include "graphics/texture.h"
 
 struct AssetLoader {
-  static AssetRef<Texture> LoadTexture(const std::filesystem::path& path);
+  static AssetRef<Texture> LoadTexture(const std::string& path);
 };

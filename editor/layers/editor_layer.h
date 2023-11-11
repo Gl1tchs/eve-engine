@@ -36,20 +36,29 @@ class EditorLayer : public Layer {
 
   void DrawMenubar();
 
+  void OpenProject();
+
   void NewScene();
 
   void SaveScene();
 
   void SaveSceneAs();
 
-  void OpenScene();
+  void OpenScene(const std::filesystem::path& path);
+
+  void OnScenePlay();
+
+  void OnSceneStop();
+
+  void OnScenePause();
 
  private:
   Ref<LogInstance> editor_logger_;
 
   Ref<Scene> active_scene_;
+  Ref<Scene> editor_scene_;
   SceneState scene_state_ = SceneState::kEdit;
-  std::string active_scene_path_;
+  std::string editor_scene_path_;
 
   EditorCamera editor_camera_;
 

@@ -4,6 +4,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "asset/asset_library.h"
 #include "core/debug/log.h"
 
 namespace YAML {
@@ -65,13 +66,15 @@ struct convert<TextureMetadata> {
 
 }  // namespace YAML
 
-AssetRef<Texture> AssetLoader::LoadTexture(const std::filesystem::path& path) {
+AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
+  std::string path_absolute = AssetLibrary::GetAssetPath(path).string();
+
   YAML::Node data;
   try {
-    data = YAML::LoadFile(path.string());
+    data = YAML::LoadFile(path_absolute);
   } catch (YAML::ParserException e) {
     LOG_ENGINE_ERROR("Failed to load asset from file '{0}'\n\t{1}",
-                     path.string(), e.what());
+                     path_absolute, e.what());
     return {};
   }
 
@@ -87,7 +90,7 @@ AssetRef<Texture> AssetLoader::LoadTexture(const std::filesystem::path& path) {
     LOG_ENGINE_ERROR(
         "Failed to load asset from: {0}\nAsset types did not match with "
         "texture!",
-        path.string());
+        path);
     return {};
   }
 

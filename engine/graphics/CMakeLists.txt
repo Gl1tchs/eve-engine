@@ -71,6 +71,7 @@ target_include_directories(eve_graphics PRIVATE
 
 target_link_libraries(eve_graphics PRIVATE
   eve::core
+  eve::asset
   glm
   glad
   glfw

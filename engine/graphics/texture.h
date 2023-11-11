@@ -55,6 +55,6 @@ class Texture {
   [[nodiscard]] static Ref<Texture> Create(const TextureMetadata& metadata,
                                            const void* pixels);
 
-  [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path,
+  [[nodiscard]] static Ref<Texture> Create(const std::string& path,
                                            const TextureMetadata& metadata);
 };

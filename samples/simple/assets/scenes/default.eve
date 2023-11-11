@@ -1,4 +1,4 @@
-scene: checkerboard_scene
+scene: default
 entities:
   - id: 453953480392206736
     tag_component:
@@ -32,4 +32,4 @@ entities:
         - 2
         - 3
         - 0
-      texture: assets/textures/checkerboard.png.meta
+      texture: res://textures/checkerboard.png.meta

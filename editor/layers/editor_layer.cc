@@ -8,6 +8,7 @@
 #include "core/debug/instrumentor.h"
 #include "editor_layer.h"
 #include "graphics/render_command.h"
+#include "project/project.h"
 #include "scene/entity.h"
 #include "scene/scene_serializer.h"
 
@@ -24,33 +25,14 @@ EditorLayer::~EditorLayer() {
 void EditorLayer::OnStart() {
   PROFILE_FUNCTION();
 
-  active_scene_ = CreateRef<Scene>(GetState());
+  editor_scene_ = CreateRef<Scene>(GetState());
+  active_scene_ = editor_scene_;
 
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
   viewport_ = CreateScope<ViewportPanel>(frame_buffer_);
 
   render_stats_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
-
-  Entity entity = active_scene_->CreateEntity("My Entity");
-
-  // RenderPacket packet;
-  // packet.vertices = {
-  //     {{-0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-  //     {{-0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-  //     {{0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-  //     {{0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-  // };
-  // packet.indices = {0, 1, 2, 2, 3, 0};
-
-  // // TODO add proper asset system and use res:// thing.
-  // AssetRef<Texture> texture = GetState()->asset_library->LoadFromMeta<Texture>(
-  //     "assets/textures/checkerboard.png.meta");
-
-  // DrawableComponent drawable;
-  // drawable.packet = packet;
-  // drawable.texture = texture;
-  // entity.AddComponent<DrawableComponent>(drawable);
 }
 
 void EditorLayer::OnDestroy() {
@@ -160,8 +142,8 @@ void EditorLayer::EndDockspace() {
 void EditorLayer::DrawMenubar() {
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("File")) {
-      if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
-        OpenScene();
+      if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
+        OpenProject();
       }
 
       ImGui::Separator();
@@ -199,17 +181,40 @@ void EditorLayer::DrawMenubar() {
   }
 }
 
+void EditorLayer::OpenProject() {
+  const char* filter_patterns[1] = {"*.eproject"};
+  const char* path = tinyfd_openFileDialog("Open Scene", "", 1, filter_patterns,
+                                           "Eve Project Files", 0);
+
+  if (!path) {
+    LOG_ENGINE_ERROR("Unable to open scene from path: {0}\n", path);
+    return;
+  }
+
+  if (Ref<Project> project = Project::Load(path); project) {
+    // ScriptEngine::Init();
+
+    auto& project_config = project->GetConfig();
+
+    GetState()->window->SetTitle(
+        std::format("Eve Editor | {0}", project_config.name));
+
+    OpenScene(
+        AssetLibrary::GetAssetPath(project_config.default_scene.string()));
+  }
+}
+
 void EditorLayer::NewScene() {
-  active_scene_path_ = "";
+  editor_scene_path_ = "";
   scene_state_ = SceneState::kEdit;
 
   active_scene_ = CreateRef<Scene>(GetState(), "untitled");
 }
 
 void EditorLayer::SaveScene() {
-  if (!active_scene_path_.empty()) {
+  if (!editor_scene_path_.empty()) {
     SceneSerializer serializer(active_scene_, GetState()->asset_library);
-    serializer.Serialize(active_scene_path_);
+    serializer.Serialize(editor_scene_path_);
   } else {
     SaveSceneAs();
   }
@@ -217,35 +222,55 @@ void EditorLayer::SaveScene() {
 
 void EditorLayer::SaveSceneAs() {
   const char* filter_patterns[1] = {"*.eve"};
-  std::string result = tinyfd_saveFileDialog(
-      "Save Scene", "scene.eve", 1, filter_patterns, "Eve Scene Files");
+  std::string path = tinyfd_saveFileDialog("Save Scene", "scene.eve", 1,
+                                           filter_patterns, "Eve Scene Files");
 
-  if (result.empty()) {
-    LOG_ENGINE_ERROR("Unable to save scene to path: {0}\n", result);
+  if (path.empty()) {
+    LOG_ENGINE_ERROR("Unable to save scene to path: {0}\n", path);
     return;
   }
 
-  active_scene_path_ = result;
+  editor_scene_path_ = path;
 
   SceneSerializer serializer(active_scene_, GetState()->asset_library);
-  serializer.Serialize(active_scene_path_);
+  serializer.Serialize(editor_scene_path_);
 }
 
-void EditorLayer::OpenScene() {
-  const char* filter_patterns[1] = {"*.eve"};
-  const char* result = tinyfd_openFileDialog(
-      "Open Scene", "", 1, filter_patterns, "Eve Scene Files", 0);
-
-  if (!result) {
-    LOG_ENGINE_ERROR("Unable to open scene from path: {0}\n", result);
-    return;
+void EditorLayer::OpenScene(const std::filesystem::path& path) {
+  if (scene_state_ != SceneState::kEdit) {
+    OnScenePause();
   }
-
-  active_scene_path_ = result;
 
   Ref<Scene> new_scene = CreateRef<Scene>(GetState());
   SceneSerializer serializer(new_scene, GetState()->asset_library);
-  if (serializer.Deserialize(active_scene_path_)) {
-    active_scene_ = new_scene;
+  if (serializer.Deserialize(path)) {
+    editor_scene_ = new_scene;
+    active_scene_ = editor_scene_;
+
+    editor_scene_path_ = path.string();
   }
+}
+
+void EditorLayer::OnScenePlay() {
+  scene_state_ = SceneState::kPlay;
+
+  active_scene_ = Scene::Copy(editor_scene_);
+  active_scene_->OnRuntimeStart();
+}
+
+void EditorLayer::OnSceneStop() {
+  if (scene_state_ == SceneState::kPlay) {
+    active_scene_->OnRuntimeStop();
+  }
+
+  scene_state_ = SceneState::kEdit;
+
+  active_scene_ = editor_scene_;
+}
+
+void EditorLayer::OnScenePause() {
+  if (scene_state_ == SceneState::kEdit)
+    return;
+
+  active_scene_->SetPaused(true);
 }
