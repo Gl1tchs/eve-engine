@@ -8,6 +8,11 @@
 
 struct GLFWwindow;
 
+enum class CursorState {
+  kNormal,
+  kHidden
+};
+
 enum class WindowMode {
   kWindowed,
   kFullscreen,
@@ -45,6 +50,8 @@ class Window final {
 
   [[nodiscard]] std::string GetTitle();
   void SetTitle(const std::string& value);
+
+  void SetCursorState(CursorState state);
 
   [[nodiscard]] GLFWwindow* GetNativeWindow();
 

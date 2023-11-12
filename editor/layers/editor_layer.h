@@ -85,6 +85,7 @@ class EditorLayer : public Layer {
   ExitModal exit_modal_;
 
   bool unsaved_changes_{false};
-
   bool show_exit_dialog_{false};
+
+  CursorState old_cursor_state_ = CursorState::kNormal;
 };

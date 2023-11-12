@@ -7,10 +7,10 @@
 constexpr glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
 constexpr glm::vec3 kVec3Down = -kVec3Up;
 
-constexpr glm::vec3 kVec3Right(-1.0f, 0.0f, 0.0f);
+constexpr glm::vec3 kVec3Right(1.0f, 0.0f, 0.0f);
 constexpr glm::vec3 kVec3Left = -kVec3Right;
 
-constexpr glm::vec3 kVec3Forward(0.0f, 0.0f, 1.0f);
+constexpr glm::vec3 kVec3Forward(0.0f, 0.0f, -1.0f);
 constexpr glm::vec3 kVec3Back = -kVec3Forward;
 
 constexpr glm::vec3 kVec3Zero(0.0f, 0.0f, 0.0f);
@@ -32,15 +32,16 @@ struct Transform final {
 
   [[nodiscard]] glm::vec3 GetForward();
 
-  [[nodiscard]] glm::vec3 GetUp();
-
   [[nodiscard]] glm::vec3 GetRight();
+
+  [[nodiscard]] glm::vec3 GetUp();
 
   [[nodiscard]] glm::mat4 GetModelMatrix() const;
 
  private:
   void UpdateVectors();
 
+ private:
   glm::vec3 forward_;
   glm::vec3 right_;
   glm::vec3 up_;

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "scene/transform.h"
 #include "graphics/perspective_camera.h"
+#include "scene/transform.h"
 
 class EditorCamera : public PerspectiveCamera {
  public:
@@ -16,6 +16,21 @@ class EditorCamera : public PerspectiveCamera {
 
   void Update(float ds);
 
+  void SetSpeed(float value) { speed_ = value; }
+  [[nodiscard]] float GetSpeed() const { return speed_; }
+
+  void SetSensitivity(float value) { sensitivity_ = value; }
+  [[nodiscard]] float GetSensitivity() const { return sensitivity_; }
+
+  void ResetTransform();
+
+  void ResetMousePos();
+
  private:
   Transform transform_;
+
+  float speed_{5.0f};
+  float sensitivity_{0.1f};
+
+  glm::dvec2 last_mouse_pos_;
 };

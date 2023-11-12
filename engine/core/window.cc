@@ -53,7 +53,11 @@ Window::Window(WindowProps props) {
   SetVsync(props.vsync);
 
   InitEvents();
-  Input::Init();
+
+  glm::dvec2 mouse_pos{};
+  glfwGetCursorPos(window_, &mouse_pos.x, &mouse_pos.y);
+
+  Input::Init(mouse_pos);
 }
 
 Window::~Window() {
@@ -142,6 +146,19 @@ std::string Window::GetTitle() {
 void Window::SetTitle(const std::string& value) {
   glfwSetWindowTitle(window_, value.c_str());
   title_ = value;
+}
+
+void Window::SetCursorState(CursorState state) {
+  switch (state) {
+    case CursorState::kNormal:
+      glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      break;
+    case CursorState::kHidden:
+      glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      break;
+    default:
+      break;
+  }
 }
 
 GLFWwindow* Window::GetNativeWindow() {

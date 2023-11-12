@@ -55,7 +55,7 @@ void EditorLayer::OnUpdate(float ds) {
     OnSceneModify();
   }
 
-  auto viewport_size = viewport_panel_->GetSize();
+  auto& viewport_size = viewport_panel_->GetSize();
 
   active_scene_->OnViewportResize(
       {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
@@ -84,7 +84,22 @@ void EditorLayer::OnUpdate(float ds) {
 
   switch (scene_state_) {
     case SceneState::kEdit: {
-      editor_camera_.Update(ds);
+      if (viewport_panel_->IsFocused() &&
+          Input::IsMouseButtonPressed(MouseCode::kRight)) {
+        // hide the cursor since we are now controlling the camera
+        if (old_cursor_state_ == CursorState::kNormal) {
+          old_cursor_state_ = CursorState::kHidden;
+          GetState()->window->SetCursorState(old_cursor_state_);
+        }
+        editor_camera_.Update(ds);
+      } else {
+        // set cursor to normal again
+        if (old_cursor_state_ == CursorState::kHidden) {
+          old_cursor_state_ = CursorState::kNormal;
+          GetState()->window->SetCursorState(old_cursor_state_);
+        }
+        editor_camera_.ResetMousePos();
+      }
 
       active_scene_->OnUpdateEditor(ds, editor_camera_);
       break;
@@ -96,10 +111,6 @@ void EditorLayer::OnUpdate(float ds) {
   }
 
   frame_buffer_->Unbind();
-}
-
-void EditorLayer::OnGUI(float ds) {
-  PROFILE_FUNCTION();
 
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
@@ -125,6 +136,10 @@ void EditorLayer::OnGUI(float ds) {
       }
     }
   }
+}
+
+void EditorLayer::OnGUI(float ds) {
+  PROFILE_FUNCTION();
 
   BeginDockspace();
   {
@@ -265,6 +280,7 @@ void EditorLayer::NewScene() {
   editor_scene_path_ = "";
 
   inspector_panel_->SetModified(true);
+  editor_camera_.ResetTransform();
 }
 
 void EditorLayer::SaveScene() {
@@ -310,6 +326,8 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
     hierarchy_panel_->SetScene(active_scene_);
 
     editor_scene_path_ = path.string();
+
+    editor_camera_.ResetTransform();
   }
 }
 

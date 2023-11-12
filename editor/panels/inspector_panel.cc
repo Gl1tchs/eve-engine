@@ -52,8 +52,8 @@ void InspectorPanel::Draw() {
 
     ImGui::Text("Rotation:");
     ImGui::SameLine();
-    if (ImGui::DragFloat3("##transform_rotation",
-                          glm::value_ptr(transform.rotation), 0.05f)) {
+    if (ImGui::DragFloat3("##transform_rotation", glm::value_ptr(transform.rotation),
+                          0.05f)) {
       modified_ = true;
     }
 
