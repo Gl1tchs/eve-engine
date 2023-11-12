@@ -15,6 +15,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/lib/${CMAKE_BUILD_
 # Define the configurations
 set(CMAKE_CONFIGURATION_TYPES "debug;release;dist")
 if(NOT CMAKE_BUILD_TYPE)
+    message(WARNING "Configuration not found using default (debug) instead!")
     set(CMAKE_BUILD_TYPE "debug" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
