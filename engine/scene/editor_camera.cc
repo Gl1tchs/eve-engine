@@ -47,7 +47,7 @@ void EditorCamera::Update(float ds) {
   
   // up / down controls
   if (Input::IsKeyPressed(KeyCode::kE)) {
-    transform_.position = kWorldUp * speed_ * ds;
+    transform_.position += kWorldUp * speed_ * ds;
   }
   if (Input::IsKeyPressed(KeyCode::kQ)) {
     transform_.position -= kWorldUp * speed_ * ds;
