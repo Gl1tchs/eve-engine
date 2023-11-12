@@ -6,7 +6,7 @@
 
 ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer)
     : Panel({true, frame_buffer->GetSize()}), frame_buffer_(frame_buffer) {
-  PushStyle(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+  PushStyle(ImGuiStyleVar_WindowPadding, glm::vec2{0, 0});
   SetFlags(ImGuiWindowFlags_NoCollapse);
   SetStatic(true);
 }

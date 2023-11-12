@@ -1,6 +1,10 @@
 set(SOURCES
   layers/editor_layer.cc
   layers/editor_layer.h
+  modals/exit_modal.cc
+  modals/exit_modal.h
+  modals/modal.cc
+  modals/modal.h
   panels/hierarchy_panel.cc
   panels/hierarchy_panel.h
   panels/inspector_panel.cc

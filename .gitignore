@@ -57,3 +57,5 @@
 
 # Imgui files
 imgui.ini
+
+compile_commands.json

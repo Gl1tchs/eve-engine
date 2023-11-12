@@ -4,6 +4,7 @@
 
 #include <inttypes.h>
 
+#include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <glm/gtc/type_ptr.hpp>
 

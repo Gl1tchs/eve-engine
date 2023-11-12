@@ -10,6 +10,7 @@
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
 
+#include "modals/exit_modal.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
 #include "panels/render_stats_panel.h"
@@ -62,6 +63,8 @@ class EditorLayer : public Layer {
 
   void SetSceneTitle();
 
+  void OnExitModalAnswer(ExitModalAnswer answer);
+
  private:
   Ref<LogInstance> editor_logger_;
 
@@ -78,6 +81,8 @@ class EditorLayer : public Layer {
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
   Scope<RenderStatsPanel> render_stats_panel_;
+
+  ExitModal exit_modal_;
 
   bool unsaved_changes_{false};
 

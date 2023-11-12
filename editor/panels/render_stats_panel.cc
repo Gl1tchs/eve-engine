@@ -3,7 +3,6 @@
 #include "panels/render_stats_panel.h"
 
 #include <imgui.h>
-#include "render_stats_panel.h"
 
 RenderStatsPanel::RenderStatsPanel(Ref<Renderer>& renderer)
     : Panel({false, {0, 0}}), renderer_(renderer) {}

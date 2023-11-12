@@ -9,13 +9,13 @@
 #include "core/event/event_handler.h"
 #include "core/event/events.h"
 #include "core/event/input.h"
-#include "editor_layer.h"
+#include "core/utils/memory.h"
 #include "graphics/render_command.h"
 #include "project/project.h"
-#include "scene/entity.h"
 #include "scene/scene_serializer.h"
 
-EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
+EditorLayer::EditorLayer(Ref<State>& state)
+    : Layer(state), exit_modal_(BIND_FUNC(OnExitModalAnswer)) {
   PROFILE_FUNCTION();
 
   editor_logger_ = LoggerManager::AddLogger("EDITOR");
@@ -136,33 +136,7 @@ void EditorLayer::OnGUI(float ds) {
     render_stats_panel_->Render();
 
     if (show_exit_dialog_) {
-      ImGui::OpenPopup("Save Changes?");
-    }
-
-    if (ImGui::BeginPopupModal(
-            "Save Changes?", nullptr,
-            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
-      ImGui::Text("There are unsaved changes.");
-      ImGui::Separator();
-
-      if (ImGui::Button("Save and Exit")) {
-        SaveScene();
-        Exit();
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::SetItemDefaultFocus();
-      ImGui::SameLine();
-
-      if (ImGui::Button("Exit Without Saving")) {
-        ImGui::CloseCurrentPopup();
-        Exit(true);
-      }
-
-      if (ImGui::Button("Cancel")) {
-        show_exit_dialog_ = false;
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
+      exit_modal_.Show();
     }
   }
   EndDockspace();
@@ -395,4 +369,21 @@ void EditorLayer::OnSceneSave() {
 void EditorLayer::SetSceneTitle() {
   GetState()->window->SetTitle(
       std::format("Eve Editor | {0}", Project::GetActive()->GetConfig().name));
+}
+
+void EditorLayer::OnExitModalAnswer(ExitModalAnswer answer) {
+  switch (answer) {
+    case ExitModalAnswer::kSaveAndExit:
+      SaveScene();
+      Exit();
+      break;
+    case ExitModalAnswer::kExitWithoutSaving:
+      Exit(true);
+      break;
+    case ExitModalAnswer::kCancel:
+      show_exit_dialog_ = false;
+      break;
+    default:
+      break;
+  }
 }

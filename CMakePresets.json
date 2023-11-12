@@ -11,11 +11,12 @@
       "description": "Debug Configuration",
       "hidden": false,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/intermediate/debug",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "debug",
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
@@ -23,11 +24,12 @@
       "description": "Release Configuration",
       "hidden": false,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/intermediate/release",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "release",
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" 
       }
     },
     {
@@ -35,11 +37,12 @@
       "description": "Dist Configuration",
       "hidden": false,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/intermediate/dist",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "dist",
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
   ]

@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <variant>
 
-#include <imgui.h>
 #include <glm/glm.hpp>
 
 #define IMPL_PANEL(name)                         \
@@ -26,9 +25,9 @@ class Panel {
 
   void Render();
 
-  void PushStyle(ImGuiStyleVar style_var, std::variant<ImVec2, float> style);
+  void PushStyle(int style_var, std::variant<glm::vec2, float> style);
 
-  void SetFlags(ImGuiWindowFlags flags);
+  void SetFlags(int flags);
 
   void SetStatic(bool value) { is_static_ = value; }
 
@@ -52,9 +51,9 @@ class Panel {
   [[nodiscard]] virtual std::string GetName() = 0;
 
  private:
-  std::unordered_map<ImGuiStyleVar, std::variant<ImVec2, float>> styles_;
+  std::unordered_map<int, std::variant<glm::vec2, float>> styles_;
 
-  ImGuiWindowFlags window_flags_ = ImGuiWindowFlags_None;
+  int window_flags_ = 0;
 
   bool is_active_;
   bool is_hovered_;

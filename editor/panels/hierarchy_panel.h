@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "panels/panel.h"
-
 #include "scene/entity.h"
 #include "scene/scene.h"
+
+#include "panels/panel.h"
 
 class HierarchyPanel : public Panel {
   IMPL_PANEL("Hierarchy")

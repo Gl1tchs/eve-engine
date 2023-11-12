@@ -2,6 +2,8 @@
 
 #include "panels/panel.h"
 
+#include <imgui.h>
+
 Panel::Panel(PanelProperties props)
     : is_active_(props.default_active), panel_size_(props.size) {}
 
@@ -13,20 +15,20 @@ void Panel::Render() {
   }
 }
 
-void Panel::PushStyle(ImGuiStyleVar style_var,
-                      std::variant<ImVec2, float> style) {
+void Panel::PushStyle(int style_var, std::variant<glm::vec2, float> style) {
   styles_[style_var] = style;
 }
 
-void Panel::SetFlags(ImGuiWindowFlags flags) {
+void Panel::SetFlags(int flags) {
   window_flags_ = flags;
 }
 
 void Panel::Begin() {
   if (styles_.size() > 0) {
     for (auto [style_var, value] : styles_) {
-      if (std::holds_alternative<ImVec2>(value)) {
-        ImGui::PushStyleVar(style_var, std::get<ImVec2>(value));
+      if (std::holds_alternative<glm::vec2>(value)) {
+        const auto& value_glm = std::get<glm::vec2>(value);
+        ImGui::PushStyleVar(style_var, ImVec2(value_glm.x, value_glm.y));
       } else if (std::holds_alternative<float>(value)) {
         ImGui::PushStyleVar(style_var, std::get<float>(value));
       }
