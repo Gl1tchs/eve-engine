@@ -34,6 +34,7 @@ Renderer::Renderer() {
 
   BufferLayout layout = {{ShaderDataType::kFloat4, "a_pos"},
                          {ShaderDataType::kFloat4, "a_color"},
+                         {ShaderDataType::kFloat3, "a_normal"},
                          {ShaderDataType::kFloat2, "a_tex_coords"},
                          {ShaderDataType::kFloat, "a_tex_index"}};
   vertex_buffer_->SetLayout(layout);
@@ -86,29 +87,6 @@ void Renderer::EndScene() {
   Flush();
 }
 
-void Renderer::Draw(const RenderPacket& packet) {
-  PROFILE_FUNCTION();
-
-  if (NeedsNewBatch(packet.indices.size())) {
-    NextBatch();
-  }
-
-  float texture_index = 0.0f;
-  for (Vertex vertex : packet.vertices) {
-    vertex.tex_index = texture_index;
-    vertices_[vertex_count_++] = vertex;
-  }
-
-  for (const uint32_t& index : packet.indices) {
-    indices_[index_count_++] = index_offset_ + index;
-  }
-
-  index_offset_ += packet.vertices.size();
-
-  stats_.index_count += packet.indices.size();
-  stats_.vertex_count += packet.vertices.size();
-}
-
 void Renderer::Draw(const RenderPacket& packet, const Ref<Texture>& texture) {
   PROFILE_FUNCTION();
 
@@ -144,6 +122,33 @@ void Renderer::Draw(const RenderPacket& packet, const Ref<Texture>& texture) {
   stats_.vertex_count += packet.vertices.size();
 }
 
+void Renderer::Draw(const Ref<Model>& model, const Transform& transform) {
+  PROFILE_FUNCTION();
+
+  for (auto mesh : model->meshes) {
+    if (NeedsNewBatch(mesh.indices.size())) {
+      NextBatch();
+    }
+
+    float texture_index = 0.0f;
+    for (Vertex vertex : mesh.vertices) {
+      vertex.position = transform.GetModelMatrix() * vertex.position;
+      vertex.color = model->material.color;
+      vertex.tex_index = texture_index;
+      vertices_[vertex_count_++] = vertex;
+    }
+
+    for (const uint32_t& index : mesh.indices) {
+      indices_[index_count_++] = index_offset_ + index;
+    }
+
+    index_offset_ += mesh.vertices.size();
+
+    stats_.index_count += mesh.indices.size();
+    stats_.vertex_count += mesh.vertices.size();
+  }
+}
+
 void Renderer::ResetStats() {
   memset(&stats_, 0, sizeof(RenderStats));
 }
@@ -176,7 +181,6 @@ void Renderer::Flush() {
     texture_slots_[i]->Bind(i);
   }
 
-  // TODO multiple shaders
   shader_->Bind();
   RenderCommand::DrawIndexed(vertex_array_, index_count_);
 

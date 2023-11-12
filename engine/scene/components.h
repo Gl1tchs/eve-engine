@@ -4,12 +4,12 @@
 
 #include <string>
 
-#include "asset/asset_library.h"
 #include "core/utils/guuid.h"
+#include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
-#include "graphics/renderer.h"
 #include "graphics/texture.h"
+#include "scene/static_mesh.h"
 
 struct IdComponent {
   GUUID id;
@@ -28,13 +28,8 @@ struct CameraComponent {
   bool is_fixed_aspect_ratio = false;
 };
 
-struct DrawableComponent {
-  RenderPacket packet;
-  AssetRef<Texture> texture;
-};
-
 template <typename... Component>
 struct ComponentGroup {};
 
 using AllComponents =
-    ComponentGroup<Transform, CameraComponent, DrawableComponent>;
+    ComponentGroup<Transform, CameraComponent, ModelComponent>;

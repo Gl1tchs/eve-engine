@@ -7,30 +7,20 @@
 
 #include <glm/glm.hpp>
 
-#include "core/math/transform.h"
 #include "core/utils/memory.h"
 #include "graphics/index_buffer.h"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 #include "graphics/uniform_buffer.h"
+#include "graphics/vertex.h"
 #include "graphics/vertex_array.h"
 #include "graphics/vertex_buffer.h"
+#include "scene/components.h"
+#include "scene/transform.h"
 
 static constexpr size_t kMaxVertexCount = 4000;
 static constexpr size_t kMaxIndexCount = 8000;
 static constexpr size_t kMaxTextures = 32;
-
-struct Vertex final {
-  glm::vec4 position;
-  glm::vec4 color;
-  glm::vec2 tex_coords;
-  float tex_index = 0.0f;
-};
-
-struct RenderPacket final {
-  std::vector<Vertex> vertices;
-  std::vector<uint32_t> indices;
-};
 
 struct CameraData final {
   glm::mat4 view;
@@ -52,9 +42,9 @@ class Renderer final {
 
   void EndScene();
 
-  void Draw(const RenderPacket& packet);
-
   void Draw(const RenderPacket& packet, const Ref<Texture>& texture);
+
+  void Draw(const Ref<Model>& model, const Transform& transform);
 
   [[nodiscard]] const RenderStats& GetStats() const { return stats_; }
 

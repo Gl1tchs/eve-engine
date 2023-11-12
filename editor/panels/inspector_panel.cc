@@ -44,18 +44,24 @@ void InspectorPanel::Draw() {
 
     ImGui::Text("Position:");
     ImGui::SameLine();
-    ImGui::DragFloat3("##transform_position",
-                      glm::value_ptr(transform.position), 0.05f);
+    if (ImGui::DragFloat3("##transform_position",
+                          glm::value_ptr(transform.position), 0.05f)) {
+      modified_ = true;
+    }
 
     ImGui::Text("Rotation:");
     ImGui::SameLine();
-    ImGui::DragFloat3("##transform_rotation",
-                      glm::value_ptr(transform.rotation), 0.05f);
+    if (ImGui::DragFloat3("##transform_rotation",
+                          glm::value_ptr(transform.rotation), 0.05f)) {
+      modified_ = true;
+    }
 
     ImGui::Text("Scale:");
     ImGui::SameLine();
-    ImGui::DragFloat3("##transform_scale", glm::value_ptr(transform.scale),
-                      0.05f);
+    if (ImGui::DragFloat3("##transform_scale", glm::value_ptr(transform.scale),
+                          0.05f)) {
+      modified_ = true;
+    }
   }
 
   if (selected_entity.HasComponent<CameraComponent>()) {
@@ -68,24 +74,32 @@ void InspectorPanel::Draw() {
 
       ImGui::Text("Zoom Level:");
       float zoom_level = camera.GetZoomLevel();
-      ImGui::DragFloat("##ortho_zoom_level", &zoom_level);
+      if (ImGui::DragFloat("##ortho_zoom_level", &zoom_level)) {
+        modified_ = true;
+      }
       camera.SetZoomLevel(zoom_level);
 
       ImGui::Text("Near Clip:");
       float near_clip = camera.GetNearClip();
-      ImGui::DragFloat("##ortho_near_clip", &near_clip);
+      if (ImGui::DragFloat("##ortho_near_clip", &near_clip)) {
+        modified_ = true;
+      }
       camera.SetNearClip(near_clip);
 
       ImGui::Text("Far Clip:");
       float far_clip = camera.GetFarClip();
-      ImGui::DragFloat("##ortho_far_clip", &far_clip);
+      if (ImGui::DragFloat("##ortho_far_clip", &far_clip)) {
+        modified_ = true;
+      }
       camera.SetFarClip(far_clip);
 
       if (camera_comp.is_fixed_aspect_ratio) {
         ImGui::Text("Aspect Ratio:");
         ImGui::SameLine();
         float aspect_ratio = camera.GetAspectRatio();
-        ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f);
+        if (ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f)) {
+          modified_ = true;
+        }
         camera.SetAspectRatio(aspect_ratio);
       }
     } else {
@@ -93,34 +107,47 @@ void InspectorPanel::Draw() {
 
       ImGui::Text("FOV:");
       float zoom_level = camera.GetFov();
-      ImGui::DragFloat("##persp_zoom_level", &zoom_level);
+      if (ImGui::DragFloat("##persp_zoom_level", &zoom_level)) {
+        modified_ = true;
+      }
       camera.SetFov(zoom_level);
 
       ImGui::Text("Near Clip:");
       float near_clip = camera.GetNearClip();
-      ImGui::DragFloat("##persp_near_clip", &near_clip);
+      if (ImGui::DragFloat("##persp_near_clip", &near_clip)) {
+        modified_ = true;
+      }
       camera.SetNearClip(near_clip);
 
       ImGui::Text("Far Clip:");
       float far_clip = camera.GetFarClip();
-      ImGui::DragFloat("##persp_far_clip", &far_clip);
+      if (ImGui::DragFloat("##persp_far_clip", &far_clip)) {
+        modified_ = true;
+      }
       camera.SetFarClip(far_clip);
 
       if (camera_comp.is_fixed_aspect_ratio) {
         ImGui::Text("Aspect Ratio:");
         ImGui::SameLine();
         float aspect_ratio = camera.GetAspectRatio();
-        ImGui::DragFloat("##persp_aspect_ratio", &aspect_ratio, 0.05f);
+        if (ImGui::DragFloat("##persp_aspect_ratio", &aspect_ratio, 0.05f)) {
+          modified_ = true;
+        }
         camera.SetAspectRatio(aspect_ratio);
       }
     }
 
     ImGui::Text("Primary:");
     ImGui::SameLine();
-    ImGui::Checkbox("##is_primary", &camera_comp.is_primary);
+    if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
+      modified_ = true;
+    }
 
     ImGui::Text("Fixed");
     ImGui::SameLine();
-    ImGui::Checkbox("##fixed_aspect_ratio", &camera_comp.is_fixed_aspect_ratio);
+    if (ImGui::Checkbox("##fixed_aspect_ratio",
+                        &camera_comp.is_fixed_aspect_ratio)) {
+      modified_ = true;
+    }
   }
 }

@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#include "core/math/transform.h"
+#include "scene/transform.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -54,10 +54,10 @@ glm::mat4 Transform::GetModelMatrix() const {
   transform = glm::scale(transform, scale);
 
   transform = glm::rotate(transform, glm::radians(rotation.x),
-                          glm::vec3(1.0f, 0.0f, 0.0f)) *
-              glm::rotate(transform, glm::radians(rotation.y),
-                          glm::vec3(0.0f, 1.0f, 0.0f)) *
-              glm::rotate(transform, glm::radians(rotation.z),
+                          glm::vec3(1.0f, 0.0f, 0.0f));
+  transform = glm::rotate(transform, glm::radians(rotation.y),
+                          glm::vec3(0.0f, 1.0f, 0.0f));
+  transform = glm::rotate(transform, glm::radians(rotation.z),
                           glm::vec3(0.0f, 0.0f, 1.0f));
 
   return transform;

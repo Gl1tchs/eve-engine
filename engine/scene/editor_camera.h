@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "core/math/transform.h"
-#include "graphics/orthographic_camera.h"
+#include "scene/transform.h"
+#include "graphics/perspective_camera.h"
 
-class EditorCamera : public OrthographicCamera {
+class EditorCamera : public PerspectiveCamera {
  public:
   EditorCamera();
 

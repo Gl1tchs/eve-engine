@@ -2,10 +2,10 @@
 
 #include "scene/scene.h"
 
-#include "core/math/transform.h"
 #include "graphics/camera.h"
 #include "scene.h"
 #include "scene/entity.h"
+#include "scene/transform.h"
 
 Scene::Scene(Ref<State>& state, std::string name)
     : state_(state), name_(name) {}
@@ -136,18 +136,10 @@ void Scene::OnUpdateRuntime(float ds) {
     renderer->BeginScene({main_camera->GetViewMatrix(*camera_transform),
                           main_camera->GetProjectionMatrix()});
 
-    registry_.view<Transform, DrawableComponent>().each(
-        [renderer](entt::entity entity_id, Transform& tc,
-                   DrawableComponent& dc) {
-          for (auto& vertex : dc.packet.vertices) {
-            vertex.position = tc.GetModelMatrix() * vertex.position;
-          }
-
-          if (dc.texture) {
-            renderer->Draw(dc.packet, dc.texture->asset);
-          } else {
-            renderer->Draw(dc.packet);
-          }
+    registry_.view<Transform, ModelComponent>().each(
+        [renderer](entt::entity entity_id, const Transform& transform,
+                   const ModelComponent& model_comp) {
+          renderer->Draw(model_comp.model->asset, transform);
         });
 
     renderer->EndScene();
@@ -211,18 +203,10 @@ void Scene::RenderScene(EditorCamera& camera) {
 
   renderer->BeginScene({camera.GetViewMatrix(), camera.GetProjectionMatrix()});
 
-  registry_.view<Transform, DrawableComponent>().each(
-      [renderer](entt::entity entity_id, const Transform& tc,
-                 DrawableComponent dc) {
-        for (auto& vertex : dc.packet.vertices) {
-          vertex.position = tc.GetModelMatrix() * vertex.position;
-        }
-
-        if (dc.texture) {
-          renderer->Draw(dc.packet, dc.texture->asset);
-        } else {
-          renderer->Draw(dc.packet);
-        }
+  registry_.view<Transform, ModelComponent>().each(
+      [renderer](entt::entity entity_id, const Transform& transform,
+                 const ModelComponent& model_comp) {
+        renderer->Draw(model_comp.model->asset, transform);
       });
 
   renderer->EndScene();

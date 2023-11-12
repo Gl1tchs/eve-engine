@@ -4,10 +4,12 @@
 
 #include "core/event/input.h"
 
-EditorCamera::EditorCamera() : OrthographicCamera() {}
+EditorCamera::EditorCamera() : PerspectiveCamera() {
+  transform_.position = {0, 0, -5};
+}
 
 glm::mat4 EditorCamera::GetViewMatrix() {
-  return OrthographicCamera::GetViewMatrix(transform_);
+  return PerspectiveCamera::GetViewMatrix(transform_);
 }
 
 void EditorCamera::Update(float ds) {}

@@ -14,8 +14,8 @@ class InspectorPanel : public Panel {
  public:
   InspectorPanel(Ref<HierarchyPanel> hierarchy_panel);
 
-  void ResetModified() { modified_ = false; }
   [[nodiscard]] bool IsModified() { return modified_; }
+  void SetModified(bool modified) { modified_ = modified; }
 
  protected:
   void Draw() override;

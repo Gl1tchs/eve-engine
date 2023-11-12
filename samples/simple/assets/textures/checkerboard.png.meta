@@ -2,7 +2,7 @@ name: checkerboard
 path: res://textures/checkerboard.png
 type: 0
 id: 574173709551615
-texture_metadata:
+metadata:
   format: 2
   size: [216, 216]
   min_filter: 1

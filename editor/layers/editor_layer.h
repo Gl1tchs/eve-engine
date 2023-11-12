@@ -54,7 +54,7 @@ class EditorLayer : public Layer {
 
   void OnScenePause();
 
-  void Exit();
+  void Exit(bool force = false);
 
   void OnSceneModify();
 
@@ -79,5 +79,7 @@ class EditorLayer : public Layer {
   Scope<InspectorPanel> inspector_panel_;
   Scope<RenderStatsPanel> render_stats_panel_;
 
-  bool modified_title_updated_{false};
+  bool unsaved_changes_{false};
+
+  bool show_exit_dialog_{false};
 };

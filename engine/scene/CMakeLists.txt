@@ -8,6 +8,10 @@ set(SOURCES
   scene_serializer.h
   scene.cc
   scene.h
+  static_mesh.cc
+  static_mesh.h
+  transform.cc
+  transform.h
 )
 
 add_library(eve_scene STATIC ${SOURCES})
@@ -20,9 +24,11 @@ target_include_directories(eve_scene PUBLIC
 target_include_directories(eve_scene PRIVATE
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/yaml-cpp/include
+  ${VENDOR_DIR}/include
 )
 
 target_link_libraries(eve_scene PRIVATE
+  eve::asset
   eve::core
   EnTT
   yaml-cpp

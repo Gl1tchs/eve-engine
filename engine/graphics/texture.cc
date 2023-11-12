@@ -24,14 +24,12 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
   }
 }
 
-Ref<Texture> Texture::Create(const std::string& path,
+Ref<Texture> Texture::Create(const std::filesystem::path& path,
                              const TextureMetadata& metadata) {
-  std::string path_absolute = AssetLibrary::GetAssetPath(path).string();
-
   int width, height, channels;
   stbi_set_flip_vertically_on_load(true);
   stbi_uc* data =
-      stbi_load(path_absolute.c_str(), &width, &height, &channels, 0);
+      stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
   ENGINE_ASSERT(data, "Failed to load texture!");
 

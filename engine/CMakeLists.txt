@@ -9,6 +9,7 @@ add_subdirectory("ui")
 add_library(eve INTERFACE)
 
 target_link_libraries(eve INTERFACE
+  eve::asset
   eve::core
   eve::graphics
   eve::project

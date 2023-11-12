@@ -9,6 +9,7 @@ set(SOURCES
   graphics.h
   index_buffer.cc
   index_buffer.h
+  material.h
   orthographic_camera.cc
   orthographic_camera.h
   perspective_camera.cc
@@ -29,6 +30,7 @@ set(SOURCES
   vertex_array.h
   vertex_buffer.cc
   vertex_buffer.h
+  vertex.h
 )
 
 set(OPENGL_SOURCES
@@ -70,8 +72,9 @@ target_include_directories(eve_graphics PRIVATE
 )
 
 target_link_libraries(eve_graphics PRIVATE
+  eve::asset 
   eve::core
-  eve::asset
+  eve::scene
   glm
   glad
   glfw

@@ -188,32 +188,14 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::EndMap;  // CameraComponent
   }
 
-  // TODO temporarly
-  if (entity.HasComponent<DrawableComponent>()) {
-    auto& drawable_component = entity.GetComponent<DrawableComponent>();
+  if (entity.HasComponent<ModelComponent>()) {
+    auto& model_component = entity.GetComponent<ModelComponent>();
 
-    out << YAML::Key << "drawable_component";
-    out << YAML::BeginMap;  // DrawableComponent
+    out << YAML::Key << "model_component";
+    out << YAML::BeginMap;
 
-    out << YAML::Key << "vertices" << YAML::Value << YAML::BeginSeq;
-    for (auto vertex : drawable_component.packet.vertices) {
-      out << YAML::BeginMap;
-      out << YAML::Key << "position" << YAML::Value << vertex.position;
-      out << YAML::Key << "color" << YAML::Value << vertex.color;
-      out << YAML::Key << "tex_coords" << YAML::Value << vertex.tex_coords;
-      out << YAML::Key << "tex_index" << YAML::Value << vertex.tex_index;
-      out << YAML::EndMap;
-    }
-    out << YAML::EndSeq;
-
-    out << YAML::Key << "indices" << YAML::Value << YAML::BeginSeq;
-    for (auto index : drawable_component.packet.indices) {
-      out << YAML::Value << index;
-    }
-    out << YAML::EndSeq;
-
-    out << YAML::Key << "texture" << YAML::Value
-        << drawable_component.texture->info.meta_path.string();
+    out << YAML::Key << "path" << YAML::Value
+        << model_component.model->info.meta_path.string();
 
     out << YAML::EndMap;
   }
@@ -316,26 +298,12 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
           camera_comp_yaml["is_fixed_aspect_ratio"].as<bool>();
     }
 
-    auto drawable_comp_yaml = entity["drawable_component"];
-    if (drawable_comp_yaml) {
-      auto& drawable_component =
-          deserialing_entity.AddComponent<DrawableComponent>();
+    auto model_comp_yaml = entity["model_component"];
+    if (model_comp_yaml) {
+      auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
-      for (auto vertex_yaml : drawable_comp_yaml["vertices"]) {
-        Vertex vertex;
-        vertex.position = vertex_yaml["position"].as<glm::vec4>();
-        vertex.color = vertex_yaml["color"].as<glm::vec4>();
-        vertex.tex_coords = vertex_yaml["tex_coords"].as<glm::vec2>();
-        vertex.tex_index = vertex_yaml["tex_index"].as<float>();
-        drawable_component.packet.vertices.push_back(vertex);
-      }
-
-      for (auto index_yaml : drawable_comp_yaml["indices"]) {
-        drawable_component.packet.indices.push_back(index_yaml.as<uint32_t>());
-      }
-
-      drawable_component.texture = asset_library_->LoadFromMeta<Texture>(
-          drawable_comp_yaml["texture"].as<std::string>());
+      model_component.model = asset_library_->LoadFromMeta<Model>(
+          model_comp_yaml["path"].as<std::string>());
     }
   }
 

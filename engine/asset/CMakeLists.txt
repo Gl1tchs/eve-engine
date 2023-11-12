@@ -19,5 +19,6 @@ target_link_libraries(eve_asset PRIVATE
   eve::core
   eve::graphics
   eve::project
+  eve::scene
   yaml-cpp
 )

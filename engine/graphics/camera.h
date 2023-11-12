@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#include "core/math/transform.h"
+#include "scene/transform.h"
 
 class Camera {
  public:

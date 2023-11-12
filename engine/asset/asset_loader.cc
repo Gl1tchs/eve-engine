@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "asset/asset_library.h"
+#include "asset_loader.h"
 #include "core/debug/log.h"
 
 namespace YAML {
@@ -66,43 +67,38 @@ struct convert<TextureMetadata> {
 
 }  // namespace YAML
 
-AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
-  std::string path_absolute = AssetLibrary::GetAssetPath(path).string();
+struct AssetInfoYAML {
+  std::string name;
+  std::string asset_path;
+  GUUID id;
+  YAML::Node metadata;
+};
+
+[[nodiscard]] static std::optional<AssetInfoYAML> DeserializeAssetInfo(
+    const std::string& path) {
+  std::string absolute_path = AssetLibrary::GetAssetPath(path).string();
 
   YAML::Node data;
   try {
-    data = YAML::LoadFile(path_absolute);
+    data = YAML::LoadFile(absolute_path);
   } catch (YAML::ParserException e) {
     LOG_ENGINE_ERROR("Failed to load asset from file '{0}'\n\t{1}",
-                     path_absolute, e.what());
+                     absolute_path, e.what());
     return {};
   }
 
-  if (!data["type"] || !data["path"]) {
+  if (!data["path"]) {
     LOG_ENGINE_ERROR("Failed to load asset metadata.");
     return {};
   }
 
-  std::string asset_path = data["path"].as<std::string>();
-
-  AssetType type = static_cast<AssetType>(data["type"].as<int>());
-  if (type != AssetType::kTexture) {
-    LOG_ENGINE_ERROR(
-        "Failed to load asset from: {0}\nAsset types did not match with "
-        "texture!",
-        path);
-    return {};
-  }
-
-  AssetRef<Texture> texture = CreateRef<Asset<Texture>>();
-
-  AssetInfo info;
-
-  info.type = AssetType::kTexture;
+  AssetInfoYAML info;
 
   if (data["name"]) {
     info.name = data["name"].as<std::string>();
   }
+
+  info.asset_path = data["path"].as<std::string>();
 
   if (data["id"]) {
     info.id = GUUID(data["id"].as<uint64_t>());
@@ -110,46 +106,81 @@ AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
     info.id = GUUID();
   }
 
-  info.meta_path = path;
+  info.metadata = data["metadata"];
 
-  TextureMetadata metadata;
-  if (auto metadata_yaml = data["texture_metadata"]; metadata_yaml) {
+  return std::optional<AssetInfoYAML>(info);
+}
+
+AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
+  std::optional<AssetInfoYAML> info_yaml = DeserializeAssetInfo(path);
+  if (!info_yaml.has_value()) {
+    return nullptr;
+  }
+
+  TextureMetadata texture_metadata;
+  if (auto metadata_yaml = info_yaml.value().metadata["texture_metadata"];
+      metadata_yaml) {
     if (metadata_yaml["format"]) {
-      metadata.format =
+      texture_metadata.format =
           static_cast<TextureFormat>(metadata_yaml["format"].as<int>());
     }
-
     if (metadata_yaml["size"]) {
-      metadata.size = metadata_yaml["size"].as<glm::ivec2>();
+      texture_metadata.size = metadata_yaml["size"].as<glm::ivec2>();
     }
-
     if (metadata_yaml["min_filter"]) {
-      metadata.min_filter = static_cast<TextureFilteringMode>(
+      texture_metadata.min_filter = static_cast<TextureFilteringMode>(
           metadata_yaml["min_filter"].as<int>());
     }
-
     if (metadata_yaml["mag_filter"]) {
-      metadata.mag_filter = static_cast<TextureFilteringMode>(
+      texture_metadata.mag_filter = static_cast<TextureFilteringMode>(
           metadata_yaml["mag_filter"].as<int>());
     }
-
     if (metadata_yaml["wrap_s"]) {
-      metadata.wrap_s =
+      texture_metadata.wrap_s =
           static_cast<TextureWrappingMode>(metadata_yaml["wrap_s"].as<int>());
     }
-
     if (metadata_yaml["wrap_t"]) {
-      metadata.wrap_t =
+      texture_metadata.wrap_t =
           static_cast<TextureWrappingMode>(metadata_yaml["wrap_t"].as<int>());
     }
-
     if (metadata_yaml["generate_mipmaps"]) {
-      metadata.generate_mipmaps = metadata_yaml["generate_mipmaps"].as<bool>();
+      texture_metadata.generate_mipmaps =
+          metadata_yaml["generate_mipmaps"].as<bool>();
     }
   }
 
+  AssetInfo info;
+  info.name = info_yaml.value().name;
+  info.meta_path = path;
+  info.type = AssetType::kTexture;
+  info.id = info_yaml.value().id;
+
+  AssetRef<Texture> texture = CreateRef<Asset<Texture>>();
   texture->info = info;
-  texture->asset = Texture::Create(asset_path, metadata);
+  texture->asset =
+      Texture::Create(AssetLibrary::GetAssetPath(info_yaml.value().asset_path),
+                      texture_metadata);
 
   return texture;
+}
+
+AssetRef<Model> AssetLoader::LoadModel(const std::string& path) {
+  std::optional<AssetInfoYAML> info_yaml = DeserializeAssetInfo(path);
+  if (!info_yaml.has_value()) {
+    return nullptr;
+  }
+
+  AssetRef<Model> model = CreateRef<Asset<Model>>();
+
+  AssetInfo info;
+  info.name = info_yaml.value().name;
+  info.meta_path = path;
+  info.type = AssetType::kStaticMesh;
+  info.id = info_yaml.value().id;
+
+  model->info = info;
+  model->asset =
+      Model::Load(AssetLibrary::GetAssetPath(info_yaml.value().asset_path));
+
+  return model;
 }

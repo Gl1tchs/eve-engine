@@ -6,6 +6,8 @@
 #include <tinyfiledialogs.h>
 
 #include "core/debug/instrumentor.h"
+#include "core/event/event_handler.h"
+#include "core/event/events.h"
 #include "core/event/input.h"
 #include "editor_layer.h"
 #include "graphics/render_command.h"
@@ -17,6 +19,11 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   PROFILE_FUNCTION();
 
   editor_logger_ = LoggerManager::AddLogger("EDITOR");
+
+  // Remove default beheaviour
+  PopEvent<WindowCloseEvent>();
+  SubscribeEvent<WindowCloseEvent>(
+      [this](const WindowCloseEvent& event) { Exit(); });
 }
 
 EditorLayer::~EditorLayer() {
@@ -44,7 +51,7 @@ void EditorLayer::OnDestroy() {
 void EditorLayer::OnUpdate(float ds) {
   PROFILE_FUNCTION();
 
-  if (inspector_panel_->IsModified() && !modified_title_updated_) {
+  if (inspector_panel_->IsModified() && !unsaved_changes_) {
     OnSceneModify();
   }
 
@@ -127,6 +134,36 @@ void EditorLayer::OnGUI(float ds) {
     hierarchy_panel_->Render();
     inspector_panel_->Render();
     render_stats_panel_->Render();
+
+    if (show_exit_dialog_) {
+      ImGui::OpenPopup("Save Changes?");
+    }
+
+    if (ImGui::BeginPopupModal(
+            "Save Changes?", nullptr,
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+      ImGui::Text("There are unsaved changes.");
+      ImGui::Separator();
+
+      if (ImGui::Button("Save and Exit")) {
+        SaveScene();
+        Exit();
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SetItemDefaultFocus();
+      ImGui::SameLine();
+
+      if (ImGui::Button("Exit Without Saving")) {
+        ImGui::CloseCurrentPopup();
+        Exit(true);
+      }
+
+      if (ImGui::Button("Cancel")) {
+        show_exit_dialog_ = false;
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   }
   EndDockspace();
 }
@@ -180,19 +217,22 @@ void EditorLayer::DrawMenubar() {
 
       ImGui::Separator();
 
-      if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
-        NewScene();
-      }
+      // Only show scene control if a project is available
+      if (Project::GetActive()) {
+        if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
+          NewScene();
+        }
 
-      if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
-        SaveScene();
-      }
+        if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+          SaveScene();
+        }
 
-      if (ImGui::MenuItem("Save Scene As", "Ctrl+Shift+S")) {
-        SaveSceneAs();
-      }
+        if (ImGui::MenuItem("Save Scene As", "Ctrl+Shift+S")) {
+          SaveSceneAs();
+        }
 
-      ImGui::Separator();
+        ImGui::Separator();
+      }
 
       if (ImGui::MenuItem("Exit", "Ctrl+Shift+Q")) {
         Exit();
@@ -202,6 +242,17 @@ void EditorLayer::DrawMenubar() {
     }
 
     if (ImGui::BeginMenu("View")) {
+
+      if (ImGui::MenuItem("Hierarchy")) {
+        hierarchy_panel_->SetActive(true);
+      }
+
+      if (ImGui::MenuItem("Inspector")) {
+        inspector_panel_->SetActive(true);
+      }
+
+      ImGui::Separator();
+
       if (ImGui::MenuItem("Render Stats")) {
         render_stats_panel_->SetActive(true);
       }
@@ -219,13 +270,11 @@ void EditorLayer::OpenProject() {
                                            "Eve Project Files", 0);
 
   if (!path) {
-    LOG_ENGINE_ERROR("Unable to open scene from path: {0}\n", path);
+    LOG_ENGINE_ERROR("Unable to open scene from path.");
     return;
   }
 
-  if (Ref<Project> project = Project::Load(path); project) {
-    // ScriptEngine::Init();
-
+  if (Ref<Project> project = Project::Load(std::string(path)); project) {
     auto& project_config = project->GetConfig();
 
     SetSceneTitle();
@@ -236,10 +285,12 @@ void EditorLayer::OpenProject() {
 }
 
 void EditorLayer::NewScene() {
-  editor_scene_path_ = "";
-  scene_state_ = SceneState::kEdit;
-
   active_scene_ = CreateRef<Scene>(GetState(), "untitled");
+  hierarchy_panel_->SetScene(active_scene_);
+
+  editor_scene_path_ = "";
+
+  inspector_panel_->SetModified(true);
 }
 
 void EditorLayer::SaveScene() {
@@ -255,15 +306,15 @@ void EditorLayer::SaveScene() {
 
 void EditorLayer::SaveSceneAs() {
   const char* filter_patterns[1] = {"*.eve"};
-  std::string path = tinyfd_saveFileDialog("Save Scene", "scene.eve", 1,
+  const char* path = tinyfd_saveFileDialog("Save Scene", "scene.eve", 1,
                                            filter_patterns, "Eve Scene Files");
 
-  if (path.empty()) {
-    LOG_ENGINE_ERROR("Unable to save scene to path: {0}\n", path);
+  if (!path) {
+    LOG_ENGINE_ERROR("Unable to save scene to path.");
     return;
   }
 
-  editor_scene_path_ = path;
+  editor_scene_path_ = std::string(path);
 
   SceneSerializer serializer(active_scene_, GetState()->asset_library);
   serializer.Serialize(editor_scene_path_);
@@ -316,7 +367,12 @@ void EditorLayer::OnScenePause() {
   active_scene_->SetPaused(true);
 }
 
-void EditorLayer::Exit() {
+void EditorLayer::Exit(bool force) {
+  if (inspector_panel_->IsModified() && !force) {
+    show_exit_dialog_ = true;
+    return;
+  }
+
   GetState()->running = false;
 }
 
@@ -325,14 +381,15 @@ void EditorLayer::OnSceneModify() {
   std::string title = window->GetTitle();
   window->SetTitle(title + " *");
 
-  modified_title_updated_ = true;
+  unsaved_changes_ = true;
 }
 
 void EditorLayer::OnSceneSave() {
   SetSceneTitle();
 
-  inspector_panel_->ResetModified();
-  modified_title_updated_ = false;
+  inspector_panel_->SetModified(false);
+  unsaved_changes_ = false;
+  show_exit_dialog_ = false;
 }
 
 void EditorLayer::SetSceneTitle() {

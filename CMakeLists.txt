@@ -8,10 +8,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(imgui-extras)
 
-# Options
-option(ENABLE_TESTING "Should enable testing?" ON)
-set(ENABLE_TESTING ${ENABLE_TESTING} CACHE BOOL "Should enable testing?" FORCE)
-
 # Set the output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin/${CMAKE_BUILD_TYPE}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/lib/${CMAKE_BUILD_TYPE}")
