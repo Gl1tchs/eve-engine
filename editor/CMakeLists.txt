@@ -15,6 +15,10 @@ set(SOURCES
   panels/render_stats_panel.h
   panels/viewport_panel.cc
   panels/viewport_panel.h
+  widgets/dock_space.cc
+  widgets/dock_space.h
+  widgets/menu_bar.cc
+  widgets/menu_bar.h
   editor.cc
 )
 

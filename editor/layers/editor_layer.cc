@@ -2,7 +2,6 @@
 
 #include "layers/editor_layer.h"
 
-#include <imgui.h>
 #include <tinyfiledialogs.h>
 
 #include "core/debug/instrumentor.h"
@@ -13,6 +12,7 @@
 #include "graphics/render_command.h"
 #include "project/project.h"
 #include "scene/scene_serializer.h"
+#include "widgets/dock_space.h"
 
 EditorLayer::EditorLayer(Ref<State>& state)
     : Layer(state), exit_modal_(BIND_FUNC(OnExitModalAnswer)) {
@@ -42,6 +42,74 @@ void EditorLayer::OnStart() {
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
   render_stats_panel_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
+
+  Menu file_menu("File");
+  {
+    MenuItemGroup project_group;
+    {
+      MenuItem open_project(
+          "Open Project", [&]() { OpenProject(); }, "Ctrl+O");
+      project_group.PushMenuItem(open_project);
+
+      file_menu.PushItemGroup(project_group);
+    }
+
+    MenuItemGroup scene_group(
+        []() -> bool { return Project::GetActive() != nullptr; });
+    {
+      MenuItem new_scene(
+          "New Scene", [&]() { NewScene(); }, "Ctrl+N");
+      scene_group.PushMenuItem(new_scene);
+
+      MenuItem save_scene(
+          "Save Scene", [&]() { SaveScene(); }, "Ctrl+S");
+      scene_group.PushMenuItem(save_scene);
+
+      MenuItem save_scene_as(
+          "Save Scene As", [&]() { SaveSceneAs(); }, "Ctrl+Shift+S");
+      scene_group.PushMenuItem(save_scene_as);
+
+      file_menu.PushItemGroup(scene_group);
+    }
+
+    MenuItemGroup system_group;
+    {
+      MenuItem exit(
+          "Exit", [&]() { Exit(); }, "Ctrl+Shift+Q");
+      system_group.PushMenuItem(exit);
+
+      file_menu.PushItemGroup(system_group);
+    }
+
+    menu_bar_.PushMenu(file_menu);
+  }
+
+  Menu view_menu("View");
+  {
+    MenuItemGroup base_group;
+    {
+      MenuItem hierarchy("Hierarchy",
+                         [this]() { hierarchy_panel_->SetActive(true); });
+      base_group.PushMenuItem(hierarchy);
+
+      MenuItem inspector("Inspector",
+                         [this]() { inspector_panel_->SetActive(true); });
+      base_group.PushMenuItem(inspector);
+
+      view_menu.PushItemGroup(base_group);
+    }
+
+    MenuItemGroup renderer_group;
+    {
+      MenuItem render_stats("Render Stats",
+                            [this]() { render_stats_panel_->SetActive(true); });
+      renderer_group.PushMenuItem(render_stats);
+
+      view_menu.PushItemGroup(renderer_group);
+    }
+
+    menu_bar_.PushMenu(view_menu);
+  }
 }
 
 void EditorLayer::OnDestroy() {
@@ -141,9 +209,10 @@ void EditorLayer::OnUpdate(float ds) {
 void EditorLayer::OnGUI(float ds) {
   PROFILE_FUNCTION();
 
-  BeginDockspace();
+  DockSpace::Begin();
   {
-    DrawMenubar();
+    menu_bar_.Draw();
+
     // Render panels
     viewport_panel_->Render();
     hierarchy_panel_->Render();
@@ -154,103 +223,7 @@ void EditorLayer::OnGUI(float ds) {
       exit_modal_.Show();
     }
   }
-  EndDockspace();
-}
-
-void EditorLayer::BeginDockspace() {
-  static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-  ImGuiWindowFlags window_flags =
-      ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
-  ImGui::SetNextWindowPos(viewport->Pos);
-  ImGui::SetNextWindowSize(viewport->Size);
-  ImGui::SetNextWindowViewport(viewport->ID);
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-  window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-  window_flags |=
-      ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-  if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-    window_flags |= ImGuiWindowFlags_NoBackground;
-
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-  ImGui::Begin("MyDockSpace", nullptr, window_flags);
-  ImGui::PopStyleVar(3);
-
-  // DockSpace
-  ImGuiIO& io = ImGui::GetIO();
-  ImGuiStyle& style = ImGui::GetStyle();
-  float min_win_size_x = style.WindowMinSize.x;
-  style.WindowMinSize.x = 370.0f;
-  if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-  }
-
-  style.WindowMinSize.x = min_win_size_x;
-}
-
-void EditorLayer::EndDockspace() {
-  ImGui::End();
-}
-
-void EditorLayer::DrawMenubar() {
-  if (ImGui::BeginMenuBar()) {
-    if (ImGui::BeginMenu("File")) {
-      if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
-        OpenProject();
-      }
-
-      ImGui::Separator();
-
-      // Only show scene control if a project is available
-      if (Project::GetActive()) {
-        if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
-          NewScene();
-        }
-
-        if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
-          SaveScene();
-        }
-
-        if (ImGui::MenuItem("Save Scene As", "Ctrl+Shift+S")) {
-          SaveSceneAs();
-        }
-
-        ImGui::Separator();
-      }
-
-      if (ImGui::MenuItem("Exit", "Ctrl+Shift+Q")) {
-        Exit();
-      }
-
-      ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("View")) {
-
-      if (ImGui::MenuItem("Hierarchy")) {
-        hierarchy_panel_->SetActive(true);
-      }
-
-      if (ImGui::MenuItem("Inspector")) {
-        inspector_panel_->SetActive(true);
-      }
-
-      ImGui::Separator();
-
-      if (ImGui::MenuItem("Render Stats")) {
-        render_stats_panel_->SetActive(true);
-      }
-
-      ImGui::EndMenu();
-    }
-
-    ImGui::EndMenuBar();
-  }
+  DockSpace::End();
 }
 
 void EditorLayer::OpenProject() {

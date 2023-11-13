@@ -15,6 +15,7 @@
 #include "panels/inspector_panel.h"
 #include "panels/render_stats_panel.h"
 #include "panels/viewport_panel.h"
+#include "widgets/menu_bar.h"
 
 enum class SceneState { kEdit, kPlay };
 
@@ -33,12 +34,6 @@ class EditorLayer : public Layer {
   void OnGUI(float ds) override;
 
  private:
-  void BeginDockspace();
-
-  void EndDockspace();
-
-  void DrawMenubar();
-
   void OpenProject();
 
   void NewScene();
@@ -83,6 +78,8 @@ class EditorLayer : public Layer {
   Scope<RenderStatsPanel> render_stats_panel_;
 
   ExitModal exit_modal_;
+
+  MenuBar menu_bar_;
 
   bool unsaved_changes_{false};
   bool show_exit_dialog_{false};

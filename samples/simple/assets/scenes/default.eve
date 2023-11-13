@@ -1,14 +1,5 @@
 scene: default
 entities:
-  - id: 453953480392206736
-    tag_component:
-      tag: Cube
-    transform:
-      position: [0, -1, -1]
-      rotation: [0, 0, 0]
-      scale: [0.75, 0.75, 0.75]
-    model_component:
-      path: res://models/cube.obj.meta
   - id: 323468953567323581
     tag_component:
       tag: Monkey
@@ -18,3 +9,12 @@ entities:
       scale: [1, 0.800000012, 1]
     model_component:
       path: res://models/monkey.obj.meta
+  - id: 453953480392206736
+    tag_component:
+      tag: Cube
+    transform:
+      position: [0, -1, -1]
+      rotation: [0, 0, 0]
+      scale: [0.75, 0.75, 0.75]
+    model_component:
+      path: res://models/cube.obj.meta
