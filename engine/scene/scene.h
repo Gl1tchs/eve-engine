@@ -24,6 +24,8 @@ class Scene {
   Entity CreateEntityWithUUID(GUUID uuid,
                               const std::string& name = std::string());
 
+  [[nodiscard]] bool Exists(Entity entity);
+
   void DestroyEntity(Entity entity);
 
   void OnRuntimeStart();
@@ -55,6 +57,8 @@ class Scene {
  private:
   void RenderScene(Camera& camera, Transform& transform);
 
+  bool EntityNameExists(const std::string& name);
+
  private:
   entt::registry registry_;
 
@@ -66,7 +70,7 @@ class Scene {
 
   Ref<State> state_;
 
-  std::unordered_map<GUUID, entt::entity> entity_map_;
+  std::unordered_map<GUUID, Entity> entity_map_;
 
   std::string name_;
 

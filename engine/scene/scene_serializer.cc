@@ -113,9 +113,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
   return out;
 }
 
-SceneSerializer::SceneSerializer(const Ref<Scene>& scene,
-                                 const Ref<AssetLibrary>& asset_library)
-    : scene_(scene), asset_library_(asset_library) {}
+SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(YAML::Emitter& out, Entity entity) {
   ENGINE_ASSERT(entity.HasComponent<IdComponent>())
@@ -195,7 +193,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::BeginMap;
 
     out << YAML::Key << "path" << YAML::Value
-        << model_component.model->info.meta_path.string();
+        << model_component.model->info.meta_path;
 
     out << YAML::EndMap;
   }
@@ -329,7 +327,7 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
     if (model_comp_yaml) {
       auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
-      model_component.model = asset_library_->LoadFromMeta<Model>(
+      model_component.model = AssetLibrary::LoadFromMeta<Model>(
           model_comp_yaml["path"].as<std::string>());
     }
 

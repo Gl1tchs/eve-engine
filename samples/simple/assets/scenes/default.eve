@@ -23,6 +23,11 @@ entities:
       scale: [0.75, 0.75, 0.75]
     model_component:
       path: res://models/cube.obj.meta
+    material_component:
+      ambient: [0.830115795, 0.830115795, 0.830115795]
+      diffuse: [0.779922783, 0.779922783, 0.779922783]
+      specular: [0.772200763, 0.772200763, 0.772200763]
+      shininess: 32
   - id: 54253711328505163
     tag_component:
       tag: Directional Light

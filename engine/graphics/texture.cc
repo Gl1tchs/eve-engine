@@ -25,13 +25,15 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
 }
 
 Ref<Texture> Texture::Create(const std::filesystem::path& path,
-                             const TextureMetadata& metadata) {
+                             TextureMetadata metadata) {
   int width, height, channels;
   stbi_set_flip_vertically_on_load(true);
   stbi_uc* data =
       stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
   ENGINE_ASSERT(data, "Failed to load texture!");
+
+  metadata.size = glm::ivec2{width, height};
 
   Ref<Texture> texture = Texture::Create(metadata, data);
 

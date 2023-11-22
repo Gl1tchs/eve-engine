@@ -8,10 +8,14 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "core/utils/functional.h"
+#include "inspector_panel.h"
 #include "scene/components.h"
+#include "utils/modify_info.h"
 
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
-    : hierarchy_panel_(hierarchy_panel) {}
+    : hierarchy_panel_(hierarchy_panel),
+      importer_(BIND_FUNC(OnModelMetaWrite)) {}
 
 void InspectorPanel::Draw() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
@@ -19,9 +23,67 @@ void InspectorPanel::Draw() {
     return;
   }
 
+  importer_.Render();
+
+  RenderComponentProperties(selected_entity);
+
+  ImGui::Spacing();
+  ImGui::Separator();
+
+  ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
+                       ImGui::GetContentRegionAvail().y -
+                       ImGui::GetTextLineHeightWithSpacing());
+
+  RenderAddComponentDialog(selected_entity);
+}
+
+void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
+  ImGui::Button("Add Component", ImVec2(-1, 0));  // Full width button
+  if (ImGui::IsItemClicked()) {
+    // Get the mouse position
+    ImVec2 mouse_pos = ImGui::GetMousePos();
+
+    // Open the popup under the cursor
+    ImGui::OpenPopup("AddComponentPopup");
+    ImGui::SetNextWindowPos(mouse_pos);
+
+    // Reset the flag
+    show_add_component_dialog_ = false;
+  }
+
+  // Check if the dialog is open and render it
+  if (ImGui::BeginPopup(
+          "AddComponentPopup",
+          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize |
+              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking |
+              ImGuiWindowFlags_NoMove)) {
+    ImGui::Text("Choose a component to add:");
+
+    if (ImGui::Button("Camera")) {
+      selected_entity.AddComponent<CameraComponent>();
+    }
+
+    if (ImGui::Button("Material")) {
+      selected_entity.AddComponent<Material>();
+    }
+
+    if (ImGui::Button("Model")) {
+      importer_.SetActive(true);
+    }
+
+    ImGui::EndPopup();
+    add_component_dialog_opened_ = true;
+  } else {
+    // Close the window if clicked elsewhere
+    add_component_dialog_opened_ = false;
+  }
+}
+
+void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
+  // TODO if advanced
   ImGui::SeparatorText("Id Component");
   {
-    auto id_comp = selected_entity.GetComponent<IdComponent>();
+    auto& id_comp = selected_entity.GetComponent<IdComponent>();
 
     ImGui::Text("ID:");
     ImGui::SameLine();
@@ -34,8 +96,9 @@ void InspectorPanel::Draw() {
 
     ImGui::Text("Tag:");
     ImGui::SameLine();
+    // TODO only accept unique names
     if (ImGui::InputText("##tag_input", &tag_comp.tag)) {
-      modified_ = true;
+      modify_info.SetModified();
     }
   }
 
@@ -47,26 +110,35 @@ void InspectorPanel::Draw() {
     ImGui::SameLine();
     if (ImGui::DragFloat3("##transform_position",
                           glm::value_ptr(transform.position), 0.05f)) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Rotation:");
     ImGui::SameLine();
     if (ImGui::DragFloat3("##transform_rotation",
                           glm::value_ptr(transform.rotation), 0.05f)) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Scale:");
     ImGui::SameLine();
     if (ImGui::DragFloat3("##transform_scale", glm::value_ptr(transform.scale),
                           0.05f)) {
-      modified_ = true;
+      modify_info.SetModified();
     }
   }
 
   if (selected_entity.HasComponent<CameraComponent>()) {
-    ImGui::SeparatorText("Camera Component");
+    bool should_remove = false;
+
+    ImGui::Separator();
+    ImGui::Text("Camera Component");
+    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+    ImGui::PushID("camera_remove_button");
+    if (ImGui::Button("-")) {
+      should_remove = true;
+    }
+    ImGui::PopID();
 
     auto& camera_comp = selected_entity.GetComponent<CameraComponent>();
 
@@ -76,21 +148,21 @@ void InspectorPanel::Draw() {
       ImGui::Text("Zoom Level:");
       float zoom_level = camera.GetZoomLevel();
       if (ImGui::DragFloat("##ortho_zoom_level", &zoom_level)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetZoomLevel(zoom_level);
 
       ImGui::Text("Near Clip:");
       float near_clip = camera.GetNearClip();
       if (ImGui::DragFloat("##ortho_near_clip", &near_clip)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetNearClip(near_clip);
 
       ImGui::Text("Far Clip:");
       float far_clip = camera.GetFarClip();
       if (ImGui::DragFloat("##ortho_far_clip", &far_clip)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetFarClip(far_clip);
 
@@ -99,7 +171,7 @@ void InspectorPanel::Draw() {
         ImGui::SameLine();
         float aspect_ratio = camera.GetAspectRatio();
         if (ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f)) {
-          modified_ = true;
+          modify_info.SetModified();
         }
         camera.SetAspectRatio(aspect_ratio);
       }
@@ -109,21 +181,21 @@ void InspectorPanel::Draw() {
       ImGui::Text("FOV:");
       float zoom_level = camera.GetFov();
       if (ImGui::DragFloat("##persp_zoom_level", &zoom_level)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetFov(zoom_level);
 
       ImGui::Text("Near Clip:");
       float near_clip = camera.GetNearClip();
       if (ImGui::DragFloat("##persp_near_clip", &near_clip)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetNearClip(near_clip);
 
       ImGui::Text("Far Clip:");
       float far_clip = camera.GetFarClip();
       if (ImGui::DragFloat("##persp_far_clip", &far_clip)) {
-        modified_ = true;
+        modify_info.SetModified();
       }
       camera.SetFarClip(far_clip);
 
@@ -132,7 +204,7 @@ void InspectorPanel::Draw() {
         ImGui::SameLine();
         float aspect_ratio = camera.GetAspectRatio();
         if (ImGui::DragFloat("##persp_aspect_ratio", &aspect_ratio, 0.05f)) {
-          modified_ = true;
+          modify_info.SetModified();
         }
         camera.SetAspectRatio(aspect_ratio);
       }
@@ -141,19 +213,33 @@ void InspectorPanel::Draw() {
     ImGui::Text("Primary:");
     ImGui::SameLine();
     if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Fixed");
     ImGui::SameLine();
     if (ImGui::Checkbox("##fixed_aspect_ratio",
                         &camera_comp.is_fixed_aspect_ratio)) {
-      modified_ = true;
+      modify_info.SetModified();
+    }
+
+    if (should_remove) {
+      selected_entity.RemoveComponent<CameraComponent>();
+      modify_info.SetModified();
     }
   }
 
   if (selected_entity.HasComponent<DirectionalLight>()) {
-    ImGui::SeparatorText("Directional Light");
+    bool should_remove = false;
+
+    ImGui::Separator();
+    ImGui::Text("Directional Light");
+    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+    ImGui::PushID("directional_light_remove_button");
+    if (ImGui::Button("-")) {
+      should_remove = true;
+    }
+    ImGui::PopID();
 
     auto& light = selected_entity.GetComponent<DirectionalLight>();
 
@@ -161,26 +247,73 @@ void InspectorPanel::Draw() {
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##directional_light_ambient",
                           glm::value_ptr(light.ambient))) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Diffuse:");
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##directional_light_diffuse",
                           glm::value_ptr(light.diffuse))) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Specular:");
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##directional_light_specular",
                           glm::value_ptr(light.specular))) {
-      modified_ = true;
+      modify_info.SetModified();
+    }
+
+    if (should_remove) {
+      selected_entity.RemoveComponent<DirectionalLight>();
+      modify_info.SetModified();
+    }
+  }
+
+  if (selected_entity.HasComponent<ModelComponent>()) {
+    bool should_remove = false;
+
+    ImGui::Separator();
+    ImGui::Text("Model");
+    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+    ImGui::PushID("model_remove_button");
+    if (ImGui::Button("-")) {
+      should_remove = true;
+    }
+    ImGui::PopID();
+
+    auto& model_comp = selected_entity.GetComponent<ModelComponent>();
+
+    ImGui::Text("Model Path:");
+    ImGui::SameLine();
+
+    std::string old_path = model_comp.model->info.meta_path;
+    static std::string path = old_path;
+    if (ImGui::InputText("##model_path_input", &path)) {
+      modify_info.SetModified();
+    }
+
+    if (path != old_path && ImGui::Button("Reimport", ImVec2(-1, 0))) {
+      model_comp.model = AssetLibrary::LoadFromMeta<Model>(path);
+    }
+
+    if (should_remove) {
+      selected_entity.RemoveComponent<ModelComponent>();
+      modify_info.SetModified();
     }
   }
 
   if (selected_entity.HasComponent<Material>()) {
-    ImGui::SeparatorText("Material");
+    bool should_remove = false;
+
+    ImGui::Separator();
+    ImGui::Text("Material");
+    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+    ImGui::PushID("material_remove_button");
+    if (ImGui::Button("-")) {
+      should_remove = true;
+    }
+    ImGui::PopID();
 
     auto& material = selected_entity.GetComponent<Material>();
 
@@ -188,27 +321,39 @@ void InspectorPanel::Draw() {
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##material_ambient",
                           glm::value_ptr(material.ambient))) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Diffuse:");
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##material_diffuse",
                           glm::value_ptr(material.diffuse))) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Specular:");
     ImGui::SameLine();
     if (ImGui::ColorEdit3("##material_specular",
                           glm::value_ptr(material.specular))) {
-      modified_ = true;
+      modify_info.SetModified();
     }
 
     ImGui::Text("Shininess:");
     ImGui::SameLine();
     if (ImGui::DragFloat("##material_shininess", &material.shininess, 0.05f)) {
-      modified_ = true;
+      modify_info.SetModified();
+    }
+
+    if (should_remove) {
+      selected_entity.RemoveComponent<Material>();
+      modify_info.SetModified();
     }
   }
+}
+
+void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
+  Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
+
+  auto& modal_component = selected_entity.AddComponent<ModelComponent>();
+  modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);
 }

@@ -68,7 +68,6 @@ struct convert<TextureMetadata> {
 }  // namespace YAML
 
 struct AssetInfoYAML {
-  std::string name;
   std::string asset_path;
   GUUID id;
   YAML::Node metadata;
@@ -93,10 +92,6 @@ struct AssetInfoYAML {
   }
 
   AssetInfoYAML info;
-
-  if (data["name"]) {
-    info.name = data["name"].as<std::string>();
-  }
 
   info.asset_path = data["path"].as<std::string>();
 
@@ -150,7 +145,6 @@ AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
   }
 
   AssetInfo info;
-  info.name = info_yaml.value().name;
   info.meta_path = path;
   info.type = AssetType::kTexture;
   info.id = info_yaml.value().id;
@@ -173,7 +167,6 @@ AssetRef<Model> AssetLoader::LoadModel(const std::string& path) {
   AssetRef<Model> model = CreateRef<Asset<Model>>();
 
   AssetInfo info;
-  info.name = info_yaml.value().name;
   info.meta_path = path;
   info.type = AssetType::kStaticMesh;
   info.id = info_yaml.value().id;

@@ -1,7 +1,5 @@
-name: checkerboard
 path: res://textures/checkerboard.png
 type: 0
-id: 574173709551615
 metadata:
   format: 2
   size: [216, 216]

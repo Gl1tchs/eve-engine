@@ -7,10 +7,13 @@
 #include "core/debug/log.h"
 
 Modal::Modal(const std::string name, bool closable)
-    : name_(name), closable_(closable) {
-}
+    : name_(name), closable_(closable) {}
 
-void Modal::Show() {
+void Modal::Render() {
+  if (!should_show_) {
+    return;
+  }
+
   ImGui::OpenPopup(name_.c_str());
 
   bool* p_open = nullptr;

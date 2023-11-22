@@ -3,7 +3,6 @@
 #include "scene/scene.h"
 
 #include "graphics/camera.h"
-#include "scene.h"
 #include "scene/entity.h"
 #include "scene/transform.h"
 
@@ -75,6 +74,7 @@ Ref<Scene> Scene::Copy(Ref<Scene> other) {
 
   return new_scene;
 }
+
 Entity Scene::CreateEntity(const std::string& name) {
   return CreateEntityWithUUID(GUUID(), name);
 }
@@ -84,11 +84,39 @@ Entity Scene::CreateEntityWithUUID(GUUID uuid, const std::string& name) {
   entity.AddComponent<IdComponent>(uuid);
   entity.AddComponent<Transform>();
   auto& tag = entity.AddComponent<TagComponent>();
-  tag.tag = name.empty() ? "Entity" : name;
+
+  static int default_counter = 0;
+  if (!name.empty()) {
+
+    std::string name_unique = name;
+    int counter = 1;
+
+    while (EntityNameExists(name_unique)) {
+      name_unique = std::format("{0} ({1})", name, counter);
+      counter++;
+    }
+
+    tag.tag = name_unique;
+
+  } else if (name.empty() && default_counter == 0) {
+    tag.tag = "Entity";
+    default_counter++;
+  } else {
+    tag.tag = std::format("Entity ({0})", default_counter);
+    default_counter++;
+  }
 
   entity_map_[uuid] = entity;
 
   return entity;
+}
+
+bool Scene::Exists(Entity entity) {
+  if (!entity.HasComponent<IdComponent>()) {
+    return false;
+  }
+
+  return entity_map_.find(entity.GetUUID()) != entity_map_.end();
 }
 
 void Scene::DestroyEntity(Entity entity) {
@@ -212,4 +240,15 @@ void Scene::RenderScene(Camera& camera, Transform& transform) {
       });
 
   renderer->EndScene();
+}
+
+bool Scene::EntityNameExists(const std::string& name) {
+  auto it =
+      std::find_if(entity_map_.begin(), entity_map_.end(), [&](auto& pair) {
+        const auto& tag_comp =
+            pair.second.template GetComponent<TagComponent>();
+        return tag_comp.tag == name;
+      });
+
+  return it != entity_map_.end();
 }

@@ -12,6 +12,7 @@
 #include "graphics/render_command.h"
 #include "project/project.h"
 #include "scene/scene_serializer.h"
+#include "utils/modify_info.h"
 #include "widgets/dock_space.h"
 
 EditorLayer::EditorLayer(Ref<State>& state)
@@ -119,7 +120,7 @@ void EditorLayer::OnDestroy() {
 void EditorLayer::OnUpdate(float ds) {
   PROFILE_FUNCTION();
 
-  if (inspector_panel_->IsModified() && !unsaved_changes_) {
+  if (modify_info.modified && !unsaved_changes_) {
     OnSceneModify();
   }
 
@@ -204,6 +205,14 @@ void EditorLayer::OnUpdate(float ds) {
       }
     }
   }
+
+  if (auto entity = hierarchy_panel_->GetSelectedEntity(); entity) {
+    if (Input::IsKeyPressed(KeyCode::kDelete)) {
+      active_scene_->DestroyEntity(entity);
+      hierarchy_panel_->SetSelectedEntity(Entity{});
+      modify_info.SetModified();
+    }
+  }
 }
 
 void EditorLayer::OnGUI(float ds) {
@@ -219,9 +228,7 @@ void EditorLayer::OnGUI(float ds) {
     inspector_panel_->Render();
     render_stats_panel_->Render();
 
-    if (show_exit_dialog_) {
-      exit_modal_.Show();
-    }
+    exit_modal_.Render();
   }
   DockSpace::End();
 }
@@ -252,13 +259,13 @@ void EditorLayer::NewScene() {
 
   editor_scene_path_ = "";
 
-  inspector_panel_->SetModified(true);
+  modify_info.SetModified();
   editor_camera_.ResetTransform();
 }
 
 void EditorLayer::SaveScene() {
   if (!editor_scene_path_.empty()) {
-    SceneSerializer serializer(active_scene_, GetState()->asset_library);
+    SceneSerializer serializer(active_scene_);
     serializer.Serialize(editor_scene_path_);
 
     OnSceneSave();
@@ -279,7 +286,7 @@ void EditorLayer::SaveSceneAs() {
 
   editor_scene_path_ = std::string(path);
 
-  SceneSerializer serializer(active_scene_, GetState()->asset_library);
+  SceneSerializer serializer(active_scene_);
   serializer.Serialize(editor_scene_path_);
 
   OnSceneSave();
@@ -291,7 +298,7 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
   }
 
   Ref<Scene> new_scene = CreateRef<Scene>(GetState());
-  SceneSerializer serializer(new_scene, GetState()->asset_library);
+  SceneSerializer serializer(new_scene);
   if (serializer.Deserialize(path)) {
     editor_scene_ = new_scene;
     active_scene_ = editor_scene_;
@@ -333,8 +340,8 @@ void EditorLayer::OnScenePause() {
 }
 
 void EditorLayer::Exit(bool force) {
-  if (inspector_panel_->IsModified() && !force) {
-    show_exit_dialog_ = true;
+  if (modify_info.modified && !force) {
+    exit_modal_.SetActive(true);
     return;
   }
 
@@ -352,7 +359,7 @@ void EditorLayer::OnSceneModify() {
 void EditorLayer::OnSceneSave() {
   SetSceneTitle();
 
-  inspector_panel_->SetModified(false);
+  modify_info.OnSave();
   unsaved_changes_ = false;
   show_exit_dialog_ = false;
 }

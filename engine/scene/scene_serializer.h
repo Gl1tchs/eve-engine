@@ -9,8 +9,7 @@
 
 class SceneSerializer {
  public:
-  SceneSerializer(const Ref<Scene>& scene,
-                  const Ref<AssetLibrary>& asset_library);
+  SceneSerializer(const Ref<Scene>& scene);
 
   void Serialize(const std::filesystem::path& file_path);
 
@@ -18,5 +17,4 @@ class SceneSerializer {
 
  private:
   Ref<Scene> scene_;
-  Ref<AssetLibrary> asset_library_;
 };

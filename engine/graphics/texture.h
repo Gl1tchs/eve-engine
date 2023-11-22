@@ -31,6 +31,7 @@ enum class TextureWrappingMode {
 };
 
 struct TextureMetadata final {
+  // will be setted by texture importer
   glm::ivec2 size;
   TextureFormat format;
   TextureFilteringMode min_filter;
@@ -56,5 +57,5 @@ class Texture {
                                            const void* pixels);
 
   [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path,
-                                           const TextureMetadata& metadata);
+                                           TextureMetadata metadata);
 };

@@ -9,7 +9,10 @@ class Modal {
   Modal(const std::string name, bool closable = true);
   virtual ~Modal() = default;
 
-  void Show();
+  void Render();
+
+  [[nodiscard]] bool ShouldShow() const { return should_show_; }
+  void SetActive(bool value) { should_show_ = value; }
 
   void SetFlags(int flags) { window_flags_ = flags; }
 
@@ -19,6 +22,6 @@ class Modal {
  private:
   std::string name_;
   bool closable_;
-
+  bool should_show_ = false;
   int window_flags_ = 0;
 };

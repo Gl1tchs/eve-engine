@@ -12,9 +12,8 @@ enum class AssetType { kTexture, kFont, kScene, kStaticMesh };
 
 struct AssetInfo {
   GUUID id;
-  std::string name = "";
   AssetType type;
-  std::filesystem::path meta_path;
+  std::string meta_path;
 };
 
 template <typename T>

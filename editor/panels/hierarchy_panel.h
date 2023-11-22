@@ -16,7 +16,13 @@ class HierarchyPanel : public Panel {
   void SetScene(const Ref<Scene>& scene);
 
   void SetSelectedEntity(Entity entity);
-  Entity GetSelectedEntity() const { return selected_entity_; }
+  Entity GetSelectedEntity() {
+    if (selected_entity_ && !scene_->Exists(selected_entity_)) {
+      return Entity{};
+    }
+
+    return selected_entity_;
+  }
 
  protected:
   void Draw() override;

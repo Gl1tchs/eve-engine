@@ -13,24 +13,14 @@
 
 class AssetLibrary {
  public:
-  AssetLibrary() = default;
-  ~AssetLibrary() = default;
-
   template <typename T>
-  AssetRef<T> LoadFromMeta(const std::string& path);
-
-  [[nodiscard]] bool Exists(GUUID id);
-
-  [[nodiscard]] bool Exists(const std::string& name);
+  [[nodiscard]] static AssetRef<T> LoadFromMeta(const std::string& path);
 
   // Get the path with some predefined substrings
   // Use "res://" to get asset directory
   // Use "proj://" to get project directory
   [[nodiscard]] static std::filesystem::path GetAssetPath(
       std::string relative_path);
-
- private:
-  std::unordered_map<std::string, AssetInfo> assets_;
 };
 
 #include "asset/asset_library.inl"

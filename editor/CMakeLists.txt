@@ -3,6 +3,8 @@ set(SOURCES
   layers/editor_layer.h
   modals/exit_modal.cc
   modals/exit_modal.h
+  modals/importer_modal.cc
+  modals/importer_modal.h
   modals/modal.cc
   modals/modal.h
   panels/hierarchy_panel.cc
@@ -15,6 +17,8 @@ set(SOURCES
   panels/render_stats_panel.h
   panels/viewport_panel.cc
   panels/viewport_panel.h
+  widgets/combo.cc
+  widgets/combo.h
   widgets/dock_space.cc
   widgets/dock_space.h
   widgets/menu_bar.cc
