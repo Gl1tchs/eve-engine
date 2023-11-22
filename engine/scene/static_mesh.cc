@@ -6,6 +6,14 @@
 
 #include "core/debug/log.h"
 
+glm::vec2 ToGLM2(const objl::Vector2& from) {
+  return glm::vec2{from.X, from.Y};
+}
+
+glm::vec3 ToGLM3(const objl::Vector3& from) {
+  return glm::vec3{from.X, from.Y, from.Z};
+}
+
 Ref<Model> Model::Load(const std::filesystem::path& path) {
   objl::Loader loader;
 
@@ -23,26 +31,26 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
     mesh.name = mesh_loaded.MeshName;
     for (auto vertex_loaded : mesh_loaded.Vertices) {
       Vertex vertex;
-      vertex.position = {vertex_loaded.Position.X, vertex_loaded.Position.Y,
-                         vertex_loaded.Position.Z, 1.0f};
-      vertex.normal = {vertex_loaded.Normal.X, vertex_loaded.Normal.Y,
-                       vertex_loaded.Normal.Z};
-      vertex.tex_coords = {vertex_loaded.TextureCoordinate.X,
-                           vertex_loaded.TextureCoordinate.Y};
+      vertex.position = glm::vec4(ToGLM3(vertex_loaded.Position), 1.0);
+      vertex.normal = ToGLM3(vertex_loaded.Normal);
+      vertex.tex_coords = ToGLM2(vertex_loaded.TextureCoordinate);
 
       mesh.vertices.push_back(vertex);
     }
 
     mesh.indices = mesh_loaded.Indices;
 
+    Material material;
+    material.ambient = ToGLM3(mesh_loaded.MeshMaterial.Ka);
+    material.diffuse = ToGLM3(mesh_loaded.MeshMaterial.Kd);
+    material.specular = ToGLM3(mesh_loaded.MeshMaterial.Ks);
+    material.shininess = mesh_loaded.MeshMaterial.Ns;
+    // TODO material textures
+
+    mesh.material = material;
+
     model->meshes.push_back(mesh);
   }
 
-  Material material;
-  // TODO import material
-  material.color = {0.31f, 0.62f, 0.93f, 1.0f};
-
-  model->material = material;
-  
   return model;
 }

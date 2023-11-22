@@ -8,7 +8,10 @@
 #include "graphics/texture.h"
 
 struct Material {
-  glm::vec4 color;
+  glm::vec3 ambient;
+  glm::vec3 diffuse;
+  glm::vec3 specular;
+  float shininess;
   // glm::vec4 ambient_color;
   // glm::vec4 diffuse_color;
   // glm::vec4 specular_color;

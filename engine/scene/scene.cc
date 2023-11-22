@@ -131,24 +131,12 @@ void Scene::OnUpdateRuntime(float ds) {
   }
 
   if (main_camera && camera_transform) {
-    Ref<Renderer>& renderer = state_->renderer;
-
-    renderer->BeginScene({main_camera->GetViewMatrix(*camera_transform),
-                          main_camera->GetProjectionMatrix(),
-                          camera_transform->position});
-
-    registry_.view<Transform, ModelComponent>().each(
-        [renderer](entt::entity entity_id, const Transform& transform,
-                   const ModelComponent& model_comp) {
-          renderer->Draw(model_comp.model->asset, transform);
-        });
-
-    renderer->EndScene();
+    RenderScene(*main_camera, *camera_transform);
   }
 }
 
 void Scene::OnUpdateEditor(float ds, EditorCamera& camera) {
-  RenderScene(camera);
+  RenderScene(camera, camera.GetTransform());
 }
 
 void Scene::OnViewportResize(glm::uvec2 size) {
@@ -199,16 +187,28 @@ void Scene::Step(int frames) {
   step_frames_ = frames;
 }
 
-void Scene::RenderScene(EditorCamera& camera) {
+void Scene::RenderScene(Camera& camera, Transform& transform) {
   Ref<Renderer>& renderer = state_->renderer;
 
-  renderer->BeginScene({camera.GetViewMatrix(), camera.GetProjectionMatrix(),
-                        camera.GetTransform().position});
+  renderer->BeginScene({camera.GetViewMatrix(transform),
+                        camera.GetProjectionMatrix(), transform.position});
+
+  registry_.view<DirectionalLight, Transform>().each(
+      [renderer](entt::entity entity_id, const DirectionalLight& light,
+                 Transform& transform) {
+        renderer->AddLight(light, transform.GetDirection());
+      });
 
   registry_.view<Transform, ModelComponent>().each(
-      [renderer](entt::entity entity_id, const Transform& transform,
-                 const ModelComponent& model_comp) {
-        renderer->Draw(model_comp.model->asset, transform);
+      [&](entt::entity entity_id, const Transform& transform,
+          const ModelComponent& model_comp) {
+        std::optional<Material> material{};
+        if (registry_.all_of<Material>(entity_id)) {
+          material =
+              std::optional<Material>(registry_.get<Material>(entity_id));
+        }
+
+        renderer->Draw(model_comp.model->asset, transform, material);
       });
 
   renderer->EndScene();

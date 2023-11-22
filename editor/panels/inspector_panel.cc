@@ -52,8 +52,8 @@ void InspectorPanel::Draw() {
 
     ImGui::Text("Rotation:");
     ImGui::SameLine();
-    if (ImGui::DragFloat3("##transform_rotation", glm::value_ptr(transform.rotation),
-                          0.05f)) {
+    if (ImGui::DragFloat3("##transform_rotation",
+                          glm::value_ptr(transform.rotation), 0.05f)) {
       modified_ = true;
     }
 
@@ -148,6 +148,66 @@ void InspectorPanel::Draw() {
     ImGui::SameLine();
     if (ImGui::Checkbox("##fixed_aspect_ratio",
                         &camera_comp.is_fixed_aspect_ratio)) {
+      modified_ = true;
+    }
+  }
+
+  if (selected_entity.HasComponent<DirectionalLight>()) {
+    ImGui::SeparatorText("Directional Light");
+
+    auto& light = selected_entity.GetComponent<DirectionalLight>();
+
+    ImGui::Text("Ambient:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##directional_light_ambient",
+                          glm::value_ptr(light.ambient))) {
+      modified_ = true;
+    }
+
+    ImGui::Text("Diffuse:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##directional_light_diffuse",
+                          glm::value_ptr(light.diffuse))) {
+      modified_ = true;
+    }
+
+    ImGui::Text("Specular:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##directional_light_specular",
+                          glm::value_ptr(light.specular))) {
+      modified_ = true;
+    }
+  }
+
+  if (selected_entity.HasComponent<Material>()) {
+    ImGui::SeparatorText("Material");
+
+    auto& material = selected_entity.GetComponent<Material>();
+
+    ImGui::Text("Ambient:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##material_ambient",
+                          glm::value_ptr(material.ambient))) {
+      modified_ = true;
+    }
+
+    ImGui::Text("Diffuse:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##material_diffuse",
+                          glm::value_ptr(material.diffuse))) {
+      modified_ = true;
+    }
+
+    ImGui::Text("Specular:");
+    ImGui::SameLine();
+    if (ImGui::ColorEdit3("##material_specular",
+                          glm::value_ptr(material.specular))) {
+      modified_ = true;
+    }
+
+    ImGui::Text("Shininess:");
+    ImGui::SameLine();
+    if (ImGui::DragFloat("##material_shininess", &material.shininess, 0.05f)) {
       modified_ = true;
     }
   }

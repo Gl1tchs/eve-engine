@@ -16,6 +16,7 @@
 #include "graphics/vertex_array.h"
 #include "graphics/vertex_buffer.h"
 #include "scene/components.h"
+#include "scene/lights.h"
 #include "scene/transform.h"
 
 static constexpr size_t kMaxVertexCount = 4000;
@@ -28,7 +29,11 @@ struct CameraData final {
   glm::vec3 position;
 };
 
-struct RenderStats {
+struct LightData final {
+  DirectionalLight directional_light;
+};
+
+struct RenderStats final {
   uint32_t draw_calls = 0;
   uint32_t vertex_count = 0;
   uint32_t index_count = 0;
@@ -43,9 +48,14 @@ class Renderer final {
 
   void EndScene();
 
-  void Draw(const RenderPacket& packet, const Ref<Texture>& texture);
+  void Draw(const RenderPacket& packet, const Transform& transform,
+            const Ref<Texture>& texture);
 
-  void Draw(const Ref<Model>& model, const Transform& transform);
+  void Draw(const Ref<Model>& model, const Transform& transform,
+            const std::optional<Material>& material);
+
+  // TODO add multiple
+  void AddLight(const DirectionalLight& light, const glm::vec3& direction);
 
   [[nodiscard]] const RenderStats& GetStats() const { return stats_; }
 
@@ -61,6 +71,7 @@ class Renderer final {
   void NextBatch();
 
  private:
+  // Renderer Data
   Ref<VertexArray> vertex_array_;
   Ref<VertexBuffer> vertex_buffer_;
   Ref<IndexBuffer> index_buffer_;
@@ -74,11 +85,19 @@ class Renderer final {
   uint32_t index_count_{0};
   uint32_t index_offset_{0};
 
+  // Textures
   Ref<Texture> white_texture_;
   std::array<Ref<Texture>, kMaxTextures> texture_slots_{};
   uint32_t texture_slot_index_{0};
 
+  // Camera stuff
   Ref<UniformBuffer> camera_uniform_buffer_;
 
+  // Lightning
+  Ref<UniformBuffer> light_uniform_buffer_;
+  // TODO optional
+  DirectionalLight dir_light;
+
+  // Misc
   RenderStats stats_;
 };

@@ -3,20 +3,33 @@
 #version 450
 
 #include "camera_data.glsl"
+#include "output.glsl"
+#include "material.glsl"
 
 layout(location = 0) in vec4 a_pos;
-layout(location = 1) in vec4 a_color;
-layout(location = 2) in vec3 a_normal;
-layout(location = 3) in vec2 a_tex_coords;
-layout(location = 4) in float a_tex_index;
+layout(location = 1) in vec3 a_ambient;
+layout(location = 2) in vec3 a_diffuse;
+layout(location = 3) in vec3 a_specular;
+layout(location = 4) in float a_shininess;
+layout(location = 5) in vec3 a_normal;
+layout(location = 6) in vec2 a_tex_coords;
+layout(location = 7) in float a_tex_index;
 
-layout(location = 0) out vec4 v_color;
-layout(location = 1) out vec2 v_tex_coords;
-layout(location = 2) out float v_tex_index;
+layout(location = 0) out VertexOutput v_output;
 
 void main() {
-  v_color = a_color;
-  v_tex_coords = a_tex_coords;
-  v_tex_index = a_tex_index;
+  // assign material values
+  Material material;
+  material.ambient = a_ambient;
+  material.diffuse = a_diffuse;
+  material.specular = a_specular;
+  material.shininess = a_shininess;
+
+  v_output.material = material;
+  v_output.frag_pos = a_pos.xyz;
+  v_output.normal = a_normal;
+  v_output.tex_coords = a_tex_coords;
+  v_output.tex_index = a_tex_index;
+  
   gl_Position = u_camera.proj * u_camera.view * a_pos;
 }

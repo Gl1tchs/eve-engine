@@ -38,6 +38,8 @@ struct Transform final {
 
   [[nodiscard]] glm::mat4 GetModelMatrix() const;
 
+  [[nodiscard]] glm::vec3 GetDirection();
+
  private:
   void UpdateVectors();
 

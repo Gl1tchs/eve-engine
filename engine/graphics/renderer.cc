@@ -7,7 +7,6 @@
 #include "core/core_minimal.h"
 #include "graphics/graphics.h"
 #include "graphics/render_command.h"
-#include "renderer.h"
 
 Renderer::Renderer() {
   PROFILE_FUNCTION();
@@ -16,8 +15,9 @@ Renderer::Renderer() {
 
   RenderCommand::Init();
 
-  shader_ = Shader::Create(std::filesystem::path(".eve/shaders/default.vert.spirv"),
-                           std::filesystem::path(".eve/shaders/default.frag.spirv"));
+  shader_ =
+      Shader::Create(std::filesystem::path(".eve/shaders/default.vert.spirv"),
+                     std::filesystem::path(".eve/shaders/default.frag.spirv"));
 
   shader_->Bind();
 
@@ -33,7 +33,10 @@ Renderer::Renderer() {
   vertex_buffer_ = VertexBuffer::Create(kMaxVertexCount * sizeof(Vertex));
 
   BufferLayout layout = {{ShaderDataType::kFloat4, "a_pos"},
-                         {ShaderDataType::kFloat4, "a_color"},
+                         {ShaderDataType::kFloat3, "a_ambient"},
+                         {ShaderDataType::kFloat3, "a_diffuse"},
+                         {ShaderDataType::kFloat3, "a_specular"},
+                         {ShaderDataType::kFloat, "a_shininess"},
                          {ShaderDataType::kFloat3, "a_normal"},
                          {ShaderDataType::kFloat2, "a_tex_coords"},
                          {ShaderDataType::kFloat, "a_tex_index"}};
@@ -64,6 +67,8 @@ Renderer::Renderer() {
             white_texture_);
 
   camera_uniform_buffer_ = UniformBuffer::Create(sizeof(CameraData), 0);
+
+  light_uniform_buffer_ = UniformBuffer::Create(sizeof(LightData), 1);
 }
 
 Renderer::~Renderer() {
@@ -87,7 +92,8 @@ void Renderer::EndScene() {
   Flush();
 }
 
-void Renderer::Draw(const RenderPacket& packet, const Ref<Texture>& texture) {
+void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
+                    const Ref<Texture>& texture) {
   PROFILE_FUNCTION();
 
   if (NeedsNewBatch(packet.indices.size()) ||
@@ -108,6 +114,15 @@ void Renderer::Draw(const RenderPacket& packet, const Ref<Texture>& texture) {
   }
 
   for (Vertex vertex : packet.vertices) {
+    vertex.position = transform.GetModelMatrix() * vertex.position;
+
+    // set material values
+    auto material = packet.material;
+    vertex.ambient = material.ambient;
+    vertex.specular = material.diffuse;
+    vertex.diffuse = material.specular;
+    vertex.shininess = material.shininess;
+
     vertex.tex_index = texture_index;
     vertices_[vertex_count_++] = vertex;
   }
@@ -122,7 +137,8 @@ void Renderer::Draw(const RenderPacket& packet, const Ref<Texture>& texture) {
   stats_.vertex_count += packet.vertices.size();
 }
 
-void Renderer::Draw(const Ref<Model>& model, const Transform& transform) {
+void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
+                    const std::optional<Material>& material) {
   PROFILE_FUNCTION();
 
   for (auto mesh : model->meshes) {
@@ -130,10 +146,19 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform) {
       NextBatch();
     }
 
+    Material material_in_use =
+        material.has_value() ? material.value() : mesh.material;
+
     float texture_index = 0.0f;
     for (Vertex vertex : mesh.vertices) {
       vertex.position = transform.GetModelMatrix() * vertex.position;
-      vertex.color = model->material.color;
+
+      // set material values
+      vertex.ambient = material_in_use.ambient;
+      vertex.specular = material_in_use.diffuse;
+      vertex.diffuse = material_in_use.specular;
+      vertex.shininess = material_in_use.shininess;
+
       vertex.tex_index = texture_index;
       vertices_[vertex_count_++] = vertex;
     }
@@ -147,6 +172,12 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform) {
     stats_.index_count += mesh.indices.size();
     stats_.vertex_count += mesh.vertices.size();
   }
+}
+
+void Renderer::AddLight(const DirectionalLight& light,
+                        const glm::vec3& direction) {
+  dir_light = light;
+  dir_light.direction = direction;
 }
 
 void Renderer::ResetStats() {
@@ -164,9 +195,16 @@ void Renderer::BeginBatch() {
   index_offset_ = 0;
 
   texture_slot_index_ = 1;
+
+  // TODO find better way
+  dir_light = DirectionalLight{};
 }
 
 void Renderer::Flush() {
+  LightData light_data;
+  light_data.directional_light = dir_light;
+  light_uniform_buffer_->SetData(&light_data, sizeof(LightData));
+
   index_buffer_->SetData(indices_, index_count_ * sizeof(uint32_t));
   vertex_buffer_->SetData(vertices_, vertex_count_ * sizeof(Vertex));
 

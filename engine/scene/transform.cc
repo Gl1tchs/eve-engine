@@ -4,6 +4,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include "transform.h"
 
 Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     : position(position),
@@ -49,8 +50,15 @@ glm::mat4 Transform::GetModelMatrix() const {
   return translation_mat * rotation_mat * scale_mat;
 }
 
+glm::vec3 Transform::GetDirection() {
+  glm::vec3 dir(cos(rotation.x) * cos(rotation.y), sin(rotation.x),
+                cos(rotation.x) * sin(rotation.y));
+  dir = glm::normalize(dir);
+  return dir;
+}
+
 void Transform::UpdateVectors() {
-  glm::fquat orientation = glm::fquat(glm::radians(rotation)); 
+  glm::fquat orientation = glm::fquat(glm::radians(rotation));
 
   forward_ = glm::normalize(orientation * kVec3Forward);
   right_ = glm::normalize(orientation * kVec3Right);

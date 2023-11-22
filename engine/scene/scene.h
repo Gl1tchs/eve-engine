@@ -53,7 +53,7 @@ class Scene {
   [[nodiscard]] const std::string& GetName() const { return name_; }
 
  private:
-  void RenderScene(EditorCamera& camera);
+  void RenderScene(Camera& camera, Transform& transform);
 
  private:
   entt::registry registry_;
