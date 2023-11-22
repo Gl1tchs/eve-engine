@@ -61,8 +61,8 @@ Ref<Scene> Scene::Copy(Ref<Scene> other) {
   std::unordered_map<GUUID, entt::entity> entt_map;
 
   // Create entities in new scene
-  auto idView = src_scene_registry.view<IdComponent>();
-  for (auto e : idView) {
+  auto id_view = src_scene_registry.view<IdComponent>();
+  for (auto e : id_view) {
     GUUID uuid = src_scene_registry.get<IdComponent>(e).id;
     const auto& name = src_scene_registry.get<TagComponent>(e).tag;
     Entity newEntity = new_scene->CreateEntityWithUUID(uuid, name);
@@ -134,7 +134,8 @@ void Scene::OnUpdateRuntime(float ds) {
     Ref<Renderer>& renderer = state_->renderer;
 
     renderer->BeginScene({main_camera->GetViewMatrix(*camera_transform),
-                          main_camera->GetProjectionMatrix()});
+                          main_camera->GetProjectionMatrix(),
+                          camera_transform->position});
 
     registry_.view<Transform, ModelComponent>().each(
         [renderer](entt::entity entity_id, const Transform& transform,
@@ -201,7 +202,8 @@ void Scene::Step(int frames) {
 void Scene::RenderScene(EditorCamera& camera) {
   Ref<Renderer>& renderer = state_->renderer;
 
-  renderer->BeginScene({camera.GetViewMatrix(), camera.GetProjectionMatrix()});
+  renderer->BeginScene({camera.GetViewMatrix(), camera.GetProjectionMatrix(),
+                        camera.GetTransform().position});
 
   registry_.view<Transform, ModelComponent>().each(
       [renderer](entt::entity entity_id, const Transform& transform,

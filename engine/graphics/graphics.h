@@ -15,7 +15,9 @@
 #include "graphics/vertex_array.h"
 #include "graphics/vertex_buffer.h"
 
-constexpr GraphicsAPI kGraphicsAPI = GraphicsAPI::kOpenGL;
+constexpr GraphicsAPI GetGraphicsAPI() {
+  return GraphicsAPI::kOpenGL;
+}
 
 Ref<VertexBuffer> CreateVertexBuffer(uint32_t size);
 

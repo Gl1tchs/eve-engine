@@ -20,6 +20,8 @@ set(SOURCES
   renderer_api.h
   renderer.cc
   renderer.h
+  shader_compiler.cc
+  shader_compiler.h
   shader.cc
   shader.h
   texture.cc
@@ -69,6 +71,8 @@ target_include_directories(eve_graphics PRIVATE
   ${VENDOR_DIR}/glad/include/
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/include
+  ${VENDOR_DIR}/SPIRV-Cross
+  ${Vulkan_INCLUDE_DIRS}
 )
 
 target_link_libraries(eve_graphics PRIVATE
@@ -78,22 +82,9 @@ target_link_libraries(eve_graphics PRIVATE
   glm
   glad
   glfw
+  spirv-cross-core
+  spirv-cross-glsl
+  Vulkan::shaderc_combined
 )
 
 target_compile_definitions(eve_graphics PRIVATE GLFW_INCLUDE_NONE)
-
-if (SHADER_COMPILER_FOUND) 
-  compile_shader(eve_graphics  
-    ENV opengl # todo make it dynamic
-    KIND vertex
-    DEFINITIONS OPENGL
-    SOURCES shaders/default.vert
-  )
-
-  compile_shader(eve_graphics
-    ENV opengl # todo make it dynamic
-    KIND fragment
-    DEFINITIONS OPENGL
-    SOURCES shaders/default.frag
-  )
-endif()

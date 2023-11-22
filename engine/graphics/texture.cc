@@ -12,7 +12,7 @@
 
 Ref<Texture> Texture::Create(const TextureMetadata& metadata,
                              const void* pixels) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLTexture2D>(metadata, pixels);
     case GraphicsAPI::kVulkan:

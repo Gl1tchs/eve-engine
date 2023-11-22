@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_vertex_array.h"
 
 Ref<VertexArray> VertexArray::Create() {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLVertexArray>();
     case GraphicsAPI::kVulkan:

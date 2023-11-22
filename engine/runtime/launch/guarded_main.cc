@@ -1,22 +1,28 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
+#include <filesystem>
+
 #include "core/core_minimal.h"
 #include "core/instance.h"
 
 extern Instance* CreateInstance(CommandLineArguments args);
 
 int GuardedMain(CommandLineArguments args) {
-  LoggerManager::Init("intermediate/engine.log");
+  if (!std::filesystem::exists(".eve/")) {
+    std::filesystem::create_directory(".eve/");
+  }
 
-  PROFILE_BEGIN_SESSION("Startup", "intermediate/eve-profiler-startup.prf");
+  LoggerManager::Init(".eve/engine.log");
+
+  PROFILE_BEGIN_SESSION("Startup", ".eve/eve-profiler-startup.prf");
   Instance* instance = CreateInstance(args);
   PROFILE_END_SESSION();
 
-  PROFILE_BEGIN_SESSION("Runtime", "intermediate/eve-profiler-runtime.prf");
+  PROFILE_BEGIN_SESSION("Runtime", ".eve/eve-profiler-runtime.prf");
   instance->StartEventLoop();
   PROFILE_END_SESSION();
 
-  PROFILE_BEGIN_SESSION("Shutdown", "intermediate/eve-profiler-shutdown.prf");
+  PROFILE_BEGIN_SESSION("Shutdown", ".eve/eve-profiler-shutdown.prf");
   delete instance;
   PROFILE_END_SESSION();
 

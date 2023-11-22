@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_index_buffer.h"
 
 Ref<IndexBuffer> IndexBuffer::Create(uint32_t size) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLIndexBuffer>(size);
     case GraphicsAPI::kVulkan:
@@ -20,7 +20,7 @@ Ref<IndexBuffer> IndexBuffer::Create(uint32_t size) {
 }
 
 Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLIndexBuffer>(indices, count);
     case GraphicsAPI::kVulkan:

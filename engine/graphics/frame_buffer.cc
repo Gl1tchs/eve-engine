@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_frame_buffer.h"
 
 Ref<FrameBuffer> FrameBuffer::Create(const glm::ivec2 size) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLFrameBuffer>(size);
     case GraphicsAPI::kVulkan:

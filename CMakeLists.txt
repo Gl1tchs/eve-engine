@@ -51,8 +51,10 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "dist")
     add_compile_definitions(EVE_DIST)
 endif()
 
-# Build helper programs
-add_subdirectory("programs")
+find_package(Vulkan REQUIRED COMPONENTS shaderc_combined)
+if(NOT Vulkan_FOUND)
+    message(FATAL_ERROR "Vulkan not found. Please install the Vulkan SDK.")
+endif()
 
 # Define the targets
 add_subdirectory("editor")

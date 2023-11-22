@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_context.h"
 
 Ref<GraphicsContext> GraphicsContext::Create() {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLContext>();
     case GraphicsAPI::kVulkan:

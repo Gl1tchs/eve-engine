@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_uniform_buffer.h"
 
 Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLUniformBuffer>(size, binding);
     case GraphicsAPI::kVulkan:

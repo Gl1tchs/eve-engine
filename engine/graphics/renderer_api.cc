@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_renderer_api.h"
 
 Scope<RendererAPI> RendererAPI::Create() {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateScope<OpenGLRendererAPI>();
     case GraphicsAPI::kVulkan:

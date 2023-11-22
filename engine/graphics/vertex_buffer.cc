@@ -7,7 +7,7 @@
 #include "graphics/platforms/opengl/opengl_vertex_buffer.h"
 
 Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLVertexBuffer>(size);
     case GraphicsAPI::kVulkan:
@@ -20,7 +20,7 @@ Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
 }
 
 Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLVertexBuffer>(vertices, size);
     case GraphicsAPI::kVulkan:

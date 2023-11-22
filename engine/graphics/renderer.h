@@ -25,6 +25,7 @@ static constexpr size_t kMaxTextures = 32;
 struct CameraData final {
   glm::mat4 view;
   glm::mat4 proj;
+  glm::vec3 position;
 };
 
 struct RenderStats {

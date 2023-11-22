@@ -9,7 +9,7 @@
 Ref<Shader> Shader::Create(const std::string& vs_source,
                            const std::string& fs_source,
                            const std::string& gs_source) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLShader>(vs_source, fs_source, gs_source);
     case GraphicsAPI::kVulkan:
@@ -24,7 +24,7 @@ Ref<Shader> Shader::Create(const std::string& vs_source,
 Ref<Shader> Shader::Create(const std::filesystem::path& vs_path,
                            const std::filesystem::path& fs_path,
                            const std::filesystem::path& gs_path) {
-  switch (kGraphicsAPI) {
+  switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLShader>(vs_path, fs_path, gs_path);
     case GraphicsAPI::kVulkan:

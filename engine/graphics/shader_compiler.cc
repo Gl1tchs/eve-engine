@@ -1,21 +1,22 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#include "compiler.h"
+#include "graphics/shader_compiler.h"
 
 #include <fstream>
-#include <iostream>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross.hpp>
 #include <spirv_glsl.hpp>
 
-std::optional<TargetEnv> DeserializeTargetEnv(std::string env) {
+#include "core/debug/assert.h"
+
+std::optional<GraphicsAPI> DeserializeTargetEnv(std::string env) {
   if (env == "vulkan") {
-    return std::optional<TargetEnv>(TargetEnv::kVulkan);
+    return std::optional<GraphicsAPI>(GraphicsAPI::kVulkan);
   } else if (env == "opengl") {
-    return std::optional<TargetEnv>(TargetEnv::kOpenGL);
+    return std::optional<GraphicsAPI>(GraphicsAPI::kOpenGL);
   } else {
-    return std::optional<TargetEnv>();
+    return std::optional<GraphicsAPI>();
   }
 }
 
@@ -29,20 +30,26 @@ std::optional<ShaderKind> DeserializeShaderKind(std::string kind) {
   }
 }
 
-shaderc_target_env GetTargetEnv(TargetEnv env) {
+shaderc_target_env GetTargetEnv(GraphicsAPI env) {
   switch (env) {
-    case TargetEnv::kVulkan:
+    case GraphicsAPI::kVulkan:
       return shaderc_target_env_vulkan;
-    case TargetEnv::kOpenGL:
+    case GraphicsAPI::kOpenGL:
+      return shaderc_target_env_opengl;
+    default:
+      ENGINE_ASSERT(false, "Unknown Graphics API!")
       return shaderc_target_env_opengl;
   }
 }
 
-shaderc_env_version GetEnvVersion(TargetEnv env) {
+shaderc_env_version GetEnvVersion(GraphicsAPI env) {
   switch (env) {
-    case TargetEnv::kVulkan:
+    case GraphicsAPI::kVulkan:
       return shaderc_env_version_vulkan_1_3;
-    case TargetEnv::kOpenGL:
+    case GraphicsAPI::kOpenGL:
+      return shaderc_env_version_opengl_4_5;
+    default:
+      ENGINE_ASSERT(false, "Unknown Graphics API!")
       return shaderc_env_version_opengl_4_5;
   }
 }
@@ -58,7 +65,7 @@ shaderc_shader_kind GetShaderKind(ShaderKind kind) {
 
 std::string LoadShaderSource(const std::filesystem::path& path) {
   if (!std::filesystem::exists(path)) {
-    std::cerr << "Shader file not found at: " << path.string() << "\n";
+    LOG_ENGINE_ERROR("Shader file not found at: {0}", path.string());
     return "";
   }
 
@@ -69,7 +76,7 @@ std::string LoadShaderSource(const std::filesystem::path& path) {
   std::ifstream file(path);
 
   if (!file.is_open()) {
-    std::cerr << "Could not open the shader at: " << path.string() << "\n";
+    LOG_ENGINE_ERROR("Could not open the shader at: {0}", path.string());
     return full_source_code;
   }
 
@@ -100,7 +107,7 @@ std::string LoadShaderSource(const std::filesystem::path& path) {
 
 std::vector<uint32_t> CompileShader(const std::string& source,
                                     const char* file_name, ShaderKind kind,
-                                    TargetEnv env, std::string definitions) {
+                                    GraphicsAPI env, std::string definitions) {
   shaderc::Compiler compiler;
   shaderc::CompileOptions options;
 
@@ -116,7 +123,7 @@ std::vector<uint32_t> CompileShader(const std::string& source,
   shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
       source, GetShaderKind(kind), file_name, options);
   if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
-    std::cerr << module.GetErrorMessage() << "\n";
+    LOG_ENGINE_ERROR("{0}", module.GetErrorMessage());
     return {};
   }
 

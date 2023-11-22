@@ -16,8 +16,8 @@ Renderer::Renderer() {
 
   RenderCommand::Init();
 
-  shader_ = Shader::Create(std::filesystem::path("shaders/default.vert.spirv"),
-                           std::filesystem::path("shaders/default.frag.spirv"));
+  shader_ = Shader::Create(std::filesystem::path(".eve/shaders/default.vert.spirv"),
+                           std::filesystem::path(".eve/shaders/default.frag.spirv"));
 
   shader_->Bind();
 
