@@ -23,3 +23,6 @@
 [submodule "thirdparty/yaml-cpp"]
 	path = thirdparty/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "thirdparty/ImGuizmo"]
+	path = thirdparty/ImGuizmo
+	url = https://github.com/Gl1tchs/ImGuizmo.git

@@ -16,12 +16,14 @@ target_include_directories(eve_ui PUBLIC
 )
 
 target_include_directories(eve_ui PRIVATE
-  ${VENDOR_DIR}/imgui
   ${VENDOR_DIR}/glfw/include
+  ${VENDOR_DIR}/imgui
+  ${VENDOR_DIR}/ImGuizmo
 )
 
 target_link_libraries(eve_ui PRIVATE
   eve::core
   ImGui
+  ImGuizmo
   glfw
 )

@@ -34,6 +34,8 @@ class EditorLayer : public Layer {
   void OnGUI(float ds) override;
 
  private:
+  void HandleShortcuts();
+
   void OpenProject();
 
   void NewScene();
@@ -69,6 +71,7 @@ class EditorLayer : public Layer {
   std::string editor_scene_path_;
 
   EditorCamera editor_camera_;
+  bool camera_translatable_;
 
   Ref<FrameBuffer> frame_buffer_;
 

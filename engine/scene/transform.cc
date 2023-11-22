@@ -3,8 +3,8 @@
 #include "scene/transform.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/quaternion.hpp>
-#include "transform.h"
 
 Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     : position(position),
@@ -38,16 +38,15 @@ glm::vec3 Transform::GetUp() {
 }
 
 glm::mat4 Transform::GetModelMatrix() const {
-  glm::mat4 translation_mat = glm::translate(glm::mat4(1.0f), position);
+  glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
 
-  glm::mat4 rotation_mat =
-      glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), kVec3Right) *
-      glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), kVec3Up) *
-      glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), kVec3Forward);
+  transform = glm::rotate(transform, glm::radians(rotation.x), kVec3Right);
+  transform = glm::rotate(transform, glm::radians(rotation.y), kVec3Up);
+  transform = glm::rotate(transform, glm::radians(rotation.z), kVec3Forward);
 
-  glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), scale);
+  transform = glm::scale(transform, scale);
 
-  return translation_mat * rotation_mat * scale_mat;
+  return transform;
 }
 
 glm::vec3 Transform::GetDirection() {

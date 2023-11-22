@@ -4,6 +4,7 @@ add_subdirectory("glad")
 add_subdirectory("glfw")
 add_subdirectory("glm")
 add_subdirectory("imgui")
+add_subdirectory("ImGuizmo")
 add_subdirectory("spdlog")
 
 option(YAML_CPP_BUILD_CONTRIB OFF)

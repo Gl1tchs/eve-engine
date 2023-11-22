@@ -2,6 +2,7 @@
 
 #include "layers/editor_layer.h"
 
+#include <ImGuizmo.h>
 #include <tinyfiledialogs.h>
 
 #include "core/debug/instrumentor.h"
@@ -39,8 +40,9 @@ void EditorLayer::OnStart() {
 
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
-  viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_);
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
+  viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
+                                               &editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
   render_stats_panel_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
 
@@ -155,6 +157,8 @@ void EditorLayer::OnUpdate(float ds) {
     case SceneState::kEdit: {
       if (viewport_panel_->IsFocused() &&
           Input::IsMouseButtonPressed(MouseCode::kRight)) {
+        camera_translatable_ = true;
+
         // hide the cursor since we are now controlling the camera
         if (old_cursor_state_ == CursorState::kNormal) {
           old_cursor_state_ = CursorState::kHidden;
@@ -162,6 +166,8 @@ void EditorLayer::OnUpdate(float ds) {
         }
         editor_camera_.Update(ds);
       } else {
+        camera_translatable_ = false;
+
         // set cursor to normal again
         if (old_cursor_state_ == CursorState::kHidden) {
           old_cursor_state_ = CursorState::kNormal;
@@ -180,6 +186,32 @@ void EditorLayer::OnUpdate(float ds) {
   }
 
   frame_buffer_->Unbind();
+
+  HandleShortcuts();
+}
+
+void EditorLayer::OnGUI(float ds) {
+  PROFILE_FUNCTION();
+
+  DockSpace::Begin();
+  {
+    menu_bar_.Draw();
+
+    // Render panels
+    viewport_panel_->Render();
+    hierarchy_panel_->Render();
+    inspector_panel_->Render();
+    render_stats_panel_->Render();
+
+    exit_modal_.Render();
+  }
+  DockSpace::End();
+}
+
+void EditorLayer::HandleShortcuts() {
+  if (camera_translatable_) {
+    return;
+  }
 
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
@@ -206,6 +238,29 @@ void EditorLayer::OnUpdate(float ds) {
     }
   }
 
+  // Gizmo and transform manuplation shortcuts
+  if (!ImGuizmo::IsUsing()) {
+    if (Input::IsKeyPressed(KeyCode::kQ)) {
+      viewport_panel_->SetGizmoState(-1);
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kW)) {
+      viewport_panel_->SetGizmoState(ImGuizmo::OPERATION::TRANSLATE);
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kE)) {
+      viewport_panel_->SetGizmoState(ImGuizmo::OPERATION::ROTATE);
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kR)) {
+      viewport_panel_->SetGizmoState(ImGuizmo::OPERATION::SCALE);
+    }
+
+    if (Input::IsKeyPressed(KeyCode::kT)) {
+      viewport_panel_->SetGizmoState(ImGuizmo::OPERATION::UNIVERSAL);
+    }
+  }
+
   if (auto entity = hierarchy_panel_->GetSelectedEntity(); entity) {
     if (Input::IsKeyPressed(KeyCode::kDelete)) {
       active_scene_->DestroyEntity(entity);
@@ -213,24 +268,6 @@ void EditorLayer::OnUpdate(float ds) {
       modify_info.SetModified();
     }
   }
-}
-
-void EditorLayer::OnGUI(float ds) {
-  PROFILE_FUNCTION();
-
-  DockSpace::Begin();
-  {
-    menu_bar_.Draw();
-
-    // Render panels
-    viewport_panel_->Render();
-    hierarchy_panel_->Render();
-    inspector_panel_->Render();
-    render_stats_panel_->Render();
-
-    exit_modal_.Render();
-  }
-  DockSpace::End();
 }
 
 void EditorLayer::OpenProject() {

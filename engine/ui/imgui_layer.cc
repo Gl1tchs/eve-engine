@@ -3,13 +3,13 @@
 #include "ui/imgui_layer.h"
 
 #include <GLFW/glfw3.h>
+#include <ImGuizmo.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
 #include "core/debug/instrumentor.h"
-#include "imgui_layer.h"
 
 ImGuiLayer::ImGuiLayer(Ref<State>& state) : Layer(state) {}
 
@@ -19,6 +19,7 @@ void ImGuiLayer::Begin() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+  ImGuizmo::BeginFrame();
 }
 
 void ImGuiLayer::End() {

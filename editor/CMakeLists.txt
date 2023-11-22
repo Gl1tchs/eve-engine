@@ -40,6 +40,7 @@ target_include_directories(eve_editor PRIVATE
   ${CMAKE_SOURCE_DIR}/editor
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/imgui
+  ${VENDOR_DIR}/ImGuizmo
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/tinyfiledialogs
@@ -47,8 +48,9 @@ target_include_directories(eve_editor PRIVATE
 
 target_link_libraries(eve_editor PRIVATE
   eve::all
-  ImGui
   glfw # for imgui
+  ImGui
+  ImGuizmo
   EnTT
   tinyfiledialogs
 )
