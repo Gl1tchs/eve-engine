@@ -44,6 +44,7 @@ endif()
 target_include_directories(eve_editor PRIVATE
   ${CMAKE_SOURCE_DIR}/editor
   ${CMAKE_SOURCE_DIR}/engine
+  ${VENDOR_DIR}/cxxopts/include
   ${VENDOR_DIR}/imgui
   ${VENDOR_DIR}/ImGuizmo
   ${VENDOR_DIR}/include
@@ -54,6 +55,7 @@ target_include_directories(eve_editor PRIVATE
 
 target_link_libraries(eve_editor PRIVATE
   eve::all
+  cxxopts
   glfw # for imgui
   ImGui
   ImGuizmo

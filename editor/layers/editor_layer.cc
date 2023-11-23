@@ -13,6 +13,7 @@
 #include "graphics/render_command.h"
 #include "project/project.h"
 #include "scene/scene_serializer.h"
+
 #include "utils/modify_info.h"
 #include "widgets/dock_space.h"
 
@@ -36,9 +37,6 @@ EditorLayer::~EditorLayer() {
 void EditorLayer::OnStart() {
   PROFILE_FUNCTION();
 
-  editor_scene_ = nullptr;
-  active_scene_ = nullptr;
-
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
   toolbar_panel_ = CreateScope<ToolbarPanel>();
@@ -56,6 +54,16 @@ void EditorLayer::OnStart() {
                                                &editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
   render_stats_panel_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
+
+  // If active project run it.
+  if (Ref<Project> project = Project::GetActive(); project) {
+    auto& project_config = project->GetConfig();
+
+    SetSceneTitle();
+
+    OpenScene(
+        AssetLibrary::GetAssetPath(project_config.default_scene.string()));
+  }
 
   Menu file_menu("File");
   {

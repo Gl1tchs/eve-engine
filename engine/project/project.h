@@ -32,9 +32,9 @@ class Project {
 
   [[nodiscard]] static Ref<Project> GetActive() { return active_project_; }
 
-  [[nodiscard]] static Ref<Project> New();
+  static Ref<Project> New();
 
-  [[nodiscard]] static Ref<Project> Load(const std::filesystem::path& path);
+  static Ref<Project> Load(const std::filesystem::path& path);
 
   static void SaveActive(const std::filesystem::path& path);
 

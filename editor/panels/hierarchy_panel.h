@@ -11,7 +11,7 @@ class HierarchyPanel : public Panel {
   IMPL_PANEL("Hierarchy")
 
  public:
-  HierarchyPanel() = default;
+  HierarchyPanel();
 
   void SetScene(const Ref<Scene>& scene);
 

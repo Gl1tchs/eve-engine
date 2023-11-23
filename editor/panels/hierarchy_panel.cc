@@ -9,9 +9,11 @@
 #include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
+HierarchyPanel::HierarchyPanel() : scene_(nullptr), selected_entity_({}) {}
+
 void HierarchyPanel::SetScene(const Ref<Scene>& scene) {
   scene_ = scene;
-  selected_entity_ = {};
+  selected_entity_ = Entity{};
 }
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {

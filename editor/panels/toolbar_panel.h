@@ -3,6 +3,7 @@
 #pragma once
 
 #include "core/utils/functional.h"
+
 #include "panels/panel.h"
 
 enum class SceneState { kEdit, kPlay, kPaused };

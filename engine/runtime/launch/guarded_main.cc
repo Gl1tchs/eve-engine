@@ -16,6 +16,10 @@ int GuardedMain(CommandLineArguments args) {
 
   PROFILE_BEGIN_SESSION("Startup", ".eve/eve-profiler-startup.prf");
   Instance* instance = CreateInstance(args);
+  if (!instance) {
+    LOG_ENGINE_CRITICAL("Unable to create application!");
+    return 1;
+  }
   PROFILE_END_SESSION();
 
   PROFILE_BEGIN_SESSION("Runtime", ".eve/eve-profiler-runtime.prf");

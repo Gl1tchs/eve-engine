@@ -14,6 +14,7 @@
 struct InstanceSpecifications {
   std::string name;
   std::string description;
+  CommandLineArguments args;
 };
 
 class Instance {

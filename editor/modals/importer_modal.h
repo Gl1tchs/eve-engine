@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "asset/asset_library.h"
+
 #include "modals/modal.h"
 
 class ImporterModal : public Modal {
