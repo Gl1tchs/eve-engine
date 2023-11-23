@@ -47,7 +47,9 @@ class Entity {
     scene_->registry_.remove<T>(entity_handle_);
   }
 
-  operator bool() const { return entity_handle_ != entt::null; }
+  operator bool() const {
+    return entity_handle_ != entt::null || scene_ != nullptr;
+  }
   operator entt::entity() const { return entity_handle_; }
   operator uint32_t() const { return (uint32_t)entity_handle_; }
 

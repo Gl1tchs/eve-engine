@@ -198,7 +198,7 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
 }
 
 void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
-                        const glm::vec4 color) {
+                        const glm::vec4& color) {
   if (NeedsNewBatch(line_data_.vertex_count, 2)) {
     NextBatch();
   }
@@ -210,6 +210,13 @@ void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
   line_data_.vertices[line_data_.vertex_count].position = p1;
   line_data_.vertices[line_data_.vertex_count].color = color;
   line_data_.vertex_count++;
+}
+
+void Renderer::DrawBox(Box box, const glm::vec4& color) {
+  DrawLine(box.top_left, box.top_right, color);
+  DrawLine(box.top_right, box.bottom_right, color);
+  DrawLine(box.bottom_right, box.bottom_left, color);
+  DrawLine(box.bottom_left, box.top_left, color);
 }
 
 void Renderer::AddLight(const DirectionalLight& light,

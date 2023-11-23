@@ -14,6 +14,7 @@ set(SOURCES
   event/mouse_code.h
   event/mouse_event.h
   event/window_event.h
+  math/box.h
   utils/functional.h
   utils/guuid.cc
   utils/guuid.h

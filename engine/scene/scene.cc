@@ -296,6 +296,120 @@ void Scene::RenderSceneEditor(const CameraData& data) {
     }
   }
 
+  // Draw camera bounds if selected
+  if (selected_entity_ != nullptr && *selected_entity_ &&
+      selected_entity_->HasComponent<CameraComponent>()) {
+    CameraComponent& cc = selected_entity_->GetComponent<CameraComponent>();
+    Transform& tc = selected_entity_->GetTransform();
+
+    glm::vec4 color(0.75f, 0.75f, 0.75f, 1.0f);
+
+    // Check if the camera is perspective or orthographic
+    if (!cc.is_orthographic) {
+      PerspectiveCamera& camera = cc.persp_camera;
+
+      // Perspective camera
+      float fov = glm::radians(camera.fov);
+      float aspect_ratio = camera.aspect_ratio;
+      float near_plane = camera.near_clip;
+      float far_plane = camera.far_clip;
+
+      float near_height = 2.0f * near_plane * glm::tan(fov / 2.0f);
+      float near_width = near_height * aspect_ratio;
+
+      float far_height = 2.0f * far_plane * glm::tan(fov / 2.0f);
+      float far_width = far_height * aspect_ratio;
+
+      // Calculate points of the camera's frustum
+      Box near_box = {
+          .bottom_left = tc.position - 0.5f * near_height * tc.GetUp() -
+                         0.5f * near_width * tc.GetRight() +
+                         near_plane * tc.GetForward(),
+          .bottom_right = tc.position - 0.5f * near_height * tc.GetUp() +
+                          0.5f * near_width * tc.GetRight() +
+                          near_plane * tc.GetForward(),
+          .top_left = tc.position + 0.5f * near_height * tc.GetUp() -
+                      0.5f * near_width * tc.GetRight() +
+                      near_plane * tc.GetForward(),
+          .top_right = tc.position + 0.5f * near_height * tc.GetUp() +
+                       0.5f * near_width * tc.GetRight() +
+                       near_plane * tc.GetForward(),
+      };
+
+      Box far_box = {
+          .bottom_left = tc.position - 0.5f * far_height * tc.GetUp() -
+                         0.5f * far_width * tc.GetRight() +
+                         far_plane * tc.GetForward(),
+          .bottom_right = tc.position - 0.5f * far_height * tc.GetUp() +
+                          0.5f * far_width * tc.GetRight() +
+                          far_plane * tc.GetForward(),
+          .top_left = tc.position + 0.5f * far_height * tc.GetUp() -
+                      0.5f * far_width * tc.GetRight() +
+                      far_plane * tc.GetForward(),
+          .top_right = tc.position + 0.5f * far_height * tc.GetUp() +
+                       0.5f * far_width * tc.GetRight() +
+                       far_plane * tc.GetForward()};
+
+      // Draw frustum boxes
+      renderer->DrawBox(near_box, color);
+      renderer->DrawBox(far_box, color);
+
+      // Draw connection lines
+      renderer->DrawLine(near_box.top_left, far_box.top_left, color);
+      renderer->DrawLine(near_box.top_right, far_box.top_right, color);
+      renderer->DrawLine(near_box.bottom_left, far_box.bottom_left, color);
+      renderer->DrawLine(near_box.bottom_right, far_box.bottom_right, color);
+    } else {
+      OrthographicCamera& camera = cc.ortho_camera;
+
+      // Orthographic camera
+      float zoom_level = camera.zoom_level;
+      float aspect_ratio = camera.aspect_ratio;
+      float near_plane = camera.near_clip;
+      float far_plane = camera.far_clip;
+
+      float half_height = zoom_level * 0.5f;
+      float half_width = half_height * aspect_ratio;
+
+      // Calculate points of the camera's frustum
+      Box near_box = {.bottom_left = tc.position - half_height * tc.GetUp() -
+                                     half_width * tc.GetRight() +
+                                     near_plane * tc.GetForward(),
+                      .bottom_right = tc.position - half_height * tc.GetUp() +
+                                      half_width * tc.GetRight() +
+                                      near_plane * tc.GetForward(),
+                      .top_left = tc.position + half_height * tc.GetUp() -
+                                  half_width * tc.GetRight() +
+                                  near_plane * tc.GetForward(),
+                      .top_right = tc.position + half_height * tc.GetUp() +
+                                   half_width * tc.GetRight() +
+                                   near_plane * tc.GetForward()};
+
+      Box far_box = {.bottom_left = tc.position - half_height * tc.GetUp() -
+                                    half_width * tc.GetRight() +
+                                    far_plane * tc.GetForward(),
+                     .bottom_right = tc.position - half_height * tc.GetUp() +
+                                     half_width * tc.GetRight() +
+                                     far_plane * tc.GetForward(),
+                     .top_left = tc.position + half_height * tc.GetUp() -
+                                 half_width * tc.GetRight() +
+                                 far_plane * tc.GetForward(),
+                     .top_right = tc.position + half_height * tc.GetUp() +
+                                  half_width * tc.GetRight() +
+                                  far_plane * tc.GetForward()};
+
+      // Draw frustum boxes
+      renderer->DrawBox(near_box, color);
+      renderer->DrawBox(far_box, color);
+
+      // Draw connection lines
+      renderer->DrawLine(near_box.top_left, far_box.top_left, color);
+      renderer->DrawLine(near_box.top_right, far_box.top_right, color);
+      renderer->DrawLine(near_box.bottom_left, far_box.bottom_left, color);
+      renderer->DrawLine(near_box.bottom_right, far_box.bottom_right, color);
+    }
+  }
+
   RenderScene();
 
   renderer->EndScene();

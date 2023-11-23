@@ -57,20 +57,20 @@ entities:
     tag_component:
       tag: Main Camera
     transform:
-      position: [-5, 3, 10]
-      rotation: [-15, -30, 0]
+      position: [-5.63062, 2.87215948, 11.0922642]
+      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
       scale: [1, 1, 1]
     camera_component:
       orthographic_camera:
-        aspect_ratio: 1.14987719
+        aspect_ratio: 1.14864862
         zoom_level: 1
         near_clip: -1
         far_clip: 1
       perspective_camera:
-        aspect_ratio: 1.14987719
+        aspect_ratio: 1.14864862
         fov: 45
         near_clip: 0.100000001
-        far_clip: 100
+        far_clip: 50
       is_orthographic: false
       is_primary: true
       is_fixed_aspect_ratio: false

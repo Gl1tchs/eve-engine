@@ -65,6 +65,8 @@ class Scene {
   bool EntityNameExists(const std::string& name);
 
  private:
+  std::string name_;
+
   entt::registry registry_;
 
   glm::uvec2 viewport_size_;
@@ -80,7 +82,7 @@ class Scene {
 
   std::unordered_map<GUUID, Entity> entity_map_;
 
-  std::string name_;
+  Entity* selected_entity_{nullptr};
 
   friend class Entity;
   friend class SceneSerializer;

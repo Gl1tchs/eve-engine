@@ -18,6 +18,7 @@ void HierarchyPanel::SetScene(const Ref<Scene>& scene) {
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {
   selected_entity_ = entity;
+  scene_->selected_entity_ = &selected_entity_;
 }
 
 void HierarchyPanel::Draw() {

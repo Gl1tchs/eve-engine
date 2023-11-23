@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 
+#include "core/math/box.h"
 #include "core/utils/memory.h"
 #include "graphics/index_buffer.h"
 #include "graphics/shader.h"
@@ -90,7 +91,9 @@ class Renderer final {
             const std::optional<Material>& material);
 
   void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
-                const glm::vec4 color);
+                const glm::vec4& color);
+
+  void DrawBox(Box box, const glm::vec4& color);
 
   // TODO add multiple
   void AddLight(const DirectionalLight& light, const glm::vec3& direction);
