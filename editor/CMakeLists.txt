@@ -33,9 +33,9 @@ set(SOURCES
 
 list(APPEND SOURCES ${IMGUI_OPENGL_SOURCES})
 
-if(${EVE_PLATFORM} STREQUAL WIN32)
+if(${EVE_PLATFORM} STREQUAL WIN32 AND CMAKE_BUILD_TYPE STREQUAL "dist")
   add_executable(eve_editor WIN32 ${SOURCES})
-elseif(${EVE_PLATFORM} STREQUAL LINUX)
+elseif(${EVE_PLATFORM} STREQUAL LINUX OR ${EVE_PLATFORM} STREQUAL WIN32)
   add_executable(eve_editor ${SOURCES})
 else()
   message(FATAL_ERROR "Editor cannot run except windows or linux!")

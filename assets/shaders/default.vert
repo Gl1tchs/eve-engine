@@ -2,9 +2,8 @@
 
 #version 450
 
+#include "default_output.glsl"
 #include "camera_data.glsl"
-#include "output.glsl"
-#include "material.glsl"
 
 layout(location = 0) in vec4 a_pos;
 layout(location = 1) in vec3 a_ambient;
@@ -15,7 +14,7 @@ layout(location = 5) in vec3 a_normal;
 layout(location = 6) in vec2 a_tex_coords;
 layout(location = 7) in float a_tex_index;
 
-layout(location = 0) out VertexOutput v_output;
+layout(location = 0) out DefaultVertexOutput v_output;
 
 void main() {
   // assign material values

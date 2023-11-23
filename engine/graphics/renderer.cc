@@ -15,67 +15,88 @@ Renderer::Renderer() {
 
   RenderCommand::Init();
 
-  shader_ =
-      Shader::Create(std::filesystem::path(".eve/shaders/default.vert.spirv"),
-                     std::filesystem::path(".eve/shaders/default.frag.spirv"));
+  // Initialize shape render data
+  {
+    shape_data_.vertex_array_ = VertexArray::Create();
 
-  shader_->Bind();
+    shape_data_.shader_ = Shader::Create(
+        std::filesystem::path(".eve/shaders/default.vert.spirv"),
+        std::filesystem::path(".eve/shaders/default.frag.spirv"));
 
-  int samplers[32];
-  // fill the textures with empty values
-  std::iota(std::begin(samplers), std::end(samplers), 0);
-  shader_->SetUniform("u_textures", 32, samplers);
+    shape_data_.shader_->Bind();
 
-  vertex_array_ = VertexArray::Create();
+    int samplers[32];
+    // fill the textures with empty values
+    std::iota(std::begin(samplers), std::end(samplers), 0);
+    shape_data_.shader_->SetUniform("u_textures", 32, samplers);
 
-  // initialize vertex buffer
-  vertices_ = new Vertex[kMaxVertexCount];
-  vertex_buffer_ = VertexBuffer::Create(kMaxVertexCount * sizeof(Vertex));
+    // initialize vertex buffer
+    shape_data_.vertices = new Vertex[kMaxVertexCount];
+    shape_data_.vertex_buffer_ =
+        VertexBuffer::Create(kMaxVertexCount * sizeof(Vertex));
+    shape_data_.vertex_buffer_->SetLayout(
+        {{ShaderDataType::kFloat4, "a_pos"},
+         {ShaderDataType::kFloat3, "a_ambient"},
+         {ShaderDataType::kFloat3, "a_diffuse"},
+         {ShaderDataType::kFloat3, "a_specular"},
+         {ShaderDataType::kFloat, "a_shininess"},
+         {ShaderDataType::kFloat3, "a_normal"},
+         {ShaderDataType::kFloat2, "a_tex_coords"},
+         {ShaderDataType::kFloat, "a_tex_index"}});
+    shape_data_.vertex_array_->AddVertexBuffer(shape_data_.vertex_buffer_);
 
-  BufferLayout layout = {{ShaderDataType::kFloat4, "a_pos"},
-                         {ShaderDataType::kFloat3, "a_ambient"},
-                         {ShaderDataType::kFloat3, "a_diffuse"},
-                         {ShaderDataType::kFloat3, "a_specular"},
-                         {ShaderDataType::kFloat, "a_shininess"},
-                         {ShaderDataType::kFloat3, "a_normal"},
-                         {ShaderDataType::kFloat2, "a_tex_coords"},
-                         {ShaderDataType::kFloat, "a_tex_index"}};
-  vertex_buffer_->SetLayout(layout);
+    // initialize index buffer
+    shape_data_.indices_ = new uint32_t[kMaxIndexCount];
+    shape_data_.index_buffer_ =
+        IndexBuffer::Create(kMaxIndexCount * sizeof(uint32_t));
+    shape_data_.vertex_array_->SetIndexBuffer(shape_data_.index_buffer_);
 
-  vertex_array_->AddVertexBuffer(vertex_buffer_);
+    // Create default 1x1 white texture
+    TextureMetadata metadata;
+    metadata.size = {1, 1};
+    metadata.format = TextureFormat::kRGBA;
+    metadata.min_filter = TextureFilteringMode::kLinear;
+    metadata.mag_filter = TextureFilteringMode::kLinear;
+    metadata.wrap_s = TextureWrappingMode::kClampToEdge;
+    metadata.wrap_t = TextureWrappingMode::kClampToEdge;
+    metadata.generate_mipmaps = false;
 
-  // initialize index buffer
-  indices_ = new uint32_t[kMaxIndexCount];
-  index_buffer_ = IndexBuffer::Create(kMaxIndexCount * sizeof(uint32_t));
-  vertex_array_->SetIndexBuffer(index_buffer_);
+    uint32_t color = 0xffffff;
+    shape_data_.white_texture_ = Texture::Create(metadata, &color);
 
-  // Create default 1x1 white texture
-  TextureMetadata metadata;
-  metadata.size = {1, 1};
-  metadata.format = TextureFormat::kRGBA;
-  metadata.min_filter = TextureFilteringMode::kLinear;
-  metadata.mag_filter = TextureFilteringMode::kLinear;
-  metadata.wrap_s = TextureWrappingMode::kClampToEdge;
-  metadata.wrap_t = TextureWrappingMode::kClampToEdge;
-  metadata.generate_mipmaps = false;
+    // Fill texture slots with default white texture
+    std::fill(std::begin(shape_data_.texture_slots_),
+              std::end(shape_data_.texture_slots_), shape_data_.white_texture_);
+  }
 
-  uint32_t color = 0xffffff;
-  white_texture_ = Texture::Create(metadata, &color);
+  // Initialize line data
+  {
+    line_data_.vertex_array_ = VertexArray::Create();
 
-  // Fill texture slots with default white texture
-  std::fill(std::begin(texture_slots_), std::end(texture_slots_),
-            white_texture_);
+    line_data_.shader_ =
+        Shader::Create(std::filesystem::path(".eve/shaders/line.vert.spirv"),
+                       std::filesystem::path(".eve/shaders/line.frag.spirv"));
+
+    line_data_.vertices = new LineVertex[kMaxVertexCount];
+    line_data_.vertex_buffer_ =
+        VertexBuffer::Create(kMaxVertexCount * sizeof(LineVertex));
+    line_data_.vertex_buffer_->SetLayout(
+        {{ShaderDataType::kFloat3, "a_pos"},
+         {ShaderDataType::kFloat4, "a_color"}});
+    line_data_.vertex_array_->AddVertexBuffer(line_data_.vertex_buffer_);
+  }
 
   camera_uniform_buffer_ = UniformBuffer::Create(sizeof(CameraData), 0);
-
   light_uniform_buffer_ = UniformBuffer::Create(sizeof(LightData), 1);
 }
 
 Renderer::~Renderer() {
   PROFILE_FUNCTION();
 
-  delete[] vertices_;
-  delete[] indices_;
+  delete[] shape_data_.vertices;
+  delete[] shape_data_.indices_;
+
+  delete[] line_data_.vertices;
 }
 
 void Renderer::BeginScene(const CameraData& camera_data) {
@@ -96,21 +117,21 @@ void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
                     const Ref<Texture>& texture) {
   PROFILE_FUNCTION();
 
-  if (NeedsNewBatch(packet.indices.size()) ||
-      texture_slot_index_ >= kMaxTextures) {
+  if (NeedsNewBatch(shape_data_.index_count_, packet.indices.size()) ||
+      shape_data_.texture_slot_index_ >= kMaxTextures) {
     NextBatch();
   }
 
   float texture_index = 0.0f;
-  for (uint32_t i = 1; i < texture_slot_index_; i++) {
-    if (texture_slots_[i] == texture) {
+  for (uint32_t i = 1; i < shape_data_.texture_slot_index_; i++) {
+    if (shape_data_.texture_slots_[i] == texture) {
       texture_index = (float)i;
     }
   }
 
   if (texture_index == 0.0f) {
-    texture_index = (float)texture_slot_index_;
-    texture_slots_[texture_slot_index_++] = texture;
+    texture_index = (float)shape_data_.texture_slot_index_;
+    shape_data_.texture_slots_[shape_data_.texture_slot_index_++] = texture;
   }
 
   for (Vertex vertex : packet.vertices) {
@@ -124,14 +145,15 @@ void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
     vertex.shininess = material.shininess;
 
     vertex.tex_index = texture_index;
-    vertices_[vertex_count_++] = vertex;
+    shape_data_.vertices[shape_data_.vertex_count_++] = vertex;
   }
 
   for (const uint32_t& index : packet.indices) {
-    indices_[index_count_++] = index_offset_ + index;
+    shape_data_.indices_[shape_data_.index_count_++] =
+        shape_data_.index_offset_ + index;
   }
 
-  index_offset_ += packet.vertices.size();
+  shape_data_.index_offset_ += packet.vertices.size();
 
   stats_.index_count += packet.indices.size();
   stats_.vertex_count += packet.vertices.size();
@@ -142,7 +164,7 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
   PROFILE_FUNCTION();
 
   for (auto mesh : model->meshes) {
-    if (NeedsNewBatch(mesh.indices.size())) {
+    if (NeedsNewBatch(shape_data_.index_count_, mesh.indices.size())) {
       NextBatch();
     }
 
@@ -160,18 +182,34 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
       vertex.shininess = material_in_use.shininess;
 
       vertex.tex_index = texture_index;
-      vertices_[vertex_count_++] = vertex;
+      shape_data_.vertices[shape_data_.vertex_count_++] = vertex;
     }
 
     for (const uint32_t& index : mesh.indices) {
-      indices_[index_count_++] = index_offset_ + index;
+      shape_data_.indices_[shape_data_.index_count_++] =
+          shape_data_.index_offset_ + index;
     }
 
-    index_offset_ += mesh.vertices.size();
+    shape_data_.index_offset_ += mesh.vertices.size();
 
     stats_.index_count += mesh.indices.size();
     stats_.vertex_count += mesh.vertices.size();
   }
+}
+
+void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
+                        const glm::vec4 color) {
+  if (NeedsNewBatch(line_data_.vertex_count, 2)) {
+    NextBatch();
+  }
+
+  line_data_.vertices[line_data_.vertex_count].position = p0;
+  line_data_.vertices[line_data_.vertex_count].color = color;
+  line_data_.vertex_count++;
+
+  line_data_.vertices[line_data_.vertex_count].position = p1;
+  line_data_.vertices[line_data_.vertex_count].color = color;
+  line_data_.vertex_count++;
 }
 
 void Renderer::AddLight(const DirectionalLight& light,
@@ -188,35 +226,51 @@ void Renderer::ResetStats() {
   memset(&stats_, 0, sizeof(RenderStats));
 }
 
-bool Renderer::NeedsNewBatch(uint32_t index_count) {
-  return (index_count_ + index_count) >= kMaxIndexCount;
+bool Renderer::NeedsNewBatch(uint32_t current_count, uint32_t index_count) {
+  return (current_count + index_count) >= kMaxIndexCount;
 }
 
 void Renderer::BeginBatch() {
-  vertex_count_ = 0;
+  {
+    shape_data_.vertex_count_ = 0;
 
-  index_count_ = 0;
-  index_offset_ = 0;
+    shape_data_.index_count_ = 0;
+    shape_data_.index_offset_ = 0;
 
-  texture_slot_index_ = 1;
+    shape_data_.texture_slot_index_ = 1;
+  }
+
+  { line_data_.vertex_count = 0; }
 }
 
 void Renderer::Flush() {
-  if (!index_count_) {
-    return;
+  if (shape_data_.index_count_) {
+    shape_data_.index_buffer_->SetData(
+        shape_data_.indices_, shape_data_.index_count_ * sizeof(uint32_t));
+    shape_data_.vertex_buffer_->SetData(
+        shape_data_.vertices, shape_data_.vertex_count_ * sizeof(Vertex));
+
+    for (uint32_t i = 0; i <= shape_data_.texture_slot_index_; i++) {
+      shape_data_.texture_slots_[i]->Bind(i);
+    }
+
+    shape_data_.shader_->Bind();
+    RenderCommand::DrawIndexed(shape_data_.vertex_array_,
+                               shape_data_.index_count_);
+
+    stats_.draw_calls++;
   }
 
-  index_buffer_->SetData(indices_, index_count_ * sizeof(uint32_t));
-  vertex_buffer_->SetData(vertices_, vertex_count_ * sizeof(Vertex));
+  if (line_data_.vertex_count) {
+    line_data_.vertex_buffer_->SetData(
+        line_data_.vertices, line_data_.vertex_count * sizeof(LineVertex));
 
-  for (uint32_t i = 0; i <= texture_slot_index_; i++) {
-    texture_slots_[i]->Bind(i);
+    line_data_.shader_->Bind();
+    RenderCommand::SetLineWidth(line_data_.line_width);
+    RenderCommand::DrawLines(line_data_.vertex_array_, line_data_.vertex_count);
+
+    stats_.draw_calls++;
   }
-
-  shader_->Bind();
-  RenderCommand::DrawIndexed(vertex_array_, index_count_);
-
-  stats_.draw_calls++;
 }
 
 void Renderer::NextBatch() {

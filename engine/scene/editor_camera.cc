@@ -5,6 +5,9 @@
 #include "core/event/input.h"
 
 EditorCamera::EditorCamera() : PerspectiveCamera() {
+  near_clip = 0.01f;
+  far_clip = 300.0f;
+  
   ResetTransform();
 
   last_mouse_pos_ = Input::GetMousePosition();
@@ -55,8 +58,8 @@ void EditorCamera::Update(float ds) {
 }
 
 void EditorCamera::ResetTransform() {
-  transform_.position = {0, 0, 5};
-  transform_.rotation = {0, 0, 0};
+  transform_.position = {-5, 3, 10};
+  transform_.rotation = {-15, -30, 0};
   transform_.scale = {1, 1, 1};
 }
 

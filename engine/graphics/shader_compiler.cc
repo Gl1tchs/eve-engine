@@ -25,6 +25,8 @@ std::optional<ShaderKind> DeserializeShaderKind(std::string kind) {
     return std::optional<ShaderKind>(ShaderKind::kVertex);
   } else if (kind == "fragment") {
     return std::optional<ShaderKind>(ShaderKind::kFragment);
+  } else if (kind == "geometry") {
+    return std::optional<ShaderKind>(ShaderKind::kGeometry);
   } else {
     return std::optional<ShaderKind>();
   }
@@ -60,6 +62,8 @@ shaderc_shader_kind GetShaderKind(ShaderKind kind) {
       return shaderc_vertex_shader;
     case ShaderKind::kFragment:
       return shaderc_fragment_shader;
+    case ShaderKind::kGeometry:
+      return shaderc_geometry_shader;
   }
 }
 

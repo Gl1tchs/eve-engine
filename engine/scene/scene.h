@@ -56,7 +56,11 @@ class Scene {
   [[nodiscard]] const std::string& GetName() const { return name_; }
 
  private:
-  void RenderScene(const CameraData& data);
+  void RenderSceneEditor(const CameraData& data);
+
+  void RenderSceneRuntime(const CameraData& data);
+
+  void RenderScene();
 
   bool EntityNameExists(const std::string& name);
 

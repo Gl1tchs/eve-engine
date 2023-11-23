@@ -30,9 +30,10 @@ struct BufferElement final {
   uint32_t size;
   uint64_t offset;
   bool normalized;
+  uint32_t divisor;
 
   BufferElement(ShaderDataType type, const std::string& name,
-                bool normalized = false);
+                bool normalized = false, uint32_t divisor = 0);
 
   uint32_t GetComponentCount() const;
 };

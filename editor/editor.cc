@@ -53,7 +53,8 @@ class EditorInstance : public Instance {
     for (const auto& entry : std::filesystem::directory_iterator(shader_dir)) {
       // Check if the file is a shader source file
       if (entry.path().extension() == ".vert" ||
-          entry.path().extension() == ".frag") {
+          entry.path().extension() == ".frag" ||
+          entry.path().extension() == ".geom") {
         // Compile and save the shader
         CompileAndSaveShaderIfNeeded(entry.path(), spirv_dir);
       }
@@ -87,6 +88,8 @@ void CompileAndSaveShader(const std::filesystem::path& path,
     kind = ShaderKind::kVertex;
   } else if (path.extension() == ".frag") {
     kind = ShaderKind::kFragment;
+  } else if (path.extension() == ".geom") {
+    kind = ShaderKind::kGeometry;
   } else {
     // Unsupported shader type
     LOG_ENGINE_ERROR("Unsupported shader type: {0}", path.string());

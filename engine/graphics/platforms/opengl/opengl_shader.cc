@@ -89,13 +89,6 @@ OpenGLShader::OpenGLShader(const std::filesystem::path& vs_path,
   glSpecializeShaderARB(vertex_shader, "main", 0, nullptr, nullptr);
   glAttachShader(program_, vertex_shader);
 
-  uint32_t fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderBinary(1, &fragment_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-                 fragment_spirv.data(),
-                 fragment_spirv.size() * sizeof(uint32_t));
-  glSpecializeShaderARB(fragment_shader, "main", 0, nullptr, nullptr);
-  glAttachShader(program_, fragment_shader);
-
   uint32_t geometry_shader = 0;
   if (!gs_path.empty()) {
     geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
@@ -105,6 +98,13 @@ OpenGLShader::OpenGLShader(const std::filesystem::path& vs_path,
     glSpecializeShaderARB(geometry_shader, "main", 0, nullptr, nullptr);
     glAttachShader(program_, geometry_shader);
   }
+
+  uint32_t fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderBinary(1, &fragment_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+                 fragment_spirv.data(),
+                 fragment_spirv.size() * sizeof(uint32_t));
+  glSpecializeShaderARB(fragment_shader, "main", 0, nullptr, nullptr);
+  glAttachShader(program_, fragment_shader);
 
   glLinkProgram(program_);
 

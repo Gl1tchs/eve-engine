@@ -14,8 +14,13 @@ class RenderCommand final {
 
   static void DrawIndexed(const Ref<VertexArray>& vertex_array,
                           uint32_t index_count);
+
   static void DrawLines(const Ref<VertexArray>& vertex_array,
                         uint32_t vertex_count);
+
+  static void DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
+                                  uint32_t vertex_count,
+                                  uint32_t instance_count);
 
   static void SetLineWidth(float width);
 

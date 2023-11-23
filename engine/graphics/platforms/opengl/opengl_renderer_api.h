@@ -16,8 +16,13 @@ class OpenGLRendererAPI final : public RendererAPI {
 
   void DrawIndexed(const Ref<VertexArray>& vertex_array,
                    uint32_t index_Count = 0) override;
+
   void DrawLines(const Ref<VertexArray>& vertex_array,
                  uint32_t vertex_count) override;
+
+  void DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
+                           uint32_t vertex_count,
+                           uint32_t instance_count) override;
 
   void SetLineWidth(float width) override;
 };

@@ -31,6 +31,9 @@ class RendererAPI {
   virtual void DrawLines(const Ref<VertexArray>& vertex_array,
                          uint32_t vertex_count) = 0;
 
+  virtual void DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
+                           uint32_t vertex_count, uint32_t instance_count) = 0;
+
   virtual void SetLineWidth(float width) = 0;
 
   [[nodiscard]] static Scope<RendererAPI> Create();

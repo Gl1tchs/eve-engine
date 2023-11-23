@@ -32,6 +32,13 @@ void RenderCommand::DrawLines(const Ref<VertexArray>& vertex_array,
   renderer_api_->DrawLines(vertex_array, vertex_count);
 }
 
+void RenderCommand::DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
+                                        uint32_t vertex_count,
+                                        uint32_t instance_count) {
+  renderer_api_->DrawArraysInstanced(vertex_array, vertex_count,
+                                     instance_count);
+}
+
 void RenderCommand::SetLineWidth(float width) {
   renderer_api_->SetLineWidth(width);
 }

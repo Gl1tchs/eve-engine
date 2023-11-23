@@ -9,7 +9,7 @@
 
 #include "graphics/renderer_api.h"
 
-enum class ShaderKind { kVertex, kFragment };
+enum class ShaderKind { kVertex, kFragment, kGeometry };
 
 std::string LoadShaderSource(const std::filesystem::path& path);
 

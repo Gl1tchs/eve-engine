@@ -478,7 +478,7 @@ void EditorLayer::OnSceneSave() {
 
   modify_info.OnSave();
   unsaved_changes_ = false;
-  show_exit_dialog_ = false;
+  exit_modal_.SetActive(false);
 }
 
 void EditorLayer::SetSceneTitle() {
@@ -496,7 +496,7 @@ void EditorLayer::OnExitModalAnswer(ExitModalAnswer answer) {
       Exit(true);
       break;
     case ExitModalAnswer::kCancel:
-      show_exit_dialog_ = false;
+      exit_modal_.SetActive(false);
       break;
     default:
       break;

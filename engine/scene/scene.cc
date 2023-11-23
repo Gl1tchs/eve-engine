@@ -157,7 +157,7 @@ void Scene::OnUpdateRuntime(float ds) {
               cc.persp_camera.GetProjectionMatrix(), tc.position};
     }
 
-    RenderScene(data);
+    RenderSceneRuntime(data);
 
     last_primary_transform_ = tc;
     editor_primary_used_ = true;
@@ -196,7 +196,7 @@ void Scene::OnUpdateEditor(float ds, EditorCamera& editor_camera,
     editor_primary_used_ = false;
   }
 
-  RenderScene(data);
+  RenderSceneEditor(data);
 }
 
 void Scene::OnViewportResize(glm::uvec2 size) {
@@ -247,10 +247,72 @@ void Scene::Step(int frames) {
   step_frames_ = frames;
 }
 
-void Scene::RenderScene(const CameraData& data) {
+void Scene::RenderSceneEditor(const CameraData& data) {
   Ref<Renderer>& renderer = state_->renderer;
 
   renderer->BeginScene(data);
+
+  // Draw grid
+  {
+    float grid_size = 5.0f;  // Adjust the size of the grid
+    int num_lines = 101;  // Number of grid lines (odd to have the center line)
+
+    // Draw the base grid lines along the X, Y, and Z axes with different colors
+    renderer->DrawLine({-grid_size * num_lines / 2.0f, 0.0f, 0.0f},
+                       {grid_size * num_lines / 2.0f, 0.0f, 0.0f},
+                       {1.0f, 0.0f, 0.0f, 1.0f});  // X-axis (red)
+    renderer->DrawLine({0.0f, -grid_size * num_lines / 2.0f, 0.0f},
+                       {0.0f, grid_size * num_lines / 2.0f, 0.0f},
+                       {0.0f, 1.0f, 0.0f, 1.0f});  // Y-axis (green)
+    renderer->DrawLine({0.0f, 0.0f, -grid_size * num_lines / 2.0f},
+                       {0.0f, 0.0f, grid_size * num_lines / 2.0f},
+                       {0.0f, 0.0f, 1.0f, 1.0f});  // Z-axis (blue)
+
+    // Draw sub-grids with a different color (gray)
+    glm::vec4 sub_grid_color(0.5f, 0.5f, 0.5f, 1.0f);
+
+    // Draw the sub-grid lines along the X-axis
+    for (int i = -num_lines / 2; i <= num_lines / 2; ++i) {
+      float x_pos = static_cast<float>(i) * grid_size;
+      if (i == 0) {
+        continue;
+      }
+
+      renderer->DrawLine({x_pos, 0.0f, -grid_size * num_lines / 2.0f},
+                         {x_pos, 0.0f, grid_size * num_lines / 2.0f},
+                         sub_grid_color);
+    }
+
+    // Draw the sub-grid lines along the Z-axis
+    for (int i = -num_lines / 2; i <= num_lines / 2; ++i) {
+      float z_pos = static_cast<float>(i) * grid_size;
+      if (i == 0) {
+        continue;
+      }
+
+      renderer->DrawLine({-grid_size * num_lines / 2.0f, 0.0f, z_pos},
+                         {grid_size * num_lines / 2.0f, 0.0f, z_pos},
+                         sub_grid_color);
+    }
+  }
+
+  RenderScene();
+
+  renderer->EndScene();
+}
+
+void Scene::RenderSceneRuntime(const CameraData& data) {
+  Ref<Renderer>& renderer = state_->renderer;
+
+  renderer->BeginScene(data);
+
+  RenderScene();
+
+  renderer->EndScene();
+}
+
+void Scene::RenderScene() {
+  Ref<Renderer>& renderer = state_->renderer;
 
   registry_.view<DirectionalLight, Transform>().each(
       [renderer](entt::entity entity_id, const DirectionalLight& light,
@@ -269,8 +331,6 @@ void Scene::RenderScene(const CameraData& data) {
 
         renderer->Draw(model_comp.model->asset, transform, material);
       });
-
-  renderer->EndScene();
 }
 
 bool Scene::EntityNameExists(const std::string& name) {

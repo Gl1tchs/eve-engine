@@ -1,11 +1,11 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#ifndef OUTPUT_GLSL_
-#define OUTPUT_GLSL_
+#ifndef DEFAULT_OUTPUT_GLSL_
+#define DEFAULT_OUTPUT_GLSL_
 
 #include "material.glsl"
 
-struct VertexOutput {
+struct DefaultVertexOutput {
   Material material;
   vec3 frag_pos;
   vec3 normal;
@@ -13,4 +13,4 @@ struct VertexOutput {
   float tex_index;
 };
 
-#endif // OUTPUT_GLSL_
+#endif // DEFAULT_OUTPUT_GLSL_

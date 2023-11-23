@@ -2,13 +2,13 @@
 
 #version 450
 
-#include "camera_data.glsl"
-#include "output.glsl"
+#include "default_output.glsl"
 #include "directional_light.glsl"
+#include "camera_data.glsl"
 
 layout(location = 0) out vec4 o_color;
 
-layout(location = 0) in VertexOutput v_input;
+layout(location = 0) in DefaultVertexOutput v_input;
 
 layout(set = 0, binding = 0) uniform sampler2D u_textures[32];
 

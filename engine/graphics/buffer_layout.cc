@@ -35,12 +35,13 @@ uint32_t GetShaderDataTypeSize(ShaderDataType type) {
 }
 
 BufferElement::BufferElement(ShaderDataType type, const std::string& name,
-                             bool normalized)
+                             bool normalized, uint32_t divisor)
     : type(type),
       name(name),
       size(GetShaderDataTypeSize(type)),
       offset(0),
-      normalized(normalized) {}
+      normalized(normalized),
+      divisor(divisor) {}
 
 uint32_t BufferElement::GetComponentCount() const {
   switch (type) {

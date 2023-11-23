@@ -54,6 +54,13 @@ void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertex_array,
   glDrawArrays(GL_LINES, 0, vertex_count);
 }
 
+void OpenGLRendererAPI::DrawArraysInstanced(
+    const Ref<VertexArray>& vertex_array, uint32_t vertex_count,
+    uint32_t instance_count) {
+  vertex_array->Bind();
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertex_count, instance_count);
+}
+
 void OpenGLRendererAPI::SetLineWidth(float width) {
   glLineWidth(width);
 }
