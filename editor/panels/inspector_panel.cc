@@ -287,17 +287,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     ImGui::Text("Model Path:");
     ImGui::SameLine();
 
-    std::string path = model_comp.model->info.meta_path;
-    // Remove .meta from path
-    {
-      size_t last_dot_pos = path.find_last_of('.');
-
-      // Check if the dot is found and it is not the first character in the string an then if found remove it
-      if (last_dot_pos != std::string::npos && last_dot_pos != 0) {
-        path = path.substr(0, last_dot_pos);
-      }
-    }
-
+    std::string path = model_comp.model->info.GetAssetPath();
     if (ImGui::InputText("##model_path_input", &path,
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
       model_comp.model = AssetLibrary::LoadFromPath<Model>(path);

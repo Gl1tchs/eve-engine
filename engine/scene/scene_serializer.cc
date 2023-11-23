@@ -193,7 +193,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::BeginMap;
 
     out << YAML::Key << "path" << YAML::Value
-        << model_component.model->info.meta_path;
+        << model_component.model->info.GetAssetPath();
 
     out << YAML::EndMap;
   }

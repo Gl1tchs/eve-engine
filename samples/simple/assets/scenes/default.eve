@@ -1,41 +1,55 @@
 scene: default
 entities:
-  - id: 54253711328505163
+  - id: 12736979694298266258
     tag_component:
-      tag: Directional Light
+      tag: Red Monkey
     transform:
-      position: [0, 0, 0]
-      rotation: [-45, -45, -45]
+      position: [2.53720474, 1.18018866, -0.0640716553]
+      rotation: [2.20313245e-06, -36.984848, -3.28437955e-06]
       scale: [1, 1, 1]
-    directional_light:
-      ambient: [0.710424721, 0.710424721, 0.710424721]
-      diffuse: [0.764478743, 0.764478743, 0.764478743]
-      specular: [0.772200763, 0.772200763, 0.772200763]
-  - id: 453953480392206736
-    tag_component:
-      tag: Cube
-    transform:
-      position: [-0.00956356153, -0.773926079, 0.387510061]
-      rotation: [1.75065613, 33.5904045, -8.15001202]
-      scale: [0.598869026, 0.532499313, 0.691803753]
     model_component:
-      path: res://models/cube.obj.meta
+      path: res://models/monkey.obj
     material_component:
-      ambient: [0.830115795, 0.830115795, 0.830115795]
-      diffuse: [0.779922783, 0.779922783, 0.779922783]
-      specular: [0.772200763, 0.772200763, 0.772200763]
+      ambient: [0.826254845, 0.0669936463, 0.0669936463]
+      diffuse: [0.234036893, 0.586872578, 0.0929026157]
+      specular: [0.0643998012, 0.577083647, 0.926640928]
       shininess: 32
   - id: 323468953567323581
     tag_component:
       tag: Monkey
     transform:
-      position: [-0.116036877, 0.94369477, 0.0254045203]
-      rotation: [15.8076162, 23.9359188, 3.91878414]
-      scale: [0.889997482, 0.712001324, 0.890000224]
+      position: [-0.383916318, 1.40199006, 0.0311570838]
+      rotation: [2.14157271, 20.8061962, 2.97224307]
+      scale: [0.889997482, 0.712001324, 0.838704526]
     model_component:
-      path: res://models/monkey.obj.meta
+      path: res://models/monkey.obj
     material_component:
       ambient: [1, 1, 0]
       diffuse: [1, 1, 0]
       specular: [1, 1, 0]
       shininess: 32
+  - id: 453953480392206736
+    tag_component:
+      tag: Cube
+    transform:
+      position: [0.111033306, -0.819865942, 1.41854215]
+      rotation: [1.50710154, 14.6289787, -8.73800087]
+      scale: [0.550959527, 0.489899367, 0.63645941]
+    model_component:
+      path: res://models/cube.obj
+    material_component:
+      ambient: [0.830115795, 0.830115795, 0.830115795]
+      diffuse: [0.779922783, 0.779922783, 0.779922783]
+      specular: [0.772200763, 0.772200763, 0.772200763]
+      shininess: 32
+  - id: 54253711328505163
+    tag_component:
+      tag: Directional Light
+    transform:
+      position: [0, 0, 0]
+      rotation: [-48.4210472, -41.1133423, -39.9934387]
+      scale: [1, 1, 1]
+    directional_light:
+      ambient: [0.710424721, 0.710424721, 0.710424721]
+      diffuse: [0.764478743, 0.764478743, 0.764478743]
+      specular: [0.772200763, 0.772200763, 0.772200763]

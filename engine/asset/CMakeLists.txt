@@ -4,6 +4,7 @@ set(SOURCES
   asset_library.inl
   asset_loader.cc
   asset_loader.h
+  asset.cc
   asset.h
 )
 

@@ -14,6 +14,8 @@ struct AssetInfo {
   GUUID id;
   AssetType type;
   std::string meta_path;
+
+  [[nodiscard]] std::string GetAssetPath() const;
 };
 
 template <typename T>
