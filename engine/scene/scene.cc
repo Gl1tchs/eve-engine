@@ -141,30 +141,62 @@ void Scene::OnUpdateRuntime(float ds) {
     return;
   }
 
-  Camera* main_camera = nullptr;
-  Transform* camera_transform = nullptr;
-  auto view = registry_.view<Transform, CameraComponent>();
-  for (auto entity : view) {
-    auto [transform, camera] = view.get<Transform, CameraComponent>(entity);
+  // TODO update scripts
 
-    if (camera.is_primary) {
-      if (camera.is_orthographic) {
-        main_camera = &camera.ortho_camera;
-      } else {
-        main_camera = &camera.persp_camera;
-      }
-      camera_transform = &transform;
-      break;
+  auto camera = GetPrimaryCameraEntity();
+  if (camera.has_value() && camera.value().HasComponent<CameraComponent>()) {
+    auto& cc = camera.value().GetComponent<CameraComponent>();
+    auto& tc = camera.value().GetTransform();
+
+    CameraData data;
+    if (cc.is_orthographic) {
+      data = {cc.ortho_camera.GetViewMatrix(tc),
+              cc.ortho_camera.GetProjectionMatrix(), tc.position};
+    } else {
+      data = {cc.persp_camera.GetViewMatrix(tc),
+              cc.persp_camera.GetProjectionMatrix(), tc.position};
     }
-  }
 
-  if (main_camera && camera_transform) {
-    RenderScene(*main_camera, *camera_transform);
+    RenderScene(data);
+
+    last_primary_transform_ = tc;
+    editor_primary_used_ = true;
   }
 }
 
-void Scene::OnUpdateEditor(float ds, EditorCamera& camera) {
-  RenderScene(camera, camera.GetTransform());
+void Scene::OnUpdateEditor(float ds, EditorCamera& editor_camera,
+                           bool use_primary_if_exists) {
+  if (editor_primary_used_) {
+    editor_camera.GetTransform() = last_primary_transform_;
+  }
+
+  CameraData data;
+  if (use_primary_if_exists) {
+    auto primary_camera = GetPrimaryCameraEntity();
+    if (primary_camera.has_value() &&
+        primary_camera.value().HasComponent<CameraComponent>()) {
+      auto& cc = primary_camera.value().GetComponent<CameraComponent>();
+      auto& tc = primary_camera.value().GetTransform();
+
+      if (cc.is_orthographic) {
+        data = {cc.ortho_camera.GetViewMatrix(tc),
+                cc.ortho_camera.GetProjectionMatrix(), tc.position};
+      } else {
+        data = {cc.persp_camera.GetViewMatrix(tc),
+                cc.persp_camera.GetProjectionMatrix(), tc.position};
+      }
+
+      last_primary_transform_ = tc;
+      editor_primary_used_ = true;
+    }
+  } else {
+    data = {editor_camera.GetViewMatrix(), editor_camera.GetProjectionMatrix(),
+            editor_camera.GetTransform().position};
+
+    editor_primary_used_ = false;
+  }
+
+  RenderScene(data);
 }
 
 void Scene::OnViewportResize(glm::uvec2 size) {
@@ -176,10 +208,10 @@ void Scene::OnViewportResize(glm::uvec2 size) {
 
   // Resize our non-FixedAspectRatio cameras
   registry_.view<CameraComponent>().each(
-      [size](entt::entity, CameraComponent cc) {
+      [size](entt::entity, CameraComponent& cc) {
         if (!cc.is_fixed_aspect_ratio) {
-          cc.persp_camera.SetAspectRatio((float)size.x / (float)size.y);
-          cc.ortho_camera.SetAspectRatio((float)size.x / (float)size.y);
+          cc.persp_camera.aspect_ratio = (float)size.x / (float)size.y;
+          cc.ortho_camera.aspect_ratio = (float)size.x / (float)size.y;
         }
       });
 }
@@ -215,11 +247,10 @@ void Scene::Step(int frames) {
   step_frames_ = frames;
 }
 
-void Scene::RenderScene(Camera& camera, Transform& transform) {
+void Scene::RenderScene(const CameraData& data) {
   Ref<Renderer>& renderer = state_->renderer;
 
-  renderer->BeginScene({camera.GetViewMatrix(transform),
-                        camera.GetProjectionMatrix(), transform.position});
+  renderer->BeginScene(data);
 
   registry_.view<DirectionalLight, Transform>().each(
       [renderer](entt::entity entity_id, const DirectionalLight& light,

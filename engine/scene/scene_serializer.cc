@@ -157,23 +157,20 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::Key << "orthographic_camera" << YAML::Value;
     out << YAML::BeginMap;  // OrthographicCamera
     out << YAML::Key << "aspect_ratio" << YAML::Value
-        << ortho_camera.GetAspectRatio();
-    out << YAML::Key << "zoom_level" << YAML::Value
-        << ortho_camera.GetZoomLevel();
-    out << YAML::Key << "near_clip" << YAML::Value
-        << ortho_camera.GetNearClip();
+        << ortho_camera.aspect_ratio;
+    out << YAML::Key << "zoom_level" << YAML::Value << ortho_camera.zoom_level;
+    out << YAML::Key << "near_clip" << YAML::Value << ortho_camera.near_clip;
 
-    out << YAML::Key << "far_clip" << YAML::Value << ortho_camera.GetFarClip();
+    out << YAML::Key << "far_clip" << YAML::Value << ortho_camera.far_clip;
     out << YAML::EndMap;  // OrthographicCamera
 
     out << YAML::Key << "perspective_camera" << YAML::Value;
     out << YAML::BeginMap;  // PerspectiveCamera
     out << YAML::Key << "aspect_ratio" << YAML::Value
-        << persp_camera.GetAspectRatio();
-    out << YAML::Key << "fov" << YAML::Value << persp_camera.GetFov();
-    out << YAML::Key << "near_clip" << YAML::Value
-        << persp_camera.GetNearClip();
-    out << YAML::Key << "far_clip" << YAML::Value << persp_camera.GetFarClip();
+        << persp_camera.aspect_ratio;
+    out << YAML::Key << "fov" << YAML::Value << persp_camera.fov;
+    out << YAML::Key << "near_clip" << YAML::Value << persp_camera.near_clip;
+    out << YAML::Key << "far_clip" << YAML::Value << persp_camera.far_clip;
     out << YAML::EndMap;  // PerspectiveCamera
 
     out << YAML::Key << "is_orthographic" << YAML::Value
@@ -296,25 +293,24 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
           deserialing_entity.AddComponent<CameraComponent>();
 
       auto ortho_camera_yaml = camera_comp_yaml["orthographic_camera"];
-      camera_component.ortho_camera.SetAspectRatio(
-          ortho_camera_yaml["aspect_ratio"].as<float>());
-      camera_component.ortho_camera.SetZoomLevel(
-          ortho_camera_yaml["zoom_level"].as<float>());
-      camera_component.ortho_camera.SetNearClip(
-          ortho_camera_yaml["near_clip"].as<float>());
-      camera_component.ortho_camera.SetFarClip(
-          ortho_camera_yaml["far_clip"].as<float>());
+      camera_component.ortho_camera.aspect_ratio =
+          ortho_camera_yaml["aspect_ratio"].as<float>();
+      camera_component.ortho_camera.zoom_level =
+          ortho_camera_yaml["zoom_level"].as<float>();
+      camera_component.ortho_camera.near_clip =
+          ortho_camera_yaml["near_clip"].as<float>();
+      camera_component.ortho_camera.far_clip =
+          ortho_camera_yaml["far_clip"].as<float>();
 
       auto persp_camera_yaml = camera_comp_yaml["perspective_camera"];
 
-      camera_component.persp_camera.SetAspectRatio(
-          persp_camera_yaml["aspect_ratio"].as<float>());
-      camera_component.persp_camera.SetFov(
-          persp_camera_yaml["fov"].as<float>());
-      camera_component.persp_camera.SetNearClip(
-          persp_camera_yaml["near_clip"].as<float>());
-      camera_component.persp_camera.SetFarClip(
-          persp_camera_yaml["far_clip"].as<float>());
+      camera_component.persp_camera.aspect_ratio =
+          persp_camera_yaml["aspect_ratio"].as<float>();
+      camera_component.persp_camera.fov = persp_camera_yaml["fov"].as<float>();
+      camera_component.persp_camera.near_clip =
+          persp_camera_yaml["near_clip"].as<float>();
+      camera_component.persp_camera.far_clip =
+          persp_camera_yaml["far_clip"].as<float>();
 
       camera_component.is_orthographic =
           camera_comp_yaml["is_orthographic"].as<bool>();

@@ -18,6 +18,7 @@ target_include_directories(eve_ui PUBLIC
 target_include_directories(eve_ui PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/imgui
+  ${VENDOR_DIR}/include
   ${VENDOR_DIR}/ImGuizmo
 )
 

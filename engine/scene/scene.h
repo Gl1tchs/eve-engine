@@ -32,7 +32,8 @@ class Scene {
   void OnRuntimeStop();
   void OnUpdateRuntime(float ds);
 
-  void OnUpdateEditor(float ds, EditorCamera& camera);
+  void OnUpdateEditor(float ds, EditorCamera& editor_camera,
+                      bool use_primary_if_exists = false);
   void OnViewportResize(glm::uvec2 size);
 
   [[nodiscard]] std::optional<Entity> FindEntityByName(std::string_view name);
@@ -55,7 +56,7 @@ class Scene {
   [[nodiscard]] const std::string& GetName() const { return name_; }
 
  private:
-  void RenderScene(Camera& camera, Transform& transform);
+  void RenderScene(const CameraData& data);
 
   bool EntityNameExists(const std::string& name);
 
@@ -67,6 +68,9 @@ class Scene {
   bool is_running_ = false;
   bool is_paused_ = false;
   int step_frames_ = 0;
+
+  bool editor_primary_used_ = false;
+  Transform last_primary_transform_;
 
   Ref<State> state_;
 

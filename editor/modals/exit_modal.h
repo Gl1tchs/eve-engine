@@ -14,12 +14,11 @@ enum class ExitModalAnswer {
 
 class ExitModal : public Modal {
  public:
-  ExitModal(std::function<void(ExitModalAnswer answer)> on_answer_delegate);
+  ExitModal();
   virtual ~ExitModal() = default;
+
+  std::function<void(ExitModalAnswer answer)> on_answer;
 
  protected:
   void Draw() override;
-
- private:
-  std::function<void(ExitModalAnswer answer)> on_answer_delegate_;
 };

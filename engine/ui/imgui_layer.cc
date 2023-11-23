@@ -3,6 +3,7 @@
 #include "ui/imgui_layer.h"
 
 #include <GLFW/glfw3.h>
+#include <IconsFontAwesome4.h>
 #include <ImGuizmo.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -54,11 +55,14 @@ void ImGuiLayer::OnStart() {
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-  float font_size = 18.0f;  // TODO add this as an setting
-  io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Bold.ttf",
-                               font_size);
   io.FontDefault = io.Fonts->AddFontFromFileTTF(
-      "assets/fonts/Roboto/Roboto-Regular.ttf", font_size);
+      "assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
+
+  ImFontConfig config;
+  config.MergeMode = true;
+  static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+  io.Fonts->AddFontFromFileTTF("assets/fonts/fontawesome-webfont.ttf", 13.0f,
+                               &config, icon_ranges);
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();

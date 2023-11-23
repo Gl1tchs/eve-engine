@@ -16,11 +16,12 @@
 #include "utils/modify_info.h"
 #include "widgets/dock_space.h"
 
-EditorLayer::EditorLayer(Ref<State>& state)
-    : Layer(state), exit_modal_(BIND_FUNC(OnExitModalAnswer)) {
+EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   PROFILE_FUNCTION();
 
   editor_logger_ = LoggerManager::AddLogger("EDITOR");
+
+  exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
 
   // Remove default beheaviour
   PopEvent<WindowCloseEvent>();
@@ -35,10 +36,20 @@ EditorLayer::~EditorLayer() {
 void EditorLayer::OnStart() {
   PROFILE_FUNCTION();
 
-  editor_scene_ = CreateRef<Scene>(GetState());
-  active_scene_ = editor_scene_;
+  editor_scene_ = nullptr;
+  active_scene_ = nullptr;
 
   frame_buffer_ = FrameBuffer::Create({300, 300});
+
+  toolbar_panel_ = CreateScope<ToolbarPanel>();
+  {
+    toolbar_panel_->on_play = BIND_FUNC(OnScenePlay);
+    toolbar_panel_->on_stop = BIND_FUNC(OnSceneStop);
+    toolbar_panel_->on_pause = BIND_FUNC(OnScenePause);
+    toolbar_panel_->on_resume = BIND_FUNC(OnSceneResume);
+    toolbar_panel_->on_step = BIND_FUNC(OnSceneStep);
+    toolbar_panel_->on_eject = BIND_FUNC(OnSceneEject);
+  }
 
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
@@ -87,6 +98,22 @@ void EditorLayer::OnStart() {
     menu_bar_.PushMenu(file_menu);
   }
 
+  Menu edit_menu("Edit");
+  {
+    MenuItemGroup base_group;
+    {
+      MenuItem advanced_inspector("Advanced Inspector", [this]() {
+        inspector_panel_->ToggleAdvanced();
+      });
+
+      base_group.PushMenuItem(advanced_inspector);
+
+      edit_menu.PushItemGroup(base_group);
+    }
+
+    menu_bar_.PushMenu(edit_menu);
+  }
+
   Menu view_menu("View");
   {
     MenuItemGroup base_group;
@@ -122,6 +149,40 @@ void EditorLayer::OnDestroy() {
 void EditorLayer::OnUpdate(float ds) {
   PROFILE_FUNCTION();
 
+  BeforeRender();
+  OnRenderScene(ds);
+}
+
+void EditorLayer::OnGUI(float ds) {
+  PROFILE_FUNCTION();
+
+  DockSpace::Begin();
+  {
+    menu_bar_.Draw();
+
+    if (!active_scene_) {
+      DockSpace::End();
+      return;
+    }
+
+    // Render panels
+    toolbar_panel_->Render();
+    viewport_panel_->Render();
+    hierarchy_panel_->Render();
+    inspector_panel_->Render();
+    render_stats_panel_->Render();
+
+    // Render modals
+    exit_modal_.Render();
+  }
+  DockSpace::End();
+}
+
+void EditorLayer::BeforeRender() {
+  if (!active_scene_) {
+    return;
+  }
+
   if (modify_info.modified && !unsaved_changes_) {
     OnSceneModify();
   }
@@ -138,7 +199,13 @@ void EditorLayer::OnUpdate(float ds) {
       (size.x != viewport_size.x || size.y != viewport_size.y)) {
     frame_buffer_->SetSize(
         {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
-    editor_camera_.SetAspectRatio(viewport_size.x / viewport_size.y);
+    editor_camera_.aspect_ratio = viewport_size.x / viewport_size.y;
+  }
+}
+
+void EditorLayer::OnRenderScene(float ds) {
+  if (!active_scene_) {
+    return;
   }
 
   Ref<Renderer>& renderer = GetState()->renderer;
@@ -148,12 +215,14 @@ void EditorLayer::OnUpdate(float ds) {
   frame_buffer_->Bind();
   frame_buffer_->Refresh();
 
+  auto& viewport_size = viewport_panel_->GetSize();
   RenderCommand::SetViewport(0, 0, (uint32_t)viewport_size.x,
                              (uint32_t)viewport_size.y);
   RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
   RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
 
   switch (scene_state_) {
+    case SceneState::kPaused:
     case SceneState::kEdit: {
       // Update camera movement
       if (viewport_panel_->IsFocused() &&
@@ -177,7 +246,7 @@ void EditorLayer::OnUpdate(float ds) {
         editor_camera_.ResetMousePos();
       }
 
-      active_scene_->OnUpdateEditor(ds, editor_camera_);
+      active_scene_->OnUpdateEditor(ds, editor_camera_, !is_ejected_);
 
       HandleShortcuts();
 
@@ -190,24 +259,6 @@ void EditorLayer::OnUpdate(float ds) {
   }
 
   frame_buffer_->Unbind();
-}
-
-void EditorLayer::OnGUI(float ds) {
-  PROFILE_FUNCTION();
-
-  DockSpace::Begin();
-  {
-    menu_bar_.Draw();
-
-    // Render panels
-    viewport_panel_->Render();
-    hierarchy_panel_->Render();
-    inspector_panel_->Render();
-    render_stats_panel_->Render();
-
-    exit_modal_.Render();
-  }
-  DockSpace::End();
 }
 
 void EditorLayer::HandleShortcuts() {
@@ -351,31 +402,50 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
 }
 
 void EditorLayer::OnScenePlay() {
-  scene_state_ = SceneState::kPlay;
+  SetSceneState(SceneState::kPlay);
 
   active_scene_ = Scene::Copy(editor_scene_);
   active_scene_->OnRuntimeStart();
 
   hierarchy_panel_->SetScene(active_scene_);
+
+  is_ejected_ = false;
 }
 
 void EditorLayer::OnSceneStop() {
-  if (scene_state_ == SceneState::kPlay) {
-    active_scene_->OnRuntimeStop();
-  }
-
-  scene_state_ = SceneState::kEdit;
+  SetSceneState(SceneState::kEdit);
 
   active_scene_ = editor_scene_;
-
   hierarchy_panel_->SetScene(active_scene_);
+
+  is_ejected_ = true;
 }
 
 void EditorLayer::OnScenePause() {
-  if (scene_state_ == SceneState::kEdit)
-    return;
-
+  SetSceneState(SceneState::kPaused);
   active_scene_->SetPaused(true);
+
+  is_ejected_ = false;
+}
+
+void EditorLayer::OnSceneResume() {
+  SetSceneState(SceneState::kPlay);
+  active_scene_->SetPaused(false);
+
+  is_ejected_ = false;
+}
+
+void EditorLayer::OnSceneStep() {
+  active_scene_->Step();
+}
+
+void EditorLayer::OnSceneEject() {
+  is_ejected_ = !is_ejected_;
+}
+
+void EditorLayer::SetSceneState(SceneState state) {
+  scene_state_ = state;
+  toolbar_panel_->SetState(state);
 }
 
 void EditorLayer::Exit(bool force) {

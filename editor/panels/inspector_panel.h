@@ -14,6 +14,8 @@ class InspectorPanel : public Panel {
  public:
   InspectorPanel(Ref<HierarchyPanel> hierarchy_panel);
 
+  void ToggleAdvanced() { advanced_ = !advanced_; }
+
  protected:
   void Draw() override;
 
@@ -28,6 +30,8 @@ class InspectorPanel : public Panel {
   Ref<HierarchyPanel> hierarchy_panel_;
 
   ImporterModal model_importer_;
+
+  bool advanced_ = false;
 
   bool show_add_component_dialog_ = false;
   bool add_component_dialog_opened_ = false;

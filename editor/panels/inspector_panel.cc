@@ -4,13 +4,14 @@
 
 #include <inttypes.h>
 
+#include <IconsFontAwesome4.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "core/utils/functional.h"
-#include "inspector_panel.h"
 #include "scene/components.h"
+#include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
@@ -28,8 +29,6 @@ void InspectorPanel::Draw() {
   RenderComponentProperties(selected_entity);
 
   ImGui::Spacing();
-  ImGui::Separator();
-
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
                        ImGui::GetContentRegionAvail().y -
                        ImGui::GetTextLineHeightWithSpacing());
@@ -63,6 +62,10 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
       selected_entity.AddComponent<CameraComponent>();
     }
 
+    if (ImGui::Button("Directional Light")) {
+      selected_entity.AddComponent<DirectionalLight>();
+    }
+
     if (ImGui::Button("Material")) {
       selected_entity.AddComponent<Material>();
     }
@@ -79,18 +82,39 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
   }
 }
 
-void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
-  // TODO if advanced
-  ImGui::SeparatorText("Id Component");
-  {
-    auto& id_comp = selected_entity.GetComponent<IdComponent>();
+#define COMPONENT_HEADER(name)                                \
+  ImGui::Separator();                                         \
+  bool should_remove = false;                                 \
+  ImGui::Text(name);                                          \
+  ImGui::PushID(name "_remove_button");                       \
+  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30); \
+  if (ImGui::ButtonTransparent(ICON_FA_MINUS, 30, 0)) {       \
+    should_remove = true;                                     \
+  }                                                           \
+  ImGui::PopID();
 
-    ImGui::Text("ID:");
-    ImGui::SameLine();
-    ImGui::Text("%" PRIu64, (uint64_t)id_comp.id);
+#define REMOVE_COMPONENT_IF_NEEDED(ComponentType)     \
+  if (should_remove) {                                \
+    selected_entity.RemoveComponent<ComponentType>(); \
+    modify_info.SetModified();                        \
   }
 
-  ImGui::SeparatorText("Tag Component");
+void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
+  // TODO if advanced
+  if (advanced_) {
+    ImGui::Separator();
+    ImGui::Text(ICON_FA_ID_BADGE " Id Component");
+    {
+      auto& id_comp = selected_entity.GetComponent<IdComponent>();
+
+      ImGui::Text("ID:");
+      ImGui::SameLine();
+      ImGui::Text("%" PRIu64, (uint64_t)id_comp.id);
+    }
+  }
+
+  ImGui::Separator();
+  ImGui::Text(ICON_FA_TAG " Tag Component");
   {
     auto& tag_comp = selected_entity.GetComponent<TagComponent>();
 
@@ -102,185 +126,189 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     }
   }
 
-  ImGui::SeparatorText("Transform");
+  ImGui::Separator();
+  ImGui::Text(ICON_FA_ARROWS_ALT " Transform");
   {
     auto& transform = selected_entity.GetTransform();
 
+    ImGui::Columns(2, "Transform Settings Columns");
+
     ImGui::Text("Position:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::DragFloat3("##transform_position",
                           glm::value_ptr(transform.position), 0.05f)) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Rotation:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::DragFloat3("##transform_rotation",
                           glm::value_ptr(transform.rotation), 0.05f)) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Scale:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::DragFloat3("##transform_scale", glm::value_ptr(transform.scale),
                           0.05f)) {
       modify_info.SetModified();
     }
+
+    ImGui::Columns();
   }
 
   if (selected_entity.HasComponent<CameraComponent>()) {
-    bool should_remove = false;
-
-    ImGui::Separator();
-    ImGui::Text("Camera Component");
-    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-    ImGui::PushID("camera_remove_button");
-    if (ImGui::Button("-")) {
-      should_remove = true;
-    }
-    ImGui::PopID();
+    COMPONENT_HEADER(ICON_FA_CAMERA_RETRO " Camera Component")
 
     auto& camera_comp = selected_entity.GetComponent<CameraComponent>();
+
+    ImGui::Columns(2, "Camera Settings Columns");
 
     if (camera_comp.is_orthographic) {
       auto& camera = camera_comp.ortho_camera;
 
       ImGui::Text("Zoom Level:");
-      float zoom_level = camera.GetZoomLevel();
-      if (ImGui::DragFloat("##ortho_zoom_level", &zoom_level)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##ortho_zoom_level", &camera.zoom_level)) {
         modify_info.SetModified();
       }
-      camera.SetZoomLevel(zoom_level);
+
+      ImGui::NextColumn();
 
       ImGui::Text("Near Clip:");
-      float near_clip = camera.GetNearClip();
-      if (ImGui::DragFloat("##ortho_near_clip", &near_clip)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##ortho_near_clip", &camera.near_clip)) {
         modify_info.SetModified();
       }
-      camera.SetNearClip(near_clip);
+
+      ImGui::NextColumn();
 
       ImGui::Text("Far Clip:");
-      float far_clip = camera.GetFarClip();
-      if (ImGui::DragFloat("##ortho_far_clip", &far_clip)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##ortho_far_clip", &camera.far_clip)) {
         modify_info.SetModified();
-      }
-      camera.SetFarClip(far_clip);
-
-      if (camera_comp.is_fixed_aspect_ratio) {
-        ImGui::Text("Aspect Ratio:");
-        ImGui::SameLine();
-        float aspect_ratio = camera.GetAspectRatio();
-        if (ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f)) {
-          modify_info.SetModified();
-        }
-        camera.SetAspectRatio(aspect_ratio);
       }
     } else {
       auto& camera = camera_comp.persp_camera;
 
       ImGui::Text("FOV:");
-      float zoom_level = camera.GetFov();
-      if (ImGui::DragFloat("##persp_zoom_level", &zoom_level)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##persp_fov", &camera.fov)) {
         modify_info.SetModified();
       }
-      camera.SetFov(zoom_level);
+
+      ImGui::NextColumn();
 
       ImGui::Text("Near Clip:");
-      float near_clip = camera.GetNearClip();
-      if (ImGui::DragFloat("##persp_near_clip", &near_clip)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##persp_near_clip", &camera.near_clip)) {
         modify_info.SetModified();
       }
-      camera.SetNearClip(near_clip);
+
+      ImGui::NextColumn();
 
       ImGui::Text("Far Clip:");
-      float far_clip = camera.GetFarClip();
-      if (ImGui::DragFloat("##persp_far_clip", &far_clip)) {
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##persp_far_clip", &camera.far_clip)) {
         modify_info.SetModified();
       }
-      camera.SetFarClip(far_clip);
 
-      if (camera_comp.is_fixed_aspect_ratio) {
-        ImGui::Text("Aspect Ratio:");
-        ImGui::SameLine();
-        float aspect_ratio = camera.GetAspectRatio();
-        if (ImGui::DragFloat("##persp_aspect_ratio", &aspect_ratio, 0.05f)) {
-          modify_info.SetModified();
-        }
-        camera.SetAspectRatio(aspect_ratio);
+      ImGui::NextColumn();
+
+      ImGui::Text("Aspect Ratio:");
+      ImGui::NextColumn();
+      if (ImGui::DragFloat("##persp_aspect_ratio", &camera.aspect_ratio,
+                           0.05f)) {
+        modify_info.SetModified();
       }
     }
 
+    ImGui::NextColumn();
+
+    ImGui::Text("Is Orthographic");
+    ImGui::NextColumn();
+    if (ImGui::Checkbox("##is_orthographic", &camera_comp.is_orthographic)) {
+      modify_info.SetModified();
+    }
+
+    ImGui::NextColumn();
+
     ImGui::Text("Primary:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Fixed");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::Checkbox("##fixed_aspect_ratio",
                         &camera_comp.is_fixed_aspect_ratio)) {
       modify_info.SetModified();
     }
 
-    if (should_remove) {
-      selected_entity.RemoveComponent<CameraComponent>();
-      modify_info.SetModified();
+    ImGui::NextColumn();
+
+    if (camera_comp.is_fixed_aspect_ratio) {
+      ImGui::Text("Aspect Ratio:");
+      ImGui::NextColumn();
+      float aspect_ratio;
+      if (ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f)) {
+        camera_comp.ortho_camera.aspect_ratio = aspect_ratio;
+        camera_comp.persp_camera.aspect_ratio = aspect_ratio;
+        modify_info.SetModified();
+      }
     }
+
+    ImGui::Columns();
+
+    REMOVE_COMPONENT_IF_NEEDED(CameraComponent)
   }
 
   if (selected_entity.HasComponent<DirectionalLight>()) {
-    bool should_remove = false;
-
-    ImGui::Separator();
-    ImGui::Text("Directional Light");
-    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-    ImGui::PushID("directional_light_remove_button");
-    if (ImGui::Button("-")) {
-      should_remove = true;
-    }
-    ImGui::PopID();
+    COMPONENT_HEADER(ICON_FA_SUN_O " Directional Light");
 
     auto& light = selected_entity.GetComponent<DirectionalLight>();
 
+    ImGui::Columns(2, "Directional Light Columns");
+
     ImGui::Text("Ambient:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##directional_light_ambient",
                           glm::value_ptr(light.ambient))) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Diffuse:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##directional_light_diffuse",
                           glm::value_ptr(light.diffuse))) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Specular:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##directional_light_specular",
                           glm::value_ptr(light.specular))) {
       modify_info.SetModified();
     }
 
-    if (should_remove) {
-      selected_entity.RemoveComponent<DirectionalLight>();
-      modify_info.SetModified();
-    }
+    ImGui::Columns();
+
+    REMOVE_COMPONENT_IF_NEEDED(DirectionalLight)
   }
 
   if (selected_entity.HasComponent<ModelComponent>()) {
-    bool should_remove = false;
-
-    ImGui::Separator();
-    ImGui::Text("Model");
-    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-    ImGui::PushID("model_remove_button");
-    if (ImGui::Button("-")) {
-      should_remove = true;
-    }
-    ImGui::PopID();
+    COMPONENT_HEADER(ICON_FA_CUBES " Model Component")
 
     auto& model_comp = selected_entity.GetComponent<ModelComponent>();
 
@@ -294,57 +322,52 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       modify_info.SetModified();
     }
 
-    if (should_remove) {
-      selected_entity.RemoveComponent<ModelComponent>();
-      modify_info.SetModified();
-    }
+    REMOVE_COMPONENT_IF_NEEDED(ModelComponent)
   }
 
   if (selected_entity.HasComponent<Material>()) {
-    bool should_remove = false;
-
-    ImGui::Separator();
-    ImGui::Text("Material");
-    ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-    ImGui::PushID("material_remove_button");
-    if (ImGui::Button("-")) {
-      should_remove = true;
-    }
-    ImGui::PopID();
+    COMPONENT_HEADER(ICON_FA_PICTURE_O " Material Component")
 
     auto& material = selected_entity.GetComponent<Material>();
 
+    ImGui::Columns(2, "Material Columns");
+
     ImGui::Text("Ambient:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##material_ambient",
                           glm::value_ptr(material.ambient))) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Diffuse:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##material_diffuse",
                           glm::value_ptr(material.diffuse))) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Specular:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::ColorEdit3("##material_specular",
                           glm::value_ptr(material.specular))) {
       modify_info.SetModified();
     }
 
+    ImGui::NextColumn();
+
     ImGui::Text("Shininess:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
     if (ImGui::DragFloat("##material_shininess", &material.shininess, 0.05f)) {
       modify_info.SetModified();
     }
 
-    if (should_remove) {
-      selected_entity.RemoveComponent<Material>();
-      modify_info.SetModified();
-    }
+    ImGui::Columns();
+
+    REMOVE_COMPONENT_IF_NEEDED(Material)
   }
 }
 

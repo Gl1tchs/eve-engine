@@ -14,10 +14,9 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
 #include "panels/render_stats_panel.h"
+#include "panels/toolbar_panel.h"
 #include "panels/viewport_panel.h"
 #include "widgets/menu_bar.h"
-
-enum class SceneState { kEdit, kPlay };
 
 class EditorLayer : public Layer {
  public:
@@ -34,6 +33,10 @@ class EditorLayer : public Layer {
   void OnGUI(float ds) override;
 
  private:
+  void BeforeRender();
+
+  void OnRenderScene(float ds0);
+
   void HandleShortcuts();
 
   void OpenProject();
@@ -46,11 +49,20 @@ class EditorLayer : public Layer {
 
   void OpenScene(const std::filesystem::path& path);
 
+  // Toolbar button callbacks
   void OnScenePlay();
 
   void OnSceneStop();
 
   void OnScenePause();
+
+  void OnSceneResume();
+
+  void OnSceneStep();
+
+  void OnSceneEject();
+
+  void SetSceneState(SceneState state);
 
   void Exit(bool force = false);
 
@@ -74,6 +86,9 @@ class EditorLayer : public Layer {
   bool camera_translatable_;
 
   Ref<FrameBuffer> frame_buffer_;
+
+  Scope<ToolbarPanel> toolbar_panel_;
+  bool is_ejected_;
 
   Scope<ViewportPanel> viewport_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;

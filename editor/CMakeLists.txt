@@ -15,8 +15,13 @@ set(SOURCES
   panels/panel.h
   panels/render_stats_panel.cc
   panels/render_stats_panel.h
+  panels/toolbar_panel.cc
+  panels/toolbar_panel.h
   panels/viewport_panel.cc
   panels/viewport_panel.h
+  utils/imgui_utils.cc
+  utils/imgui_utils.h
+  utils/modify_info.h
   widgets/combo.cc
   widgets/combo.h
   widgets/dock_space.cc
@@ -41,6 +46,7 @@ target_include_directories(eve_editor PRIVATE
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/imgui
   ${VENDOR_DIR}/ImGuizmo
+  ${VENDOR_DIR}/include
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/tinyfiledialogs

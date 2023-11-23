@@ -2,9 +2,11 @@
 
 #include "panels/hierarchy_panel.h"
 
+#include <IconsFontAwesome4.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
 void HierarchyPanel::SetScene(const Ref<Scene>& scene) {
@@ -23,8 +25,8 @@ void HierarchyPanel::Draw() {
 
   ImGui::Text("%s", scene_->GetName().c_str());
 
-  ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-  if (ImGui::Button("Add")) {
+  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+  if (ImGui::ButtonTransparent(ICON_FA_PLUS, 30, 0)) {
     scene_->CreateEntity();
     modify_info.SetModified();
   }
@@ -38,7 +40,8 @@ void HierarchyPanel::Draw() {
 
     ImGui::PushID(id);
 
-    if (ImGui::Selectable(name.c_str(), selected_entity_ == entity)) {
+    if (ImGui::Selectable(std::format("{0} {1}", ICON_FA_CUBE, name).c_str(),
+                          selected_entity_ == entity)) {
       SetSelectedEntity(entity);
     }
 
