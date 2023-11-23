@@ -217,15 +217,6 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       if (ImGui::DragFloat("##persp_far_clip", &camera.far_clip)) {
         modify_info.SetModified();
       }
-
-      ImGui::NextColumn();
-
-      ImGui::Text("Aspect Ratio:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##persp_aspect_ratio", &camera.aspect_ratio,
-                           0.05f)) {
-        modify_info.SetModified();
-      }
     }
 
     ImGui::NextColumn();
@@ -253,13 +244,12 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       modify_info.SetModified();
     }
 
-    ImGui::NextColumn();
-
     if (camera_comp.is_fixed_aspect_ratio) {
+      ImGui::NextColumn();
       ImGui::Text("Aspect Ratio:");
       ImGui::NextColumn();
       float aspect_ratio;
-      if (ImGui::DragFloat("##ortho_aspect_ratio", &aspect_ratio, 0.05f)) {
+      if (ImGui::DragFloat("##camera_aspect_ratio", &aspect_ratio, 0.05f)) {
         camera_comp.ortho_camera.aspect_ratio = aspect_ratio;
         camera_comp.persp_camera.aspect_ratio = aspect_ratio;
         modify_info.SetModified();

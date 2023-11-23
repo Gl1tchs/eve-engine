@@ -61,8 +61,6 @@ class EditorInstance : public Instance {
 
     PushLayer<EditorLayer>(GetState());
   }
-
- private:
 };
 
 Instance* CreateInstance(CommandLineArguments args) {

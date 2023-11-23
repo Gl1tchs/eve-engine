@@ -176,8 +176,12 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
 
 void Renderer::AddLight(const DirectionalLight& light,
                         const glm::vec3& direction) {
-  dir_light = light;
+  DirectionalLight dir_light = light;
   dir_light.direction = direction;
+
+  LightData light_data;
+  light_data.directional_light = dir_light;
+  light_uniform_buffer_->SetData(&light_data, sizeof(LightData));
 }
 
 void Renderer::ResetStats() {
@@ -195,25 +199,15 @@ void Renderer::BeginBatch() {
   index_offset_ = 0;
 
   texture_slot_index_ = 1;
-
-  // TODO find better way
-  dir_light = DirectionalLight{};
 }
 
 void Renderer::Flush() {
-  LightData light_data;
-  light_data.directional_light = dir_light;
-  light_uniform_buffer_->SetData(&light_data, sizeof(LightData));
-
-  index_buffer_->SetData(indices_, index_count_ * sizeof(uint32_t));
-  vertex_buffer_->SetData(vertices_, vertex_count_ * sizeof(Vertex));
-
-  RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-  RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
-
   if (!index_count_) {
     return;
   }
+
+  index_buffer_->SetData(indices_, index_count_ * sizeof(uint32_t));
+  vertex_buffer_->SetData(vertices_, vertex_count_ * sizeof(Vertex));
 
   for (uint32_t i = 0; i <= texture_slot_index_; i++) {
     texture_slots_[i]->Bind(i);

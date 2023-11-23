@@ -95,8 +95,6 @@ class Renderer final {
 
   // Lightning
   Ref<UniformBuffer> light_uniform_buffer_;
-  // TODO optional
-  DirectionalLight dir_light;
 
   // Misc
   RenderStats stats_;
