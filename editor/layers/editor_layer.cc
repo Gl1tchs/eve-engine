@@ -155,6 +155,7 @@ void EditorLayer::OnUpdate(float ds) {
 
   switch (scene_state_) {
     case SceneState::kEdit: {
+      // Update camera movement
       if (viewport_panel_->IsFocused() &&
           Input::IsMouseButtonPressed(MouseCode::kRight)) {
         camera_translatable_ = true;
@@ -177,6 +178,9 @@ void EditorLayer::OnUpdate(float ds) {
       }
 
       active_scene_->OnUpdateEditor(ds, editor_camera_);
+
+      HandleShortcuts();
+
       break;
     }
     case SceneState::kPlay: {
@@ -186,8 +190,6 @@ void EditorLayer::OnUpdate(float ds) {
   }
 
   frame_buffer_->Unbind();
-
-  HandleShortcuts();
 }
 
 void EditorLayer::OnGUI(float ds) {

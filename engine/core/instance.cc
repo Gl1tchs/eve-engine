@@ -18,7 +18,7 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   // TODO get this from project config
   WindowProps props;
   props.title = specs_.name;
-  props.size = {1280, 720};
+  props.size = {1680, 900};
   props.mode = WindowMode::kWindowed;
   props.vsync = true;
 

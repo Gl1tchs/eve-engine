@@ -76,6 +76,10 @@ struct AssetInfoYAML {
 [[nodiscard]] static std::optional<AssetInfoYAML> DeserializeAssetInfo(
     const std::string& path) {
   std::string absolute_path = AssetLibrary::GetAssetPath(path).string();
+  if (std::filesystem::path(absolute_path).extension() != ".meta") {
+    LOG_ENGINE_ERROR("Unable to load .meta file extension not valid.");
+    return {};
+  }
 
   YAML::Node data;
   try {

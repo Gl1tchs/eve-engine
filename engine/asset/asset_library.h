@@ -14,6 +14,9 @@
 class AssetLibrary {
  public:
   template <typename T>
+  [[nodiscard]] static AssetRef<T> LoadFromPath(const std::string& path);
+
+  template <typename T>
   [[nodiscard]] static AssetRef<T> LoadFromMeta(const std::string& path);
 
   // Get the path with some predefined substrings

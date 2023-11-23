@@ -8,10 +8,7 @@
 
 struct GLFWwindow;
 
-enum class CursorState {
-  kNormal,
-  kHidden
-};
+enum class CursorState { kNormal, kHidden };
 
 enum class WindowMode {
   kWindowed,

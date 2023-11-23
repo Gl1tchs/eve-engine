@@ -21,8 +21,13 @@ static TextureWrappingMode DeserializeTextureWrappingMode(
     const std::string& mode);
 
 ImporterModal::ImporterModal(
-    std::function<void(const std::string&)> submit_callback)
-    : Modal("Asset Importer", true), submit_callback_(submit_callback) {}
+    std::function<void(const std::string&)> submit_callback, AssetType for_type)
+    : Modal("Asset Importer", true),
+      submit_callback_(submit_callback),
+      asset_type_(for_type) {
+  SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
+           ImGuiWindowFlags_NoSavedSettings);
+}
 
 void ImporterModal::Draw() {
   {
@@ -32,7 +37,7 @@ void ImporterModal::Draw() {
     ImGui::InputText("##path_input_text", &import_path_);
   }
 
-  {
+  if (asset_type_ == AssetType::kNone) {
     ImGui::Text("Type");
     ImGui::SameLine();
 
@@ -42,9 +47,7 @@ void ImporterModal::Draw() {
                 [this](const std::string& selected) {
                   asset_type_ = DeserializeAssetType(selected);
                 });
-  }
-
-  if (asset_type_ == AssetType::kTexture) {
+  } else if (asset_type_ == AssetType::kTexture) {
     TextureMetadata metadata;
 
     {
@@ -119,6 +122,10 @@ void ImporterModal::Draw() {
   if (ImGui::Button("Import", ImVec2(-1, 0))) {
     CreateAndWriteMeta();
     submit_callback_(GetMetaPath());
+    SetActive(false);
+  }
+
+  if (ImGui::Button("Cancel", ImVec2(-1, 0))) {
     SetActive(false);
   }
 }

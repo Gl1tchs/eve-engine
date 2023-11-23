@@ -41,7 +41,6 @@ void ViewportPanel::Draw() {
 
     // Entity transform
     auto& tc = selected_entity.GetComponent<Transform>();
-    glm::mat4 transform = tc.GetModelMatrix();
 
     // Snapping
     bool snap = Input::IsKeyPressed(KeyCode::kLeftControl);
@@ -56,22 +55,37 @@ void ViewportPanel::Draw() {
     const glm::mat4& camera_proj = editor_camera_->GetProjectionMatrix();
     glm::mat4 camera_view = editor_camera_->GetViewMatrix();
 
-    ImGuizmo::Manipulate(
-        glm::value_ptr(camera_view), glm::value_ptr(camera_proj),
-        (ImGuizmo::OPERATION)operation_, ImGuizmo::LOCAL,
-        glm::value_ptr(transform), nullptr, snap ? snap_values : nullptr);
+    float tmp_matrix[16];
+    ImGuizmo::RecomposeMatrixFromComponents(
+        glm::value_ptr(tc.position), glm::value_ptr(tc.rotation),
+        glm::value_ptr(tc.scale), tmp_matrix);
+
+    ImGuizmo::Manipulate(glm::value_ptr(camera_view),
+                         glm::value_ptr(camera_proj),
+                         (ImGuizmo::OPERATION)operation_, ImGuizmo::LOCAL,
+                         tmp_matrix, nullptr, snap ? snap_values : nullptr);
 
     if (ImGuizmo::IsUsing()) {
-      glm::vec3 translation, rotation, scale;
+      glm::vec3 position, rotation, scale;
       ImGuizmo::DecomposeMatrixToComponents(
-          glm::value_ptr(transform), glm::value_ptr(translation),
-          glm::value_ptr(rotation), glm::value_ptr(scale));
+          tmp_matrix, glm::value_ptr(position), glm::value_ptr(rotation),
+          glm::value_ptr(scale));
 
-      glm::vec3 delta_rotation = rotation - tc.rotation;
-
-      tc.position = translation;
-      tc.rotation += delta_rotation;
-      tc.scale = scale;
+      switch (operation_) {
+        case ImGuizmo::OPERATION::TRANSLATE: {
+          tc.position = position;
+          break;
+        }
+        case ImGuizmo::OPERATION::ROTATE: {
+          glm::vec3 delta_rotation = rotation - tc.rotation;
+          tc.rotation += delta_rotation;
+          break;
+        }
+        case ImGuizmo::OPERATION::SCALE: {
+          tc.scale = scale;
+          break;
+        }
+      }
 
       modify_info.SetModified();
     }

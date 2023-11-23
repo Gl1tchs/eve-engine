@@ -327,7 +327,7 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
     if (model_comp_yaml) {
       auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
-      model_component.model = AssetLibrary::LoadFromMeta<Model>(
+      model_component.model = AssetLibrary::LoadFromPath<Model>(
           model_comp_yaml["path"].as<std::string>());
     }
 

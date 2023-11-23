@@ -27,7 +27,7 @@ class InspectorPanel : public Panel {
  private:
   Ref<HierarchyPanel> hierarchy_panel_;
 
-  ImporterModal importer_;
+  ImporterModal model_importer_;
 
   bool show_add_component_dialog_ = false;
   bool add_component_dialog_opened_ = false;

@@ -8,7 +8,7 @@
 #include "core/utils/guuid.h"
 #include "core/utils/memory.h"
 
-enum class AssetType { kTexture, kFont, kScene, kStaticMesh };
+enum class AssetType { kTexture, kFont, kScene, kStaticMesh, kNone };
 
 struct AssetInfo {
   GUUID id;

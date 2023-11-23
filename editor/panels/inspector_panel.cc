@@ -15,7 +15,7 @@
 
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
     : hierarchy_panel_(hierarchy_panel),
-      importer_(BIND_FUNC(OnModelMetaWrite)) {}
+      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh) {}
 
 void InspectorPanel::Draw() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
@@ -23,7 +23,7 @@ void InspectorPanel::Draw() {
     return;
   }
 
-  importer_.Render();
+  model_importer_.Render();
 
   RenderComponentProperties(selected_entity);
 
@@ -68,7 +68,7 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
     }
 
     if (ImGui::Button("Model")) {
-      importer_.SetActive(true);
+      model_importer_.SetActive(true);
     }
 
     ImGui::EndPopup();
@@ -287,14 +287,21 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     ImGui::Text("Model Path:");
     ImGui::SameLine();
 
-    std::string old_path = model_comp.model->info.meta_path;
-    static std::string path = old_path;
-    if (ImGui::InputText("##model_path_input", &path)) {
-      modify_info.SetModified();
+    std::string path = model_comp.model->info.meta_path;
+    // Remove .meta from path
+    {
+      size_t last_dot_pos = path.find_last_of('.');
+
+      // Check if the dot is found and it is not the first character in the string an then if found remove it
+      if (last_dot_pos != std::string::npos && last_dot_pos != 0) {
+        path = path.substr(0, last_dot_pos);
+      }
     }
 
-    if (path != old_path && ImGui::Button("Reimport", ImVec2(-1, 0))) {
-      model_comp.model = AssetLibrary::LoadFromMeta<Model>(path);
+    if (ImGui::InputText("##model_path_input", &path,
+                         ImGuiInputTextFlags_EnterReturnsTrue)) {
+      model_comp.model = AssetLibrary::LoadFromPath<Model>(path);
+      modify_info.SetModified();
     }
 
     if (should_remove) {

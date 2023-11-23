@@ -9,7 +9,8 @@
 
 class ImporterModal : public Modal {
  public:
-  ImporterModal(std::function<void(const std::string&)> submit_callback);
+  ImporterModal(std::function<void(const std::string&)> submit_callback,
+                AssetType for_type = AssetType::kNone);
   virtual ~ImporterModal() = default;
 
  protected:
@@ -21,7 +22,7 @@ class ImporterModal : public Modal {
   void CreateAndWriteMeta();
 
  private:
-  std::string import_path_;
+  std::string import_path_ = "res://";
   AssetType asset_type_;
 
   TextureMetadata texture_metadata_;

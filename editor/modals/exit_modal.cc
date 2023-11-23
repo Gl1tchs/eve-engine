@@ -32,7 +32,7 @@ void ExitModal::Draw() {
     ImGui::CloseCurrentPopup();
   }
 
-  if (ImGui::Button("Cancel")) {
+  if (ImGui::Button("Cancel", ImVec2(-1, 0))) {
     if (on_answer_delegate_) {
       on_answer_delegate_(ExitModalAnswer::kCancel);
     }
