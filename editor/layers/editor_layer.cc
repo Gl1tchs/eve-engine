@@ -37,7 +37,13 @@ EditorLayer::~EditorLayer() {
 void EditorLayer::OnStart() {
   PROFILE_FUNCTION();
 
-  frame_buffer_ = FrameBuffer::Create({300, 300});
+  FrameBufferSpecification fb_spec;
+  fb_spec.attachments = {FrameBufferTextureFormat::kRGB8,
+                         FrameBufferTextureFormat::kR32I,
+                         FrameBufferTextureFormat::kDepth};
+  fb_spec.width = 1280;
+  fb_spec.height = 720;
+  frame_buffer_ = FrameBuffer::Create(fb_spec);
 
   toolbar_panel_ = CreateScope<ToolbarPanel>();
   {
@@ -201,12 +207,10 @@ void EditorLayer::BeforeRender() {
       {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
 
   // Resize
-  if (glm::vec2 size = frame_buffer_->GetSize();
-      viewport_size.x > 0.0f &&
-      viewport_size.y > 0.0f &&  // zero sized framebuffer is invalid
-      (size.x != viewport_size.x || size.y != viewport_size.y)) {
-    frame_buffer_->SetSize(
-        {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
+  if (viewport_size.x > 0.0f && viewport_size.y > 0.0f &&
+      (frame_buffer_->GetSpecification().width != viewport_size.x ||
+       frame_buffer_->GetSpecification().height != viewport_size.y)) {
+    frame_buffer_->Resize((uint32_t)viewport_size.x, (uint32_t)viewport_size.y);
     editor_camera_.aspect_ratio = viewport_size.x / viewport_size.y;
   }
 }
@@ -221,13 +225,11 @@ void EditorLayer::OnRenderScene(float ds) {
   renderer->ResetStats();
 
   frame_buffer_->Bind();
-  frame_buffer_->Refresh();
-
-  auto& viewport_size = viewport_panel_->GetSize();
-  RenderCommand::SetViewport(0, 0, (uint32_t)viewport_size.x,
-                             (uint32_t)viewport_size.y);
   RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
   RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
+
+  // Clear our entity ID attachment to -1
+  frame_buffer_->ClearAttachment(1, -1);
 
   switch (scene_state_) {
     case SceneState::kPaused:
@@ -263,6 +265,27 @@ void EditorLayer::OnRenderScene(float ds) {
     case SceneState::kPlay: {
       active_scene_->OnUpdateRuntime(ds);
       break;
+    }
+  }
+
+  // Mouse select entities
+  if (!ImGuizmo::IsUsing() && Input::IsMouseButtonPressed(MouseCode::kLeft)) {
+    auto [mx, my] = ImGui::GetMousePos();
+    mx -= viewport_panel_->GetBounds()[0].x;
+    my -= viewport_panel_->GetBounds()[0].y;
+    glm::vec2 viewport_size =
+        viewport_panel_->GetBounds()[1] - viewport_panel_->GetBounds()[0];
+    my = viewport_size.y - my;
+    int mouse_x = (int)mx;
+    int mouse_y = (int)my;
+
+    if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)viewport_size.x &&
+        mouse_y < (int)viewport_size.y) {
+      int pixel_data = frame_buffer_->ReadPixel(1, mouse_x, mouse_y);
+      hierarchy_panel_->SetSelectedEntity(
+          pixel_data == -1
+              ? Entity()
+              : Entity((entt::entity)pixel_data, active_scene_.get()));
     }
   }
 

@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 
 #include "core/debug/assert.h"
-#include "opengl_texture.h"
 
 int DeserializeTextureFormat(TextureFormat format) {
   switch (format) {

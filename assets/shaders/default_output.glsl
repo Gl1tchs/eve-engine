@@ -6,11 +6,10 @@
 #include "material.glsl"
 
 struct DefaultVertexOutput {
-  Material material;
   vec3 frag_pos;
   vec3 normal;
   vec2 tex_coords;
-  float tex_index;
+  Material material;
 };
 
 #endif // DEFAULT_OUTPUT_GLSL_

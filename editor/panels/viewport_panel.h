@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <glm/glm.hpp>
 
 #include "core/utils/memory.h"
@@ -21,6 +23,8 @@ class ViewportPanel : public Panel {
 
   void SetGizmoState(int state) { operation_ = state; }
 
+  const std::array<glm::vec2, 2>& GetBounds() const { return bounds_box_; }
+
  protected:
   void Draw() override;
 
@@ -28,6 +32,8 @@ class ViewportPanel : public Panel {
   Ref<FrameBuffer> frame_buffer_;
   Ref<HierarchyPanel> hierarchy_panel_;
   EditorCamera* editor_camera_;
+
+  std::array<glm::vec2, 2> bounds_box_{};
 
   int operation_ = 7;
 };

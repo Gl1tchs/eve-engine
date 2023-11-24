@@ -11,13 +11,14 @@
 
 struct Vertex final {
   glm::vec4 position;
+  glm::vec3 normal;
   glm::vec3 ambient;
   glm::vec3 diffuse;
   glm::vec3 specular;
   float shininess;
-  glm::vec3 normal;
   glm::vec2 tex_coords;
   float tex_index = 0.0f;
+  int entity_id = -1;
 };
 
 struct RenderPacket final {

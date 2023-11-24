@@ -13,7 +13,9 @@
 ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
                              Ref<HierarchyPanel> hierarchy_panel,
                              EditorCamera* editor_camera)
-    : Panel({true, frame_buffer->GetSize()}),
+    : Panel({true,
+             {frame_buffer->GetSpecification().width,
+              frame_buffer->GetSpecification().height}}),
       frame_buffer_(frame_buffer),
       hierarchy_panel_(hierarchy_panel),
       editor_camera_(editor_camera) {
@@ -23,9 +25,17 @@ ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
 }
 
 void ViewportPanel::Draw() {
+  auto viewport_min_region = ImGui::GetWindowContentRegionMin();
+  auto viewport_max_region = ImGui::GetWindowContentRegionMax();
+  auto viewport_offset = ImGui::GetWindowPos();
+  bounds_box_[0] = {viewport_min_region.x + viewport_offset.x,
+                    viewport_min_region.y + viewport_offset.y};
+  bounds_box_[1] = {viewport_max_region.x + viewport_offset.x,
+                    viewport_max_region.y + viewport_offset.y};
+
   // Draw frame buffer image
   {
-    uint64_t texture_id = frame_buffer_->GetTexture()->GetTextureID();
+    uint64_t texture_id = frame_buffer_->GetColorAttachmentRendererID(0);
     ImGui::Image(reinterpret_cast<void*>(texture_id),
                  ImVec2{GetSize().x, GetSize().y}, ImVec2{0, 1}, ImVec2{1, 0});
   }

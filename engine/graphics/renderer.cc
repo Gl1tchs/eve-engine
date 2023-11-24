@@ -34,15 +34,17 @@ Renderer::Renderer() {
     shape_data_.vertices = new Vertex[kMaxVertexCount];
     shape_data_.vertex_buffer_ =
         VertexBuffer::Create(kMaxVertexCount * sizeof(Vertex));
-    shape_data_.vertex_buffer_->SetLayout(
-        {{ShaderDataType::kFloat4, "a_pos"},
-         {ShaderDataType::kFloat3, "a_ambient"},
-         {ShaderDataType::kFloat3, "a_diffuse"},
-         {ShaderDataType::kFloat3, "a_specular"},
-         {ShaderDataType::kFloat, "a_shininess"},
-         {ShaderDataType::kFloat3, "a_normal"},
-         {ShaderDataType::kFloat2, "a_tex_coords"},
-         {ShaderDataType::kFloat, "a_tex_index"}});
+    shape_data_.vertex_buffer_->SetLayout({
+        {ShaderDataType::kFloat4, "a_pos"},
+        {ShaderDataType::kFloat3, "a_normal"},
+        {ShaderDataType::kFloat2, "a_tex_coords"},
+        {ShaderDataType::kFloat3, "a_ambient"},
+        {ShaderDataType::kFloat3, "a_diffuse"},
+        {ShaderDataType::kFloat3, "a_specular"},
+        {ShaderDataType::kFloat, "a_shininess"},
+        {ShaderDataType::kFloat, "a_tex_index"},
+        {ShaderDataType::kInt, "a_entity_id"},
+    });
     shape_data_.vertex_array_->AddVertexBuffer(shape_data_.vertex_buffer_);
 
     // initialize index buffer
@@ -80,9 +82,11 @@ Renderer::Renderer() {
     line_data_.vertices = new LineVertex[kMaxVertexCount];
     line_data_.vertex_buffer_ =
         VertexBuffer::Create(kMaxVertexCount * sizeof(LineVertex));
-    line_data_.vertex_buffer_->SetLayout(
-        {{ShaderDataType::kFloat3, "a_pos"},
-         {ShaderDataType::kFloat4, "a_color"}});
+    line_data_.vertex_buffer_->SetLayout({
+        {ShaderDataType::kFloat3, "a_pos"},
+        {ShaderDataType::kFloat4, "a_color"},
+        {ShaderDataType::kInt, "a_entity_id"},
+    });
     line_data_.vertex_array_->AddVertexBuffer(line_data_.vertex_buffer_);
   }
 
@@ -114,7 +118,7 @@ void Renderer::EndScene() {
 }
 
 void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
-                    const Ref<Texture>& texture) {
+                    const Ref<Texture>& texture, int entity_id) {
   PROFILE_FUNCTION();
 
   if (NeedsNewBatch(shape_data_.index_count_, packet.indices.size()) ||
@@ -145,6 +149,8 @@ void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
     vertex.shininess = material.shininess;
 
     vertex.tex_index = texture_index;
+    vertex.entity_id = entity_id;
+
     shape_data_.vertices[shape_data_.vertex_count_++] = vertex;
   }
 
@@ -160,7 +166,7 @@ void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
 }
 
 void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
-                    const std::optional<Material>& material) {
+                    const std::optional<Material>& material, int entity_id) {
   PROFILE_FUNCTION();
 
   for (auto mesh : model->meshes) {
@@ -182,6 +188,8 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
       vertex.shininess = material_in_use.shininess;
 
       vertex.tex_index = texture_index;
+      vertex.entity_id = entity_id;
+
       shape_data_.vertices[shape_data_.vertex_count_++] = vertex;
     }
 

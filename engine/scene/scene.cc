@@ -437,13 +437,15 @@ void Scene::RenderScene() {
   registry_.view<Transform, ModelComponent>().each(
       [&](entt::entity entity_id, const Transform& transform,
           const ModelComponent& model_comp) {
+        // use default mesh material if material component not found
         std::optional<Material> material{};
         if (registry_.all_of<Material>(entity_id)) {
           material =
               std::optional<Material>(registry_.get<Material>(entity_id));
         }
 
-        renderer->Draw(model_comp.model->asset, transform, material);
+        renderer->Draw(model_comp.model->asset, transform, material,
+                       (int)entity_id);
       });
 }
 

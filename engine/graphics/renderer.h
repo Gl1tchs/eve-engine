@@ -61,6 +61,7 @@ struct ShapeRenderData {
 
 struct LineVertex {
   glm::vec3 position;
+  int entity_id = -1;
   glm::vec4 color;
 };
 
@@ -85,10 +86,10 @@ class Renderer final {
   void EndScene();
 
   void Draw(const RenderPacket& packet, const Transform& transform,
-            const Ref<Texture>& texture);
+            const Ref<Texture>& texture, int entity_id = -1);
 
   void Draw(const Ref<Model>& model, const Transform& transform,
-            const std::optional<Material>& material);
+            const std::optional<Material>& material, int entity_id = -1);
 
   void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
                 const glm::vec4& color);
