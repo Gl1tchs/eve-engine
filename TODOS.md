@@ -8,3 +8,5 @@
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
     but should display the name of it based on the asset metadata.
 - [ ] Add an external scene renderer class.
+- [ ] Use a custom format rather yaml.
+- [ ] Make EnTT library private.
