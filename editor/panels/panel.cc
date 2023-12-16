@@ -4,8 +4,16 @@
 
 #include <imgui.h>
 
-Panel::Panel(PanelProperties props)
-    : is_active_(props.default_active), panel_size_(props.size) {}
+ImVec2 VecToImVec(const glm::vec2& lhs) {
+  return ImVec2(lhs.x, lhs.y);
+}
+
+glm::vec2 ImVecToVec(const ImVec2& lhs) {
+  return glm::vec2(lhs.x, lhs.y);
+}
+
+Panel::Panel(bool default_active, glm::vec2 size, glm::vec2 pos)
+    : is_active_(default_active), panel_size_(size), panel_pos_(pos) {}
 
 void Panel::Render() {
   if (is_active_) {
@@ -38,6 +46,9 @@ void Panel::Begin() {
   bool* p_active = nullptr;
   if (!is_static_) {
     p_active = &is_active_;
+  } else {
+    ImGui::SetNextWindowPos(VecToImVec(panel_pos_));
+    ImGui::SetNextWindowPos(VecToImVec(panel_size_));
   }
 
   ImGui::Begin(GetName().c_str(), p_active, window_flags_);
@@ -45,8 +56,10 @@ void Panel::Begin() {
   is_focused_ = ImGui::IsWindowFocused();
   is_hovered_ = ImGui::IsWindowHovered();
 
-  ImVec2 size = ImGui::GetContentRegionAvail();
-  panel_size_ = {size.x, size.y};
+  if (!is_static_) {
+    panel_size_ = ImVecToVec(ImGui::GetContentRegionAvail());
+    panel_pos_ = ImVecToVec(ImGui::GetWindowPos());
+  }
 }
 
 void Panel::End() {

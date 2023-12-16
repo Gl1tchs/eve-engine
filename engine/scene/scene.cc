@@ -2,7 +2,6 @@
 
 #include "scene/scene.h"
 
-#include "graphics/camera.h"
 #include "scene/entity.h"
 #include "scene/transform.h"
 

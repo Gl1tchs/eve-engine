@@ -9,14 +9,9 @@
     return name;                                 \
   }
 
-struct PanelProperties {
-  bool default_active{true};
-  glm::vec2 size{};
-};
-
 class Panel {
  public:
-  Panel(PanelProperties props = PanelProperties());
+  Panel(bool default_active = false, glm::vec2 size = {}, glm::vec2 pos = {});
   virtual ~Panel() = default;
 
   void Render();
@@ -34,6 +29,10 @@ class Panel {
 
   [[nodiscard]] bool IsHovered() const { return is_hovered_; }
 
+  void SetPos(const glm::vec2& pos) { panel_pos_ = pos; }
+  [[nodiscard]] const glm::vec2& GetPos() const { return panel_pos_; }
+
+  void SetSize(const glm::vec2& size) { panel_size_ = size; }
   [[nodiscard]] const glm::vec2& GetSize() const { return panel_size_; }
 
  protected:
@@ -57,4 +56,5 @@ class Panel {
   bool is_static_ = false;
 
   glm::vec2 panel_size_;
+  glm::vec2 panel_pos_;
 };

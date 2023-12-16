@@ -10,9 +10,9 @@
 #include "scene/scene.h"
 
 #include "modals/exit_modal.h"
+#include "panels/debug_info_panel.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
-#include "panels/render_stats_panel.h"
 #include "panels/toolbar_panel.h"
 #include "panels/viewport_panel.h"
 #include "widgets/menu_bar.h"
@@ -90,7 +90,7 @@ class EditorLayer : public Layer {
   Scope<ViewportPanel> viewport_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
-  Scope<RenderStatsPanel> render_stats_panel_;
+  Scope<DebugInfoPanel> debug_info_panel_;
 
   ExitModal exit_modal_;
 

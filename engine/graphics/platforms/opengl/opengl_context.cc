@@ -4,6 +4,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include "graphics/graphics_context.h"
 
 static void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
                                              uint32_t id, uint32_t severity,
@@ -26,9 +27,15 @@ void OpenGLContext::Init() {
   LOG_TRACE("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
   LOG_TRACE("  Version: {0}", (const char*)glGetString(GL_VERSION));
 
-  ASSERT(
-      GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
-      "Requires at least OpenGL version of 4.5!");
+  ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
+         "Requires at least OpenGL version of 4.5!");
+}
+
+DeviceInformation OpenGLContext::GetDeviceInfo() const {
+  DeviceInformation info;
+  info.vendor = (const char*)glGetString(GL_VENDOR);
+  info.renderer = (const char*)glGetString(GL_RENDERER);
+  return info;
 }
 
 void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,

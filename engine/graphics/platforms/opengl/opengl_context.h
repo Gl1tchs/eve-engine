@@ -9,4 +9,6 @@
 class OpenGLContext final : public GraphicsContext {
  public:
   void Init() override;
+
+  DeviceInformation GetDeviceInfo() const override;
 };

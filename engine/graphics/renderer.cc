@@ -2,11 +2,11 @@
 
 #include "graphics/renderer.h"
 
-#include "graphics/graphics_context.h"
 #include "graphics/render_command.h"
 
 Renderer::Renderer() {
-  GraphicsContext::Create()->Init();
+  graphics_context_ = GraphicsContext::Create();
+  graphics_context_->Init();
 
   RenderCommand::Init();
 

@@ -7,16 +7,20 @@
 #include "graphics/renderer.h"
 
 #include "panels/panel.h"
+#include "utils/cpuid.h"
 
-class RenderStatsPanel : public Panel {
-  IMPL_PANEL("Render Stats")
+class DebugInfoPanel : public Panel {
+  IMPL_PANEL("Debug Info")
 
  public:
-  RenderStatsPanel(Ref<Renderer>& renderer);
+  DebugInfoPanel(Ref<Renderer>& renderer);
 
  protected:
   void Draw() override;
 
  private:
   Ref<Renderer> renderer_;
+
+  uint64_t system_memory_ = 0;
+  CPUInfo cpu_info_;
 };

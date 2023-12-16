@@ -7,18 +7,20 @@ set(SOURCES
   modals/importer_modal.h
   modals/modal.cc
   modals/modal.h
+  panels/debug_info_panel.cc
+  panels/debug_info_panel.h
   panels/hierarchy_panel.cc
   panels/hierarchy_panel.h
   panels/inspector_panel.cc
   panels/inspector_panel.h
   panels/panel.cc
   panels/panel.h
-  panels/render_stats_panel.cc
-  panels/render_stats_panel.h
   panels/toolbar_panel.cc
   panels/toolbar_panel.h
   panels/viewport_panel.cc
   panels/viewport_panel.h
+  utils/cpuid.cc
+  utils/cpuid.h
   utils/imgui_utils.cc
   utils/imgui_utils.h
   utils/modify_info.h

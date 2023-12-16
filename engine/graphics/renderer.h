@@ -5,6 +5,7 @@
 #include "pch_shared.h"
 
 #include "core/math/box.h"
+#include "graphics/graphics_context.h"
 #include "graphics/index_buffer.h"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
@@ -96,6 +97,10 @@ class Renderer final {
 
   [[nodiscard]] const RenderStats& GetStats() const { return stats_; }
 
+  [[nodiscard]] const Ref<GraphicsContext> GetContext() const {
+    return graphics_context_;
+  }
+
   void ResetStats();
 
   void SetLineWidth(float width) { line_data_.line_width = width; }
@@ -110,6 +115,8 @@ class Renderer final {
   void NextBatch();
 
  private:
+  Ref<GraphicsContext> graphics_context_;
+
   // Renderer Data
   ShapeRenderData shape_data_;
   LineRenderData line_data_;

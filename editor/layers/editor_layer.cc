@@ -12,9 +12,9 @@
 #include "graphics/render_command.h"
 #include "project/project.h"
 #include "scene/scene_serializer.h"
+#include "widgets/dock_space.h"
 
 #include "utils/modify_info.h"
-#include "widgets/dock_space.h"
 
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
@@ -44,7 +44,7 @@ void EditorLayer::OnStart() {
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
                                                &editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
-  render_stats_panel_ = CreateScope<RenderStatsPanel>(GetState()->renderer);
+  debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
   // If active project run it.
   if (Ref<Project> project = Project::GetActive(); project) {
@@ -117,6 +117,10 @@ void EditorLayer::OnStart() {
   {
     MenuItemGroup base_group;
     {
+      MenuItem viewport("Viewport",
+                        [this]() { viewport_panel_->SetActive(true); });
+      base_group.PushMenuItem(viewport);
+
       MenuItem hierarchy("Hierarchy",
                          [this]() { hierarchy_panel_->SetActive(true); });
       base_group.PushMenuItem(hierarchy);
@@ -130,9 +134,9 @@ void EditorLayer::OnStart() {
 
     MenuItemGroup renderer_group;
     {
-      MenuItem render_stats("Render Stats",
-                            [this]() { render_stats_panel_->SetActive(true); });
-      renderer_group.PushMenuItem(render_stats);
+      MenuItem debug_info("Render Stats",
+                          [this]() { debug_info_panel_->SetActive(true); });
+      renderer_group.PushMenuItem(debug_info);
 
       view_menu.PushItemGroup(renderer_group);
     }
@@ -144,12 +148,17 @@ void EditorLayer::OnStart() {
 void EditorLayer::OnDestroy() {}
 
 void EditorLayer::OnUpdate(float ds) {
+  if (!active_scene_) {
+    HandleShortcuts();
+    return;
+  }
 
   BeforeRender();
   OnRenderScene(ds);
 }
 
 void EditorLayer::OnGUI(float ds) {
+  RenderCommand::Clear(BufferBits_kColor);
 
   DockSpace::Begin();
   {
@@ -165,7 +174,7 @@ void EditorLayer::OnGUI(float ds) {
     viewport_panel_->Render();
     hierarchy_panel_->Render();
     inspector_panel_->Render();
-    render_stats_panel_->Render();
+    debug_info_panel_->Render();
 
     // Render modals
     exit_modal_.Render();
@@ -174,10 +183,6 @@ void EditorLayer::OnGUI(float ds) {
 }
 
 void EditorLayer::BeforeRender() {
-  if (!active_scene_) {
-    return;
-  }
-
   if (modify_info.modified && !unsaved_changes_) {
     OnSceneModify();
   }
@@ -199,10 +204,6 @@ void EditorLayer::BeforeRender() {
 }
 
 void EditorLayer::OnRenderScene(float ds) {
-  if (!active_scene_) {
-    return;
-  }
-
   Ref<Renderer>& renderer = GetState()->renderer;
 
   renderer->ResetStats();
@@ -257,10 +258,6 @@ void EditorLayer::OnRenderScene(float ds) {
 }
 
 void EditorLayer::HandleShortcuts() {
-  if (camera_translatable_) {
-    return;
-  }
-
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
     if (Input::IsKeyPressed(KeyCode::kO)) {
@@ -287,7 +284,7 @@ void EditorLayer::HandleShortcuts() {
   }
 
   // Gizmo and transform manuplation shortcuts
-  if (!ImGuizmo::IsUsing()) {
+  if (!camera_translatable_ && !ImGuizmo::IsUsing()) {
     if (Input::IsKeyPressed(KeyCode::kQ)) {
       viewport_panel_->SetGizmoState(-1);
     }

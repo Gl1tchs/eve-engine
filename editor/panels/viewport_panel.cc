@@ -12,13 +12,20 @@
 ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
                              Ref<HierarchyPanel> hierarchy_panel,
                              EditorCamera* editor_camera)
-    : Panel({true, frame_buffer->GetSize()}),
+    : Panel(true, frame_buffer->GetSize()),
       frame_buffer_(frame_buffer),
       hierarchy_panel_(hierarchy_panel),
       editor_camera_(editor_camera) {
   PushStyle(ImGuiStyleVar_WindowPadding, glm::vec2{0, 0});
   SetFlags(ImGuiWindowFlags_NoCollapse);
-  SetStatic(true);
+
+  // SetStatic(true);
+  //   const ImVec2 pos(0.0f, 50.0f);
+  //   ImVec2 size = ImGui::GetWindowSize();
+  //   size.y -= pos.y * 2;
+
+  //   SetPos(pos);
+  //   ImGui::SetNextWindowSize(size);
 }
 
 void ViewportPanel::Draw() {

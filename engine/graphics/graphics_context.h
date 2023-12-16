@@ -4,9 +4,16 @@
 
 #include "pch_shared.h"
 
+struct DeviceInformation {
+  const char* vendor;
+  const char* renderer;
+};
+
 class GraphicsContext {
  public:
   virtual void Init() = 0;
+
+  virtual DeviceInformation GetDeviceInfo() const = 0;
 
   [[nodiscard]] static Ref<GraphicsContext> Create();
 };

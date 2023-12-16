@@ -62,12 +62,12 @@ entities:
       scale: [1, 1, 1]
     camera_component:
       orthographic_camera:
-        aspect_ratio: 1.14864862
+        aspect_ratio: 1.74688792
         zoom_level: 1
         near_clip: -1
         far_clip: 1
       perspective_camera:
-        aspect_ratio: 1.14864862
+        aspect_ratio: 1.74688792
         fov: 45
         near_clip: 0.100000001
         far_clip: 50
