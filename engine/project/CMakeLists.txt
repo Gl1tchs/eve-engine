@@ -5,18 +5,19 @@ set(SOURCES
   project.h
 )
 
-add_library(eve_project STATIC ${SOURCES})
-add_library(eve::project ALIAS eve_project)
+add_module(project ${SOURCES})
 
-target_include_directories(eve_project PUBLIC
+module_include_directories(project PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
 )
 
-target_include_directories(eve_project PRIVATE
+module_include_directories(project PRIVATE
   ${VENDOR_DIR}/yaml-cpp/include
 )
 
-target_link_libraries(eve_project PRIVATE
+module_precompile_headers(graphics PUBLIC ${ENGINE_DIR}/pch_shared.h)
+
+module_link_libraries(project PRIVATE
   eve::core
   yaml-cpp
 )

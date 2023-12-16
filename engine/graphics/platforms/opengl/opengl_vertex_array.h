@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "graphics/vertex_array.h"
 
 class OpenGLVertexArray final : public VertexArray {

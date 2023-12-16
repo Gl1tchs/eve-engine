@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "core/core_minimal.h"
+#include "core/debug/log.h"
 #include "core/instance.h"
 
 extern Instance* CreateInstance(CommandLineArguments args);
@@ -12,23 +13,19 @@ int GuardedMain(CommandLineArguments args) {
     std::filesystem::create_directory(".eve/");
   }
 
-  LoggerManager::Init(".eve/engine.log");
+  Logger::Init(".eve/engine.log");
 
-  PROFILE_BEGIN_SESSION("Startup", ".eve/eve-profiler-startup.prf");
   Instance* instance = CreateInstance(args);
   if (!instance) {
-    LOG_ENGINE_CRITICAL("Unable to create application!");
+    LOG_FATAL("Unable to create application!");
     return 1;
   }
-  PROFILE_END_SESSION();
 
-  PROFILE_BEGIN_SESSION("Runtime", ".eve/eve-profiler-runtime.prf");
   instance->StartEventLoop();
-  PROFILE_END_SESSION();
 
-  PROFILE_BEGIN_SESSION("Shutdown", ".eve/eve-profiler-shutdown.prf");
   delete instance;
-  PROFILE_END_SESSION();
+
+  Logger::Deinit();
 
   return 0;
 }

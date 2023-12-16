@@ -9,7 +9,6 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "core/utils/functional.h"
 #include "scene/components.h"
 
 #include "utils/imgui_utils.h"

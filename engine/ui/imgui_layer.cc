@@ -10,12 +10,10 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "core/debug/instrumentor.h"
-
 ImGuiLayer::ImGuiLayer(Ref<State>& state) : Layer(state) {}
 
 void ImGuiLayer::Begin() {
-  PROFILE_FUNCTION();
+  
 
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
@@ -24,7 +22,7 @@ void ImGuiLayer::Begin() {
 }
 
 void ImGuiLayer::End() {
-  PROFILE_FUNCTION();
+  
 
   ImGuiIO& io = ImGui::GetIO();
   auto size = GetState()->window->GetSize();
@@ -43,7 +41,7 @@ void ImGuiLayer::End() {
 }
 
 void ImGuiLayer::OnStart() {
-  PROFILE_FUNCTION();
+  
 
   // Setup ImGui context
   IMGUI_CHECKVERSION();
@@ -74,7 +72,7 @@ void ImGuiLayer::OnStart() {
 }
 
 void ImGuiLayer::OnDestroy() {
-  PROFILE_FUNCTION();
+  
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();

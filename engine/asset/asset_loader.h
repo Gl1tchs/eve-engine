@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <filesystem>
+#include "pch_shared.h"
 
 #include "asset/asset.h"
-#include "core/utils/memory.h"
 #include "graphics/texture.h"
 #include "scene/components.h"
 #include "scene/static_mesh.h"

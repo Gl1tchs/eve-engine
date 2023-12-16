@@ -15,14 +15,15 @@ elseif(${EVE_PLATFORM} STREQUAL LINUX)
   )
 endif()
 
-add_library(eve_runtime STATIC ${SOURCES})
-add_library(eve::runtime ALIAS eve_runtime)
+add_module(runtime STATIC ${SOURCES})
 
-target_include_directories(eve_runtime PUBLIC
+module_include_directories(runtime PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
 )
 
-target_link_libraries(eve_runtime PRIVATE
+module_link_libraries(runtime PRIVATE
   eve::core
   eve::graphics
 )
+
+module_precompile_headers(runtime PUBLIC ${ENGINE_DIR}/pch_shared.h)

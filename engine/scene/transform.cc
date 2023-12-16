@@ -2,10 +2,6 @@
 
 #include "scene/transform.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtc/quaternion.hpp>
-
 Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
     : position(position),
       rotation(rotation),

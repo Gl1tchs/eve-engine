@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <filesystem>
+#include "pch_shared.h"
 
-#include "core/utils/memory.h"
+#include "core/core_minimal.h"
+
 #include "graphics/frame_buffer.h"
 #include "graphics/graphics_context.h"
 #include "graphics/index_buffer.h"
@@ -45,7 +46,5 @@ Ref<UniformBuffer> CreateUniformBuffer(uint32_t size, uint32_t binding);
 
 Ref<Texture> CreateTexture2D(const TextureMetadata& metadata,
                              const void* pixels = nullptr);
-
-// TODO Ref<Texture> create_Texture2D(filepath path);
 
 Ref<FrameBuffer> CreateFrameBuffer(const glm::ivec2& size);

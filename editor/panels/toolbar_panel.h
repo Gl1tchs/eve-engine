@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "core/utils/functional.h"
+#include "pch.h"
 
 #include "panels/panel.h"
 

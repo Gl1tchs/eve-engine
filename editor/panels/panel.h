@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <variant>
-
-#include <glm/glm.hpp>
+#include "pch.h"
 
 #define IMPL_PANEL(name)                         \
   [[nodiscard]] std::string GetName() override { \

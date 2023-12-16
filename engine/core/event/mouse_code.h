@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include "pch_shared.h"
 
 enum class MouseCode : uint32_t {
   k1 = 0,

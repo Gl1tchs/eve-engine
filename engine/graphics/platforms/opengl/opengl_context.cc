@@ -5,35 +5,35 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-#include "core/debug/assert.h"
-
-static void OpenGLMessageCallback(uint32_t source, uint32_t type, uint32_t id,
-                                  uint32_t severity, int32_t length,
-                                  const char* message, const void* user_param);
+static void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
+                                             uint32_t id, uint32_t severity,
+                                             int32_t length,
+                                             const char* message,
+                                             const void* user_param);
 
 void OpenGLContext::Init() {
   // TODO if you add different window classes update this
   int32_t status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-  ENGINE_ASSERT(status, "Failed to initialize Glad!");
+  ASSERT(status, "Failed to initialize Glad!");
 
 #ifdef EVE_DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 #endif
 
-  LOG_ENGINE_TRACE("OpenGL Info:");
-  LOG_ENGINE_TRACE("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
-  LOG_ENGINE_TRACE("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
-  LOG_ENGINE_TRACE("  Version: {0}", (const char*)glGetString(GL_VERSION));
+  LOG_TRACE("OpenGL Info:");
+  LOG_TRACE("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
+  LOG_TRACE("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
+  LOG_TRACE("  Version: {0}", (const char*)glGetString(GL_VERSION));
 
-  ENGINE_ASSERT(
+  ASSERT(
       GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
       "Requires at least OpenGL version of 4.5!");
 }
 
-void OpenGLMessageCallback(uint32_t source, uint32_t type, uint32_t id,
-                           uint32_t severity, int32_t, const char* message,
-                           const void*) {
+void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
+                                      uint32_t id, uint32_t severity, int32_t,
+                                      const char* message, const void*) {
   // Convert GLenum parameters to strings
   std::string source_string;
   switch (source) {
@@ -113,10 +113,10 @@ void OpenGLMessageCallback(uint32_t source, uint32_t type, uint32_t id,
       break;
   }
 
-  LOG_ENGINE_TRACE("OpenGL Debug Message:");
-  LOG_ENGINE_TRACE("Source: {0}", source_string);
-  LOG_ENGINE_TRACE("Type: {0}", type_string);
-  LOG_ENGINE_TRACE("ID: {0}", id);
-  LOG_ENGINE_TRACE("Severity: {0}", severity_string);
-  LOG_ENGINE_TRACE("Message: {0}", message);
+  LOG_TRACE("OpenGL Debug Message:");
+  LOG_TRACE("Source: {0}", source_string);
+  LOG_TRACE("Type: {0}", type_string);
+  LOG_TRACE("ID: {0}", id);
+  LOG_TRACE("Severity: {0}", severity_string);
+  LOG_TRACE("Message: {0}", message);
 }

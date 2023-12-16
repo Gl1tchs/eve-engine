@@ -1,7 +1,4 @@
 set(SOURCES
-  debug/instrumentor.cc
-  debug/instrumentor.h
-  debug/instrumentor.inl
   debug/log.cc
   debug/log.h
   event/event_handler.h
@@ -15,7 +12,6 @@ set(SOURCES
   event/mouse_event.h
   event/window_event.h
   math/box.h
-  utils/functional.h
   utils/guuid.cc
   utils/guuid.h
   utils/memory.h
@@ -34,25 +30,25 @@ set(SOURCES
   window.h
 )
 
-add_library(eve_core STATIC ${SOURCES})
-add_library(eve::core ALIAS eve_core)
+add_module(core ${SOURCES})
 
-target_include_directories(eve_core PUBLIC
+module_include_directories(core PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/glm
 )
 
-target_include_directories(eve_core PRIVATE
+module_include_directories(core PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/spdlog/include
 )
 
-target_link_libraries(eve_core PRIVATE
+module_link_libraries(core PRIVATE
   eve::asset
   eve::ui
   glfw
   glm
-  spdlog
 )
 
-target_compile_definitions(eve_core PRIVATE GLFW_INCLUDE_NONE)
+module_precompile_headers(core PUBLIC ${ENGINE_DIR}/pch_shared.h)
+
+module_compile_definitions(core PRIVATE GLFW_INCLUDE_NONE)

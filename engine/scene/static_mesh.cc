@@ -19,7 +19,7 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
 
   bool success = loader.LoadFile(path.string());
   if (!success) {
-    LOG_ENGINE_ERROR("Unable to load mesh from path: {0}.", path.string());
+    LOG_ERROR("Unable to load mesh from path: {0}.", path.string());
     return nullptr;
   }
 

@@ -4,8 +4,6 @@
 
 #include <imgui.h>
 
-#include "core/debug/log.h"
-
 Modal::Modal(const std::string name, bool closable)
     : name_(name), closable_(closable) {}
 

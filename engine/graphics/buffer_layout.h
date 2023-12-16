@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <initializer_list>
-#include <string>
-#include <vector>
+#include "pch_shared.h"
 
 enum class ShaderDataType {
   kNone = 0,

@@ -2,12 +2,8 @@
 
 #include "scene/scene_serializer.h"
 
-#include <fstream>
-
 #include <yaml-cpp/yaml.h>
-#include <glm/glm.hpp>
 
-#include "core/debug/assert.h"
 #include "core/utils/guuid.h"
 #include "scene/entity.h"
 
@@ -116,7 +112,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(YAML::Emitter& out, Entity entity) {
-  ENGINE_ASSERT(entity.HasComponent<IdComponent>())
+  ASSERT(entity.HasComponent<IdComponent>())
 
   out << YAML::BeginMap;
   out << YAML::Key << "id" << YAML::Value << entity.GetUUID();
@@ -249,8 +245,8 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
   try {
     data = YAML::LoadFile(file_path.string());
   } catch (YAML::ParserException e) {
-    LOG_ENGINE_ERROR("Failed to load scene file '{0}'\n\t{1}",
-                     file_path.string(), e.what());
+    LOG_ERROR("Failed to load scene file '{0}'\n\t{1}", file_path.string(),
+              e.what());
     return false;
   }
 
@@ -259,7 +255,7 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
   }
 
   std::string scene_name = data["scene"].as<std::string>();
-  LOG_ENGINE_TRACE("Deserializing scene: {0}", scene_name);
+  LOG_TRACE("Deserializing scene: {0}", scene_name);
 
   scene_->name_ = scene_name;
 

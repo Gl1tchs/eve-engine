@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch.h"
 
-#include "core/debug/log.h"
 #include "core/layer.h"
 #include "graphics/frame_buffer.h"
 #include "scene/editor_camera.h"
@@ -75,8 +74,6 @@ class EditorLayer : public Layer {
   void OnExitModalAnswer(ExitModalAnswer answer);
 
  private:
-  Ref<LogInstance> editor_logger_;
-
   Ref<Scene> active_scene_;
   Ref<Scene> editor_scene_;
   SceneState scene_state_ = SceneState::kEdit;

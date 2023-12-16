@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "graphics/renderer_api.h"
 
 class OpenGLRendererAPI final : public RendererAPI {

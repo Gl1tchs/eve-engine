@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <cstdint>
+#include "pch_shared.h"
 
-#include "core/utils/memory.h"
 #include "graphics/buffer_layout.h"
 
 class VertexBuffer {

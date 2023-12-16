@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string>
-
-#include "core/debug/assert.h"
-#include "core/utils/memory.h"
+#include "pch_shared.h"
 
 struct ProjectConfig {
   std::string name;
@@ -17,13 +13,13 @@ struct ProjectConfig {
 class Project {
  public:
   [[nodiscard]] static std::filesystem::path GetProjectDirectory() {
-    ENGINE_ASSERT(active_project_)
+    ASSERT(active_project_)
     return active_project_->project_dir_;
   }
 
   // Relative to project directory
   [[nodiscard]] static std::filesystem::path GetAssetDirectory() {
-    ENGINE_ASSERT(active_project_)
+    ASSERT(active_project_)
     return active_project_->project_dir_ /
            active_project_->config_.asset_directory;
   }

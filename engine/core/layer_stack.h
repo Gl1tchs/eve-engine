@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
+#include "pch_shared.h"
 
 #include "core/layer.h"
 

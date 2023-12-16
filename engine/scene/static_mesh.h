@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <vector>
+#include "pch_shared.h"
 
-#include "core/utils/memory.h"
 #include "graphics/material.h"
 #include "graphics/vertex.h"
 

@@ -4,7 +4,6 @@
 
 #include <ImGuizmo.h>
 #include <imgui.h>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "core/event/input.h"
 

@@ -2,14 +2,10 @@
 
 #pragma once
 
-#include <any>
-#include <filesystem>
-#include <string>
-#include <unordered_map>
+#include "pch_shared.h"
 
 #include "asset/asset.h"
 #include "asset/asset_loader.h"
-#include "core/debug/log.h"
 
 class AssetLibrary {
  public:

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <memory>
+#include "pch_shared.h"
 
 template <typename T>
 using Scope = std::unique_ptr<T>;

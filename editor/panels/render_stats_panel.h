@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "pch.h"
+
 #include "graphics/renderer.h"
 
 #include "panels/panel.h"

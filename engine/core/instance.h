@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <string>
-#include <type_traits>
+#include "pch_shared.h"
 
 #include "core/core_minimal.h"
 #include "core/layer_stack.h"

@@ -2,8 +2,6 @@
 
 #include "project/project_serializer.h"
 
-#include <fstream>
-
 #include <yaml-cpp/yaml.h>
 
 ProjectSerializer::ProjectSerializer(Ref<Project> project)
@@ -35,7 +33,7 @@ bool ProjectSerializer::Deserialize(const std::filesystem::path& path) {
   try {
     data = YAML::LoadFile(path.string());
   } catch (YAML::ParserException e) {
-    LOG_ENGINE_ERROR("Failed to load project file '{0}'\n\t{1}", path.string(),
+    LOG_ERROR("Failed to load project file '{0}'\n\t{1}", path.string(),
                      e.what());
     return false;
   }

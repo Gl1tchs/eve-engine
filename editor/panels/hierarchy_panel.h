@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "pch.h"
+
 #include "scene/entity.h"
 #include "scene/scene.h"
 

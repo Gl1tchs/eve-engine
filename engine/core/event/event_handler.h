@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <functional>
-#include <type_traits>
+#include "pch_shared.h"
 
 class Event {
  protected:

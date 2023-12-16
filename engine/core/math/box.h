@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 struct Box {
   glm::vec3 bottom_left;

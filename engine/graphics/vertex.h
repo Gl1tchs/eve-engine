@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 #include "graphics/material.h"
 

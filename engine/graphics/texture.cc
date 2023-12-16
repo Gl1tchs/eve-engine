@@ -5,8 +5,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "asset/asset_library.h"
-#include "core/debug/assert.h"
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_texture.h"
 
@@ -16,10 +14,10 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLTexture2D>(metadata, pixels);
     case GraphicsAPI::kVulkan:
-      ENGINE_ASSERT(false, "Vulkan not supported yet!");
+      ASSERT(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ENGINE_ASSERT(false, "Unknown graphics API");
+      ASSERT(false, "Unknown graphics API");
       return nullptr;
   }
 }
@@ -31,7 +29,7 @@ Ref<Texture> Texture::Create(const std::filesystem::path& path,
   stbi_uc* data =
       stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
-  ENGINE_ASSERT(data, "Failed to load texture!");
+  ASSERT(data, "Failed to load texture!");
 
   metadata.size = glm::ivec2{width, height};
 

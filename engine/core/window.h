@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <string>
-
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 struct GLFWwindow;
 

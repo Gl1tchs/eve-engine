@@ -1,18 +1,12 @@
 [submodule "thirdparty/glfw"]
 	path = thirdparty/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "thirdparty/spdlog"]
-	path = thirdparty/spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "thirdparty/glm"]
 	path = thirdparty/glm
 	url = https://github.com/g-truc/glm.git
 [submodule "thirdparty/cxxopts"]
 	path = thirdparty/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
-[submodule "thirdparty/SPIRV-Cross"]
-	path = thirdparty/SPIRV-Cross
-	url = https://github.com/KhronosGroup/SPIRV-Cross.git
 [submodule "thirdparty/entt"]
 	path = thirdparty/entt
 	url = https://github.com/skypjack/entt.git

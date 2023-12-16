@@ -20,8 +20,6 @@ set(SOURCES
   renderer_api.h
   renderer.cc
   renderer.h
-  shader_compiler.cc
-  shader_compiler.h
   shader.cc
   shader.h
   texture.cc
@@ -59,15 +57,14 @@ set(OPENGL_SOURCES
 # TODO add this as an option
 list(APPEND SOURCES ${OPENGL_SOURCES})
 
-add_library(eve_graphics STATIC ${SOURCES})
-add_library(eve::graphics ALIAS eve_graphics)
+add_module(graphics ${SOURCES})
 
-target_include_directories(eve_graphics PUBLIC
+module_include_directories(graphics PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/glm
 )
   
-target_include_directories(eve_graphics PRIVATE
+module_include_directories(graphics PRIVATE
   ${VENDOR_DIR}/glad/include/
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/include
@@ -75,16 +72,15 @@ target_include_directories(eve_graphics PRIVATE
   ${Vulkan_INCLUDE_DIRS}
 )
 
-target_link_libraries(eve_graphics PRIVATE
+module_link_libraries(graphics PRIVATE
   eve::asset 
   eve::core
   eve::scene
   glm
   glad
   glfw
-  spirv-cross-core
-  spirv-cross-glsl
-  Vulkan::shaderc_combined
 )
 
-target_compile_definitions(eve_graphics PRIVATE GLFW_INCLUDE_NONE)
+module_precompile_headers(graphics PUBLIC ${ENGINE_DIR}/pch_shared.h)
+
+module_compile_definitions(graphics PRIVATE GLFW_INCLUDE_NONE)

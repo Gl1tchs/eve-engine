@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <filesystem>
+#include "pch_shared.h"
 
 #include "asset/asset_library.h"
 #include "scene/scene.h"

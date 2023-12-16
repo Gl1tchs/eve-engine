@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "pch_shared.h"
+
 #include "core/state.h"
-#include "core/utils/memory.h"
 
 class Layer {
  public:

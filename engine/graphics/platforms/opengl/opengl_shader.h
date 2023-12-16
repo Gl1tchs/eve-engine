@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "graphics/shader.h"
 
 [[nodiscard]] std::string SerializeShaderType(ShaderType type);
@@ -12,11 +10,8 @@
 
 class OpenGLShader final : public Shader {
  public:
-  OpenGLShader(const std::string& vs_source, const std::string& fs_source,
-               const std::string& gs_source = std::string());
-  OpenGLShader(const std::filesystem::path& vs_path,
-               const std::filesystem::path& fs_path,
-               const std::filesystem::path& gs_path = std::filesystem::path());
+  OpenGLShader(const std::string& vs_path, const std::string& fs_path,
+               const std::string& gs_path = "");
   ~OpenGLShader();
 
   void Bind() const override;
@@ -38,8 +33,7 @@ class OpenGLShader final : public Shader {
   [[nodiscard]] uint32_t GetProgramID() const { return program_; }
 
  private:
-  [[nodiscard]] static std::vector<uint32_t> LoadSPIRV(
-      const std::filesystem::path& path);
+  [[nodiscard]] static std::string LoadShaderSource(const std::filesystem::path& path);
 
   [[nodiscard]] int GetUniformLocation(const std::string& name) const;
 

@@ -2,12 +2,7 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string>
-
-#include <glm/glm.hpp>
-
-#include "core/utils/memory.h"
+#include "pch_shared.h"
 
 enum class ShaderType { kNone = 0, kVertex, kFragment, kGeometry };
 
@@ -28,12 +23,7 @@ class Shader {
   virtual void SetUniform(const std::string& name, int count,
                           float* value) const = 0;
 
-  [[nodiscard]] static Ref<Shader> Create(const std::string& vs_source,
-                                          const std::string& fs_source,
-                                          const std::string& gs_source = "");
-
-  [[nodiscard]] static Ref<Shader> Create(
-      const std::filesystem::path& vs_path,
-      const std::filesystem::path& fs_path,
-      const std::filesystem::path& gs_path = std::filesystem::path());
+  [[nodiscard]] static Ref<Shader> Create(const std::string& vs_path,
+                                          const std::string& fs_path,
+                                          const std::string& gs_path = "");
 };

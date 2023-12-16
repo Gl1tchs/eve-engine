@@ -4,8 +4,6 @@
 
 #include <glad/glad.h>
 
-#include "core/debug/assert.h"
-
 static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type) {
   switch (type) {
     case ShaderDataType::kFloat:
@@ -31,7 +29,7 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type) {
     case ShaderDataType::kBool:
       return GL_BOOL;
     default:
-      ENGINE_ASSERT(false, "Unknown ShaderDataType!");
+      ASSERT(false, "Unknown ShaderDataType!");
       return 0;
   }
 }
@@ -59,8 +57,8 @@ const std::vector<Ref<VertexBuffer>>& OpenGLVertexArray::GetVertexBuffers()
 
 void OpenGLVertexArray::AddVertexBuffer(
     const Ref<VertexBuffer>& vertex_buffer) {
-  ENGINE_ASSERT(vertex_buffer->GetLayout().GetElements().size(),
-                "Vertex Buffer has no layout!");
+  ASSERT(vertex_buffer->GetLayout().GetElements().size(),
+         "Vertex Buffer has no layout!");
 
   glBindVertexArray(vao_);
 
@@ -116,7 +114,7 @@ void OpenGLVertexArray::AddVertexBuffer(
         break;
       }
       default:
-        ENGINE_ASSERT(false, "Unknown ShaderDataType!");
+        ASSERT(false, "Unknown ShaderDataType!");
     }
   }
 

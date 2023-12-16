@@ -63,6 +63,8 @@ target_link_libraries(eve_editor PRIVATE
   tinyfiledialogs
 )
 
+target_precompile_headers(eve_editor PUBLIC pch.h)
+
 add_custom_command(TARGET eve_editor PRE_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
   COMMENT "Copying assets to the build destination."

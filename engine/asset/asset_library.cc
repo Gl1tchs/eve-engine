@@ -2,8 +2,6 @@
 
 #include "asset/asset_library.h"
 
-#include <algorithm>
-
 #include "project/project.h"
 
 std::filesystem::path AssetLibrary::GetAssetPath(std::string relative_path) {

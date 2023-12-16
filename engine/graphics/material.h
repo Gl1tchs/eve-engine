@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 #include "asset/asset.h"
 #include "graphics/texture.h"

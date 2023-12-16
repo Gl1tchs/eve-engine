@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
-#include "core/utils/memory.h"
 #include "graphics/texture.h"
 
 class FrameBuffer {

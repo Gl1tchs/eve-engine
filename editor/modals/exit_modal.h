@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "core/utils/functional.h"
-
 #include "modals/modal.h"
 
 enum class ExitModalAnswer {

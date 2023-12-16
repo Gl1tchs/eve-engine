@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 constexpr glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
 constexpr glm::vec3 kVec3Down = -kVec3Up;

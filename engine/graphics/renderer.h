@@ -2,13 +2,9 @@
 
 #pragma once
 
-#include <array>
-#include <vector>
-
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 #include "core/math/box.h"
-#include "core/utils/memory.h"
 #include "graphics/index_buffer.h"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
@@ -16,8 +12,8 @@
 #include "graphics/vertex.h"
 #include "graphics/vertex_array.h"
 #include "graphics/vertex_buffer.h"
-#include "scene/components.h"
 #include "scene/lights.h"
+#include "scene/static_mesh.h"
 #include "scene/transform.h"
 
 static constexpr size_t kMaxVertexCount = 4000;

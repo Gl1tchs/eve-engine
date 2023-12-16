@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <glm/glm.hpp>
+#include "pch_shared.h"
 
 #include "core/event/event_handler.h"
 #include "core/event/mouse_code.h"

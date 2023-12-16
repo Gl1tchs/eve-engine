@@ -8,18 +8,19 @@ set(SOURCES
   asset.h
 )
 
-add_library(eve_asset STATIC ${SOURCES})
-add_library(eve::asset ALIAS eve_asset)
+add_module(asset STATIC ${SOURCES})
 
-target_include_directories(eve_asset PUBLIC
+module_include_directories(asset PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/yaml-cpp/include
 )
 
-target_link_libraries(eve_asset PRIVATE
+module_link_libraries(asset PRIVATE
   eve::core
   eve::graphics
   eve::project
   eve::scene
   yaml-cpp
 )
+
+module_precompile_headers(asset PUBLIC ${ENGINE_DIR}/pch_shared.h)

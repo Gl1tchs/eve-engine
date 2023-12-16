@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "pch_shared.h"
+
 #include <entt/entt.hpp>
 
-#include "core/debug/assert.h"
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/scene.h"
@@ -17,7 +18,7 @@ class Entity {
 
   template <typename T, typename... Args>
   T& AddComponent(Args&&... args) {
-    ENGINE_ASSERT(!HasComponent<T>(), "Entity already has that component!");
+    ASSERT(!HasComponent<T>(), "Entity already has that component!");
     T& component = scene_->registry_.emplace<T>(entity_handle_,
                                                 std::forward<Args>(args)...);
     return component;
@@ -32,7 +33,7 @@ class Entity {
 
   template <typename T>
   [[nodiscard]] T& GetComponent() {
-    ENGINE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+    ASSERT(HasComponent<T>(), "Entity does not have component!");
     return scene_->registry_.get<T>(entity_handle_);
   }
 
@@ -43,7 +44,7 @@ class Entity {
 
   template <typename T>
   void RemoveComponent() {
-    ENGINE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+    ASSERT(HasComponent<T>(), "Entity does not have component!");
     scene_->registry_.remove<T>(entity_handle_);
   }
 

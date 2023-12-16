@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <string>
+#include "pch_shared.h"
 
 #include "core/utils/guuid.h"
 #include "graphics/material.h"

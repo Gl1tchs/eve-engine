@@ -77,7 +77,7 @@ struct AssetInfoYAML {
     const std::string& path) {
   std::string absolute_path = AssetLibrary::GetAssetPath(path).string();
   if (std::filesystem::path(absolute_path).extension() != ".meta") {
-    LOG_ENGINE_ERROR("Unable to load .meta file extension not valid.");
+    LOG_ERROR("Unable to load .meta file extension not valid.");
     return {};
   }
 
@@ -85,13 +85,13 @@ struct AssetInfoYAML {
   try {
     data = YAML::LoadFile(absolute_path);
   } catch (YAML::ParserException e) {
-    LOG_ENGINE_ERROR("Failed to load asset from file '{0}'\n\t{1}",
+    LOG_ERROR("Failed to load asset from file '{0}'\n\t{1}",
                      absolute_path, e.what());
     return {};
   }
 
   if (!data["path"]) {
-    LOG_ENGINE_ERROR("Failed to load asset metadata.");
+    LOG_ERROR("Failed to load asset metadata.");
     return {};
   }
 

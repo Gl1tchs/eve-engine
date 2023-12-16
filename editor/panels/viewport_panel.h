@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
+#include "pch.h"
 
-#include "core/utils/memory.h"
 #include "graphics/frame_buffer.h"
 #include "scene/editor_camera.h"
 

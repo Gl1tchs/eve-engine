@@ -4,7 +4,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "core/core_minimal.h"
 #include "core/event/event_handler.h"
 #include "core/event/events.h"
 #include "core/event/input.h"
@@ -12,13 +11,13 @@
 void GlfwErrorCallback(int error, const char* description);
 
 Window::Window(WindowProps props) {
-  PROFILE_FUNCTION();
+  
 
   title_ = props.title;
   size_ = props.size;
   mode_ = props.mode;
 
-  ENGINE_ASSERT(glfwInit(), "Could not initialize GLFW!")
+  ASSERT(glfwInit(), "Could not initialize GLFW!");
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -46,7 +45,7 @@ Window::Window(WindowProps props) {
 
   window_ =
       glfwCreateWindow(size_.x, size_.y, title_.c_str(), monitor, nullptr);
-  ENGINE_ASSERT(window_, "GLFW window could not created!")
+  ASSERT(window_, "GLFW window could not created!")
 
   glfwMakeContextCurrent(window_);
 
@@ -61,20 +60,20 @@ Window::Window(WindowProps props) {
 }
 
 Window::~Window() {
-  PROFILE_FUNCTION();
+  
 
   glfwDestroyWindow(window_);
   glfwTerminate();
 }
 
 bool Window::IsOpen() {
-  PROFILE_FUNCTION();
+  
 
   return !glfwWindowShouldClose(window_);
 }
 
 void Window::SwapBuffers() {
-  PROFILE_FUNCTION();
+  
 
   glfwPollEvents();
   glfwSwapBuffers(window_);
@@ -85,7 +84,7 @@ bool Window::GetVsync() {
 }
 
 void Window::SetVsync(bool value) {
-  PROFILE_FUNCTION();
+  
 
   glfwSwapInterval(value);
   vsync_ = value;
@@ -96,7 +95,7 @@ WindowMode Window::GetMode() {
 }
 
 void Window::SetMode(const WindowMode& mode) {
-  PROFILE_FUNCTION();
+  
 
   if (window_ != nullptr) {
     glfwDestroyWindow(window_);
@@ -120,7 +119,7 @@ void Window::SetMode(const WindowMode& mode) {
 
   window_ =
       glfwCreateWindow(size_.x, size_.y, title_.c_str(), monitor, nullptr);
-  ENGINE_ASSERT(window_, "GLFW window could not created!")
+  ASSERT(window_, "GLFW window could not created!")
 
   mode_ = mode;
 }
@@ -166,7 +165,7 @@ GLFWwindow* Window::GetNativeWindow() {
 }
 
 void Window::InitEvents() {
-  PROFILE_FUNCTION();
+  
 
   glfwSetWindowSizeCallback(window_,
                             [](GLFWwindow* window, int width, int height) {
@@ -242,5 +241,5 @@ void Window::InitEvents() {
 }
 
 void GlfwErrorCallback(int error, const char* description) {
-  LOG_ENGINE_ERROR("GLFW Error: (no:\"{0}\") {1}", error, description);
+  LOG_ERROR("GLFW Error: (no:\"{0}\") {1}", error, description);
 }

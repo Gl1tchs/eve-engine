@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include "pch_shared.h"
 
 #include "core/event/event_handler.h"
 #include "core/event/key_code.h"

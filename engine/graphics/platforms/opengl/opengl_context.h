@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "pch_shared.h"
+
 #include "graphics/graphics_context.h"
 
 class OpenGLContext final : public GraphicsContext {

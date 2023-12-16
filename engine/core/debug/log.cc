@@ -2,63 +2,70 @@
 
 #include "core/debug/log.h"
 
-#include <unordered_map>
+static std::string GetTimestamp() {
+  auto now =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  std::tm tm_now;
+  localtime_s(&tm_now, &now);
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
-std::unordered_map<std::string, Ref<spdlog::logger>> loggers;
-std::vector<spdlog::sink_ptr> log_sinks;
-
-void LogInstance::Trace(const std::string& fmt) {
-  loggers[target]->trace(fmt);
+  std::stringstream ss;
+  ss << std::put_time(&tm_now, "%Y-%m-%d %H:%M:%S");
+  return ss.str();
 }
 
-void LogInstance::Info(const std::string& fmt) {
-  loggers[target]->info(fmt);
+std::unordered_map<LogLevel, std::string> Logger::s_verbosity_colors = {
+    {LogLevel::Trace, "\x1B[1m"},     // None
+    {LogLevel::Info, "\x1B[32m"},     // Green
+    {LogLevel::Warning, "\x1B[93m"},  // Yellow
+    {LogLevel::Error, "\x1B[91m"},    // Light Red
+    {LogLevel::Fatal, "\x1B[31m"},    // Red
+};
+
+std::ofstream Logger::s_log_file;
+
+const char* Logger::s_log_level_strings[] = {"Trace", "Info", "Warning",
+                                             "Error", "Fatal"};
+
+void Logger::Init(const std::string& file_name) {
+  s_log_file.open(file_name);
+  if (!s_log_file.is_open()) {
+    throw std::runtime_error(
+        "Error: Unable to initialize logger file does not exists!\n");
+  }
 }
 
-void LogInstance::Warning(const std::string& fmt) {
-  loggers[target]->warn(fmt);
+void Logger::Deinit() {
+  if (!s_log_file.is_open()) {
+    return;
+  }
+
+  s_log_file.close();
 }
 
-void LogInstance::Error(const std::string& fmt) {
-  loggers[target]->error(fmt);
+void Logger::Log(LogLevel level, const std::string& fmt) {
+  std::string time_stamp = GetTimestamp();
+  std::string level_str = s_log_level_strings[static_cast<size_t>(level)];
+
+  std::string message =
+      std::format("[{}] [{}]: \"{}\"", time_stamp, level_str, fmt);
+
+  std::string colored_messages = GetColoredMessage(message, level);
+
+  // Output to stdout
+  std::cout << colored_messages << "\x1B[0m\n";
+
+  // Output to file
+  if (s_log_file.is_open()) {
+    s_log_file << message << "\n";
+  }
 }
 
-void LogInstance::Critical(const std::string& fmt) {
-  loggers[target]->critical(fmt);
-}
+std::string Logger::GetColoredMessage(const std::string& message,
+                                      LogLevel level) {
+  auto color_it = s_verbosity_colors.find(level);
+  if (color_it != s_verbosity_colors.end()) {
+    return color_it->second + message;
+  }
 
-Ref<LogInstance> LoggerManager::engine_logger_ = nullptr;
-
-void LoggerManager::Init(const std::string& file_path) {
-  log_sinks.emplace_back(CreateRef<spdlog::sinks::stdout_color_sink_mt>());
-
-  log_sinks.emplace_back(
-      CreateRef<spdlog::sinks::basic_file_sink_mt>(file_path, true));
-
-  log_sinks[0]->set_pattern("[%T] %^[%n] [%l]%$: %v");
-  log_sinks[1]->set_pattern("[%T] [%n] [%l]: %v");
-
-  engine_logger_ = AddLogger("ENGINE");
-}
-
-Ref<LogInstance> LoggerManager::AddLogger(const std::string& target) {
-  Ref<LogInstance> log = CreateRef<LogInstance>(target);
-
-  Ref<spdlog::logger> spdlogger =
-      CreateRef<spdlog::logger>(target, log_sinks.begin(), log_sinks.end());
-  spdlog::register_logger(spdlogger);
-  spdlogger->set_level(spdlog::level::trace);
-  spdlogger->flush_on(spdlog::level::trace);
-
-  loggers[log->target] = spdlogger;
-
-  return log;
-}
-
-Ref<LogInstance> LoggerManager::GetEngineLogger() {
-  return engine_logger_;
+  return message;  // No color for the default case
 }

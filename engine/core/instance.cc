@@ -8,9 +8,7 @@
 Instance* Instance::instance_ = nullptr;
 
 Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
-  PROFILE_FUNCTION();
-
-  ENGINE_ASSERT(!instance_, "Only one instance can exists.");
+  ASSERT(!instance_, "Only one instance can exists.");
   instance_ = this;
 
   state_ = CreateRef<State>();
@@ -35,28 +33,20 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   PushOverlay(imgui_layer_);
 }
 
-Instance::~Instance() {
-  PROFILE_FUNCTION();
-}
+Instance::~Instance() {}
 
 void Instance::StartEventLoop() {
-  PROFILE_FUNCTION();
 
   Timer timer;
   while (state_->running) {
-    PROFILE_SCOPE("EventLoop");
-
     float ds = timer.Tick();
 
-    PROFILE_SCOPE("LayerStack OnUpdate");
     for (Layer* layer : layers_) {
       layer->OnUpdate(ds);
     }
 
     imgui_layer_->Begin();
     {
-      PROFILE_SCOPE("LayerStack OnGUI");
-
       for (Layer* layer : layers_) {
         layer->OnGUI(ds);
       }

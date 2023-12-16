@@ -2,15 +2,10 @@
 
 #include "graphics/renderer.h"
 
-#include <numeric>
-
-#include "core/core_minimal.h"
-#include "graphics/graphics.h"
+#include "graphics/graphics_context.h"
 #include "graphics/render_command.h"
 
 Renderer::Renderer() {
-  PROFILE_FUNCTION();
-
   GraphicsContext::Create()->Init();
 
   RenderCommand::Init();
@@ -19,9 +14,8 @@ Renderer::Renderer() {
   {
     shape_data_.vertex_array_ = VertexArray::Create();
 
-    shape_data_.shader_ = Shader::Create(
-        std::filesystem::path(".eve/shaders/default.vert.spirv"),
-        std::filesystem::path(".eve/shaders/default.frag.spirv"));
+    shape_data_.shader_ = Shader::Create("assets/shaders/default.vert",
+                                         "assets/shaders/default.frag");
 
     shape_data_.shader_->Bind();
 
@@ -74,8 +68,7 @@ Renderer::Renderer() {
     line_data_.vertex_array_ = VertexArray::Create();
 
     line_data_.shader_ =
-        Shader::Create(std::filesystem::path(".eve/shaders/line.vert.spirv"),
-                       std::filesystem::path(".eve/shaders/line.frag.spirv"));
+        Shader::Create("assets/shaders/line.vert", "assets/shaders/line.frag");
 
     line_data_.vertices = new LineVertex[kMaxVertexCount];
     line_data_.vertex_buffer_ =
@@ -91,8 +84,6 @@ Renderer::Renderer() {
 }
 
 Renderer::~Renderer() {
-  PROFILE_FUNCTION();
-
   delete[] shape_data_.vertices;
   delete[] shape_data_.indices_;
 
@@ -100,23 +91,17 @@ Renderer::~Renderer() {
 }
 
 void Renderer::BeginScene(const CameraData& camera_data) {
-  PROFILE_FUNCTION();
-
   camera_uniform_buffer_->SetData(&camera_data, sizeof(CameraData));
 
   BeginBatch();
 }
 
 void Renderer::EndScene() {
-  PROFILE_FUNCTION();
-
   Flush();
 }
 
 void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
                     const Ref<Texture>& texture) {
-  PROFILE_FUNCTION();
-
   if (NeedsNewBatch(shape_data_.index_count_, packet.indices.size()) ||
       shape_data_.texture_slot_index_ >= kMaxTextures) {
     NextBatch();
@@ -161,8 +146,6 @@ void Renderer::Draw(const RenderPacket& packet, const Transform& transform,
 
 void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
                     const std::optional<Material>& material) {
-  PROFILE_FUNCTION();
-
   for (auto mesh : model->meshes) {
     if (NeedsNewBatch(shape_data_.index_count_, mesh.indices.size())) {
       NextBatch();

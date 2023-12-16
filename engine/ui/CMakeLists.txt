@@ -3,26 +3,30 @@ set(SOURCES
   imgui_layer.h
 )
 
-set(IMGUI_DIR ${VENDOR_DIR}/imgui)
-
 # TODO if using vulkan change this
-list(APPEND SOURCES ${IMGUI_OPENGL_SOURCES})
+set(IMGUI_DIR ${VENDOR_DIR}/imgui)
+list(APPEND SOURCES 
+  ${IMGUI_DIR}/backends/imgui_impl_opengl3_loader.h
+  ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+  ${IMGUI_DIR}/backends/imgui_impl_opengl3.h
+  ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+  ${IMGUI_DIR}/backends/imgui_impl_glfw.h
+)
 
-add_library(eve_ui STATIC ${SOURCES})
-add_library(eve::ui ALIAS eve_ui)
+add_module(ui STATIC ${SOURCES})
 
-target_include_directories(eve_ui PUBLIC
+module_include_directories(ui PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
 )
 
-target_include_directories(eve_ui PRIVATE
+module_include_directories(ui PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/imgui
   ${VENDOR_DIR}/include
   ${VENDOR_DIR}/ImGuizmo
 )
 
-target_link_libraries(eve_ui PRIVATE
+module_link_libraries(ui PRIVATE
   eve::core
   ImGui
   ImGuizmo

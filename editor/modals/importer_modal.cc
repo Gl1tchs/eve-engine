@@ -2,8 +2,6 @@
 
 #include "modals/importer_modal.h"
 
-#include <fstream>
-
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <yaml-cpp/yaml.h>
@@ -184,7 +182,7 @@ AssetType DeserializeAssetType(const std::string& type) {
   else if (type == "Model")
     return AssetType::kStaticMesh;
 
-  LOG_ENGINE_WARNING("Unable to deserialize asset type of: {}", type);
+  LOG_WARNING("Unable to deserialize asset type of: {}", type);
   return AssetType::kTexture;
 }
 
@@ -202,7 +200,7 @@ TextureFormat DeserializeTextureFormat(const std::string& format) {
   else if (format == "BGRA")
     return TextureFormat::kBGRA;
 
-  LOG_ENGINE_WARNING("Unable to deserialize texture format of: {}", format);
+  LOG_WARNING("Unable to deserialize texture format of: {}", format);
   return TextureFormat::kRGB;
 }
 
@@ -212,7 +210,7 @@ TextureFilteringMode DeserializeTextureFilteringMode(const std::string mode) {
   else if (mode == "Linear")
     return TextureFilteringMode::kNearest;
 
-  LOG_ENGINE_WARNING("Unable to deserialize texture filtering mode of: {}",
+  LOG_WARNING("Unable to deserialize texture filtering mode of: {}",
                      mode);
   return TextureFilteringMode::kLinear;
 }
@@ -227,7 +225,7 @@ TextureWrappingMode DeserializeTextureWrappingMode(const std::string& mode) {
   else if (mode == "Clamp to Border")
     return TextureWrappingMode::kClampToBorder;
 
-  LOG_ENGINE_WARNING("Unable to deserialize texture wrapping mode of: {}",
+  LOG_WARNING("Unable to deserialize texture wrapping mode of: {}",
                      mode);
   return TextureWrappingMode::kClampToEdge;
 }

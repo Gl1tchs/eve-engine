@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <functional>
-#include <string>
-#include <vector>
+#include "pch.h"
 
 struct Combo {
   static void Draw(const char* name, std::vector<std::string> elements,

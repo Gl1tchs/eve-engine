@@ -5,7 +5,6 @@
 #include <ImGuizmo.h>
 #include <tinyfiledialogs.h>
 
-#include "core/debug/instrumentor.h"
 #include "core/event/event_handler.h"
 #include "core/event/events.h"
 #include "core/event/input.h"
@@ -18,10 +17,6 @@
 #include "widgets/dock_space.h"
 
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
-  PROFILE_FUNCTION();
-
-  editor_logger_ = LoggerManager::AddLogger("EDITOR");
-
   exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
 
   // Remove default beheaviour
@@ -30,13 +25,9 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
       [this](const WindowCloseEvent& event) { Exit(); });
 }
 
-EditorLayer::~EditorLayer() {
-  PROFILE_FUNCTION();
-}
+EditorLayer::~EditorLayer() {}
 
 void EditorLayer::OnStart() {
-  PROFILE_FUNCTION();
-
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
   toolbar_panel_ = CreateScope<ToolbarPanel>();
@@ -150,19 +141,15 @@ void EditorLayer::OnStart() {
   }
 }
 
-void EditorLayer::OnDestroy() {
-  PROFILE_FUNCTION();
-}
+void EditorLayer::OnDestroy() {}
 
 void EditorLayer::OnUpdate(float ds) {
-  PROFILE_FUNCTION();
 
   BeforeRender();
   OnRenderScene(ds);
 }
 
 void EditorLayer::OnGUI(float ds) {
-  PROFILE_FUNCTION();
 
   DockSpace::Begin();
   {
@@ -337,7 +324,7 @@ void EditorLayer::OpenProject() {
                                            "Eve Project Files", 0);
 
   if (!path) {
-    LOG_ENGINE_ERROR("Unable to open scene from path.");
+    LOG_ERROR("Unable to open scene from path.");
     return;
   }
 
@@ -378,7 +365,7 @@ void EditorLayer::SaveSceneAs() {
                                            filter_patterns, "Eve Scene Files");
 
   if (!path) {
-    LOG_ENGINE_ERROR("Unable to save scene to path.");
+    LOG_ERROR("Unable to save scene to path.");
     return;
   }
 

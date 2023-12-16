@@ -1,3 +1,5 @@
+// Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
+
 #include "graphics/platforms/opengl/opengl_vertex_buffer.h"
 
 #include <glad/glad.h>

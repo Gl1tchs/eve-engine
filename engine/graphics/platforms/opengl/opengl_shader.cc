@@ -1,11 +1,6 @@
 #include "graphics/platforms/opengl/opengl_shader.h"
 
-#include <fstream>
-
 #include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "core/debug/assert.h"
 
 std::string SerializeShaderType(ShaderType type) {
   switch (type) {
@@ -44,72 +39,33 @@ int GetOpenGLShaderType(ShaderType type) {
   }
 }
 
-OpenGLShader::OpenGLShader(const std::string& vs_source,
-                           const std::string& fs_source,
-                           const std::string& gs_source) {
+OpenGLShader::OpenGLShader(const std::string& vs_path,
+                           const std::string& fs_path,
+                           const std::string& gs_path) {
   program_ = glCreateProgram();
 
-  const uint32_t vertex_shader = CompileShader(vs_source, ShaderType::kVertex);
+  const std::string vertex_source = LoadShaderSource(vs_path);
+  const uint32_t vertex_shader =
+      CompileShader(vertex_source, ShaderType::kVertex);
   glAttachShader(program_, vertex_shader);
 
+  const std::string fragment_source = LoadShaderSource(fs_path);
   const uint32_t fragment_shader =
-      CompileShader(fs_source, ShaderType::kFragment);
+      CompileShader(fragment_source, ShaderType::kFragment);
   glAttachShader(program_, fragment_shader);
 
   uint32_t geometry_shader{0};
-  if (!gs_source.empty()) {
-    geometry_shader = CompileShader(gs_source, ShaderType::kGeometry);
-    glAttachShader(program_, geometry_shader);
-  }
-
-  glLinkProgram(program_);
-
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-
-  if (geometry_shader != 0) {
-    glDeleteShader(geometry_shader);
-  }
-}
-
-OpenGLShader::OpenGLShader(const std::filesystem::path& vs_path,
-                           const std::filesystem::path& fs_path,
-                           const std::filesystem::path& gs_path) {
-  program_ = glCreateProgram();
-
-  // Load Vulkan SPIR-V shader files
-  const std::vector<uint32_t> vertex_spirv = LoadSPIRV(vs_path);
-  const std::vector<uint32_t> fragment_spirv = LoadSPIRV(fs_path);
-  const std::vector<uint32_t> geometry_spirv =
-      (!gs_path.empty()) ? LoadSPIRV(gs_path) : std::vector<uint32_t>();
-
-  uint32_t vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderBinary(1, &vertex_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-                 vertex_spirv.data(), vertex_spirv.size() * sizeof(uint32_t));
-  glSpecializeShaderARB(vertex_shader, "main", 0, nullptr, nullptr);
-  glAttachShader(program_, vertex_shader);
-
-  uint32_t geometry_shader = 0;
   if (!gs_path.empty()) {
-    geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderBinary(1, &geometry_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-                   geometry_spirv.data(),
-                   geometry_spirv.size() * sizeof(uint32_t));
-    glSpecializeShaderARB(geometry_shader, "main", 0, nullptr, nullptr);
+    const std::string geometry_source = LoadShaderSource(gs_path);
+    geometry_shader = CompileShader(geometry_source, ShaderType::kGeometry);
     glAttachShader(program_, geometry_shader);
   }
-
-  uint32_t fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderBinary(1, &fragment_shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-                 fragment_spirv.data(),
-                 fragment_spirv.size() * sizeof(uint32_t));
-  glSpecializeShaderARB(fragment_shader, "main", 0, nullptr, nullptr);
-  glAttachShader(program_, fragment_shader);
 
   glLinkProgram(program_);
 
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
+
   if (geometry_shader != 0) {
     glDeleteShader(geometry_shader);
   }
@@ -127,27 +83,49 @@ void OpenGLShader::Unbind() const {
   glUseProgram(0);
 }
 
-std::vector<uint32_t> OpenGLShader::LoadSPIRV(
-    const std::filesystem::path& path) {
+std::string OpenGLShader::LoadShaderSource(const std::filesystem::path& path) {
   if (!std::filesystem::exists(path)) {
-    LOG_ENGINE_ERROR("Shader file not found at: {0}", path.string());
-    return {};
+    LOG_ERROR("Shader file not found at: {0}", path.string());
+    return "";
   }
 
-  std::ifstream file(path, std::ios::ate | std::ios::binary);
+  const std::string include_identifier = "#include ";
+  static bool is_recursive_call = false;
+
+  std::string full_source_code;
+  std::ifstream file(path);
+
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Failed to open SPIR-V file: {0}", path.string());
-    return {};
+    LOG_ERROR("Could not open the shader at: {0}", path.string());
+    return full_source_code;
   }
 
-  size_t file_size = static_cast<size_t>(file.tellg());
-  std::vector<uint32_t> buffer(file_size / sizeof(uint32_t));
+  std::string line_buffer;
+  while (std::getline(file, line_buffer)) {
+    if (line_buffer.find(include_identifier) != std::string::npos) {
+      line_buffer.erase(0, include_identifier.size());
 
-  file.seekg(0);
-  file.read(reinterpret_cast<char*>(buffer.data()), file_size);
+      line_buffer.erase(0, 1);
+      line_buffer.erase(line_buffer.size() - 1);
+
+      std::filesystem::path p = path.parent_path();
+      line_buffer.insert(0, p.string() + "/");
+
+      is_recursive_call = true;
+      full_source_code += LoadShaderSource(line_buffer);
+
+      continue;
+    }
+
+    full_source_code += line_buffer + '\n';
+  }
+
+  if (!is_recursive_call)
+    full_source_code += '\0';
+
   file.close();
 
-  return buffer;
+  return full_source_code;
 }
 
 int OpenGLShader::GetUniformLocation(const std::string& name) const {
@@ -201,7 +179,7 @@ bool OpenGLShader::CheckCompileErrors(const uint32_t shader,
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, nullptr, info_log);
-    LOG_ENGINE_ERROR("Unable to link shader of type: ",
+    LOG_ERROR("Unable to link shader of type: ",
                      SerializeShaderType(type), "\n", info_log);
     return false;
   }
@@ -211,14 +189,14 @@ bool OpenGLShader::CheckCompileErrors(const uint32_t shader,
 
 uint32_t OpenGLShader::CompileShader(const std::string& source,
                                      ShaderType type) {
-  ENGINE_ASSERT(type != ShaderType::kNone)
+  ASSERT(type != ShaderType::kNone)
 
   const char* source_c_str = source.c_str();
   const uint32_t shader = glCreateShader(GetOpenGLShaderType(type));
   glShaderSource(shader, 1, &source_c_str, nullptr);
   glCompileShader(shader);
 
-  ENGINE_ASSERT(CheckCompileErrors(shader, type))
+  ASSERT(CheckCompileErrors(shader, type))
 
   return shader;
 }

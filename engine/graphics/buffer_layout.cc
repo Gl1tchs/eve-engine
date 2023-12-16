@@ -2,8 +2,6 @@
 
 #include "graphics/buffer_layout.h"
 
-#include "core/debug/assert.h"
-
 uint32_t GetShaderDataTypeSize(ShaderDataType type) {
   switch (type) {
     case ShaderDataType::kFloat:
@@ -29,7 +27,7 @@ uint32_t GetShaderDataTypeSize(ShaderDataType type) {
     case ShaderDataType::kBool:
       return 1;
     default:
-      ENGINE_ASSERT(false, "Unknown ShaderDataType!")
+      ASSERT(false, "Unknown ShaderDataType!")
       return 0;
   }
 }
@@ -68,7 +66,7 @@ uint32_t BufferElement::GetComponentCount() const {
     case ShaderDataType::kBool:
       return 1;
     default:
-      ENGINE_ASSERT(false, "Unknown ShaderDataType!")
+      ASSERT(false, "Unknown ShaderDataType!")
       return 0;
   }
 }

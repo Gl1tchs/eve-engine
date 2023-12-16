@@ -2,12 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-
-#include <glm/glm.hpp>
-
-#include "core/utils/memory.h"
+#include "pch_shared.h"
 
 enum class TextureFormat {
   kRed,

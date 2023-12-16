@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 enum class KeyCode : uint32_t {
   kNone = 0,
   kSpace = 32,

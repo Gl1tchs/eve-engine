@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <optional>
+#include "pch_shared.h"
 
 #include <entt/entt.hpp>
-#include <glm/glm.hpp>
 
 #include "core/state.h"
 #include "core/utils/guuid.h"

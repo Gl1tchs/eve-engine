@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include "core/utils/memory.h"
+#include "pch_shared.h"
 
 class UniformBuffer {
  public:

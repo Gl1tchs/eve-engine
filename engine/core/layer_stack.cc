@@ -2,11 +2,7 @@
 
 #include "core/layer_stack.h"
 
-#include "core/debug/instrumentor.h"
-
 LayerStack::~LayerStack() {
-  PROFILE_FUNCTION();
-
   for (Layer* layer : layers_) {
     layer->OnDestroy();
     delete layer;
@@ -14,8 +10,6 @@ LayerStack::~LayerStack() {
 }
 
 void LayerStack::PushLayer(Layer* layer) {
-  PROFILE_FUNCTION();
-
   layers_.emplace(layers_.begin() + layer_insert_idx_, layer);
   layer_insert_idx_++;
 
@@ -23,16 +17,12 @@ void LayerStack::PushLayer(Layer* layer) {
 }
 
 void LayerStack::PushOverlay(Layer* overlay) {
-  PROFILE_FUNCTION();
-
   layers_.emplace_back(overlay);
 
   overlay->OnStart();
 }
 
 void LayerStack::PopLayer(Layer* layer) {
-  PROFILE_FUNCTION();
-
   auto it =
       std::find(layers_.begin(), layers_.begin() + layer_insert_idx_, layer);
   if (it != layers_.begin() + layer_insert_idx_) {
@@ -43,8 +33,6 @@ void LayerStack::PopLayer(Layer* layer) {
 }
 
 void LayerStack::PopOverlay(Layer* overlay) {
-  PROFILE_FUNCTION();
-
   auto it =
       std::find(layers_.begin() + layer_insert_idx_, layers_.end(), overlay);
   if (it != layers_.end()) {
