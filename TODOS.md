@@ -7,3 +7,4 @@
 - [ ] Add content browser and use id based asset system.
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
     but should display the name of it based on the asset metadata.
+- [ ] Add an external scene renderer class.
