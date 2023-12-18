@@ -8,7 +8,6 @@
 
 #include "core/state.h"
 #include "core/utils/guuid.h"
-#include "scene/editor_camera.h"
 
 class Entity;
 
@@ -19,26 +18,11 @@ class Scene {
 
   static Ref<Scene> Copy(Ref<Scene> other);
 
-  Entity CreateEntity(const std::string& name = std::string());
-  Entity CreateEntityWithUUID(GUUID uuid,
-                              const std::string& name = std::string());
-
-  [[nodiscard]] bool Exists(Entity entity);
-
-  void DestroyEntity(Entity entity);
-
   void OnRuntimeStart();
+
   void OnRuntimeStop();
+
   void OnUpdateRuntime(float ds);
-
-  void OnUpdateEditor(float ds, EditorCamera& editor_camera,
-                      bool use_primary_if_exists = false);
-  void OnViewportResize(glm::uvec2 size);
-
-  [[nodiscard]] std::optional<Entity> FindEntityByName(std::string_view name);
-  [[nodiscard]] std::optional<Entity> FindEntityByUUID(GUUID uuid);
-
-  [[nodiscard]] std::optional<Entity> GetPrimaryCameraEntity();
 
   [[nodiscard]] bool IsRunning() const { return is_running_; }
   [[nodiscard]] bool IsPaused() const { return is_paused_; }
@@ -47,6 +31,19 @@ class Scene {
 
   void Step(int frames = 1);
 
+  Entity CreateEntity(const std::string& name = std::string());
+  Entity CreateEntityWithUUID(GUUID uuid,
+                              const std::string& name = std::string());
+
+  [[nodiscard]] bool Exists(Entity entity);
+
+  void DestroyEntity(Entity entity);
+
+  [[nodiscard]] std::optional<Entity> FindEntityByName(std::string_view name);
+  [[nodiscard]] std::optional<Entity> FindEntityByUUID(GUUID uuid);
+
+  [[nodiscard]] std::optional<Entity> GetPrimaryCameraEntity();
+
   template <typename... Components>
   [[nodiscard]] auto GetAllEntitiesWith() {
     return registry_.view<Components...>();
@@ -54,36 +51,26 @@ class Scene {
 
   [[nodiscard]] const std::string& GetName() const { return name_; }
 
+  [[nodiscard]] Entity GetSelectedEntity();
+
  private:
-  void RenderSceneEditor(const CameraData& data);
-
-  void RenderSceneRuntime(const CameraData& data);
-
-  void RenderScene();
-
   bool EntityNameExists(const std::string& name);
 
  private:
-  std::string name_;
+  Ref<State> state_;
 
   entt::registry registry_;
+  std::unordered_map<GUUID, Entity> entity_map_;
 
-  glm::uvec2 viewport_size_;
+  std::string name_;
 
   bool is_running_ = false;
   bool is_paused_ = false;
   int step_frames_ = 0;
 
-  bool editor_primary_used_ = false;
-  Transform last_primary_transform_;
-
-  Ref<State> state_;
-
-  std::unordered_map<GUUID, Entity> entity_map_;
-
   Entity* selected_entity_{nullptr};
 
   friend class Entity;
-  friend class SceneSerializer;
   friend class HierarchyPanel;
+  friend class SceneSerializer;
 };

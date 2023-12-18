@@ -1,7 +1,7 @@
 #include "core/instance.h"
 
+#include "core/event/window_event.h"
 #include "core/event/event_handler.h"
-#include "core/event/events.h"
 #include "core/utils/timer.h"
 #include "instance.h"
 

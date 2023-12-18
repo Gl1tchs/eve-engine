@@ -6,15 +6,18 @@
 #include <tinyfiledialogs.h>
 
 #include "core/event/event_handler.h"
-#include "core/event/events.h"
 #include "core/event/input.h"
+#include "core/event/key_code.h"
+#include "core/event/mouse_code.h"
+#include "core/event/window_event.h"
 #include "core/utils/memory.h"
 #include "graphics/render_command.h"
+#include "graphics/scene_renderer.h"
 #include "project/project.h"
 #include "scene/scene_serializer.h"
-#include "widgets/dock_space.h"
 
 #include "utils/modify_info.h"
+#include "widgets/dock_space.h"
 
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
@@ -47,6 +50,7 @@ void EditorLayer::OnStart() {
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
   // If active project run it.
+  active_scene_ = nullptr;
   if (Ref<Project> project = Project::GetActive(); project) {
     auto& project_config = project->GetConfig();
 
@@ -56,93 +60,9 @@ void EditorLayer::OnStart() {
         AssetLibrary::GetAssetPath(project_config.default_scene.string()));
   }
 
-  Menu file_menu("File");
-  {
-    MenuItemGroup project_group;
-    {
-      MenuItem open_project(
-          "Open Project", [&]() { OpenProject(); }, "Ctrl+O");
-      project_group.PushMenuItem(open_project);
+  scene_renderer_ = CreateScope<SceneRenderer>(active_scene_, GetState());
 
-      file_menu.PushItemGroup(project_group);
-    }
-
-    MenuItemGroup scene_group(
-        []() -> bool { return Project::GetActive() != nullptr; });
-    {
-      MenuItem new_scene(
-          "New Scene", [&]() { NewScene(); }, "Ctrl+N");
-      scene_group.PushMenuItem(new_scene);
-
-      MenuItem save_scene(
-          "Save Scene", [&]() { SaveScene(); }, "Ctrl+S");
-      scene_group.PushMenuItem(save_scene);
-
-      MenuItem save_scene_as(
-          "Save Scene As", [&]() { SaveSceneAs(); }, "Ctrl+Shift+S");
-      scene_group.PushMenuItem(save_scene_as);
-
-      file_menu.PushItemGroup(scene_group);
-    }
-
-    MenuItemGroup system_group;
-    {
-      MenuItem exit(
-          "Exit", [&]() { Exit(); }, "Ctrl+Shift+Q");
-      system_group.PushMenuItem(exit);
-
-      file_menu.PushItemGroup(system_group);
-    }
-
-    menu_bar_.PushMenu(file_menu);
-  }
-
-  Menu edit_menu("Edit");
-  {
-    MenuItemGroup base_group;
-    {
-      MenuItem advanced_inspector("Advanced Inspector", [this]() {
-        inspector_panel_->ToggleAdvanced();
-      });
-
-      base_group.PushMenuItem(advanced_inspector);
-
-      edit_menu.PushItemGroup(base_group);
-    }
-
-    menu_bar_.PushMenu(edit_menu);
-  }
-
-  Menu view_menu("View");
-  {
-    MenuItemGroup base_group;
-    {
-      MenuItem viewport("Viewport",
-                        [this]() { viewport_panel_->SetActive(true); });
-      base_group.PushMenuItem(viewport);
-
-      MenuItem hierarchy("Hierarchy",
-                         [this]() { hierarchy_panel_->SetActive(true); });
-      base_group.PushMenuItem(hierarchy);
-
-      MenuItem inspector("Inspector",
-                         [this]() { inspector_panel_->SetActive(true); });
-      base_group.PushMenuItem(inspector);
-
-      view_menu.PushItemGroup(base_group);
-    }
-
-    MenuItemGroup renderer_group;
-    {
-      MenuItem debug_info("Render Stats",
-                          [this]() { debug_info_panel_->SetActive(true); });
-      renderer_group.PushMenuItem(debug_info);
-
-      view_menu.PushItemGroup(renderer_group);
-    }
-
-    menu_bar_.PushMenu(view_menu);
-  }
+  SetupMenubar();
 }
 
 void EditorLayer::OnDestroy() {}
@@ -189,7 +109,7 @@ void EditorLayer::BeforeRender() {
 
   auto& viewport_size = viewport_panel_->GetSize();
 
-  active_scene_->OnViewportResize(
+  scene_renderer_->OnViewportResize(
       {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
 
   // Resize
@@ -242,7 +162,7 @@ void EditorLayer::OnRenderScene(float ds) {
         editor_camera_.ResetMousePos();
       }
 
-      active_scene_->OnUpdateEditor(ds, editor_camera_, !is_ejected_);
+      scene_renderer_->RenderEditor(ds, editor_camera_, !is_ejected_);
 
       HandleShortcuts();
 
@@ -250,6 +170,7 @@ void EditorLayer::OnRenderScene(float ds) {
     }
     case SceneState::kPlay: {
       active_scene_->OnUpdateRuntime(ds);
+      scene_renderer_->RenderRuntime(ds);
       break;
     }
   }
@@ -326,7 +247,7 @@ void EditorLayer::OpenProject() {
   }
 
   if (Ref<Project> project = Project::Load(std::string(path)); project) {
-    auto& project_config = project->GetConfig();
+    const ProjectConfig& project_config = project->GetConfig();
 
     SetSceneTitle();
 
@@ -337,6 +258,8 @@ void EditorLayer::OpenProject() {
 
 void EditorLayer::NewScene() {
   active_scene_ = CreateRef<Scene>(GetState(), "untitled");
+  scene_renderer_->SetScene(active_scene_);
+
   hierarchy_panel_->SetScene(active_scene_);
 
   editor_scene_path_ = "";
@@ -384,6 +307,7 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
   if (serializer.Deserialize(path)) {
     editor_scene_ = new_scene;
     active_scene_ = editor_scene_;
+    scene_renderer_->SetScene(active_scene_);
 
     hierarchy_panel_->SetScene(active_scene_);
 
@@ -397,6 +321,8 @@ void EditorLayer::OnScenePlay() {
   SetSceneState(SceneState::kPlay);
 
   active_scene_ = Scene::Copy(editor_scene_);
+  scene_renderer_->SetScene(active_scene_);
+
   active_scene_->OnRuntimeStart();
 
   hierarchy_panel_->SetScene(active_scene_);
@@ -407,7 +333,11 @@ void EditorLayer::OnScenePlay() {
 void EditorLayer::OnSceneStop() {
   SetSceneState(SceneState::kEdit);
 
+  active_scene_->OnRuntimeStop();
+
   active_scene_ = editor_scene_;
+  scene_renderer_->SetScene(active_scene_);
+
   hierarchy_panel_->SetScene(active_scene_);
 
   is_ejected_ = true;
@@ -484,5 +414,101 @@ void EditorLayer::OnExitModalAnswer(ExitModalAnswer answer) {
       break;
     default:
       break;
+  }
+}
+
+void EditorLayer::SetupMenubar() {
+
+  Menu file_menu("File");
+  {
+    MenuItemGroup project_group;
+    {
+      MenuItem open_project(
+          "Open Project", [&]() { OpenProject(); }, "Ctrl+O");
+      project_group.PushMenuItem(open_project);
+
+      file_menu.PushItemGroup(project_group);
+    }
+
+    MenuItemGroup scene_group(
+        []() -> bool { return Project::GetActive() != nullptr; });
+    {
+      MenuItem new_scene(
+          "New Scene", [&]() { NewScene(); }, "Ctrl+N");
+      scene_group.PushMenuItem(new_scene);
+
+      MenuItem save_scene(
+          "Save Scene", [&]() { SaveScene(); }, "Ctrl+S");
+      scene_group.PushMenuItem(save_scene);
+
+      MenuItem save_scene_as(
+          "Save Scene As", [&]() { SaveSceneAs(); }, "Ctrl+Shift+S");
+      scene_group.PushMenuItem(save_scene_as);
+
+      file_menu.PushItemGroup(scene_group);
+    }
+
+    MenuItemGroup system_group;
+    {
+      MenuItem exit(
+          "Exit", [&]() { Exit(); }, "Ctrl+Shift+Q");
+      system_group.PushMenuItem(exit);
+
+      file_menu.PushItemGroup(system_group);
+    }
+
+    menu_bar_.PushMenu(file_menu);
+  }
+
+  Menu edit_menu("Edit");
+  {
+    MenuItemGroup base_group;
+    {
+      MenuItem reload_scene("Reload Scene",
+                            [this]() { OpenScene(editor_scene_path_); });
+
+      base_group.PushMenuItem(reload_scene);
+
+      MenuItem advanced_inspector("Advanced Inspector", [this]() {
+        inspector_panel_->ToggleAdvanced();
+      });
+
+      base_group.PushMenuItem(advanced_inspector);
+
+      edit_menu.PushItemGroup(base_group);
+    }
+
+    menu_bar_.PushMenu(edit_menu);
+  }
+
+  Menu view_menu("View");
+  {
+    MenuItemGroup base_group;
+    {
+      MenuItem viewport("Viewport",
+                        [this]() { viewport_panel_->SetActive(true); });
+      base_group.PushMenuItem(viewport);
+
+      MenuItem hierarchy("Hierarchy",
+                         [this]() { hierarchy_panel_->SetActive(true); });
+      base_group.PushMenuItem(hierarchy);
+
+      MenuItem inspector("Inspector",
+                         [this]() { inspector_panel_->SetActive(true); });
+      base_group.PushMenuItem(inspector);
+
+      view_menu.PushItemGroup(base_group);
+    }
+
+    MenuItemGroup renderer_group;
+    {
+      MenuItem debug_info("Render Stats",
+                          [this]() { debug_info_panel_->SetActive(true); });
+      renderer_group.PushMenuItem(debug_info);
+
+      view_menu.PushItemGroup(renderer_group);
+    }
+
+    menu_bar_.PushMenu(view_menu);
   }
 }

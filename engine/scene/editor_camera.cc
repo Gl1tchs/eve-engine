@@ -5,9 +5,6 @@
 #include "core/event/input.h"
 
 EditorCamera::EditorCamera() : PerspectiveCamera() {
-  near_clip = 0.01f;
-  far_clip = 300.0f;
-  
   ResetTransform();
 
   last_mouse_pos_ = Input::GetMousePosition();

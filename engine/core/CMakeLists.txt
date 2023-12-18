@@ -3,7 +3,6 @@ set(SOURCES
   debug/log.h
   event/event_handler.h
   event/event_handler.inl
-  event/events.h
   event/input.cc
   event/input.h
   event/key_code.h

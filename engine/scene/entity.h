@@ -38,7 +38,7 @@ class Entity {
   }
 
   template <typename... Components>
-  [[nodiscard]] bool HasComponent() {
+  [[nodiscard]] bool HasComponent() const {
     return scene_->registry_.all_of<Components...>(entity_handle_);
   }
 

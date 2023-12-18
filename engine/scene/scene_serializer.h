@@ -4,7 +4,6 @@
 
 #include "pch_shared.h"
 
-#include "asset/asset_library.h"
 #include "scene/scene.h"
 
 class SceneSerializer {

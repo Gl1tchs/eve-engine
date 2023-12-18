@@ -6,6 +6,7 @@
 
 #include "core/layer.h"
 #include "graphics/frame_buffer.h"
+#include "graphics/scene_renderer.h"
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
 
@@ -73,28 +74,35 @@ class EditorLayer : public Layer {
 
   void OnExitModalAnswer(ExitModalAnswer answer);
 
+  void SetupMenubar();
+
  private:
+  // rendering
+  Ref<FrameBuffer> frame_buffer_;
+  Scope<SceneRenderer> scene_renderer_;
+
+  EditorCamera editor_camera_;
+  bool camera_translatable_;
+
+  // scene members
   Ref<Scene> active_scene_;
   Ref<Scene> editor_scene_;
   SceneState scene_state_ = SceneState::kEdit;
   std::string editor_scene_path_;
 
-  EditorCamera editor_camera_;
-  bool camera_translatable_;
+  // widgets
+  ExitModal exit_modal_;
+  MenuBar menu_bar_;
 
-  Ref<FrameBuffer> frame_buffer_;
-
+  // panels
   Scope<ToolbarPanel> toolbar_panel_;
-  bool is_ejected_;
-
   Scope<ViewportPanel> viewport_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
   Scope<DebugInfoPanel> debug_info_panel_;
 
-  ExitModal exit_modal_;
-
-  MenuBar menu_bar_;
+  // is camera ejected
+  bool is_ejected_;
 
   bool unsaved_changes_{false};
   bool show_exit_dialog_{false};

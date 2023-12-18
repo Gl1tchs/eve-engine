@@ -5,13 +5,14 @@
 #include <GLFW/glfw3.h>
 
 #include "core/event/event_handler.h"
-#include "core/event/events.h"
 #include "core/event/input.h"
+#include "core/event/key_event.h"
+#include "core/event/mouse_event.h"
+#include "core/event/window_event.h"
 
 void GlfwErrorCallback(int error, const char* description);
 
 Window::Window(WindowProps props) {
-  
 
   title_ = props.title;
   size_ = props.size;
@@ -60,20 +61,17 @@ Window::Window(WindowProps props) {
 }
 
 Window::~Window() {
-  
 
   glfwDestroyWindow(window_);
   glfwTerminate();
 }
 
 bool Window::IsOpen() {
-  
 
   return !glfwWindowShouldClose(window_);
 }
 
 void Window::SwapBuffers() {
-  
 
   glfwPollEvents();
   glfwSwapBuffers(window_);
@@ -84,7 +82,6 @@ bool Window::GetVsync() {
 }
 
 void Window::SetVsync(bool value) {
-  
 
   glfwSwapInterval(value);
   vsync_ = value;
@@ -95,7 +92,6 @@ WindowMode Window::GetMode() {
 }
 
 void Window::SetMode(const WindowMode& mode) {
-  
 
   if (window_ != nullptr) {
     glfwDestroyWindow(window_);
@@ -165,7 +161,6 @@ GLFWwindow* Window::GetNativeWindow() {
 }
 
 void Window::InitEvents() {
-  
 
   glfwSetWindowSizeCallback(window_,
                             [](GLFWwindow* window, int width, int height) {

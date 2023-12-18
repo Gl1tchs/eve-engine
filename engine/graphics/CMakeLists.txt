@@ -20,6 +20,8 @@ set(SOURCES
   renderer_api.h
   renderer.cc
   renderer.h
+  scene_renderer.cc
+  scene_renderer.h
   shader.cc
   shader.h
   texture.cc
@@ -65,11 +67,10 @@ module_include_directories(graphics PUBLIC
 )
   
 module_include_directories(graphics PRIVATE
+  ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/glad/include/
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/include
-  ${VENDOR_DIR}/SPIRV-Cross
-  ${Vulkan_INCLUDE_DIRS}
 )
 
 module_link_libraries(graphics PRIVATE

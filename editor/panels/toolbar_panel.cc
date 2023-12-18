@@ -7,9 +7,9 @@
 
 #include "utils/imgui_utils.h"
 
-ToolbarPanel::ToolbarPanel() {
-  SetFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize |
-           ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+ToolbarPanel::ToolbarPanel() : Panel(true) {
+  SetFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar |
+           ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
 }
 
 void ToolbarPanel::Draw() {
