@@ -1,9 +1,10 @@
 #include "core/instance.h"
 
-#include "core/event/window_event.h"
 #include "core/event/event_handler.h"
+#include "core/event/window_event.h"
 #include "core/utils/timer.h"
 #include "instance.h"
+#include "scripting/script_engine.h"
 
 Instance* Instance::instance_ = nullptr;
 
@@ -12,6 +13,7 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   instance_ = this;
 
   state_ = CreateRef<State>();
+  state_->asset_library = CreateRef<AssetLibrary>();
 
   // TODO get this from project config
   WindowProps props;
@@ -27,8 +29,6 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 
   state_->renderer = CreateRef<Renderer>();
 
-  state_->asset_library = CreateRef<AssetLibrary>();
-
   imgui_layer_ = new ImGuiLayer(state_);
   PushOverlay(imgui_layer_);
 }
@@ -36,6 +36,7 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 Instance::~Instance() {}
 
 void Instance::StartEventLoop() {
+  ScriptEngine::Init();
 
   Timer timer;
   while (state_->running) {
@@ -55,6 +56,8 @@ void Instance::StartEventLoop() {
 
     state_->window->SwapBuffers();
   }
+
+  ScriptEngine::Deinit();
 }
 
 void Instance::PushLayer(Layer* layer) {

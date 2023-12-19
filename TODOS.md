@@ -13,10 +13,11 @@
 - [ ] Hot reload scene.
 
 ## Scripting
-- [ ] Add engine api to scripting
-- [ ] Script editor interface
-- [ ] Script serialize fields
-- [ ] Script hot reload
+- [x] Add engine api to scripting
+- [x] Script editor interface
+- [x] Script serialize fields
+- [x] Script hot reload
+- [ ] Visual scripting.
 
 ## Done
 - [x] Add an external scene renderer class.

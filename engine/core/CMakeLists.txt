@@ -33,6 +33,7 @@ add_module(core ${SOURCES})
 
 module_include_directories(core PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
+  ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/glm
 )
 

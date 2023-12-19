@@ -7,7 +7,10 @@
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
+#include "scripting/annotation_parser.h"
 #include "scripting/script.h"
+#include "scripting/script_engine.h"
+#include "yaml-cpp/emittermanip.h"
 
 namespace YAML {
 
@@ -228,6 +231,40 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
 
     out << YAML::Key << "path" << YAML::Value << sc.path;
 
+    Ref<Script> script = sc.instance;
+    if (script && !script->GetSerializeMap().empty()) {
+      const auto& serialize_data = script->GetSerializeMap();
+
+      out << YAML::Key << "fields" << YAML::Value << YAML::BeginSeq;
+
+      for (const auto& [name, data] : serialize_data) {
+        if (!data.is_overrided) {
+          continue;
+        }
+
+        out << YAML::BeginMap;
+
+        std::string result;
+        std::visit(
+            [&](const auto& arg) {
+              using T = std::decay_t<decltype(arg)>;
+              if constexpr (!std::is_same_v<T, std::string>) {
+                result = std::to_string(arg);
+              } else {
+                result = arg;
+              }
+            },
+            data.value);
+
+        out << YAML::Key << "name" << YAML::Value << name;
+        out << YAML::Key << "value" << YAML::Value << result;
+
+        out << YAML::EndMap;
+      }
+
+      out << YAML::EndSeq;
+    }
+
     out << YAML::EndMap;
   }
 
@@ -360,7 +397,30 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
       auto& sc = deserialing_entity.AddComponent<ScriptComponent>();
 
       sc.path = script_component_yaml["path"].as<std::string>();
-      sc.instance = scene_->script_engine_->AddScript(sc.path);
+      sc.instance = ScriptEngine::CreateScript(sc.path);
+
+      auto fields_yaml = script_component_yaml["fields"];
+
+      Ref<Script>& script = sc.instance;
+
+      for (auto field_yaml : fields_yaml) {
+        std::string name = field_yaml["name"].as<std::string>();
+        std::string value_str = field_yaml["value"].as<std::string>();
+
+        ScriptDataType value{};
+        if (IsFloat(value_str)) {
+          float value_float = std::stof(value_str);
+          if (IsInteger(value_float)) {
+            value = (int)value_float;
+          } else {
+            value = value_float;
+          }
+        } else {
+          value = value_str;
+        }
+
+        script->SetSerializeDataField(name, value);
+      }
     }
   }
 

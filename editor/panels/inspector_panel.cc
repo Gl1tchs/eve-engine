@@ -7,16 +7,21 @@
 #include <IconsFontAwesome4.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include <cstdint>
+#include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "scene/components.h"
+#include "scripting/script_engine.h"
 
 #include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
-    : hierarchy_panel_(hierarchy_panel),
-      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh) {}
+    : Panel(true),
+      hierarchy_panel_(hierarchy_panel),
+      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh),
+      script_importer_(BIND_FUNC(OnScriptPathWrite), AssetType::kScript) {}
 
 void InspectorPanel::Draw() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
@@ -25,13 +30,11 @@ void InspectorPanel::Draw() {
   }
 
   model_importer_.Render();
+  script_importer_.Render();
 
   RenderComponentProperties(selected_entity);
 
-  ImGui::Spacing();
-  ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
-                       ImGui::GetContentRegionAvail().y -
-                       ImGui::GetTextLineHeightWithSpacing());
+  ImGui::Separator();
 
   RenderAddComponentDialog(selected_entity);
 }
@@ -74,6 +77,10 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
       model_importer_.SetActive(true);
     }
 
+    if (ImGui::Button("Script")) {
+      script_importer_.SetActive(true);
+    }
+
     ImGui::EndPopup();
     add_component_dialog_opened_ = true;
   } else {
@@ -100,6 +107,8 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
   }
 
 void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
+  ImGui::PushID((uint32_t)selected_entity);
+
   // TODO if advanced
   if (advanced_) {
     ImGui::Separator();
@@ -302,8 +311,10 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
     auto& model_comp = selected_entity.GetComponent<ModelComponent>();
 
+    ImGui::Columns(2, "Directional Light Columns");
+
     ImGui::Text("Model Path:");
-    ImGui::SameLine();
+    ImGui::NextColumn();
 
     std::string path = model_comp.model->info.GetAssetPath();
     if (ImGui::InputText("##model_path_input", &path,
@@ -311,6 +322,10 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       model_comp.model = AssetLibrary::LoadFromPath<Model>(path);
       modify_info.SetModified();
     }
+
+    ImGui::NextColumn();
+
+    ImGui::Columns();
 
     REMOVE_COMPONENT_IF_NEEDED(ModelComponent)
   }
@@ -359,6 +374,87 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
     REMOVE_COMPONENT_IF_NEEDED(Material)
   }
+
+  if (selected_entity.HasComponent<ScriptComponent>()) {
+    COMPONENT_HEADER(ICON_FA_FILE_CODE_O " Script Component")
+
+    auto& script_comp = selected_entity.GetComponent<ScriptComponent>();
+
+    ImGui::Columns(2, "Script Field Columns");
+
+    ImGui::Text("Script Path:");
+    ImGui::NextColumn();
+    if (ImGui::InputText("##script_path_input", &script_comp.path,
+                         ImGuiInputTextFlags_EnterReturnsTrue)) {
+      script_comp.instance = ScriptEngine::CreateScript(script_comp.path);
+      modify_info.SetModified();
+    }
+
+    ImGui::NextColumn();
+
+    if (script_comp.instance) {
+      auto& serialize_map = script_comp.instance->GetSerializeMap();
+
+      for (auto& [name, data] : serialize_map) {
+
+        // put an "*" to show field overrided.
+        ImGui::Text("%s %s", data.is_overrided ? "*" : "", name.c_str());
+        ImGui::NextColumn();
+
+        if (std::holds_alternative<int>(data.value)) {
+          int int_value = std::get<int>(data.value);
+          if (ImGui::InputInt(
+                  std::format(
+                      "##{}_field_{}",
+                      std::filesystem::path(script_comp.path).stem().string(),
+                      name)
+                      .c_str(),
+                  &int_value)) {
+            modify_info.SetModified();
+            // Update the value in the serialize_map
+            script_comp.instance->SetSerializeDataField(name, int_value);
+          }
+        } else if (std::holds_alternative<float>(data.value)) {
+          float float_value = std::get<float>(data.value);
+          if (ImGui::InputFloat(
+                  std::format(
+                      "##{}_field_{}",
+                      std::filesystem::path(script_comp.path).stem().string(),
+                      name)
+                      .c_str(),
+                  &float_value)) {
+            modify_info.SetModified();
+            // Update the value in the serialize_map
+            script_comp.instance->SetSerializeDataField(name, float_value);
+          }
+        } else if (std::holds_alternative<std::string>(data.value)) {
+          std::string string_value = std::get<std::string>(data.value);
+          if (ImGui::InputText(
+                  std::format(
+                      "##{}_field_{}",
+                      std::filesystem::path(script_comp.path).stem().string(),
+                      name)
+                      .c_str(),
+                  &string_value)) {
+            modify_info.SetModified();
+            // Update the value in the serialize_map
+            script_comp.instance->SetSerializeDataField(name, string_value);
+          }
+        } else {
+          // Handle additional types as needed
+          // You may want to log an error or provide a default case
+          LOG_ERROR("Unsupported variable type");
+        }
+
+        ImGui::NextColumn();
+      }
+    }
+    ImGui::Columns();
+
+    REMOVE_COMPONENT_IF_NEEDED(ScriptComponent)
+  }
+
+  ImGui::PopID();
 }
 
 void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
@@ -366,4 +462,12 @@ void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
 
   auto& modal_component = selected_entity.AddComponent<ModelComponent>();
   modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);
+}
+
+void InspectorPanel::OnScriptPathWrite(const std::string& script_path) {
+  Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
+
+  auto& script_component = selected_entity.AddComponent<ScriptComponent>();
+  script_component.path = script_path;
+  script_component.instance = ScriptEngine::CreateScript(script_path);
 }

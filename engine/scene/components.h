@@ -33,7 +33,7 @@ struct CameraComponent {
 
 struct ScriptComponent {
   std::string path;
-  Script* instance = nullptr;
+  Ref<Script> instance;
 };
 
 template <typename... Component>

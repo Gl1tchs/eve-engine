@@ -4,16 +4,18 @@
 
 #include "pch_shared.h"
 
-namespace luacpp {
-struct LuaState;
-class LuaFunction;
-}
+#include "scene/transform.h"
+#include "scripting/annotation_parser.h"
 
-using namespace luacpp;
+namespace sol {
+class state;
+}  // namespace sol
+
+class Entity;
 
 class Script {
  public:
-  Script(LuaState* state, const std::string& path);
+  Script(sol::state* lua, const std::string& path);
 
   void OnStart();
 
@@ -21,10 +23,30 @@ class Script {
 
   void OnDestroy();
 
- private:
-  LuaState* state_;
+  void SetSerializeDataField(std::string name,
+                                               ScriptDataType value);
 
-  Scope<LuaFunction> on_start_func_;
-  Scope<LuaFunction> on_update_func_;
-  Scope<LuaFunction> on_destroy_func_;
+  [[nodiscard]] const ScriptSerializeDataMap& GetSerializeMap() {
+    return serialize_data_;
+  }
+
+ private:
+  Transform& GetTransform();
+
+  uint64_t GetId() const;
+
+ private:
+  Entity* entity_;
+
+  sol::state* lua_;
+
+  std::string file_path_;
+
+  ScriptSerializeDataMap serialize_data_;
+
+  std::function<void()> on_start_;
+  std::function<void(float)> on_update_;
+  std::function<void()> on_destroy_;
+
+  friend class Scene;
 };

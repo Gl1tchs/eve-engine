@@ -2,41 +2,25 @@
 
 #include "scripting/script_engine.h"
 
-#include <luacpp/luacpp.h>
+#include <sol/sol.hpp>
 
-ScriptEngine::ScriptEngine() : state_(new LuaState(luaL_newstate(), true)) {}
+#include "core/utils/memory.h"
+#include "scripting/engine_api.h"
 
-ScriptEngine::ScriptEngine(ScriptEngine& other)
-    : state_(other.state_), scripts_(other.scripts_) {}
+sol::state* ScriptEngine::lua_ = nullptr;
 
-ScriptEngine::~ScriptEngine() {
-  for (Script* script : scripts_) {
-    delete script;
-  }
+void ScriptEngine::Init() {
+  lua_ = new sol::state();
+  lua_->open_libraries(sol::lib::base);
 
-  delete state_;
+  RegisterTypes(lua_);
 }
 
-void ScriptEngine::Start() {
-  for (auto script : scripts_) {
-    script->OnStart();
-  }
+void ScriptEngine::Deinit() {
+  delete lua_;
 }
 
-void ScriptEngine::Update(float ds) {
-  for (auto script : scripts_) {
-    script->OnUpdate(ds);
-  }
-}
-
-void ScriptEngine::Stop() {
-  for (auto script : scripts_) {
-    script->OnDestroy();
-  }
-}
-
-Script* ScriptEngine::AddScript(const std::string& path) {
-  Script* script = new Script(state_, path);
-  scripts_.push_back(script);
+Ref<Script> ScriptEngine::CreateScript(const std::string& path) {
+  Ref<Script> script = CreateRef<Script>(lua_, path);
   return script;
 }

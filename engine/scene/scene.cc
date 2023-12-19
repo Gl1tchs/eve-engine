@@ -2,12 +2,14 @@
 
 #include "scene/scene.h"
 
+#include "scene/components.h"
 #include "scene/entity.h"
 #include "scene/transform.h"
+#include "scripting/script.h"
+#include "scripting/script_engine.h"
 
-Scene::Scene(Ref<State>& state, std::string name) : state_(state), name_(name) {
-  script_engine_ = CreateRef<ScriptEngine>();
-}
+Scene::Scene(Ref<State>& state, std::string name)
+    : state_(state), name_(name) {}
 
 template <typename... Component>
 static void CopyComponent(
@@ -50,13 +52,11 @@ static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst,
   CopyComponentIfExists<Component...>(dst, src);
 }
 
-Ref<Scene> Scene::Copy(Ref<Scene> other) {
-  Ref<Scene> new_scene = CreateRef<Scene>(other->state_, other->name_);
+Ref<Scene> Scene::Copy(Ref<Scene> src) {
+  Ref<Scene> dst_scene = CreateRef<Scene>(src->state_, src->name_);
 
-  new_scene->script_engine_ = other->script_engine_;
-
-  auto& src_scene_registry = other->registry_;
-  auto& st_scene_registry = new_scene->registry_;
+  auto& src_scene_registry = src->registry_;
+  auto& dst_scene_registry = dst_scene->registry_;
   std::unordered_map<GUUID, entt::entity> entt_map;
 
   // Create entities in new scene
@@ -64,27 +64,39 @@ Ref<Scene> Scene::Copy(Ref<Scene> other) {
   for (auto e : id_view) {
     GUUID uuid = src_scene_registry.get<IdComponent>(e).id;
     const auto& name = src_scene_registry.get<TagComponent>(e).tag;
-    Entity new_entity = new_scene->CreateEntityWithUUID(uuid, name);
+    Entity new_entity = dst_scene->CreateEntityWithUUID(uuid, name);
     entt_map[uuid] = (entt::entity)new_entity;
   }
 
   // Copy components (except IdComponent and TagComponent)
-  CopyComponent(AllComponents{}, st_scene_registry, src_scene_registry,
+  CopyComponent(AllComponents{}, dst_scene_registry, src_scene_registry,
                 entt_map);
 
-  return new_scene;
+  return dst_scene;
 }
 
 void Scene::OnRuntimeStart() {
   is_running_ = true;
 
-  script_engine_->Start();
+  GetAllEntitiesWith<ScriptComponent>().each(
+      [this](entt::entity entity_id, ScriptComponent& sc) {
+        Entity entity{entity_id, this};
+
+        Ref<Script>& script = sc.instance;
+        script->entity_ = &entity;
+
+        script->OnStart();
+      });
 }
 
 void Scene::OnRuntimeStop() {
   is_running_ = false;
 
-  script_engine_->Stop();
+  GetAllEntitiesWith<ScriptComponent>().each(
+      [this](entt::entity entity_id, ScriptComponent& sc) {
+        Ref<Script>& script = sc.instance;
+        script->OnDestroy();
+      });
 }
 
 void Scene::OnUpdateRuntime(float ds) {
@@ -92,7 +104,11 @@ void Scene::OnUpdateRuntime(float ds) {
     return;
   }
 
-  script_engine_->Update(ds);
+  GetAllEntitiesWith<ScriptComponent>().each(
+      [&ds](entt::entity entity_id, ScriptComponent& sc) {
+        Ref<Script>& script = sc.instance;
+        script->OnUpdate(ds);
+      });
 }
 
 void Scene::Step(int frames) {

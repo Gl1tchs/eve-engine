@@ -6,29 +6,14 @@
 
 #include "scripting/script.h"
 
-namespace luacpp {
-struct LuaState;
-}
-
-using namespace luacpp;
-
 class ScriptEngine {
  public:
-  ScriptEngine();
-  ScriptEngine(ScriptEngine& other);
+  static void Init();
+  static void Deinit();
 
-  ~ScriptEngine();
-
-  void Start();
-
-  void Update(float ds);
-
-  void Stop();
-
-  Script* AddScript(const std::string& path);
+  static Ref<Script> CreateScript(const std::string& path);
 
  private:
-  LuaState* state_;
-
-  std::vector<Script*> scripts_;
+  static sol::state* lua_;
+  static std::vector<Ref<Script>> scripts_;
 };

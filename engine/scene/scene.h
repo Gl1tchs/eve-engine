@@ -8,7 +8,6 @@
 
 #include "core/state.h"
 #include "core/utils/guuid.h"
-#include "scripting/script_engine.h"
 
 class Entity;
 
@@ -72,8 +71,6 @@ class Scene {
   int step_frames_ = 0;
 
   Entity* selected_entity_{nullptr};
-
-  Ref<ScriptEngine> script_engine_;
 
   friend class Entity;
   friend class HierarchyPanel;

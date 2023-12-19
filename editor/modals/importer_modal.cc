@@ -6,6 +6,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <yaml-cpp/yaml.h>
 
+#include "asset/asset.h"
 #include "widgets/combo.h"
 
 static AssetType DeserializeAssetType(const std::string& type);
@@ -118,8 +119,12 @@ void ImporterModal::Draw() {
   }
 
   if (ImGui::Button("Import", ImVec2(-1, 0))) {
-    CreateAndWriteMeta();
-    submit_callback_(GetMetaPath());
+    if (asset_type_ != AssetType::kScript) {
+      CreateAndWriteMeta();
+      submit_callback_(GetMetaPath());
+    } else {
+      submit_callback_(import_path_);
+    }
     SetActive(false);
   }
 
@@ -210,8 +215,7 @@ TextureFilteringMode DeserializeTextureFilteringMode(const std::string mode) {
   else if (mode == "Linear")
     return TextureFilteringMode::kNearest;
 
-  LOG_WARNING("Unable to deserialize texture filtering mode of: {}",
-                     mode);
+  LOG_WARNING("Unable to deserialize texture filtering mode of: {}", mode);
   return TextureFilteringMode::kLinear;
 }
 
@@ -225,7 +229,6 @@ TextureWrappingMode DeserializeTextureWrappingMode(const std::string& mode) {
   else if (mode == "Clamp to Border")
     return TextureWrappingMode::kClampToBorder;
 
-  LOG_WARNING("Unable to deserialize texture wrapping mode of: {}",
-                     mode);
+  LOG_WARNING("Unable to deserialize texture wrapping mode of: {}", mode);
   return TextureWrappingMode::kClampToEdge;
 }

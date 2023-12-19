@@ -179,6 +179,11 @@ void EditorLayer::OnRenderScene(float ds) {
 }
 
 void EditorLayer::HandleShortcuts() {
+  ImGuiIO& io = ImGui::GetIO();
+  if (io.WantTextInput) {
+    return;
+  }
+
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
     if (Input::IsKeyPressed(KeyCode::kO)) {

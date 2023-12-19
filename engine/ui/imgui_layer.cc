@@ -13,8 +13,6 @@
 ImGuiLayer::ImGuiLayer(Ref<State>& state) : Layer(state) {}
 
 void ImGuiLayer::Begin() {
-  
-
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
@@ -22,8 +20,6 @@ void ImGuiLayer::Begin() {
 }
 
 void ImGuiLayer::End() {
-  
-
   ImGuiIO& io = ImGui::GetIO();
   auto size = GetState()->window->GetSize();
   io.DisplaySize = ImVec2((float)size.x, (float)size.y);
@@ -41,8 +37,6 @@ void ImGuiLayer::End() {
 }
 
 void ImGuiLayer::OnStart() {
-  
-
   // Setup ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -72,8 +66,6 @@ void ImGuiLayer::OnStart() {
 }
 
 void ImGuiLayer::OnDestroy() {
-  
-
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
