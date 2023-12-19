@@ -5,7 +5,9 @@
 #include <yaml-cpp/yaml.h>
 
 #include "core/utils/guuid.h"
+#include "scene/components.h"
 #include "scene/entity.h"
+#include "scripting/script.h"
 
 namespace YAML {
 
@@ -218,6 +220,17 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::EndMap;
   }
 
+  if (entity.HasComponent<ScriptComponent>()) {
+    auto& sc = entity.GetComponent<ScriptComponent>();
+
+    out << YAML::Key << "script_component";
+    out << YAML::BeginMap;
+
+    out << YAML::Key << "path" << YAML::Value << sc.path;
+
+    out << YAML::EndMap;
+  }
+
   out << YAML::EndMap;
 }
 
@@ -340,6 +353,14 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
       light.ambient = directional_light_yaml["ambient"].as<glm::vec3>();
       light.diffuse = directional_light_yaml["diffuse"].as<glm::vec3>();
       light.specular = directional_light_yaml["specular"].as<glm::vec3>();
+    }
+
+    auto script_component_yaml = entity["script_component"];
+    if (script_component_yaml) {
+      auto& sc = deserialing_entity.AddComponent<ScriptComponent>();
+
+      sc.path = script_component_yaml["path"].as<std::string>();
+      sc.instance = scene_->script_engine_->AddScript(sc.path);
     }
   }
 

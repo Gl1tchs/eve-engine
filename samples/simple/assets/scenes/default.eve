@@ -63,6 +63,8 @@ entities:
       diffuse: [1, 1, 0]
       specular: [1, 1, 0]
       shininess: 32
+    script_component:
+      path: res://scripts/greeter.lua
   - id: 453953480392206736
     tag_component:
       tag: Cube

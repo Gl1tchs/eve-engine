@@ -20,3 +20,9 @@
 [submodule "thirdparty/ImGuizmo"]
 	path = thirdparty/ImGuizmo
 	url = https://github.com/Gl1tchs/ImGuizmo.git
+[submodule "thirdparty/luacpp"]
+	path = thirdparty/luacpp
+	url = https://github.com/ouonline/luacpp.git
+[submodule "thirdparty/lua"]
+	path = thirdparty/lua
+	url = https://github.com/lua/lua.git

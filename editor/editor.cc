@@ -7,6 +7,7 @@
 #include "core/debug/log.h"
 #include "graphics/graphics.h"
 #include "project/project.h"
+#include "scripting/script_engine.h"
 
 #include "layers/editor_layer.h"
 
@@ -21,7 +22,6 @@ class EditorInstance : public Instance {
   EditorInstance(const InstanceSpecifications& specs,
                  std::optional<std::string> startup_project)
       : Instance(specs) {
-
     if (startup_project.has_value()) {
       std::string project_path = startup_project.value();
       if (std::isspace(project_path[0])) {

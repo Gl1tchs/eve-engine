@@ -5,8 +5,9 @@
 #include "scene/entity.h"
 #include "scene/transform.h"
 
-Scene::Scene(Ref<State>& state, std::string name)
-    : state_(state), name_(name) {}
+Scene::Scene(Ref<State>& state, std::string name) : state_(state), name_(name) {
+  script_engine_ = CreateRef<ScriptEngine>();
+}
 
 template <typename... Component>
 static void CopyComponent(
@@ -52,6 +53,8 @@ static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst,
 Ref<Scene> Scene::Copy(Ref<Scene> other) {
   Ref<Scene> new_scene = CreateRef<Scene>(other->state_, other->name_);
 
+  new_scene->script_engine_ = other->script_engine_;
+
   auto& src_scene_registry = other->registry_;
   auto& st_scene_registry = new_scene->registry_;
   std::unordered_map<GUUID, entt::entity> entt_map;
@@ -61,8 +64,8 @@ Ref<Scene> Scene::Copy(Ref<Scene> other) {
   for (auto e : id_view) {
     GUUID uuid = src_scene_registry.get<IdComponent>(e).id;
     const auto& name = src_scene_registry.get<TagComponent>(e).tag;
-    Entity newEntity = new_scene->CreateEntityWithUUID(uuid, name);
-    entt_map[uuid] = (entt::entity)newEntity;
+    Entity new_entity = new_scene->CreateEntityWithUUID(uuid, name);
+    entt_map[uuid] = (entt::entity)new_entity;
   }
 
   // Copy components (except IdComponent and TagComponent)
@@ -75,13 +78,13 @@ Ref<Scene> Scene::Copy(Ref<Scene> other) {
 void Scene::OnRuntimeStart() {
   is_running_ = true;
 
-  // TODO start scripting engine
+  script_engine_->Start();
 }
 
 void Scene::OnRuntimeStop() {
   is_running_ = false;
 
-  // TODO stop scripting engine
+  script_engine_->Stop();
 }
 
 void Scene::OnUpdateRuntime(float ds) {
@@ -89,7 +92,7 @@ void Scene::OnUpdateRuntime(float ds) {
     return;
   }
 
-  // TODO update scripts
+  script_engine_->Update(ds);
 }
 
 void Scene::Step(int frames) {

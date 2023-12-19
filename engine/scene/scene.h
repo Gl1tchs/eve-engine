@@ -8,6 +8,7 @@
 
 #include "core/state.h"
 #include "core/utils/guuid.h"
+#include "scripting/script_engine.h"
 
 class Entity;
 
@@ -59,9 +60,11 @@ class Scene {
  private:
   Ref<State> state_;
 
+  // ECS stuff
   entt::registry registry_;
   std::unordered_map<GUUID, Entity> entity_map_;
 
+  // scene properties
   std::string name_;
 
   bool is_running_ = false;
@@ -69,6 +72,8 @@ class Scene {
   int step_frames_ = 0;
 
   Entity* selected_entity_{nullptr};
+
+  Ref<ScriptEngine> script_engine_;
 
   friend class Entity;
   friend class HierarchyPanel;

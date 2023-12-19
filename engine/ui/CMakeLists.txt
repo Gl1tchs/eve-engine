@@ -13,7 +13,7 @@ list(APPEND SOURCES
   ${IMGUI_DIR}/backends/imgui_impl_glfw.h
 )
 
-add_module(ui STATIC ${SOURCES})
+add_module(ui ${SOURCES})
 
 module_include_directories(ui PUBLIC
   ${CMAKE_SOURCE_DIR}/engine

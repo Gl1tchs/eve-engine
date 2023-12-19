@@ -30,6 +30,7 @@ module_include_directories(scene PRIVATE
 module_link_libraries(scene PRIVATE
   eve::asset
   eve::core
+  eve::scripting
   EnTT
   yaml-cpp
 )

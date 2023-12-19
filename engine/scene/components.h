@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <string>
 #include "pch_shared.h"
 
 #include "core/utils/guuid.h"
@@ -11,6 +12,7 @@
 #include "graphics/texture.h"
 #include "scene/lights.h"
 #include "scene/static_mesh.h"
+#include "scripting/script.h"
 
 struct IdComponent {
   GUUID id;
@@ -29,8 +31,14 @@ struct CameraComponent {
   bool is_fixed_aspect_ratio = false;
 };
 
+struct ScriptComponent {
+  std::string path;
+  Script* instance = nullptr;
+};
+
 template <typename... Component>
 struct ComponentGroup {};
 
-using AllComponents = ComponentGroup<Transform, CameraComponent, ModelComponent,
-                                     Material, DirectionalLight>;
+using AllComponents =
+    ComponentGroup<Transform, CameraComponent, ModelComponent, Material,
+                   DirectionalLight, ScriptComponent>;
