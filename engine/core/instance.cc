@@ -33,7 +33,9 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   PushOverlay(imgui_layer_);
 }
 
-Instance::~Instance() {}
+Instance::~Instance() {
+  ScriptEngine::Deinit();
+}
 
 void Instance::StartEventLoop() {
   ScriptEngine::Init();
@@ -56,8 +58,6 @@ void Instance::StartEventLoop() {
 
     state_->window->SwapBuffers();
   }
-
-  ScriptEngine::Deinit();
 }
 
 void Instance::PushLayer(Layer* layer) {

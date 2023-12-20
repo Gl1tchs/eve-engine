@@ -3,7 +3,7 @@
 # Screenshots
 
 ![Editor](.github/editor_base.png)
-![Scripting](.github/scripting.gif)
+![Scripting](.github/scripting.mp4)
 
 ## Table Of Contents:
   - [BUILDING](docs/BUILDING.md)
