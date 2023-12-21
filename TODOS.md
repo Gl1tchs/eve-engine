@@ -18,6 +18,8 @@
 - [x] Script serialize fields
 - [x] Script hot reload
 - [ ] Visual scripting.
+- [ ] If script doesnt exist dont let user to start.
+- [ ] Register entity type.
 
 ## Done
 - [x] Add an external scene renderer class.

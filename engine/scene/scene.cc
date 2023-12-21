@@ -83,9 +83,10 @@ void Scene::OnRuntimeStart() {
         Entity entity{entity_id, this};
 
         Ref<Script>& script = sc.instance;
-        script->entity_ = &entity;
-
-        script->OnStart();
+        if (script) {
+          script->entity_ = &entity;
+          script->OnStart();
+        }
       });
 }
 
@@ -95,7 +96,9 @@ void Scene::OnRuntimeStop() {
   GetAllEntitiesWith<ScriptComponent>().each(
       [this](entt::entity entity_id, ScriptComponent& sc) {
         Ref<Script>& script = sc.instance;
-        script->OnDestroy();
+        if (script) {
+          script->OnDestroy();
+        }
       });
 }
 
@@ -107,7 +110,9 @@ void Scene::OnUpdateRuntime(float ds) {
   GetAllEntitiesWith<ScriptComponent>().each(
       [&ds](entt::entity entity_id, ScriptComponent& sc) {
         Ref<Script>& script = sc.instance;
-        script->OnUpdate(ds);
+        if (script) {
+          script->OnUpdate(ds);
+        }
       });
 }
 

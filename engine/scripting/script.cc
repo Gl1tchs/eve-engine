@@ -10,10 +10,9 @@
 #include "scripting/annotation_parser.h"
 
 Script::Script(sol::state* lua, const std::string& path)
-    : entity_(nullptr), lua_(lua) {
-  file_path_ = AssetLibrary::GetAssetPath(path).string();
-
-  serialize_data_ = LuaParseAnnotations(file_path_);
+    : entity_(nullptr), lua_(lua), file_path_(path) {
+  serialize_data_ =
+      LuaParseAnnotations(AssetLibrary::GetAssetPath(file_path_).string());
 }
 
 void Script::OnStart() {
@@ -22,7 +21,8 @@ void Script::OnStart() {
   env.set_function("GetTransform", &Script::GetTransform, this);
   env.set_function("GetId", &Script::GetId, this);
 
-  ASSERT(lua_->script_file(file_path_, env).valid());
+  ASSERT(lua_->script_file(AssetLibrary::GetAssetPath(file_path_).string(), env)
+             .valid());
 
   // Set overrided values
   for (auto& [name, data] : serialize_data_) {
