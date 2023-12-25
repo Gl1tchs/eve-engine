@@ -95,8 +95,11 @@ void Scene::OnRuntimeStop() {
 
   GetAllEntitiesWith<ScriptComponent>().each(
       [this](entt::entity entity_id, ScriptComponent& sc) {
+        Entity entity{entity_id, this};
+
         Ref<Script>& script = sc.instance;
         if (script) {
+          script->entity_ = &entity;
           script->OnDestroy();
         }
       });
@@ -108,9 +111,13 @@ void Scene::OnUpdateRuntime(float ds) {
   }
 
   GetAllEntitiesWith<ScriptComponent>().each(
-      [&ds](entt::entity entity_id, ScriptComponent& sc) {
+      [this, &ds](entt::entity entity_id, ScriptComponent& sc) {
+        // TODO maybe do not copy every frame
+        Entity entity{entity_id, this};
+
         Ref<Script>& script = sc.instance;
         if (script) {
+          script->entity_ = &entity;
           script->OnUpdate(ds);
         }
       });

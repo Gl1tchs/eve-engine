@@ -11,7 +11,7 @@
 #include "graphics/graphics_context.h"
 
 DebugInfoPanel::DebugInfoPanel(Ref<Renderer>& renderer)
-    : Panel(true), renderer_(renderer) {
+    : Panel(false), renderer_(renderer) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
 
 #if defined(EVE_PLATFORM_WIN32)

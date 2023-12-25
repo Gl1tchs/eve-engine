@@ -4,6 +4,7 @@
 
 #include <sol/sol.hpp>
 
+#include "asset/asset_library.h"
 #include "core/utils/memory.h"
 #include "scripting/engine_api.h"
 
@@ -21,6 +22,12 @@ void ScriptEngine::Deinit() {
 }
 
 Ref<Script> ScriptEngine::CreateScript(const std::string& path) {
-  Ref<Script> script = CreateRef<Script>(lua_, path);
+  std::string path_abs = AssetLibrary::GetAssetPath(path).string();
+  if (!std::filesystem::exists(path_abs)) {
+    LOG_WARNING("Unable to load script from: {}", path_abs);
+    return nullptr;
+  }
+
+  Ref<Script> script = CreateRef<Script>(lua_, path_abs);
   return script;
 }

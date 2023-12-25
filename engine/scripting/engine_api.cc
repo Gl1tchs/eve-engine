@@ -2,15 +2,19 @@
 
 #include "scripting/engine_api.h"
 
+#include <sol/overload.hpp>
 #include <sol/sol.hpp>
 #include <sol/types.hpp>
 
 #include "core/event/input.h"
 #include "core/event/key_code.h"
 #include "glm/fwd.hpp"
+#include "glm/geometric.hpp"
 #include "scene/transform.h"
 
 static void RegisterVectorTypes(sol::state* lua);
+
+static void RegisterMathFunctions(sol::state* lua);
 
 static void RegisterInputFunctions(sol::state* lua);
 
@@ -20,20 +24,11 @@ static void RegisterMouseCodes(sol::state* lua);
 
 void RegisterTypes(sol::state* lua) {
   RegisterVectorTypes(lua);
+  RegisterMathFunctions(lua);
 
   RegisterKeyCodes(lua);
   RegisterMouseCodes(lua);
   RegisterInputFunctions(lua);
-
-  lua->new_usertype<Transform>(
-      "Transform",  //
-      sol::constructors<Transform(),
-                        Transform(const glm::vec3&, const glm::vec3&,
-                                  const glm::vec3&)>(),  //
-      "position", &Transform::position,                  //
-      "rotation", &Transform::rotation,                  //
-      "scale", &Transform::scale                         //
-  );
 }
 
 template <typename T>
@@ -104,6 +99,64 @@ void RegisterVectorTypes(sol::state* lua) {
       GetDivisionOperatorOverload<glm::vec4>(), sol::meta_function::addition,
       GetAdditionOperatorOverload<glm::vec4>(), sol::meta_function::subtraction,
       GetSubstractionOperatorOverload<glm::vec4>());
+}
+
+static void RegisterMathFunctions(sol::state* lua) {
+  // Register GLM functions
+  auto glm_funcs = lua->create_table();
+  {
+    glm_funcs.set_function(
+        "Length",
+        sol::overload(sol::resolve<float(const glm::vec2&)>(glm::length),
+                      sol::resolve<float(const glm::vec3&)>(glm::length),
+                      sol::resolve<float(const glm::vec4&)>(glm::length)));
+    glm_funcs.set_function(
+        "Distance",
+        sol::overload(sol::resolve<float(const glm::vec2&, const glm::vec2&)>(
+                          glm::distance),
+                      sol::resolve<float(const glm::vec3&, const glm::vec3&)>(
+                          glm::distance),
+                      sol::resolve<float(const glm::vec4&, const glm::vec4&)>(
+                          glm::distance)));
+    glm_funcs.set_function(
+        "Normalize",
+        sol::overload(
+            sol::resolve<glm::vec2(const glm::vec2&)>(glm::normalize),
+            sol::resolve<glm::vec3(const glm::vec3&)>(glm::normalize),
+            sol::resolve<glm::vec4(const glm::vec4&)>(glm::normalize)));
+    glm_funcs.set_function(
+        "Cross",
+        sol::overload(
+            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(
+                glm::cross),
+            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(
+                glm::cross),
+            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(
+                glm::cross)));
+    glm_funcs.set_function(
+        "Dot",
+        sol::overload(
+            sol::resolve<float(const glm::vec2&, const glm::vec2&)>(glm::dot),
+            sol::resolve<float(const glm::vec3&, const glm::vec3&)>(glm::dot),
+            sol::resolve<float(const glm::vec4&, const glm::vec4&)>(glm::dot)));
+  }
+  lua->globals()["Mathf"] = glm_funcs;
+
+  lua->new_usertype<Transform>(
+      "Transform",  //
+      sol::constructors<Transform(),
+                        Transform(const glm::vec3&, const glm::vec3&,
+                                  const glm::vec3&)>(),  //
+      "position", &Transform::position,                  //
+      "rotation", &Transform::rotation,                  //
+      "scale", &Transform::scale,                        //
+      "Translate", &Transform::Translate,                //
+      "Rotate", &Transform::Rotate,                      //
+      "GetForward", &Transform::GetForward,              //
+      "GetRight", &Transform::GetRight,                  //
+      "GetUp", &Transform::GetUp,                        //
+      "GetDirection", &Transform::GetDirection           //
+  );
 }
 
 void RegisterInputFunctions(sol::state* lua) {

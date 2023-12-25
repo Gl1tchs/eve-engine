@@ -3,40 +3,22 @@
 #include "scripting/script.h"
 
 #include <sol/sol.hpp>
-#include <utility>
 
 #include "scene/entity.h"
 #include "scene/scene.h"
-#include "scripting/annotation_parser.h"
 
 Script::Script(sol::state* lua, const std::string& path)
-    : entity_(nullptr), lua_(lua), file_path_(path) {
-  serialize_data_ =
-      LuaParseAnnotations(AssetLibrary::GetAssetPath(file_path_).string());
+    : entity_(nullptr), lua_(lua), file_path_(path), preprocessor_(path) {
+  Reload();
+}
+
+void Script::Reload() {
+  preprocessor_.Process();
+  serialize_fields_ = preprocessor_.GetSerializeMap();
 }
 
 void Script::OnStart() {
-  sol::environment env(lua_->lua_state(), sol::create, lua_->globals());
-
-  env.set_function("GetTransform", &Script::GetTransform, this);
-  env.set_function("GetId", &Script::GetId, this);
-
-  ASSERT(lua_->script_file(AssetLibrary::GetAssetPath(file_path_).string(), env)
-             .valid());
-
-  // Set overrided values
-  for (auto& [name, data] : serialize_data_) {
-    if (data.is_overrided) {
-      auto field = env[name];
-      if (field.valid()) {
-        field = data.value;
-      }
-    }
-  }
-
-  on_start_ = (sol::function)env["OnStart"];
-  on_update_ = (sol::function)env["OnUpdate"];
-  on_destroy_ = (sol::function)env["OnDestroy"];
+  LoadScript();
 
   if (!on_start_) {
     return;
@@ -62,13 +44,33 @@ void Script::OnDestroy() {
 }
 
 void Script::SetSerializeDataField(std::string name, ScriptDataType value) {
-  // key doesn't exists
-  auto it = serialize_data_.find(name);
-  if (it == serialize_data_.end()) {
+  // check if key exists
+  auto it = serialize_fields_.find(name);
+  if (it == serialize_fields_.end()) {
     return;
   }
 
   it->second = {value, true};
+}
+
+void Script::LoadScript() {
+  sol::environment env(lua_->lua_state(), sol::create, lua_->globals());
+
+  env.set_function("GetTransform", &Script::GetTransform, this);
+  env.set_function("GetId", &Script::GetId, this);
+
+  ASSERT(lua_->script_file(file_path_, env).valid());
+
+  // Set overrided values
+  for (auto& [name, data] : serialize_fields_) {
+    if (data.is_overrided) {
+      env.set(name, data.value);
+    }
+  }
+
+  on_start_ = (sol::function)env["OnStart"];
+  on_update_ = (sol::function)env["OnUpdate"];
+  on_destroy_ = (sol::function)env["OnDestroy"];
 }
 
 Transform& Script::GetTransform() {

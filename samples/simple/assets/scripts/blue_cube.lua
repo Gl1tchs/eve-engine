@@ -1,24 +1,32 @@
-transform = GetTransform();
+transform_ = GetTransform();
 
 --@serializable
-speed = 20.0
+speed_ = 25.0
+
+function IsZeroVector3(vec)
+  return vec.x == 0.0 and vec.y == 0.0 and vec.z == 0.0;
+end
 
 function OnUpdate(ds)
   local direction = Vec3:new()
 
   if IsKeyPressed(KeyCode.W) then
-    direction.z = direction.z + speed
+    direction = direction + transform_:GetForward();
   end
   if IsKeyPressed(KeyCode.S) then
-    direction.z = direction.z - speed
+    direction = direction - transform_:GetForward();
   end
 
   if IsKeyPressed(KeyCode.D) then
-    direction.x = direction.x + speed
+    direction = direction + transform_:GetRight();
   end
   if IsKeyPressed(KeyCode.A) then
-    direction.x = direction.x - speed
+    direction = direction - transform_:GetRight();
   end
 
-  transform.position = transform.position + direction * ds;
+  if not IsZeroVector3(direction) then
+    transform_:Translate(
+      Mathf.Normalize(direction) * speed_ * ds
+    );
+  end
 end

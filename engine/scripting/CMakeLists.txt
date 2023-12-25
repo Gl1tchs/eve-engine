@@ -1,8 +1,8 @@
 set(SOURCES
-  annotation_parser.cc
-  annotation_parser.h
   engine_api.cc
   engine_api.h
+  preprocessor.h
+  preprocessor.cc
   script_engine.cc
   script_engine.h
   script.h

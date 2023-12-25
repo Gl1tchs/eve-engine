@@ -7,8 +7,6 @@
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
-#include "scripting/annotation_parser.h"
-#include "scripting/script.h"
 #include "scripting/script_engine.h"
 #include "yaml-cpp/emittermanip.h"
 
@@ -231,8 +229,8 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
 
     out << YAML::Key << "path" << YAML::Value << sc.path;
 
-    Ref<Script> script = sc.instance;
-    if (script && !script->GetSerializeMap().empty()) {
+    if (Ref<Script> script = sc.instance;
+        script && !script->GetSerializeMap().empty()) {
       const auto& serialize_data = script->GetSerializeMap();
 
       out << YAML::Key << "fields" << YAML::Value << YAML::BeginSeq;
@@ -399,27 +397,26 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
       sc.path = script_component_yaml["path"].as<std::string>();
       sc.instance = ScriptEngine::CreateScript(sc.path);
 
-      auto fields_yaml = script_component_yaml["fields"];
+      if (Ref<Script>& script = sc.instance; script) {
+        auto fields_yaml = script_component_yaml["fields"];
+        for (auto field_yaml : fields_yaml) {
+          std::string name = field_yaml["name"].as<std::string>();
+          std::string value_str = field_yaml["value"].as<std::string>();
 
-      Ref<Script>& script = sc.instance;
-
-      for (auto field_yaml : fields_yaml) {
-        std::string name = field_yaml["name"].as<std::string>();
-        std::string value_str = field_yaml["value"].as<std::string>();
-
-        ScriptDataType value{};
-        if (IsFloat(value_str)) {
-          float value_float = std::stof(value_str);
-          if (IsInteger(value_float)) {
-            value = (int)value_float;
+          ScriptDataType value{};
+          if (IsFloat(value_str)) {
+            float value_float = std::stof(value_str);
+            if (IsInteger(value_float)) {
+              value = (int)value_float;
+            } else {
+              value = value_float;
+            }
           } else {
-            value = value_float;
+            value = value_str;
           }
-        } else {
-          value = value_str;
-        }
 
-        script->SetSerializeDataField(name, value);
+          script->SetSerializeDataField(name, value);
+        }
       }
     }
   }

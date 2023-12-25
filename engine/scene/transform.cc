@@ -11,7 +11,7 @@ Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
       up_(kVec3Up) {}
 
 void Transform::Translate(glm::vec3 translation) {
-  position = position + translation;
+  position += translation;
 }
 
 void Transform::Rotate(const float angle, const glm::vec3 axis) {

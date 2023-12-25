@@ -21,5 +21,8 @@
 - [ ] If script doesnt exist dont let user to start.
 - [ ] Register entity type.
 
+## Bugs
+- [ ] Closes very slowly
+
 ## Done
 - [x] Add an external scene renderer class.

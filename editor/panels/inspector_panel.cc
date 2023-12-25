@@ -386,8 +386,16 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     ImGui::NextColumn();
     if (ImGui::InputText("##script_path_input", &script_comp.path,
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
-      script_comp.instance = ScriptEngine::CreateScript(script_comp.path);
-      modify_info.SetModified();
+      Ref<Script> script_instance =
+          ScriptEngine::CreateScript(script_comp.path);
+      // only update if instance exists
+      if (script_instance) {
+        script_comp.instance = script_instance;
+        modify_info.SetModified();
+      } else {
+        script_comp.instance = nullptr;
+        script_comp.path = "";
+      }
     }
 
     ImGui::NextColumn();
@@ -397,8 +405,14 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
       for (auto& [name, data] : serialize_map) {
 
+        // remove trailing "_"
+        std::string var_name = name;
+        if (var_name.ends_with("_")) {
+          var_name.pop_back();
+        }
+
         // put an "*" to show field overrided.
-        ImGui::Text("%s %s", data.is_overrided ? "*" : "", name.c_str());
+        ImGui::Text("%s %s", data.is_overrided ? "*" : "", var_name.c_str());
         ImGui::NextColumn();
 
         if (std::holds_alternative<int>(data.value)) {
@@ -448,7 +462,17 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
         ImGui::NextColumn();
       }
+
+      // skip two columns with this
+      ImGui::NextColumn();
+
+      if (ImGui::Button("Reload")) {
+        script_comp.instance->Reload();
+      }
+
+      ImGui::NextColumn();
     }
+
     ImGui::Columns();
 
     REMOVE_COMPONENT_IF_NEEDED(ScriptComponent)

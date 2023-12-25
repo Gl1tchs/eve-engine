@@ -25,11 +25,6 @@ entities:
       diffuse: [0.779922783, 0.779922783, 0.779922783]
       specular: [0.772200763, 0.772200763, 0.772200763]
       shininess: 32
-    script_component:
-      path: res://scripts/cube.lua
-      fields:
-        - name: speed
-          value: 1
   - id: 323468953567323581
     tag_component:
       tag: Monkey
@@ -47,10 +42,7 @@ entities:
     script_component:
       path: res://scripts/monkey.lua
       fields:
-        - name: speed
-          value: 125
-        - name: foo
-          value: Hello!
+        []
   - id: 8234689535676734320
     tag_component:
       tag: Red Monkey
@@ -65,10 +57,6 @@ entities:
       diffuse: [0.234036893, 0.586872578, 0.0929026157]
       specular: [0.0643998012, 0.577083647, 0.926640928]
       shininess: 32
-    script_component:
-      path: res://scripts/red_monkey.lua
-      fields:
-        []
   - id: 1225455807429653547
     tag_component:
       tag: Main Camera
@@ -78,12 +66,12 @@ entities:
       scale: [1, 1, 1]
     camera_component:
       orthographic_camera:
-        aspect_ratio: 1.93759751
+        aspect_ratio: 1.40024626
         zoom_level: 1
         near_clip: -1
         far_clip: 1
       perspective_camera:
-        aspect_ratio: 1.93759751
+        aspect_ratio: 1.40024626
         fov: 45
         near_clip: 0.100000001
         far_clip: 300
@@ -94,7 +82,7 @@ entities:
     tag_component:
       tag: Blue Cube
     transform:
-      position: [1.797104, -1.03100967, 1.39287567]
+      position: [1.797104, -1.03100967, 1.36972928]
       rotation: [0, 0, 0]
       scale: [0.560000002, 0.560000002, 0.560000002]
     model_component:
@@ -106,3 +94,5 @@ entities:
       shininess: 32
     script_component:
       path: res://scripts/blue_cube.lua
+      fields:
+        []
