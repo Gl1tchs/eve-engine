@@ -85,8 +85,8 @@ struct AssetInfoYAML {
   try {
     data = YAML::LoadFile(absolute_path);
   } catch (YAML::ParserException e) {
-    LOG_ERROR("Failed to load asset from file '{0}'\n\t{1}",
-                     absolute_path, e.what());
+    LOG_ERROR("Failed to load asset from file '{0}'\n\t{1}", absolute_path,
+              e.what());
     return {};
   }
 
@@ -117,8 +117,7 @@ AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
   }
 
   TextureMetadata texture_metadata;
-  if (auto metadata_yaml = info_yaml.value().metadata["texture_metadata"];
-      metadata_yaml) {
+  if (auto metadata_yaml = info_yaml.value().metadata; metadata_yaml) {
     if (metadata_yaml["format"]) {
       texture_metadata.format =
           static_cast<TextureFormat>(metadata_yaml["format"].as<int>());
