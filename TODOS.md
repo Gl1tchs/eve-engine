@@ -1,12 +1,17 @@
 # EVE Todo
 
 ## General
+- [ ] Physics
+- [ ] An runtime application
 - [ ] Use a custom format rather yaml.
 
 ## Editor
 - [ ] Add content browser and use id based asset system.
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
     but should display the name of it based on the asset metadata.
+
+## Asset
+- [ ] Asset compression for shipping.
 
 ## Scene
 - [ ] Make EnTT library private.
