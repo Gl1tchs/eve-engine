@@ -4,18 +4,24 @@
 
 #include "pch_shared.h"
 
-#include "scene/transform.h"
+#include "scene/entity.h"
 #include "scripting/preprocessor.h"
 
 namespace sol {
 class state;
-}  // namespace sol
 
-class Entity;
+template <bool b>
+class basic_reference;
+using reference = basic_reference<false>;
+
+template <typename base_t>
+struct basic_environment;
+using environment = basic_environment<reference>;
+}  // namespace sol
 
 class Script {
  public:
-  Script(sol::state* lua, const std::string& path);
+  Script(Ref<sol::state> lua, const std::string& path);
 
   void Reload();
 
@@ -32,16 +38,14 @@ class Script {
   }
 
  private:
-  void LoadScript();
-
-  Transform& GetTransform();
-
-  uint64_t GetId() const;
+  bool LoadScript();
 
  private:
-  Entity* entity_;
+  Entity entity_;
 
-  sol::state* lua_;
+  Ref<sol::state> lua_;
+  Scope<sol::environment> env_;
+
   std::string file_path_;
   ScriptPreprocessor preprocessor_;
   SerializeDataMap serialize_fields_;

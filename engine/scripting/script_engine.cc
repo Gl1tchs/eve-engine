@@ -8,18 +8,17 @@
 #include "core/utils/memory.h"
 #include "scripting/engine_api.h"
 
-sol::state* ScriptEngine::lua_ = nullptr;
+Ref<sol::state> ScriptEngine::lua_ = nullptr;
+std::vector<Ref<Script>> ScriptEngine::scripts_ = {};
 
 void ScriptEngine::Init() {
-  lua_ = new sol::state();
+  lua_ = CreateRef<sol::state>();
   lua_->open_libraries(sol::lib::base);
 
   RegisterTypes(lua_);
 }
 
-void ScriptEngine::Deinit() {
-  delete lua_;
-}
+void ScriptEngine::Deinit() {}
 
 Ref<Script> ScriptEngine::CreateScript(const std::string& path) {
   std::string path_abs = AssetLibrary::GetAssetPath(path).string();
@@ -29,5 +28,6 @@ Ref<Script> ScriptEngine::CreateScript(const std::string& path) {
   }
 
   Ref<Script> script = CreateRef<Script>(lua_, path_abs);
+  scripts_.push_back(script);
   return script;
 }

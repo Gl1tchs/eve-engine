@@ -14,6 +14,6 @@ class ScriptEngine {
   static Ref<Script> CreateScript(const std::string& path);
 
  private:
-  static sol::state* lua_;
+  static Ref<sol::state> lua_;
   static std::vector<Ref<Script>> scripts_;
 };

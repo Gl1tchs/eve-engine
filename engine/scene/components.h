@@ -2,17 +2,14 @@
 
 #pragma once
 
-#include <string>
 #include "pch_shared.h"
 
 #include "core/utils/guuid.h"
 #include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
-#include "graphics/texture.h"
 #include "scene/lights.h"
 #include "scene/static_mesh.h"
-#include "scripting/script.h"
 
 struct IdComponent {
   GUUID id;
@@ -30,6 +27,8 @@ struct CameraComponent {
   bool is_primary = true;
   bool is_fixed_aspect_ratio = false;
 };
+
+class Script;
 
 struct ScriptComponent {
   std::string path;

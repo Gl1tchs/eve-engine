@@ -18,7 +18,7 @@ class Scene {
 
   static Ref<Scene> Copy(Ref<Scene> other);
 
-  void OnRuntimeStart();
+  bool OnRuntimeStart();
 
   void OnRuntimeStop();
 

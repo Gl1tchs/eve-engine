@@ -75,31 +75,36 @@ Ref<Scene> Scene::Copy(Ref<Scene> src) {
   return dst_scene;
 }
 
-void Scene::OnRuntimeStart() {
+bool Scene::OnRuntimeStart() {
   is_running_ = true;
 
-  GetAllEntitiesWith<ScriptComponent>().each(
-      [this](entt::entity entity_id, ScriptComponent& sc) {
-        Entity entity{entity_id, this};
+  for (auto& entity_id : GetAllEntitiesWith<ScriptComponent>()) {
+    Entity entity{entity_id, this};
 
-        Ref<Script>& script = sc.instance;
-        if (script) {
-          script->entity_ = &entity;
-          script->OnStart();
-        }
-      });
+    auto& script_comp = entity.GetComponent<ScriptComponent>();
+    Ref<Script>& script = script_comp.instance;
+    if (script) {
+      script->entity_ = entity;
+
+      if (!script->LoadScript()) {
+        is_running_ = false;
+        return false;
+      }
+
+      script->OnStart();
+    }
+  }
+
+  return true;
 }
 
 void Scene::OnRuntimeStop() {
   is_running_ = false;
 
   GetAllEntitiesWith<ScriptComponent>().each(
-      [this](entt::entity entity_id, ScriptComponent& sc) {
-        Entity entity{entity_id, this};
-
+      [](entt::entity entity_id, ScriptComponent& sc) {
         Ref<Script>& script = sc.instance;
         if (script) {
-          script->entity_ = &entity;
           script->OnDestroy();
         }
       });
@@ -111,13 +116,9 @@ void Scene::OnUpdateRuntime(float ds) {
   }
 
   GetAllEntitiesWith<ScriptComponent>().each(
-      [this, &ds](entt::entity entity_id, ScriptComponent& sc) {
-        // TODO maybe do not copy every frame
-        Entity entity{entity_id, this};
-
+      [&ds](entt::entity entity_id, ScriptComponent& sc) {
         Ref<Script>& script = sc.instance;
         if (script) {
-          script->entity_ = &entity;
           script->OnUpdate(ds);
         }
       });

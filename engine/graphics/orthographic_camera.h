@@ -9,6 +9,8 @@ struct OrthographicCamera : Camera {
   float near_clip = -1.0f;
   float far_clip = 1.0f;
 
+  virtual ~OrthographicCamera() = default;
+
   [[nodiscard]] glm::mat4 GetProjectionMatrix() const override;
 
   [[nodiscard]] glm::mat4 GetViewMatrix(Transform& transform) override;

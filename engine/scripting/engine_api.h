@@ -6,4 +6,4 @@ namespace sol {
 class state;
 };
 
-void RegisterTypes(sol::state* lua);
+void RegisterTypes(Ref<sol::state> lua);

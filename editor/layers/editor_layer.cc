@@ -140,6 +140,8 @@ void EditorLayer::OnRenderScene(float ds) {
   switch (scene_state_) {
     case SceneState::kPaused:
     case SceneState::kEdit: {
+      viewport_panel_->SetShouldDrawGizmos(true);
+
       // Update camera movement
       if (viewport_panel_->IsFocused() &&
           Input::IsMouseButtonPressed(MouseCode::kRight)) {
@@ -169,6 +171,8 @@ void EditorLayer::OnRenderScene(float ds) {
       break;
     }
     case SceneState::kPlay: {
+      viewport_panel_->SetShouldDrawGizmos(false);
+
       active_scene_->OnUpdateRuntime(ds);
       scene_renderer_->RenderRuntime(ds);
       break;
@@ -186,23 +190,31 @@ void EditorLayer::HandleShortcuts() {
 
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
-    if (Input::IsKeyPressed(KeyCode::kO)) {
-      OpenProject();
-    }
+    if (active_scene_) {
+      if (Input::IsKeyPressed(KeyCode::kO)) {
+        OpenScene();
+      }
 
-    if (Input::IsKeyPressed(KeyCode::kN)) {
-      NewScene();
-    }
+      if (Input::IsKeyPressed(KeyCode::kN)) {
+        NewScene();
+      }
 
-    if (Input::IsKeyPressed(KeyCode::kS)) {
-      SaveScene();
+      if (Input::IsKeyPressed(KeyCode::kS)) {
+        SaveScene();
+      }
+
+      if (Input::IsKeyPressed(KeyCode::kLeftShift)) {
+        if (Input::IsKeyPressed(KeyCode::kS)) {
+          SaveSceneAs();
+        }
+      }
+    } else {
+      if (Input::IsKeyPressed(KeyCode::kO)) {
+        OpenProject();
+      }
     }
 
     if (Input::IsKeyPressed(KeyCode::kLeftShift)) {
-      if (Input::IsKeyPressed(KeyCode::kS)) {
-        SaveSceneAs();
-      }
-
       if (Input::IsKeyPressed(KeyCode::kQ)) {
         Exit();
       }
@@ -243,18 +255,16 @@ void EditorLayer::HandleShortcuts() {
 
 void EditorLayer::OpenProject() {
   const char* filter_patterns[1] = {"*.eproject"};
-  const char* path = tinyfd_openFileDialog("Open Scene", "", 1, filter_patterns,
-                                           "Eve Project Files", 0);
+  const char* path = tinyfd_openFileDialog(
+      "Open Project", "", 1, filter_patterns, "Eve Project Files", 0);
 
   if (!path) {
-    LOG_ERROR("Unable to open scene from path.");
+    LOG_ERROR("Unable to open project from path.");
     return;
   }
 
   if (Ref<Project> project = Project::Load(std::string(path)); project) {
     const ProjectConfig& project_config = project->GetConfig();
-
-    SetSceneTitle();
 
     OpenScene(
         AssetLibrary::GetAssetPath(project_config.default_scene.string()));
@@ -302,10 +312,25 @@ void EditorLayer::SaveSceneAs() {
   OnSceneSave();
 }
 
+void EditorLayer::OpenScene() {
+  const char* filter_patterns[1] = {"*.eve"};
+  const char* path = tinyfd_openFileDialog("Open Scene", "", 1, filter_patterns,
+                                           "Eve Scene Files", 0);
+
+  if (!path) {
+    LOG_ERROR("Unable to open scene from path.");
+    return;
+  }
+
+  OpenScene(path);
+}
+
 void EditorLayer::OpenScene(const std::filesystem::path& path) {
   if (scene_state_ != SceneState::kEdit) {
     OnScenePause();
   }
+
+  SetSceneTitle();
 
   Ref<Scene> new_scene = CreateRef<Scene>(GetState());
   SceneSerializer serializer(new_scene);
@@ -327,12 +352,21 @@ void EditorLayer::OnScenePlay() {
 
   active_scene_ = Scene::Copy(editor_scene_);
   scene_renderer_->SetScene(active_scene_);
-
-  active_scene_->OnRuntimeStart();
-
   hierarchy_panel_->SetScene(active_scene_);
-
   is_ejected_ = false;
+
+  // if we encounter with an error stop the scene
+  if (!active_scene_->OnRuntimeStart()) {
+    SetSceneState(SceneState::kEdit);
+
+    active_scene_ = editor_scene_;
+    scene_renderer_->SetScene(active_scene_);
+    hierarchy_panel_->SetScene(active_scene_);
+
+    is_ejected_ = true;
+
+    return;
+  }
 }
 
 void EditorLayer::OnSceneStop() {
@@ -342,7 +376,6 @@ void EditorLayer::OnSceneStop() {
 
   active_scene_ = editor_scene_;
   scene_renderer_->SetScene(active_scene_);
-
   hierarchy_panel_->SetScene(active_scene_);
 
   is_ejected_ = true;
@@ -429,7 +462,7 @@ void EditorLayer::SetupMenubar() {
     MenuItemGroup project_group;
     {
       MenuItem open_project(
-          "Open Project", [&]() { OpenProject(); }, "Ctrl+O");
+          "Open Project", [&]() { OpenProject(); }, "Ctrl+Shift+O");
       project_group.PushMenuItem(open_project);
 
       file_menu.PushItemGroup(project_group);
@@ -438,6 +471,10 @@ void EditorLayer::SetupMenubar() {
     MenuItemGroup scene_group(
         []() -> bool { return Project::GetActive() != nullptr; });
     {
+      MenuItem open_scene(
+          "Open Scene", [&]() { OpenScene(); }, "Ctrl+O");
+      scene_group.PushMenuItem(open_scene);
+
       MenuItem new_scene(
           "New Scene", [&]() { NewScene(); }, "Ctrl+N");
       scene_group.PushMenuItem(new_scene);

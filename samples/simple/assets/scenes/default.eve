@@ -1,44 +1,5 @@
 scene: default
 entities:
-  - id: 7396437042656257214
-    tag_component:
-      tag: Blue Cube
-    transform:
-      position: [1.797104, -1.03100967, 1.36972928]
-      rotation: [0, 0, 0]
-      scale: [0.560000002, 0.560000002, 0.560000002]
-    model_component:
-      path: res://models/cube.obj
-    material_component:
-      ambient: [0.301590592, 0.222730726, 0.861003876]
-      diffuse: [0.135090396, 0.28966096, 0.760617733]
-      specular: [0.0679774955, 0.0936769769, 0.733590722]
-      shininess: 32
-    script_component:
-      path: res://scripts/blue_cube.lua
-      fields:
-        []
-  - id: 1225455807429653547
-    tag_component:
-      tag: Main Camera
-    transform:
-      position: [-5.63062, 2.87215948, 11.0922642]
-      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
-      scale: [1, 1, 1]
-    camera_component:
-      orthographic_camera:
-        aspect_ratio: 1.40024626
-        zoom_level: 1
-        near_clip: -1
-        far_clip: 1
-      perspective_camera:
-        aspect_ratio: 1.40024626
-        fov: 45
-        near_clip: 0.100000001
-        far_clip: 300
-      is_orthographic: false
-      is_primary: true
-      is_fixed_aspect_ratio: false
   - id: 8234689535676734320
     tag_component:
       tag: Red Monkey
@@ -72,20 +33,15 @@ entities:
       fields:
         - name: speed_
           value: 50
-  - id: 453953480392206736
+  - id: 1225455807429653547
     tag_component:
-      tag: Cube
+      tag: Main Camera
     transform:
-      position: [-1.48826516, -0.703429222, -0.695410967]
-      rotation: [1.50710154, 14.6289787, -8.73800087]
-      scale: [0.550959527, 0.489899367, 0.63645941]
-    model_component:
-      path: res://models/cube.obj
-    material_component:
-      ambient: [0.830115795, 0.830115795, 0.830115795]
-      diffuse: [0.779922783, 0.779922783, 0.779922783]
-      specular: [0.772200763, 0.772200763, 0.772200763]
-      shininess: 32
+      position: [-5.63062, 2.87215948, 11.0922642]
+      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
+      scale: [1, 1, 1]
+    script_component:
+      path: res://scripts/camera.lua
   - id: 54253711328505163
     tag_component:
       tag: Directional Light

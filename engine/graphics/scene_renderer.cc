@@ -77,10 +77,6 @@ void SceneRenderer::OnViewportResize(glm::uvec2 size) {
     return;
   }
 
-  if (viewport_size_ == size) {
-    return;
-  }
-
   viewport_size_ = size;
 
   // Resize our non-FixedAspectRatio cameras

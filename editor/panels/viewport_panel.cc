@@ -36,6 +36,10 @@ void ViewportPanel::Draw() {
                  ImVec2{GetSize().x, GetSize().y}, ImVec2{0, 1}, ImVec2{1, 0});
   }
 
+  if (!should_draw_gizmos_) {
+    return;
+  }
+
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
   if (selected_entity && operation_ != -1) {
     ImGuizmo::SetOrthographic(false);
@@ -53,8 +57,9 @@ void ViewportPanel::Draw() {
     bool snap = Input::IsKeyPressed(KeyCode::kLeftControl);
     float snap_value = 0.5f;  // Snap to 0.5m for translation/scale
     // Snap to 45 degrees for rotation
-    if (operation_ == ImGuizmo::OPERATION::ROTATE)
+    if (operation_ == ImGuizmo::OPERATION::ROTATE) {
       snap_value = 45.0f;
+    }
 
     float snap_values[3] = {snap_value, snap_value, snap_value};
 

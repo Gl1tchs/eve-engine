@@ -20,6 +20,8 @@ class ViewportPanel : public Panel {
 
   void SetGizmoState(int state) { operation_ = state; }
 
+  void SetShouldDrawGizmos(bool value) { should_draw_gizmos_ = value; }
+
  protected:
   void Draw() override;
 
@@ -29,4 +31,6 @@ class ViewportPanel : public Panel {
   EditorCamera* editor_camera_;
 
   int operation_ = 7;
+
+  bool should_draw_gizmos_ = true;
 };

@@ -1,10 +1,14 @@
-transform_ = GetTransform();
+local transform_ = GetTransform();
 
 --@serializable
 speed_ = 25.0
 
 function IsZeroVector3(vec)
   return vec.x == 0.0 and vec.y == 0.0 and vec.z == 0.0;
+end
+
+function OnStart()
+  print("Hello from " .. GetName())
 end
 
 function OnUpdate(ds)

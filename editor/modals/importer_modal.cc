@@ -40,8 +40,6 @@ void ImporterModal::Draw() {
     ImGui::Text("Type");
     ImGui::SameLine();
 
-    static const char* current_item = NULL;
-
     Combo::Draw("##asset_type_combo", {"Texture", "Font", "Scene", "Model"},
                 [this](const std::string& selected) {
                   asset_type_ = DeserializeAssetType(selected);

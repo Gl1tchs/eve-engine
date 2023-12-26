@@ -8,27 +8,32 @@
 
 #include "core/event/input.h"
 #include "core/event/key_code.h"
-#include "glm/fwd.hpp"
-#include "glm/geometric.hpp"
+#include "scene/components.h"
+#include "scene/lights.h"
 #include "scene/transform.h"
+#include "scripting/script.h"
 
-static void RegisterVectorTypes(sol::state* lua);
+static void RegisterVectorTypes(Ref<sol::state> lua);
 
-static void RegisterMathFunctions(sol::state* lua);
+static void RegisterMathFunctions(Ref<sol::state> lua);
 
-static void RegisterInputFunctions(sol::state* lua);
+static void RegisterInputFunctions(Ref<sol::state> lua);
 
-static void RegisterKeyCodes(sol::state* lua);
+static void RegisterKeyCodes(Ref<sol::state> lua);
 
-static void RegisterMouseCodes(sol::state* lua);
+static void RegisterMouseCodes(Ref<sol::state> lua);
 
-void RegisterTypes(sol::state* lua) {
+static void RegisterComponentTypes(Ref<sol::state> lua);
+
+void RegisterTypes(Ref<sol::state> lua) {
   RegisterVectorTypes(lua);
   RegisterMathFunctions(lua);
 
   RegisterKeyCodes(lua);
   RegisterMouseCodes(lua);
   RegisterInputFunctions(lua);
+
+  RegisterComponentTypes(lua);
 }
 
 template <typename T>
@@ -63,7 +68,7 @@ auto GetSubstractionOperatorOverload() {
       [](float lhs, const T& rhs) -> T { return lhs - rhs; });
 }
 
-void RegisterVectorTypes(sol::state* lua) {
+void RegisterVectorTypes(Ref<sol::state> lua) {
   lua->new_usertype<glm::vec2>(
       "Vec2",                                                     //
       sol::constructors<glm::vec2(), glm::vec2(float, float)>(),  //
@@ -101,7 +106,7 @@ void RegisterVectorTypes(sol::state* lua) {
       GetSubstractionOperatorOverload<glm::vec4>());
 }
 
-static void RegisterMathFunctions(sol::state* lua) {
+static void RegisterMathFunctions(Ref<sol::state> lua) {
   // Register GLM functions
   auto glm_funcs = lua->create_table();
   {
@@ -159,7 +164,7 @@ static void RegisterMathFunctions(sol::state* lua) {
   );
 }
 
-void RegisterInputFunctions(sol::state* lua) {
+void RegisterInputFunctions(Ref<sol::state> lua) {
   lua->set_function("IsKeyPressed", &Input::IsKeyPressed);
   lua->set_function("IsKeyReleased", &Input::IsKeyReleased);
   lua->set_function("IsMouseButtonPressed", &Input::IsMouseButtonPressed);
@@ -167,7 +172,7 @@ void RegisterInputFunctions(sol::state* lua) {
   lua->set_function("GetMousePosition", &Input::GetMousePosition);
 }
 
-void RegisterKeyCodes(sol::state* lua) {
+void RegisterKeyCodes(Ref<sol::state> lua) {
   (*lua)["KeyCode"] = lua->create_table_with(
       "Space", KeyCode::kSpace, "Num0", KeyCode::k0, "Num1", KeyCode::k1,
       "Num2", KeyCode::k2, "Num3", KeyCode::k3, "Num4", KeyCode::k4, "Num5",
@@ -196,11 +201,64 @@ void RegisterKeyCodes(sol::state* lua) {
       KeyCode::kRightAlt);
 }
 
-void RegisterMouseCodes(sol::state* lua) {
+void RegisterMouseCodes(Ref<sol::state> lua) {
   (*lua)["MouseCode"] = lua->create_table_with(
       "Button1", MouseCode::k1, "Button2", MouseCode::k2, "Button3",
       MouseCode::k3, "Button4", MouseCode::k4, "Button5", MouseCode::k5,
       "Button6", MouseCode::k6, "Button7", MouseCode::k7, "Button8",
       MouseCode::k8, "Left", MouseCode::kLeft, "Right", MouseCode::kRight,
       "Middle", MouseCode::kMiddle);
+}
+
+static void RegisterComponentTypes(Ref<sol::state> lua) {
+  // Register IdComponent
+  lua->new_usertype<IdComponent>("IdComponent",
+                                 sol::constructors<IdComponent()>(), "id",
+                                 &IdComponent::id);
+
+  // Register TagComponent
+  lua->new_usertype<TagComponent>("TagComponent",
+                                  sol::constructors<TagComponent()>(), "tag",
+                                  &TagComponent::tag);
+
+  // Register CameraComponent
+  lua->new_usertype<OrthographicCamera>(
+      "OrthographicCamera", sol::constructors<OrthographicCamera()>(),
+      "zoom_level", &OrthographicCamera::zoom_level, "near_clip",
+      &OrthographicCamera::near_clip, "far_clip", &OrthographicCamera::far_clip,
+      "GetProjectionMatrix", &OrthographicCamera::GetProjectionMatrix,
+      "GetViewMatrix", &OrthographicCamera::GetViewMatrix);
+
+  lua->new_usertype<PerspectiveCamera>(
+      "PerspectiveCamera", sol::constructors<PerspectiveCamera()>(), "fov",
+      &PerspectiveCamera::fov, "near_clip", &PerspectiveCamera::near_clip,
+      "far_clip", &PerspectiveCamera::far_clip, "GetProjectionMatrix",
+      &PerspectiveCamera::GetProjectionMatrix, "GetViewMatrix",
+      &PerspectiveCamera::GetViewMatrix);
+
+  lua->new_usertype<CameraComponent>(
+      "CameraComponent", sol::constructors<CameraComponent()>(), "ortho_camera",
+      &CameraComponent::ortho_camera, "persp_camera",
+      &CameraComponent::persp_camera, "is_orthographic",
+      &CameraComponent::is_orthographic, "is_primary",
+      &CameraComponent::is_primary, "is_fixed_aspect_ratio",
+      &CameraComponent::is_fixed_aspect_ratio);
+
+  // Register ScriptComponent
+  lua->new_usertype<ScriptComponent>(
+      "ScriptComponent", sol::constructors<ScriptComponent()>(), "path",
+      &ScriptComponent::path, "instance", &ScriptComponent::instance);
+
+  // Register DirectionalLight
+  lua->new_usertype<DirectionalLight>(
+      "DirectionalLight", sol::constructors<DirectionalLight()>(), "direction",
+      &DirectionalLight::direction, "ambient", &DirectionalLight::ambient,
+      "diffuse", &DirectionalLight::diffuse, "specular",
+      &DirectionalLight::specular);
+
+  // Register Material
+  lua->new_usertype<Material>(
+      "Material", sol::constructors<Material()>(), "ambient",
+      &Material::ambient, "diffuse", &Material::diffuse, "specular",
+      &Material::specular, "shininess", &Material::shininess);
 }

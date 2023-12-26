@@ -47,6 +47,8 @@ class EditorLayer : public Layer {
 
   void SaveSceneAs();
 
+  void OpenScene();
+  
   void OpenScene(const std::filesystem::path& path);
 
   // Toolbar button callbacks
