@@ -6,7 +6,10 @@ add_subdirectory(glm)
 add_subdirectory(imgui)
 add_subdirectory(ImGuizmo)
 
+option(YAML_CPP_BUILD_CONTRIB OFF)
 option(YAML_CPP_BUILD_TOOLS OFF)
+option(YAML_BUILD_SHARED_LIBS OFF)
+option(YAML_CPP_INSTALL OFF)
 add_subdirectory(yaml-cpp)
 
 add_subdirectory(tinyfiledialogs)

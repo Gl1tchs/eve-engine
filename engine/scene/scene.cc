@@ -6,7 +6,6 @@
 #include "scene/entity.h"
 #include "scene/transform.h"
 #include "scripting/script.h"
-#include "scripting/script_engine.h"
 
 Scene::Scene(Ref<State>& state, std::string name)
     : state_(state), name_(name) {}
