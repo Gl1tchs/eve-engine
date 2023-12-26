@@ -1,5 +1,30 @@
 scene: sandbox
 entities:
+  - id: 18348502279451749786
+    tag_component:
+      tag: Spot Light
+    transform:
+      position: [2.02203438e-07, -0.0337756723, 7.0463953]
+      rotation: [0, 0, 90]
+      scale: [1, 1, 1]
+  - id: 11386622121855246634
+    tag_component:
+      tag: Cube
+    transform:
+      position: [1.92280972, 0.841667593, 1.53476584]
+      rotation: [0, -23.9975834, 0]
+      scale: [1, 1, 1]
+    model_component:
+      path: res://models/cube.obj
+    material_component:
+      albedo: [0.490196079, 0, 0]
+      metallic: 1
+      roughness: 0
+      ao: 1
+    script_component:
+      path: res://scripts/blue_cube.lua
+      fields:
+        []
   - id: 1225455807429653547
     tag_component:
       tag: Main Camera
@@ -9,32 +34,17 @@ entities:
       scale: [1, 1, 1]
     script_component:
       path: res://scripts/camera.lua
-  - id: 54253711328505163
+  - id: 5195349964288604196
     tag_component:
-      tag: Directional Light
+      tag: Sphere
     transform:
-      position: [0, 0, 0]
-      rotation: [45, 45, 45]
-      scale: [1, 1, 1]
-    directional_light:
-      ambient: [0.710424721, 0.710424721, 0.710424721]
-      diffuse: [0.764478743, 0.764478743, 0.764478743]
-      specular: [0.772200763, 0.772200763, 0.772200763]
-  - id: 11386622121855246634
-    tag_component:
-      tag: Blue Cube
-    transform:
-      position: [0, 0, 0]
+      position: [-2.70056915, 0.16992867, -0.850024998]
       rotation: [0, 0, 0]
-      scale: [1, 1, 1]
+      scale: [1.25, 1.25, 1.25]
     model_component:
-      path: res://models/cube.obj
+      path: res://models/sphere.obj
     material_component:
-      ambient: [0.0992233083, 0.648532152, 0.98841697]
-      diffuse: [0, 0.965251207, 1]
-      specular: [0.0111358091, 0.862328708, 0.961389959]
-      shininess: 32
-    script_component:
-      path: res://scripts/blue_cube.lua
-      fields:
-        []
+      albedo: [0, 0.0842864141, 0.99227798]
+      metallic: 0
+      roughness: 1
+      ao: 1

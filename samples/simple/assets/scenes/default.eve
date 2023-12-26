@@ -1,38 +1,12 @@
 scene: default
 entities:
-  - id: 8234689535676734320
+  - id: 54253711328505163
     tag_component:
-      tag: Red Monkey
+      tag: Directional Light
     transform:
-      position: [2.50783038, 0.857648432, -0.0861944407]
-      rotation: [3.32424202e-06, -58.0351868, -4.77916592e-06]
+      position: [0, 0, 0]
+      rotation: [-48.4210472, -41.1133423, -39.9934387]
       scale: [1, 1, 1]
-    model_component:
-      path: res://models/monkey.obj
-    material_component:
-      ambient: [0.826254845, 0.0669936463, 0.0669936463]
-      diffuse: [0.234036893, 0.586872578, 0.0929026157]
-      specular: [0.0643998012, 0.577083647, 0.926640928]
-      shininess: 32
-  - id: 323468953567323581
-    tag_component:
-      tag: Monkey
-    transform:
-      position: [-0.278981537, 1.50603664, -0.623811126]
-      rotation: [2.00225735, -1.15031505, 2.17101574]
-      scale: [0.889997482, 0.712001324, 0.838704526]
-    model_component:
-      path: res://models/monkey.obj
-    material_component:
-      ambient: [1, 1, 0]
-      diffuse: [1, 1, 0]
-      specular: [1, 1, 0]
-      shininess: 32
-    script_component:
-      path: res://scripts/monkey.lua
-      fields:
-        - name: speed_
-          value: 50
   - id: 1225455807429653547
     tag_component:
       tag: Main Camera
@@ -42,14 +16,36 @@ entities:
       scale: [1, 1, 1]
     script_component:
       path: res://scripts/camera.lua
-  - id: 54253711328505163
+  - id: 323468953567323581
     tag_component:
-      tag: Directional Light
+      tag: Monkey
     transform:
-      position: [0, 0, 0]
-      rotation: [-48.4210472, -41.1133423, -39.9934387]
+      position: [-2.53543591, 1.3428098, -1.81286752]
+      rotation: [2.00225735, -1.15031505, 2.17101574]
+      scale: [0.889997482, 0.712001324, 0.838704526]
+    model_component:
+      path: res://models/monkey.obj
+    material_component:
+      albedo: [0.00772202015, 1, 0.55175066]
+      metallic: 0.5
+      roughness: 1
+      ao: 1
+    script_component:
+      path: res://scripts/monkey.lua
+      fields:
+        - name: speed_
+          value: 50
+  - id: 8234689535676734320
+    tag_component:
+      tag: Red Monkey
+    transform:
+      position: [2.28009415, 0.459558249, -0.114715725]
+      rotation: [3.32424202e-06, -58.0351868, -4.77916592e-06]
       scale: [1, 1, 1]
-    directional_light:
-      ambient: [0.710424721, 0.710424721, 0.710424721]
-      diffuse: [0.764478743, 0.764478743, 0.764478743]
-      specular: [0.772200763, 0.772200763, 0.772200763]
+    model_component:
+      path: res://models/monkey.obj
+    material_component:
+      albedo: [0.779922783, 0.0511918329, 0.0511918329]
+      metallic: 1
+      roughness: 0
+      ao: 1

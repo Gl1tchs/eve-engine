@@ -26,11 +26,11 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
   Ref<Model> model = CreateRef<Model>();
 
   for (auto mesh_loaded : loader.LoadedMeshes) {
-    StaticMesh mesh;
+    RenderData<MeshVertex> mesh;
 
     mesh.name = mesh_loaded.MeshName;
     for (auto vertex_loaded : mesh_loaded.Vertices) {
-      Vertex vertex;
+      MeshVertex vertex;
       vertex.position = glm::vec4(ToGLM3(vertex_loaded.Position), 1.0);
       vertex.normal = ToGLM3(vertex_loaded.Normal);
       vertex.tex_coords = ToGLM2(vertex_loaded.TextureCoordinate);
@@ -41,10 +41,10 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
     mesh.indices = mesh_loaded.Indices;
 
     Material material;
-    material.ambient = ToGLM3(mesh_loaded.MeshMaterial.Ka);
-    material.diffuse = ToGLM3(mesh_loaded.MeshMaterial.Kd);
-    material.specular = ToGLM3(mesh_loaded.MeshMaterial.Ks);
-    material.shininess = mesh_loaded.MeshMaterial.Ns;
+    // material.ambient = ToGLM3(mesh_loaded.MeshMaterial.);
+    // material.diffuse = ToGLM3(mesh_loaded.MeshMaterial.Kd);
+    // material.specular = ToGLM3(mesh_loaded.MeshMaterial.Ks);
+    // material.shininess = mesh_loaded.MeshMaterial.Ns;
     // TODO material textures
 
     mesh.material = material;

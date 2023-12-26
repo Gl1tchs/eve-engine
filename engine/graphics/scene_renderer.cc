@@ -2,6 +2,7 @@
 
 #include "graphics/scene_renderer.h"
 
+#include "graphics/renderer.h"
 #include "scene/entity.h"
 
 SceneRenderer::SceneRenderer(const Ref<Scene>& scene, const Ref<State>& state)
@@ -119,12 +120,6 @@ void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
 
 void SceneRenderer::RenderScene() {
   Ref<Renderer>& renderer = state_->renderer;
-
-  scene_->GetAllEntitiesWith<DirectionalLight, Transform>().each(
-      [renderer](entt::entity entity_id, const DirectionalLight& light,
-                 Transform& transform) {
-        renderer->AddLight(light, transform.GetDirection());
-      });
 
   scene_->GetAllEntitiesWith<Transform, ModelComponent>().each(
       [&](entt::entity entity_id, const Transform& transform,

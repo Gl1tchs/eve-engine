@@ -7,11 +7,9 @@
 #include <IconsFontAwesome4.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
-#include <cstdint>
-#include <filesystem>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "scene/components.h"
+#include "scene/static_mesh.h"
 #include "scripting/script_engine.h"
 
 #include "utils/imgui_utils.h"
@@ -63,10 +61,6 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
 
     if (ImGui::Button("Camera")) {
       selected_entity.AddComponent<CameraComponent>();
-    }
-
-    if (ImGui::Button("Directional Light")) {
-      selected_entity.AddComponent<DirectionalLight>();
     }
 
     if (ImGui::Button("Material")) {
@@ -269,43 +263,6 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     REMOVE_COMPONENT_IF_NEEDED(CameraComponent)
   }
 
-  if (selected_entity.HasComponent<DirectionalLight>()) {
-    COMPONENT_HEADER(ICON_FA_SUN_O " Directional Light");
-
-    auto& light = selected_entity.GetComponent<DirectionalLight>();
-
-    ImGui::Columns(2, "Directional Light Columns");
-
-    ImGui::Text("Ambient:");
-    ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##directional_light_ambient",
-                          glm::value_ptr(light.ambient))) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Diffuse:");
-    ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##directional_light_diffuse",
-                          glm::value_ptr(light.diffuse))) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Specular:");
-    ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##directional_light_specular",
-                          glm::value_ptr(light.specular))) {
-      modify_info.SetModified();
-    }
-
-    ImGui::Columns();
-
-    REMOVE_COMPONENT_IF_NEEDED(DirectionalLight)
-  }
-
   if (selected_entity.HasComponent<ModelComponent>()) {
     COMPONENT_HEADER(ICON_FA_CUBES " Model Component")
 
@@ -319,8 +276,13 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     std::string path = model_comp.model->info.GetAssetPath();
     if (ImGui::InputText("##model_path_input", &path,
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
-      model_comp.model = AssetLibrary::LoadFromPath<Model>(path);
-      modify_info.SetModified();
+      auto asset = AssetLibrary::LoadFromPath<Model>(path);
+      if (asset) {
+        model_comp.model = asset;
+        modify_info.SetModified();
+      } else {
+        model_importer_.SetActive(true);
+      }
     }
 
     ImGui::NextColumn();
@@ -337,36 +299,34 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
     ImGui::Columns(2, "Material Columns");
 
-    ImGui::Text("Ambient:");
+    ImGui::Text("Albedo:");
     ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##material_ambient",
-                          glm::value_ptr(material.ambient))) {
+    if (ImGui::ColorEdit3("##material_albedo",
+                          glm::value_ptr(material.albedo))) {
       modify_info.SetModified();
     }
 
     ImGui::NextColumn();
 
-    ImGui::Text("Diffuse:");
+    ImGui::Text("Metallic:");
     ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##material_diffuse",
-                          glm::value_ptr(material.diffuse))) {
+    if (ImGui::DragFloat("##material_metallic", &material.metallic)) {
       modify_info.SetModified();
     }
 
     ImGui::NextColumn();
 
-    ImGui::Text("Specular:");
+    ImGui::Text("Roughness:");
     ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##material_specular",
-                          glm::value_ptr(material.specular))) {
+    if (ImGui::DragFloat("##material_roughness", &material.roughness)) {
       modify_info.SetModified();
     }
 
     ImGui::NextColumn();
 
-    ImGui::Text("Shininess:");
+    ImGui::Text("AO:");
     ImGui::NextColumn();
-    if (ImGui::DragFloat("##material_shininess", &material.shininess, 0.05f)) {
+    if (ImGui::DragFloat("##material_ao", &material.ao, 0.05f)) {
       modify_info.SetModified();
     }
 
@@ -483,6 +443,9 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
 void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
+  if (selected_entity.HasComponent<ModelComponent>()) {
+    return;
+  }
 
   auto& modal_component = selected_entity.AddComponent<ModelComponent>();
   modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);

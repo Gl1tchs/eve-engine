@@ -44,6 +44,7 @@ OpenGLShader::OpenGLShader(const std::string& vs_path,
                            const std::string& gs_path) {
   program_ = glCreateProgram();
 
+
   const std::string vertex_source = LoadShaderSource(vs_path);
   const uint32_t vertex_shader =
       CompileShader(vertex_source, ShaderType::kVertex);

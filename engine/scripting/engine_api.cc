@@ -9,7 +9,6 @@
 #include "core/event/input.h"
 #include "core/event/key_code.h"
 #include "scene/components.h"
-#include "scene/lights.h"
 #include "scene/transform.h"
 #include "scripting/script.h"
 
@@ -249,16 +248,9 @@ static void RegisterComponentTypes(Ref<sol::state> lua) {
       "ScriptComponent", sol::constructors<ScriptComponent()>(), "path",
       &ScriptComponent::path, "instance", &ScriptComponent::instance);
 
-  // Register DirectionalLight
-  lua->new_usertype<DirectionalLight>(
-      "DirectionalLight", sol::constructors<DirectionalLight()>(), "direction",
-      &DirectionalLight::direction, "ambient", &DirectionalLight::ambient,
-      "diffuse", &DirectionalLight::diffuse, "specular",
-      &DirectionalLight::specular);
-
   // Register Material
-  lua->new_usertype<Material>(
-      "Material", sol::constructors<Material()>(), "ambient",
-      &Material::ambient, "diffuse", &Material::diffuse, "specular",
-      &Material::specular, "shininess", &Material::shininess);
+  lua->new_usertype<Material>("Material", sol::constructors<Material()>(),
+                              "albedo", &Material::albedo, "metallic",
+                              &Material::metallic, "roughness",
+                              &Material::roughness, "ao", &Material::ao);
 }

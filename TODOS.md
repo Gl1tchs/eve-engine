@@ -22,8 +22,11 @@
 - [ ] Scene management API
 
 ## Renderer
+- [ ] PBR.
+- [ ] Custom shaders with scripting API.
 - [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.)
 - [ ] Texture rendering in detail (normal maps, height maps, materials).
+- [ ] Other light sources
 
 ## Bugs
 
