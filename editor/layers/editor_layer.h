@@ -47,9 +47,14 @@ class EditorLayer : public Layer {
 
   void SaveSceneAs();
 
+  // Open scene with an modal
   void OpenScene();
-  
-  void OpenScene(const std::filesystem::path& path);
+
+  // Load scene from path
+  void OpenScene(const fs::path& path);
+
+  // Open scene from scene manager
+  void OpenScene(const uint32_t index);
 
   // Toolbar button callbacks
   void OnScenePlay();
@@ -87,10 +92,9 @@ class EditorLayer : public Layer {
   bool camera_translatable_;
 
   // scene members
-  Ref<Scene> active_scene_;
   Ref<Scene> editor_scene_;
   SceneState scene_state_ = SceneState::kEdit;
-  std::string editor_scene_path_;
+  fs::path editor_scene_path_;
 
   // widgets
   ExitModal exit_modal_;

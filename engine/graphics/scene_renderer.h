@@ -4,14 +4,12 @@
 
 #include "pch_shared.h"
 
+#include "core/state.h"
 #include "scene/editor_camera.h"
-#include "scene/scene.h"
 
 class SceneRenderer {
  public:
-  SceneRenderer(const Ref<Scene>& scene, const Ref<State>& state);
-
-  void SetScene(const Ref<Scene>& scene) { scene_ = scene; }
+  SceneRenderer(const Ref<State>& state);
 
   void RenderRuntime(float ds);
 
@@ -32,7 +30,6 @@ class SceneRenderer {
   void RenderCameraBounds();
 
  private:
-  Ref<Scene> scene_;
   Ref<State> state_;
 
   glm::uvec2 viewport_size_;

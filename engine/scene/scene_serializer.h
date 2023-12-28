@@ -10,9 +10,9 @@ class SceneSerializer {
  public:
   SceneSerializer(const Ref<Scene>& scene);
 
-  void Serialize(const std::filesystem::path& file_path);
+  void Serialize(const fs::path& file_path);
 
-  bool Deserialize(const std::filesystem::path& file_path);
+  bool Deserialize(const fs::path& file_path);
 
  private:
   Ref<Scene> scene_;

@@ -11,7 +11,7 @@ entities:
     tag_component:
       tag: Cube
     transform:
-      position: [1.92280972, 0.841667593, 1.53476584]
+      position: [1.69192934, 0.841667593, 2.400352]
       rotation: [0, -23.9975834, 0]
       scale: [1, 1, 1]
     model_component:
@@ -22,9 +22,10 @@ entities:
       roughness: 0
       ao: 1
     script_component:
-      path: res://scripts/blue_cube.lua
+      path: res://scripts/cube.lua
       fields:
-        []
+        - name: speed_
+          value: 20
   - id: 1225455807429653547
     tag_component:
       tag: Main Camera

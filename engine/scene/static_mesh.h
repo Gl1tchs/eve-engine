@@ -9,7 +9,7 @@
 struct Model {
   std::vector<RenderData<MeshVertex>> meshes;
 
-  static Ref<Model> Load(const std::filesystem::path& path);
+  static Ref<Model> Load(const fs::path& path);
 };
 
 struct ModelComponent {

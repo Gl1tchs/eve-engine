@@ -58,73 +58,49 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 void main() {
+  vec3 lightDirection = normalize(vec3(1.0, -1.0, 1.0)); // Direction of the global directional light
+  vec3 lightColor = vec3(1.0, 1.0, 1.0); // Color of the global directional light
 
-  vec3 lightPositions[] = {
-  vec3(-10.0, 10.0, 10.0), vec3(10.0, 10.0, 10.0), vec3(-10.0, -10.0, 10.0), vec3(10.0, -10.0, 10.0) };
+  vec3 N = normalize(v_input.normal);
+  vec3 V = normalize(u_camera.position - v_input.frag_pos);
 
-vec3 lightColors[] = {
-vec3(300.0, 300.0, 300.0), vec3(300.0, 300.0, 300.0), vec3(300.0, 300.0, 300.0), vec3(300.0, 300.0, 300.0) };
+  vec3 F0 = vec3(0.04);
+  F0 = mix(F0, v_input.material.albedo, v_input.material.metallic);
 
-vec3 N = normalize(v_input.normal);
-vec3 V = normalize(u_camera.position - v_input.frag_pos);
+  vec3 Lo = vec3(0.0);
 
-  // int index = int(v_input.tex_index);
-  // vec4 sampled = texture(u_textures[index], v_input.tex_coords);
+  for(int i = 0; i < 4; ++i) {
+    // calculate per-light radiance
+    vec3 L = normalize(lightDirection);
+    vec3 H = normalize(V + L);
+    float distance = length(lightDirection);
+    float attenuation = 1.0 / (distance * distance);
+    vec3 radiance = lightColor * attenuation;
 
-  // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-  // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-vec3 F0 = vec3(0.04);
-F0 = mix(F0, v_input.material.albedo, v_input.material.metallic);
+    // Cook-Torrance BRDF
+    float NDF = DistributionGGX(N, H, v_input.material.roughness);
+    float G = GeometrySmith(N, V, L, v_input.material.roughness);
+    vec3 F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
 
-    // reflectance equation
-vec3 Lo = vec3(0.0);
-for(int i = 0;
-i < 4;
-++ i) {
-        // calculate per-light radiance
-vec3 L = normalize(lightPositions[i] - v_input.frag_pos);
-vec3 H = normalize(V + L);
-float distance = length(lightPositions[i] - v_input.frag_pos);
-float attenuation = 1.0 / (distance * distance);
-vec3 radiance = lightColors[i] * attenuation;
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+    vec3 specular = numerator / denominator;
 
-        // Cook-Torrance BRDF
-float NDF = DistributionGGX(N, H, v_input.material.roughness);
-float G = GeometrySmith(N, V, L, v_input.material.roughness);
-vec3 F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - v_input.material.metallic;
 
-vec3 numerator = NDF * G * F;
-float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-vec3 specular = numerator / denominator;
+    float NdotL = max(dot(N, L), 0.0);
 
-        // kS is equal to Fresnel
-vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
-vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals 
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
-kD *= 1.0 - v_input.material.metallic;	  
+    Lo += (kD * v_input.material.albedo / PI + specular) * radiance * NdotL;
+  }
 
-        // scale light by NdotL
-float NdotL = max(dot(N, L), 0.0);        
+  vec3 ambient = vec3(0.03) * v_input.material.albedo * v_input.material.ao;
 
-        // add to outgoing radiance Lo
-Lo += (kD * v_input.material.albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-}   
+  vec3 color = ambient + Lo;
 
-    // ambient lighting (note that the next IBL tutorial will replace 
-    // this ambient lighting with environment lighting).
-vec3 ambient = vec3(0.03) * v_input.material.albedo * v_input.material.ao;
+  color = color / (color + vec3(1.0));
+  color = pow(color, vec3(1.0 / 2.2));
 
-vec3 color = ambient + Lo;
-
-    // HDR tonemapping
-color = color / (color + vec3(1.0));
-    // gamma correct
-color = pow(color, vec3(1.0 / 2.2));
-
-o_color = vec4(color, 1.0);
+  o_color = vec4(color, 1.0);
 }
