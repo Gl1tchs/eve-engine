@@ -1,4 +1,6 @@
 project:
   name: simple
-  default_scene: res://scenes/sandbox.eve
   asset_directory: assets
+  scenes:
+    - res://scenes/sandbox.eve
+    - res://scenes/default.eve

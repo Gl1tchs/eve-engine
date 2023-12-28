@@ -8,7 +8,6 @@
 #include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
-#include "scene/lights.h"
 #include "scene/static_mesh.h"
 
 struct IdComponent {
@@ -38,6 +37,5 @@ struct ScriptComponent {
 template <typename... Component>
 struct ComponentGroup {};
 
-using AllComponents =
-    ComponentGroup<Transform, CameraComponent, ModelComponent, Material,
-                   DirectionalLight, ScriptComponent>;
+using AllComponents = ComponentGroup<Transform, CameraComponent, ModelComponent,
+                                     Material, ScriptComponent>;

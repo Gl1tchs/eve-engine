@@ -43,3 +43,5 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "core/core_minimal.h"
+
+namespace fs = std::filesystem;

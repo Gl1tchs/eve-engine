@@ -13,7 +13,7 @@ class Entity;
 
 class Scene {
  public:
-  Scene(Ref<State>& state, std::string name = "untitled");
+  Scene(Ref<State> state, std::string name = "untitled");
   ~Scene() = default;
 
   static Ref<Scene> Copy(Ref<Scene> other);

@@ -4,20 +4,12 @@
 
 #include "pch_shared.h"
 
-#include "graphics/material.h"
-#include "graphics/vertex.h"
-
-struct StaticMesh {
-  std::string name;
-  std::vector<Vertex> vertices;
-  std::vector<uint32_t> indices;
-  Material material;
-};
+#include "graphics/primitives/mesh.h"
 
 struct Model {
-  std::vector<StaticMesh> meshes;
+  std::vector<RenderData<MeshVertex>> meshes;
 
-  static Ref<Model> Load(const std::filesystem::path& path);
+  static Ref<Model> Load(const fs::path& path);
 };
 
 struct ModelComponent {

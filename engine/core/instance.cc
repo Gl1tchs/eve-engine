@@ -13,7 +13,6 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   instance_ = this;
 
   state_ = CreateRef<State>();
-  state_->asset_library = CreateRef<AssetLibrary>();
 
   // TODO get this from project config
   WindowProps props;
@@ -44,6 +43,8 @@ void Instance::StartEventLoop() {
   while (state_->running) {
     float ds = timer.Tick();
 
+    ProcessMainThreadQueue();
+
     for (Layer* layer : layers_) {
       layer->OnUpdate(ds);
     }
@@ -58,6 +59,21 @@ void Instance::StartEventLoop() {
 
     state_->window->SwapBuffers();
   }
+}
+
+void Instance::EnqueueMain(const std::function<void()>& function) {
+  std::scoped_lock<std::mutex> lock(main_thread_queue_mutex_);
+
+  main_thread_queue_.emplace_back(function);
+}
+
+void Instance::ProcessMainThreadQueue() {
+  std::scoped_lock<std::mutex> lock(main_thread_queue_mutex_);
+  for (auto& func : main_thread_queue_) {
+    func();
+  }
+
+  main_thread_queue_.clear();
 }
 
 void Instance::PushLayer(Layer* layer) {

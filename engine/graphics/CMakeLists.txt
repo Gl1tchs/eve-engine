@@ -1,4 +1,9 @@
 set(SOURCES
+  primitives/line.cc
+  primitives/line.h
+  primitives/mesh.cc
+  primitives/mesh.h
+  primitives/primitive.h
   buffer_layout.cc
   buffer_layout.h
   camera.h
@@ -32,7 +37,6 @@ set(SOURCES
   vertex_array.h
   vertex_buffer.cc
   vertex_buffer.h
-  vertex.h
 )
 
 set(OPENGL_SOURCES

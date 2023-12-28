@@ -4,6 +4,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "asset/asset_library.h"
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
@@ -200,23 +201,10 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::Key << "material_component";
     out << YAML::BeginMap;
 
-    out << YAML::Key << "ambient" << YAML::Value << material.ambient;
-    out << YAML::Key << "diffuse" << YAML::Value << material.diffuse;
-    out << YAML::Key << "specular" << YAML::Value << material.specular;
-    out << YAML::Key << "shininess" << YAML::Value << material.shininess;
-
-    out << YAML::EndMap;
-  }
-
-  if (entity.HasComponent<DirectionalLight>()) {
-    auto& light = entity.GetComponent<DirectionalLight>();
-
-    out << YAML::Key << "directional_light";
-    out << YAML::BeginMap;
-
-    out << YAML::Key << "ambient" << YAML::Value << light.ambient;
-    out << YAML::Key << "diffuse" << YAML::Value << light.diffuse;
-    out << YAML::Key << "specular" << YAML::Value << light.specular;
+    out << YAML::Key << "albedo" << YAML::Value << material.albedo;
+    out << YAML::Key << "metallic" << YAML::Value << material.metallic;
+    out << YAML::Key << "roughness" << YAML::Value << material.roughness;
+    out << YAML::Key << "ao" << YAML::Value << material.ao;
 
     out << YAML::EndMap;
   }
@@ -269,7 +257,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
   out << YAML::EndMap;
 }
 
-void SceneSerializer::Serialize(const std::filesystem::path& file_path) {
+void SceneSerializer::Serialize(const fs::path& file_path) {
   YAML::Emitter out;
   out << YAML::BeginMap;
   out << YAML::Key << "scene" << YAML::Value << file_path.stem().string();
@@ -288,7 +276,7 @@ void SceneSerializer::Serialize(const std::filesystem::path& file_path) {
   fout << out.c_str();
 }
 
-bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
+bool SceneSerializer::Deserialize(const fs::path& file_path) {
   YAML::Node data;
   try {
     data = YAML::LoadFile(file_path.string());
@@ -375,19 +363,10 @@ bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
     if (material_yaml) {
       auto& material = deserialing_entity.AddComponent<Material>();
 
-      material.ambient = material_yaml["ambient"].as<glm::vec3>();
-      material.diffuse = material_yaml["diffuse"].as<glm::vec3>();
-      material.specular = material_yaml["specular"].as<glm::vec3>();
-      material.shininess = material_yaml["shininess"].as<float>();
-    }
-
-    auto directional_light_yaml = entity["directional_light"];
-    if (directional_light_yaml) {
-      auto& light = deserialing_entity.AddComponent<DirectionalLight>();
-
-      light.ambient = directional_light_yaml["ambient"].as<glm::vec3>();
-      light.diffuse = directional_light_yaml["diffuse"].as<glm::vec3>();
-      light.specular = directional_light_yaml["specular"].as<glm::vec3>();
+      material.albedo = material_yaml["albedo"].as<glm::vec3>();
+      material.metallic = material_yaml["metallic"].as<float>();
+      material.roughness = material_yaml["roughness"].as<float>();
+      material.ao = material_yaml["ao"].as<float>();
     }
 
     auto script_component_yaml = entity["script_component"];

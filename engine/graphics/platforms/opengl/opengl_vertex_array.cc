@@ -108,7 +108,9 @@ void OpenGLVertexArray::AddVertexBuffer(
               ShaderDataTypeToOpenGLBaseType(element.type),
               element.normalized ? GL_TRUE : GL_FALSE, layout.GetStride(),
               (const void*)(element.offset + sizeof(float) * count * i));
-          glVertexAttribDivisor(vertex_buffer_index_, 1);
+          if (element.divisor) {
+            glVertexAttribDivisor(vertex_buffer_index_, element.divisor);
+          }
           vertex_buffer_index_++;
         }
         break;

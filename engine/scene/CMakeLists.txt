@@ -4,7 +4,8 @@ set(SOURCES
   editor_camera.h
   entity.cc
   entity.h
-  lights.h
+  scene_manager.cc
+  scene_manager.h
   scene_serializer.cc
   scene_serializer.h
   scene.cc

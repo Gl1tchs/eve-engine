@@ -14,7 +14,6 @@
 #include "graphics/material.h"
 #include "scene/components.h"
 #include "scene/entity.h"
-#include "scene/lights.h"
 #include "scene/scene.h"
 #include "scene/transform.h"
 
@@ -95,7 +94,6 @@ void RegisterComponentFunctions(sol::environment& env, Entity* entity) {
   RegisterComponentFunction<Transform>("Transform", env, entity);
   RegisterComponentFunction<CameraComponent>("CameraComponent", env, entity);
   RegisterComponentFunction<Material>("Material", env, entity);
-  RegisterComponentFunction<DirectionalLight>("DirectionalLight", env, entity);
 }
 
 bool Script::LoadScript() {

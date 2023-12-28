@@ -9,7 +9,7 @@
 #include "core/event/input.h"
 #include "core/event/key_code.h"
 #include "scene/components.h"
-#include "scene/lights.h"
+#include "scene/scene_manager.h"
 #include "scene/transform.h"
 #include "scripting/script.h"
 
@@ -23,6 +23,8 @@ static void RegisterKeyCodes(Ref<sol::state> lua);
 
 static void RegisterMouseCodes(Ref<sol::state> lua);
 
+static void RegisterSceneTypes(Ref<sol::state> lua);
+
 static void RegisterComponentTypes(Ref<sol::state> lua);
 
 void RegisterTypes(Ref<sol::state> lua) {
@@ -33,6 +35,7 @@ void RegisterTypes(Ref<sol::state> lua) {
   RegisterMouseCodes(lua);
   RegisterInputFunctions(lua);
 
+  RegisterSceneTypes(lua);
   RegisterComponentTypes(lua);
 }
 
@@ -173,7 +176,7 @@ void RegisterInputFunctions(Ref<sol::state> lua) {
 }
 
 void RegisterKeyCodes(Ref<sol::state> lua) {
-  (*lua)["KeyCode"] = lua->create_table_with(
+  lua->globals()["KeyCode"] = lua->create_table_with(
       "Space", KeyCode::kSpace, "Num0", KeyCode::k0, "Num1", KeyCode::k1,
       "Num2", KeyCode::k2, "Num3", KeyCode::k3, "Num4", KeyCode::k4, "Num5",
       KeyCode::k5, "Num6", KeyCode::k6, "Num7", KeyCode::k7, "Num8",
@@ -202,7 +205,7 @@ void RegisterKeyCodes(Ref<sol::state> lua) {
 }
 
 void RegisterMouseCodes(Ref<sol::state> lua) {
-  (*lua)["MouseCode"] = lua->create_table_with(
+  lua->globals()["MouseCode"] = lua->create_table_with(
       "Button1", MouseCode::k1, "Button2", MouseCode::k2, "Button3",
       MouseCode::k3, "Button4", MouseCode::k4, "Button5", MouseCode::k5,
       "Button6", MouseCode::k6, "Button7", MouseCode::k7, "Button8",
@@ -210,7 +213,15 @@ void RegisterMouseCodes(Ref<sol::state> lua) {
       "Middle", MouseCode::kMiddle);
 }
 
-static void RegisterComponentTypes(Ref<sol::state> lua) {
+void RegisterSceneTypes(Ref<sol::state> lua) {
+  lua->globals()["SceneManager"] = lua->create_table_with(
+      "SetActive", &SceneManager::SetActive, "GetRegisteredSceneCount",
+      &SceneManager::GetRegisteredSceneCount, "GetActiveIndex",
+      &SceneManager::GetActiveIndex, "GetActivePath",
+      &SceneManager::GetActivePath);
+}
+
+void RegisterComponentTypes(Ref<sol::state> lua) {
   // Register IdComponent
   lua->new_usertype<IdComponent>("IdComponent",
                                  sol::constructors<IdComponent()>(), "id",
@@ -249,16 +260,9 @@ static void RegisterComponentTypes(Ref<sol::state> lua) {
       "ScriptComponent", sol::constructors<ScriptComponent()>(), "path",
       &ScriptComponent::path, "instance", &ScriptComponent::instance);
 
-  // Register DirectionalLight
-  lua->new_usertype<DirectionalLight>(
-      "DirectionalLight", sol::constructors<DirectionalLight()>(), "direction",
-      &DirectionalLight::direction, "ambient", &DirectionalLight::ambient,
-      "diffuse", &DirectionalLight::diffuse, "specular",
-      &DirectionalLight::specular);
-
   // Register Material
-  lua->new_usertype<Material>(
-      "Material", sol::constructors<Material()>(), "ambient",
-      &Material::ambient, "diffuse", &Material::diffuse, "specular",
-      &Material::specular, "shininess", &Material::shininess);
+  lua->new_usertype<Material>("Material", sol::constructors<Material()>(),
+                              "albedo", &Material::albedo, "metallic",
+                              &Material::metallic, "roughness",
+                              &Material::roughness, "ao", &Material::ao);
 }

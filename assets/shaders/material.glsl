@@ -4,10 +4,10 @@
 #define MATERIAL_GLSL_
 
 struct Material {
-  vec3 ambient;
-  vec3 diffuse;
-  vec3 specular;
-  float shininess;
+  vec3 albedo;
+  float metallic;
+  float roughness;
+  float ao;
 };
 
 #endif // MATERIAL_GLSL_

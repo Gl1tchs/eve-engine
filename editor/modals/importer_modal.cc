@@ -22,8 +22,8 @@ static TextureWrappingMode DeserializeTextureWrappingMode(
 ImporterModal::ImporterModal(
     std::function<void(const std::string&)> submit_callback, AssetType for_type)
     : Modal("Asset Importer", true),
-      submit_callback_(submit_callback),
-      asset_type_(for_type) {
+      asset_type_(for_type),
+      submit_callback_(submit_callback) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
            ImGuiWindowFlags_NoSavedSettings);
 }
