@@ -32,9 +32,9 @@ void SceneManager::SetActive(const uint32_t index) {
     Instance::Get().EnqueueMain([new_scene]() {
       current_scene->OnRuntimeStop();
       new_scene->OnRuntimeStart();
-      scene_info_.scene = new_scene;
+      current_scene = new_scene;
     });
   } else {
-    scene_info_.scene = new_scene;
+    current_scene = new_scene;
   }
 }
