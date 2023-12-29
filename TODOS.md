@@ -4,6 +4,8 @@
 - [ ] Physics
 - [ ] An runtime application
 - [ ] Use a custom format rather yaml.
+- [ ] In Game UI
+- [ ] Sounds
 
 ## Editor
 - [ ] Add content browser and use id based asset system.
@@ -24,6 +26,7 @@
 ## Scripting
 - [ ] Improve engine api for scripting.
 - [ ] Add mat4 data type
+- [ ] API Documentation / code + markdown
 
 ## Renderer
 - [ ] PBR.
@@ -31,6 +34,7 @@
 - [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.)
 - [ ] Texture rendering in detail (normal maps, height maps, materials).
 - [ ] Other light sources
+- [ ] Text rendering
 
 ## Bugs
 
