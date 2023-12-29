@@ -76,10 +76,6 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
 }
 
 void SceneRenderer::OnViewportResize(glm::uvec2 size) {
-  if (viewport_size_ == size) {
-    return;
-  }
-
   auto& scene = SceneManager::GetActive();
   if (!scene) {
     return;
@@ -91,8 +87,9 @@ void SceneRenderer::OnViewportResize(glm::uvec2 size) {
   scene->GetAllEntitiesWith<CameraComponent>().each(
       [size](entt::entity, CameraComponent& cc) {
         if (!cc.is_fixed_aspect_ratio) {
-          cc.persp_camera.aspect_ratio = (float)size.x / (float)size.y;
-          cc.ortho_camera.aspect_ratio = (float)size.x / (float)size.y;
+          float ratio = (float)size.x / (float)size.y;
+          cc.persp_camera.aspect_ratio = ratio;
+          cc.ortho_camera.aspect_ratio = ratio;
         }
       });
 }

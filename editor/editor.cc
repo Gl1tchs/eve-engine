@@ -1,12 +1,13 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#include "runtime/prelude.h"
+#include "pch.h"
+
+#include "launch/prelude.h"
 
 #include <cxxopts.hpp>
 
-#include "core/debug/log.h"
-#include "graphics/graphics.h"
 #include "project/project.h"
+#include "scene/scene_manager.h"
 #include "scripting/script_engine.h"
 
 #include "layers/editor_layer.h"
@@ -19,16 +20,11 @@ std::optional<EditorArgumentPacket> ParseArgs(const CommandLineArguments& args);
 
 class EditorInstance : public Instance {
  public:
-  EditorInstance(const InstanceSpecifications& specs,
-                 std::optional<std::string> startup_project)
-      : Instance(specs) {
-    if (startup_project.has_value()) {
-      std::string project_path = startup_project.value();
-      if (std::isspace(project_path[0])) {
-        project_path.erase(0, project_path.find_first_not_of(" "));
-      }
-
-      Project::Load(project_path);
+  EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
+    // If default project provided load it.
+    if (Ref<Project> project = Project::GetActive(); project) {
+      ScriptEngine::Init();
+      SceneManager::SetActive(0);
     }
 
     PushLayer<EditorLayer>(GetState());
@@ -42,11 +38,16 @@ Instance* CreateInstance(CommandLineArguments args) {
   specs.args = args;
 
   std::optional<EditorArgumentPacket> packet = ParseArgs(args);
-  if (!packet.has_value()) {
-    return nullptr;
+  if (packet.has_value() && packet->startup_project.has_value()) {
+    if (std::isspace(packet->startup_project.value()[0])) {
+      packet->startup_project.value().erase(
+          0, packet->startup_project.value().find_first_not_of(" "));
+    }
+
+    Project::Load(packet->startup_project.value());
   }
 
-  return new EditorInstance(specs, packet.value().startup_project);
+  return new EditorInstance(specs);
 }
 
 std::optional<EditorArgumentPacket> ParseArgs(

@@ -8,7 +8,10 @@
 
 class ScriptEngine {
  public:
-  static void Init();
+  static void Init(bool is_runtime = false);
+
+  static bool IsInitialized();
+
   static void Shutdown();
 
   static bool LoadAssembly(const fs::path& filepath);

@@ -31,8 +31,6 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
       [this](const WindowCloseEvent& event) { Exit(); });
 }
 
-EditorLayer::~EditorLayer() {}
-
 void EditorLayer::OnStart() {
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
@@ -52,10 +50,12 @@ void EditorLayer::OnStart() {
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
-  // If active project run it.
-  SceneManager::GetActive() = nullptr;
-  if (Ref<Project> project = Project::GetActive(); project) {
-    OpenScene(0);
+  // If scene alredy loaded register it.
+  if (auto& active_scene = SceneManager::GetActive(); active_scene) {
+    SetSceneTitle();
+
+    editor_scene_ = SceneManager::GetActive();
+    editor_scene_path_ = SceneManager::GetActivePath();
   }
 
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
@@ -106,7 +106,6 @@ void EditorLayer::BeforeRender() {
   }
 
   auto& viewport_size = viewport_panel_->GetSize();
-
   scene_renderer_->OnViewportResize(
       {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
 

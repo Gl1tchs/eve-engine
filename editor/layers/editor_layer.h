@@ -21,7 +21,7 @@
 class EditorLayer : public Layer {
  public:
   EditorLayer(Ref<State>& state);
-  ~EditorLayer();
+  virtual ~EditorLayer() = default;
 
  private:
   void OnStart() override;

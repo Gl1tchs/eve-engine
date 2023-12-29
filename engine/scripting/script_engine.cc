@@ -125,6 +125,10 @@ struct ScriptEngineData {
   std::vector<Scope<filewatch::FileWatch<std::string>>> script_file_watchers;
   bool assembly_reload_pending = false;
 
+  bool is_runtime = false;
+
+  bool initialized = false;
+
 #ifdef _DEBUG
   bool enable_debugging = true;
 #else
@@ -161,15 +165,22 @@ static void OnScriptFileChanged(const std::string& path,
   }
 }
 
-void ScriptEngine::Init() {
+void ScriptEngine::Init(bool is_runtime) {
+  if (data && data->initialized) {
+    ScriptEngine::Shutdown();
+  }
+
   data = new ScriptEngineData();
+  data->is_runtime = is_runtime;
 
   InitMono();
 
   ScriptGlue::RegisterFunctions();
 
-  CreateProjectFiles();
-  BuildScripts();
+  if (!is_runtime) {
+    CreateProjectFiles();
+    BuildScripts();
+  }
 
   bool status = LoadAssembly("script-core.dll");
   if (!status) {
@@ -192,6 +203,12 @@ void ScriptEngine::Init() {
 
   // Retrieve and instantiate class
   data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
+
+  data->initialized = true;
+}
+
+bool IsInitialized() {
+  return data->initialized;
 }
 
 void ScriptEngine::Shutdown() {
@@ -200,8 +217,6 @@ void ScriptEngine::Shutdown() {
 }
 
 void ScriptEngine::InitMono() {
-  CreateProjectFiles();
-
   mono_set_assemblies_path("mono/lib");
 
   if (data->enable_debugging) {
@@ -259,17 +274,19 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
 
   data->app_assembly_image = mono_assembly_get_image(data->app_assembly);
 
-  for (const auto& entry :
-       fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
-    if (entry.is_directory()) {
-      if (std::any_of(fs::directory_iterator(entry.path()),
-                      fs::directory_iterator(), [](const auto& subentry) {
-                        return subentry.path().extension() == ".cs";
-                      })) {
-        data->script_file_watchers.push_back(
-            CreateScope<filewatch::FileWatch<std::string>>(
-                entry.path().string(), OnScriptFileChanged));
-        data->assembly_reload_pending = false;
+  if (!data->is_runtime) {
+    for (const auto& entry :
+         fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
+      if (entry.is_directory()) {
+        if (std::any_of(fs::directory_iterator(entry.path()),
+                        fs::directory_iterator(), [](const auto& subentry) {
+                          return subentry.path().extension() == ".cs";
+                        })) {
+          data->script_file_watchers.push_back(
+              CreateScope<filewatch::FileWatch<std::string>>(
+                  entry.path().string(), OnScriptFileChanged));
+          data->assembly_reload_pending = false;
+        }
       }
     }
   }
