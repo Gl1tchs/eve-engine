@@ -2,8 +2,7 @@
 
 # Screenshots
 
-![Editor](.github/editor_base.png)
-![Scripting](.github/scripting.gif)
+![Editor](.github/eve_engine.png)
 
 ## Table Of Contents:
   - [BUILDING](./BUILDING.md)
