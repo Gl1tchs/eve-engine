@@ -1,0 +1,43 @@
+scene: scene2
+entities:
+  - id: 15083735012643040790
+    tag_component:
+      tag: Entity
+    transform:
+      position: [0, 0, 0]
+      rotation: [0, 0, 0]
+      scale: [0.25, 0.25, 0.25]
+    model_component:
+      path: res://models/cube.obj
+    material_component:
+      albedo: [0.0308880806, 1, 0]
+      metallic: 1
+      roughness: 0
+      ao: 1
+    script_component:
+      class_name: MultipleScenes.SceneTranslator
+      script_fields:
+        - name: isScene1
+          type: Bool
+          data: false
+  - id: 8871106926841243943
+    tag_component:
+      tag: Camera
+    transform:
+      position: [0, 0, 4]
+      rotation: [0, 0, 0]
+      scale: [1, 1, 1]
+    camera_component:
+      orthographic_camera:
+        aspect_ratio: 1.53514183
+        zoom_level: 1
+        near_clip: -1
+        far_clip: 2
+      perspective_camera:
+        aspect_ratio: 1.53514183
+        fov: 45
+        near_clip: 0.100000001
+        far_clip: 300
+      is_orthographic: false
+      is_primary: true
+      is_fixed_aspect_ratio: false

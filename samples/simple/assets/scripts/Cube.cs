@@ -6,7 +6,7 @@ namespace Simple
     public class Cube : ScriptEntity
     {
         private Transform m_transform;
-        private bool m_space_pressed = false;
+        private bool m_spacePressed = false;
 
         public float speed = 10.0f;
 
@@ -39,10 +39,10 @@ namespace Simple
                 direction -= m_transform.GetRight();
             }
 
-            if (!m_space_pressed && Input.IsKeyPressed(KeyCode.Space))
+            if (!m_spacePressed && Input.IsKeyPressed(KeyCode.Space))
             {
                 SceneManager.SetActive(1);
-                m_space_pressed = true;
+                m_spacePressed = true;
             }
 
             if (direction != Vector3.Zero)

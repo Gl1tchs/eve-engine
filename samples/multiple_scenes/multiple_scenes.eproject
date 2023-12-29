@@ -1,0 +1,6 @@
+project:
+  name: multiple_scenes
+  asset_directory: assets
+  scenes:
+    - res://scenes/scene1.eve
+    - res://scenes/scene2.eve

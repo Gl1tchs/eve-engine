@@ -2,7 +2,7 @@ add_subdirectory(asset)
 add_subdirectory(core)
 add_subdirectory(graphics)
 add_subdirectory(project)
-add_subdirectory(runtime)
+add_subdirectory(launch)
 add_subdirectory(scene)
 add_subdirectory(scripting)
 add_subdirectory(ui)
@@ -14,7 +14,7 @@ target_link_libraries(eve INTERFACE
   eve::core
   eve::graphics
   eve::project
-  eve::runtime
+  eve::launch
   eve::scene
 )
 

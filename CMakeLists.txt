@@ -12,5 +12,6 @@ set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/thirdparty)
 # Define the targets
 add_subdirectory(editor)
 add_subdirectory(engine)
+add_subdirectory(runtime)
 add_subdirectory(script-core)
 add_subdirectory(thirdparty)

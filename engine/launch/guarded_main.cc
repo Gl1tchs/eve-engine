@@ -9,15 +9,14 @@
 extern Instance* CreateInstance(CommandLineArguments args);
 
 int GuardedMain(CommandLineArguments args) {
-  if (!std::filesystem::exists(".eve/")) {
-    std::filesystem::create_directory(".eve/");
+  if (!fs::exists(".eve/")) {
+    fs::create_directory(".eve/");
   }
 
   Logger::Init(".eve/engine.log");
 
   Instance* instance = CreateInstance(args);
   if (!instance) {
-    LOG_FATAL("Unable to create application!");
     return 1;
   }
 

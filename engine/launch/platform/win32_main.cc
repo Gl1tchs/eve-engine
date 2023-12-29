@@ -1,4 +1,4 @@
-#include "runtime/launch/win32_main.h"
+#include "launch/platform/win32_main.h"
 
 #include "core/core_minimal.h"
 
