@@ -6,6 +6,8 @@
 - [ ] Use a custom format rather yaml.
 - [ ] In Game UI
 - [ ] Sounds
+- [ ] Project opener / creater application
+    - Create template scripts
 
 ## Editor
 - [ ] Add content browser and use id based asset system.
