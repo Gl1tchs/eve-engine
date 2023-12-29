@@ -6,6 +6,7 @@
 
 #include "scene/entity.h"
 #include "scene/scene.h"
+#include "scene/scene_manager.h"
 
 #include "panels/panel.h"
 
@@ -15,11 +16,10 @@ class HierarchyPanel : public Panel {
  public:
   HierarchyPanel();
 
-  void SetScene(const Ref<Scene>& scene);
-
   void SetSelectedEntity(Entity entity);
   Entity GetSelectedEntity() {
-    if (selected_entity_ && !scene_->Exists(selected_entity_)) {
+    if (selected_entity_ &&
+        !SceneManager::GetActive()->Exists(selected_entity_)) {
       return Entity{};
     }
 
@@ -30,6 +30,5 @@ class HierarchyPanel : public Panel {
   void Draw() override;
 
  private:
-  Ref<Scene> scene_;
   Entity selected_entity_;
 };

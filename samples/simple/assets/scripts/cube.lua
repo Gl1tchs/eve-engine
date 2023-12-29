@@ -3,6 +3,8 @@ local transform_ = GetTransform();
 --@serializable
 speed_ = 25.0
 
+space_pressed_ = false
+
 function IsZeroVector3(vec)
   return vec.x == 0.0 and vec.y == 0.0 and vec.z == 0.0;
 end
@@ -26,6 +28,11 @@ function OnUpdate(ds)
   end
   if IsKeyPressed(KeyCode.A) then
     direction = direction - transform_:GetRight();
+  end
+
+  if not space_pressed_ and IsKeyPressed(KeyCode.Space) then
+    SceneManager.SetActive(1);
+    space_pressed_ = true;
   end
 
   if not IsZeroVector3(direction) then

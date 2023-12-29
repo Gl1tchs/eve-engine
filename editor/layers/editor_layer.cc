@@ -14,6 +14,8 @@
 #include "graphics/render_command.h"
 #include "graphics/scene_renderer.h"
 #include "project/project.h"
+#include "scene/scene.h"
+#include "scene/scene_manager.h"
 #include "scene/scene_serializer.h"
 
 #include "utils/modify_info.h"
@@ -50,17 +52,12 @@ void EditorLayer::OnStart() {
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
   // If active project run it.
-  active_scene_ = nullptr;
+  SceneManager::GetActive() = nullptr;
   if (Ref<Project> project = Project::GetActive(); project) {
-    auto& project_config = project->GetConfig();
-
-    SetSceneTitle();
-
-    OpenScene(
-        AssetLibrary::GetAssetPath(project_config.default_scene.string()));
+    OpenScene(0);
   }
 
-  scene_renderer_ = CreateScope<SceneRenderer>(active_scene_, GetState());
+  scene_renderer_ = CreateScope<SceneRenderer>(GetState());
 
   SetupMenubar();
 }
@@ -68,7 +65,7 @@ void EditorLayer::OnStart() {
 void EditorLayer::OnDestroy() {}
 
 void EditorLayer::OnUpdate(float ds) {
-  if (!active_scene_) {
+  if (!SceneManager::GetActive()) {
     HandleShortcuts();
     return;
   }
@@ -84,7 +81,7 @@ void EditorLayer::OnGUI(float ds) {
   {
     menu_bar_.Draw();
 
-    if (!active_scene_) {
+    if (!SceneManager::GetActive()) {
       DockSpace::End();
       return;
     }
@@ -173,8 +170,11 @@ void EditorLayer::OnRenderScene(float ds) {
     case SceneState::kPlay: {
       viewport_panel_->SetShouldDrawGizmos(false);
 
-      active_scene_->OnUpdateRuntime(ds);
-      scene_renderer_->RenderRuntime(ds);
+      if (auto& scene = SceneManager::GetActive(); scene) {
+        scene->OnUpdateRuntime(ds);
+        scene_renderer_->RenderRuntime(ds);
+      }
+
       break;
     }
   }
@@ -190,7 +190,7 @@ void EditorLayer::HandleShortcuts() {
 
   // Shortcuts
   if (Input::IsKeyPressed(KeyCode::kLeftControl)) {
-    if (active_scene_) {
+    if (SceneManager::GetActive()) {
       if (Input::IsKeyPressed(KeyCode::kO)) {
         OpenScene();
       }
@@ -246,7 +246,7 @@ void EditorLayer::HandleShortcuts() {
 
   if (auto entity = hierarchy_panel_->GetSelectedEntity(); entity) {
     if (Input::IsKeyPressed(KeyCode::kDelete)) {
-      active_scene_->DestroyEntity(entity);
+      SceneManager::GetActive()->DestroyEntity(entity);
       hierarchy_panel_->SetSelectedEntity(Entity{});
       modify_info.SetModified();
     }
@@ -263,19 +263,14 @@ void EditorLayer::OpenProject() {
     return;
   }
 
-  if (Ref<Project> project = Project::Load(std::string(path)); project) {
-    const ProjectConfig& project_config = project->GetConfig();
-
-    OpenScene(
-        AssetLibrary::GetAssetPath(project_config.default_scene.string()));
+  if (Ref<Project> project = Project::Load(fs::path(path)); project) {
+    // Open the first scene index
+    OpenScene(0);
   }
 }
 
 void EditorLayer::NewScene() {
-  active_scene_ = CreateRef<Scene>(GetState(), "untitled");
-  scene_renderer_->SetScene(active_scene_);
-
-  hierarchy_panel_->SetScene(active_scene_);
+  SceneManager::GetActive() = CreateRef<Scene>(GetState(), "untitled");
 
   editor_scene_path_ = "";
 
@@ -285,7 +280,7 @@ void EditorLayer::NewScene() {
 
 void EditorLayer::SaveScene() {
   if (!editor_scene_path_.empty()) {
-    SceneSerializer serializer(active_scene_);
+    SceneSerializer serializer(SceneManager::GetActive());
     serializer.Serialize(editor_scene_path_);
 
     OnSceneSave();
@@ -306,7 +301,7 @@ void EditorLayer::SaveSceneAs() {
 
   editor_scene_path_ = std::string(path);
 
-  SceneSerializer serializer(active_scene_);
+  SceneSerializer serializer(SceneManager::GetActive());
   serializer.Serialize(editor_scene_path_);
 
   OnSceneSave();
@@ -325,7 +320,7 @@ void EditorLayer::OpenScene() {
   OpenScene(path);
 }
 
-void EditorLayer::OpenScene(const std::filesystem::path& path) {
+void EditorLayer::OpenScene(const fs::path& path) {
   if (scene_state_ != SceneState::kEdit) {
     OnScenePause();
   }
@@ -336,33 +331,44 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
   SceneSerializer serializer(new_scene);
   if (serializer.Deserialize(path)) {
     editor_scene_ = new_scene;
-    active_scene_ = editor_scene_;
-    scene_renderer_->SetScene(active_scene_);
+    SceneManager::GetActive() = editor_scene_;
 
-    hierarchy_panel_->SetScene(active_scene_);
-
-    editor_scene_path_ = path.string();
+    editor_scene_path_ = path;
 
     editor_camera_.ResetTransform();
   }
 }
 
+void EditorLayer::OpenScene(const uint32_t index) {
+  if (scene_state_ != SceneState::kEdit) {
+    OnScenePause();
+  }
+
+  if (index >= SceneManager::GetRegisteredSceneCount()) {
+    return;
+  }
+
+  SetSceneTitle();
+
+  SceneManager::SetActive(index);
+
+  editor_scene_ = SceneManager::GetActive();
+
+  editor_scene_path_ = SceneManager::GetActivePath();
+
+  editor_camera_.ResetTransform();
+}
+
 void EditorLayer::OnScenePlay() {
   SetSceneState(SceneState::kPlay);
 
-  active_scene_ = Scene::Copy(editor_scene_);
-  scene_renderer_->SetScene(active_scene_);
-  hierarchy_panel_->SetScene(active_scene_);
+  SceneManager::GetActive() = Scene::Copy(editor_scene_);
+
   is_ejected_ = false;
 
   // if we encounter with an error stop the scene
-  if (!active_scene_->OnRuntimeStart()) {
+  if (!SceneManager::GetActive()->OnRuntimeStart()) {
     SetSceneState(SceneState::kEdit);
-
-    active_scene_ = editor_scene_;
-    scene_renderer_->SetScene(active_scene_);
-    hierarchy_panel_->SetScene(active_scene_);
-
     is_ejected_ = true;
 
     return;
@@ -372,31 +378,29 @@ void EditorLayer::OnScenePlay() {
 void EditorLayer::OnSceneStop() {
   SetSceneState(SceneState::kEdit);
 
-  active_scene_->OnRuntimeStop();
+  SceneManager::GetActive()->OnRuntimeStop();
 
-  active_scene_ = editor_scene_;
-  scene_renderer_->SetScene(active_scene_);
-  hierarchy_panel_->SetScene(active_scene_);
+  SceneManager::GetActive() = editor_scene_;
 
   is_ejected_ = true;
 }
 
 void EditorLayer::OnScenePause() {
   SetSceneState(SceneState::kPaused);
-  active_scene_->SetPaused(true);
+  SceneManager::GetActive()->SetPaused(true);
 
   is_ejected_ = false;
 }
 
 void EditorLayer::OnSceneResume() {
   SetSceneState(SceneState::kPlay);
-  active_scene_->SetPaused(false);
+  SceneManager::GetActive()->SetPaused(false);
 
   is_ejected_ = false;
 }
 
 void EditorLayer::OnSceneStep() {
-  active_scene_->Step();
+  SceneManager::GetActive()->Step();
 }
 
 void EditorLayer::OnSceneEject() {
@@ -456,7 +460,6 @@ void EditorLayer::OnExitModalAnswer(ExitModalAnswer answer) {
 }
 
 void EditorLayer::SetupMenubar() {
-
   Menu file_menu("File");
   {
     MenuItemGroup project_group;

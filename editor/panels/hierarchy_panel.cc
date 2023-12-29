@@ -6,38 +6,40 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "scene/scene.h"
 #include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
-HierarchyPanel::HierarchyPanel()
-    : Panel(true), scene_(nullptr), selected_entity_({}) {}
-
-void HierarchyPanel::SetScene(const Ref<Scene>& scene) {
-  scene_ = scene;
-  selected_entity_ = Entity{};
-}
+HierarchyPanel::HierarchyPanel() : Panel(true), selected_entity_({}) {}
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {
   selected_entity_ = entity;
-  scene_->selected_entity_ = &selected_entity_;
+  SceneManager::GetActive()->selected_entity_ = &selected_entity_;
 }
 
 void HierarchyPanel::Draw() {
-  if (!scene_) {
+  auto& scene = SceneManager::GetActive();
+  if (!scene) {
+    selected_entity_ = Entity{};
     return;
   }
 
-  ImGui::Text("%s", scene_->GetName().c_str());
+  // If scene changed during runtime
+  if (selected_entity_.scene_ != scene.get()) {
+    selected_entity_ = Entity{selected_entity_.entity_handle_, scene.get()};
+  }
+
+  ImGui::Text("%s", scene->GetName().c_str());
 
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
   if (ImGui::ButtonTransparent(ICON_FA_PLUS, 30, 0)) {
-    scene_->CreateEntity();
+    scene->CreateEntity();
     modify_info.SetModified();
   }
 
   std::vector<Entity> entities_to_remove{};
 
-  for (auto [uuid, entity] : scene_->entity_map_) {
+  for (auto [uuid, entity] : scene->entity_map_) {
     const std::string& name = entity.GetName();
 
     int id = static_cast<int>((uint64_t)uuid);
@@ -62,7 +64,7 @@ void HierarchyPanel::Draw() {
   }
 
   for (auto entity : entities_to_remove) {
-    scene_->DestroyEntity(entity);
+    scene->DestroyEntity(entity);
     modify_info.SetModified();
   }
 }

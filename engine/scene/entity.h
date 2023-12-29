@@ -72,4 +72,6 @@ class Entity {
  private:
   entt::entity entity_handle_{entt::null};
   Scene* scene_ = nullptr;
+
+  friend class HierarchyPanel;
 };

@@ -4,16 +4,17 @@
 
 #include "graphics/renderer.h"
 #include "scene/entity.h"
+#include "scene/scene_manager.h"
 
-SceneRenderer::SceneRenderer(const Ref<Scene>& scene, const Ref<State>& state)
-    : scene_(scene), state_(state) {}
+SceneRenderer::SceneRenderer(const Ref<State>& state) : state_(state) {}
 
 void SceneRenderer::RenderRuntime(float ds) {
-  if (!scene_) {
+  auto& scene = SceneManager::GetActive();
+  if (!scene) {
     return;
   }
 
-  auto camera = scene_->GetPrimaryCameraEntity();
+  auto camera = scene->GetPrimaryCameraEntity();
   if (camera.has_value() && camera.value().HasComponent<CameraComponent>()) {
     auto& cc = camera.value().GetComponent<CameraComponent>();
     auto& tc = camera.value().GetTransform();
@@ -36,7 +37,8 @@ void SceneRenderer::RenderRuntime(float ds) {
 
 void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
                                  bool use_primary_if_exists) {
-  if (!scene_) {
+  auto& scene = SceneManager::GetActive();
+  if (!scene) {
     return;
   }
 
@@ -46,7 +48,7 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
 
   CameraData data;
   if (use_primary_if_exists) {
-    auto primary_camera = scene_->GetPrimaryCameraEntity();
+    auto primary_camera = scene->GetPrimaryCameraEntity();
     if (primary_camera.has_value() &&
         primary_camera.value().HasComponent<CameraComponent>()) {
       auto& cc = primary_camera.value().GetComponent<CameraComponent>();
@@ -74,14 +76,15 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
 }
 
 void SceneRenderer::OnViewportResize(glm::uvec2 size) {
-  if (!scene_) {
+  auto& scene = SceneManager::GetActive();
+  if (!scene) {
     return;
   }
 
   viewport_size_ = size;
 
   // Resize our non-FixedAspectRatio cameras
-  scene_->GetAllEntitiesWith<CameraComponent>().each(
+  scene->GetAllEntitiesWith<CameraComponent>().each(
       [size](entt::entity, CameraComponent& cc) {
         if (!cc.is_fixed_aspect_ratio) {
           cc.persp_camera.aspect_ratio = (float)size.x / (float)size.y;
@@ -91,14 +94,15 @@ void SceneRenderer::OnViewportResize(glm::uvec2 size) {
 }
 
 void SceneRenderer::RenderSceneEditor(const CameraData& data) {
-  Ref<Renderer>& renderer = state_->renderer;
+  auto& scene = SceneManager::GetActive();
+  auto& renderer = state_->renderer;
 
   renderer->BeginScene(data);
 
   DrawGrid();
 
   // Draw camera bounds if selected
-  const Entity selected_entity = scene_->GetSelectedEntity();
+  const Entity selected_entity = scene->GetSelectedEntity();
   if (selected_entity && selected_entity.HasComponent<CameraComponent>()) {
     RenderCameraBounds();
   }
@@ -109,7 +113,7 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
 }
 
 void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
-  Ref<Renderer>& renderer = state_->renderer;
+  auto& renderer = state_->renderer;
 
   renderer->BeginScene(data);
 
@@ -119,12 +123,13 @@ void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
 }
 
 void SceneRenderer::RenderScene() {
-  Ref<Renderer>& renderer = state_->renderer;
+  auto& scene = SceneManager::GetActive();
+  auto& renderer = state_->renderer;
 
-  scene_->GetAllEntitiesWith<Transform, ModelComponent>().each(
+  scene->GetAllEntitiesWith<Transform, ModelComponent>().each(
       [&](entt::entity entity_id, const Transform& transform,
           const ModelComponent& model_comp) {
-        Entity entity{entity_id, scene_.get()};
+        Entity entity{entity_id, scene.get()};
 
         std::optional<Material> material{};
         if (entity.HasComponent<Material>()) {
@@ -177,10 +182,11 @@ void SceneRenderer::DrawGrid() {
 }
 
 void SceneRenderer::RenderCameraBounds() {
+  auto& scene = SceneManager::GetActive();
   auto& renderer = state_->renderer;
 
   // check for selected entity already done
-  Entity selected_entity = scene_->GetSelectedEntity();
+  Entity selected_entity = scene->GetSelectedEntity();
   CameraComponent& cc = selected_entity.GetComponent<CameraComponent>();
   Transform& tc = selected_entity.GetTransform();
 

@@ -7,8 +7,7 @@
 #include "scene/transform.h"
 #include "scripting/script.h"
 
-Scene::Scene(Ref<State>& state, std::string name)
-    : state_(state), name_(name) {}
+Scene::Scene(Ref<State> state, std::string name) : state_(state), name_(name) {}
 
 template <typename... Component>
 static void CopyComponent(

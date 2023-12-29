@@ -6,22 +6,24 @@
 
 struct ProjectConfig {
   std::string name;
-  std::filesystem::path default_scene;
-  std::filesystem::path asset_directory;
+  fs::path asset_directory;
+  std::vector<std::string> scenes;
 };
 
 class Project {
  public:
-  [[nodiscard]] static std::filesystem::path GetProjectDirectory() {
+  [[nodiscard]] static fs::path GetProjectDirectory() {
     ASSERT(active_project_)
     return active_project_->project_dir_;
   }
 
   // Relative to project directory
-  [[nodiscard]] static std::filesystem::path GetAssetDirectory() {
+  [[nodiscard]] static fs::path GetAssetDirectory() {
     ASSERT(active_project_)
-    return active_project_->project_dir_ /
-           active_project_->config_.asset_directory;
+    using std::filesystem::path;
+    return (path(active_project_->project_dir_) /
+            path(active_project_->config_.asset_directory))
+        .string();
   }
 
   [[nodiscard]] ProjectConfig& GetConfig() { return config_; }
@@ -30,13 +32,13 @@ class Project {
 
   static Ref<Project> New();
 
-  static Ref<Project> Load(const std::filesystem::path& path);
+  static Ref<Project> Load(const fs::path& path);
 
-  static void SaveActive(const std::filesystem::path& path);
+  static void SaveActive(const fs::path& path);
 
  private:
   static Ref<Project> active_project_;
 
   ProjectConfig config_;
-  std::filesystem::path project_dir_;
+  fs::path project_dir_;
 };

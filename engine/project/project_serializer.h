@@ -8,9 +8,9 @@ class ProjectSerializer {
  public:
   ProjectSerializer(Ref<Project> project);
 
-  void Serialize(const std::filesystem::path& path);
+  void Serialize(const fs::path& path);
 
-  bool Deserialize(const std::filesystem::path& path);
+  bool Deserialize(const fs::path& path);
 
  private:
   Ref<Project> project_;

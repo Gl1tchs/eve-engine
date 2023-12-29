@@ -23,12 +23,16 @@ class Instance {
 
   void StartEventLoop();
 
+  void EnqueueMain(const std::function<void()>& function);
+
   Ref<State> GetState() { return state_; }
   const Ref<State>& GetState() const { return state_; }
 
   static Instance& Get() { return *instance_; };
 
  protected:
+  void ProcessMainThreadQueue();
+
   void PushLayer(Layer* layer);
 
   template <typename T, typename... Args>
@@ -57,4 +61,7 @@ class Instance {
   ImGuiLayer* imgui_layer_;
 
   InstanceSpecifications specs_;
+
+  std::vector<std::function<void()>> main_thread_queue_;
+  std::mutex main_thread_queue_mutex_;
 };

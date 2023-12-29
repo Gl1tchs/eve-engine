@@ -4,6 +4,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "asset/asset_library.h"
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
@@ -256,7 +257,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
   out << YAML::EndMap;
 }
 
-void SceneSerializer::Serialize(const std::filesystem::path& file_path) {
+void SceneSerializer::Serialize(const fs::path& file_path) {
   YAML::Emitter out;
   out << YAML::BeginMap;
   out << YAML::Key << "scene" << YAML::Value << file_path.stem().string();
@@ -275,7 +276,7 @@ void SceneSerializer::Serialize(const std::filesystem::path& file_path) {
   fout << out.c_str();
 }
 
-bool SceneSerializer::Deserialize(const std::filesystem::path& file_path) {
+bool SceneSerializer::Deserialize(const fs::path& file_path) {
   YAML::Node data;
   try {
     data = YAML::LoadFile(file_path.string());
