@@ -126,7 +126,6 @@ static void TransformComponent_GetForward(GUUID entity_id,
   auto entity = scene->FindEntityByUUID(entity_id);
   ASSERT(entity.has_value());
 
-  // Calculate forward based on rotation, assuming Z is forward in this case
   *out_forward = entity->GetComponent<Transform>().GetForward();
 }
 
@@ -136,7 +135,6 @@ static void TransformComponent_GetRight(GUUID entity_id, glm::vec3* out_right) {
   auto entity = scene->FindEntityByUUID(entity_id);
   ASSERT(entity.has_value());
 
-  // Calculate forward based on rotation, assuming Z is forward in this case
   *out_right = entity->GetComponent<Transform>().GetRight();
 }
 
@@ -146,8 +144,309 @@ static void TransformComponent_GetUp(GUUID entity_id, glm::vec3* out_up) {
   auto entity = scene->FindEntityByUUID(entity_id);
   ASSERT(entity.has_value());
 
-  // Calculate forward based on rotation, assuming Z is forward in this case
   *out_up = entity->GetComponent<Transform>().GetUp();
+}
+
+static void CameraComponent_OrthographicCamera_GetAspectRatio(
+    GUUID entity_id, float* out_aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_aspect_ratio =
+      entity->GetComponent<CameraComponent>().ortho_camera.aspect_ratio;
+}
+
+static void CameraComponent_OrthographicCamera_SetAspectRatio(
+    GUUID entity_id, float* aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().ortho_camera.aspect_ratio =
+      *aspect_ratio;
+}
+
+static void CameraComponent_OrthographicCamera_GetZoomLevel(
+    GUUID entity_id, float* out_zoom_level) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_zoom_level =
+      entity->GetComponent<CameraComponent>().ortho_camera.zoom_level;
+}
+
+static void CameraComponent_OrthographicCamera_SetZoomLevel(GUUID entity_id,
+                                                            float* zoom_level) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().ortho_camera.zoom_level = *zoom_level;
+}
+
+static void CameraComponent_OrthographicCamera_GetNearClip(
+    GUUID entity_id, float* out_near_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_near_clip =
+      entity->GetComponent<CameraComponent>().ortho_camera.near_clip;
+}
+
+static void CameraComponent_OrthographicCamera_SetNearClip(GUUID entity_id,
+                                                           float* near_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().ortho_camera.near_clip = *near_clip;
+}
+
+static void CameraComponent_OrthographicCamera_GetFarClip(GUUID entity_id,
+                                                          float* out_far_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_far_clip = entity->GetComponent<CameraComponent>().ortho_camera.far_clip;
+}
+
+static void CameraComponent_OrthographicCamera_SetFarClip(GUUID entity_id,
+                                                          float* far_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().ortho_camera.far_clip = *far_clip;
+}
+
+static void CameraComponent_PerspectiveCamera_GetAspectRatio(
+    GUUID entity_id, float* out_aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_aspect_ratio =
+      entity->GetComponent<CameraComponent>().persp_camera.aspect_ratio;
+}
+
+static void CameraComponent_PerspectiveCamera_SetAspectRatio(
+    GUUID entity_id, float* aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().persp_camera.aspect_ratio =
+      *aspect_ratio;
+}
+
+static void CameraComponent_PerspectiveCamera_GetFov(GUUID entity_id,
+                                                     float* out_fov) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_fov = entity->GetComponent<CameraComponent>().persp_camera.fov;
+}
+
+static void CameraComponent_PerspectiveCamera_SetFov(GUUID entity_id,
+                                                     float* fov) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().persp_camera.fov = *fov;
+}
+
+static void CameraComponent_PerspectiveCamera_GetNearClip(
+    GUUID entity_id, float* out_near_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_near_clip =
+      entity->GetComponent<CameraComponent>().persp_camera.near_clip;
+}
+
+static void CameraComponent_PerspectiveCamera_SetNearClip(GUUID entity_id,
+                                                          float* near_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().persp_camera.near_clip = *near_clip;
+}
+
+static void CameraComponent_PerspectiveCamera_GetFarClip(GUUID entity_id,
+                                                         float* out_far_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_far_clip = entity->GetComponent<CameraComponent>().persp_camera.far_clip;
+}
+
+static void CameraComponent_PerspectiveCamera_SetFarClip(GUUID entity_id,
+                                                         float* far_clip) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().persp_camera.far_clip = *far_clip;
+  ;
+}
+
+static void CameraComponent_GetIsOrthographic(GUUID entity_id,
+                                              float* out_is_orthographic) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_is_orthographic =
+      entity->GetComponent<CameraComponent>().is_orthographic;
+}
+
+static void CameraComponent_SetIsOrthographic(GUUID entity_id,
+                                              float* is_orthographic) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().is_orthographic = *is_orthographic;
+}
+
+static void CameraComponent_GetIsPrimary(GUUID entity_id,
+                                         float* out_is_primary) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_is_primary = entity->GetComponent<CameraComponent>().is_primary;
+}
+
+static void CameraComponent_SetIsPrimary(GUUID entity_id, float* is_primary) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().is_primary = *is_primary;
+}
+
+static void CameraComponent_GetIsFixedAspectRato(
+    GUUID entity_id, float* out_is_fixed_aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_is_fixed_aspect_ratio =
+      entity->GetComponent<CameraComponent>().is_fixed_aspect_ratio;
+}
+
+static void CameraComponent_SetIsFixedAspectRato(GUUID entity_id,
+                                                 float* is_fixed_aspect_ratio) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<CameraComponent>().is_fixed_aspect_ratio =
+      *is_fixed_aspect_ratio;
+}
+
+static void Material_GetAlbedo(GUUID entity_id, glm::vec3* out_albedo) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_albedo = entity->GetComponent<Material>().albedo;
+}
+
+static void Material_SetAlbedo(GUUID entity_id, glm::vec3* albedo) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<Material>().albedo = *albedo;
+}
+
+static void Material_GetMetallic(GUUID entity_id, float* out_metallic) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_metallic = entity->GetComponent<Material>().metallic;
+}
+
+static void Material_SetMetallic(GUUID entity_id, float* metallic) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<Material>().metallic = *metallic;
+}
+
+static void Material_GetRoughness(GUUID entity_id, float* out_roughness) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_roughness = entity->GetComponent<Material>().roughness;
+}
+
+static void Material_SetRoughness(GUUID entity_id, float* roughness) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<Material>().roughness = *roughness;
+}
+
+static void Material_GetAO(GUUID entity_id, float* out_ao) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  *out_ao = entity->GetComponent<Material>().ao;
+}
+
+static void Material_SetAO(GUUID entity_id, float* ao) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->FindEntityByUUID(entity_id);
+  ASSERT(entity.has_value());
+
+  entity->GetComponent<Material>().ao = *ao;
 }
 
 static bool Input_IsKeyPressed(KeyCode keycode) {
@@ -156,6 +455,18 @@ static bool Input_IsKeyPressed(KeyCode keycode) {
 
 static bool Input_IsKeyReleased(KeyCode keycode) {
   return Input::IsKeyReleased(keycode);
+}
+
+static bool Input_IsMouseButtonPressed(MouseCode mouse_code) {
+  return Input::IsMouseButtonPressed(mouse_code);
+}
+
+static bool Input_IsMouseButtonReleased(MouseCode mouse_code) {
+  return Input::IsMouseButtonReleased(mouse_code);
+}
+
+static void Input_GetMousePosition(glm::vec2* out_position) {
+  *out_position = Input::GetMousePosition();
 }
 
 static void SceneManager_SetActive(int index) {
@@ -202,9 +513,11 @@ void ScriptGlue::RegisterComponents() {
 void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(GetScriptInstance);
 
+  // Begin Entity
   ADD_INTERNAL_CALL(Entity_HasComponent);
   ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
+  // Begin Transform Component
   ADD_INTERNAL_CALL(TransformComponent_GetPosition);
   ADD_INTERNAL_CALL(TransformComponent_SetPosition);
 
@@ -218,9 +531,61 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(TransformComponent_GetRight);
   ADD_INTERNAL_CALL(TransformComponent_GetUp);
 
+  // Begin Camera Component
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetAspectRatio);
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetAspectRatio);
+
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetZoomLevel);
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetZoomLevel);
+
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetNearClip);
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetNearClip);
+
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetFarClip);
+  ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetFarClip);
+
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetAspectRatio);
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetAspectRatio);
+
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetFov);
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetFov);
+
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetNearClip);
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetNearClip);
+
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetFarClip);
+  ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetFarClip);
+
+  ADD_INTERNAL_CALL(CameraComponent_GetIsOrthographic);
+  ADD_INTERNAL_CALL(CameraComponent_SetIsOrthographic);
+
+  ADD_INTERNAL_CALL(CameraComponent_GetIsPrimary);
+  ADD_INTERNAL_CALL(CameraComponent_SetIsPrimary);
+
+  ADD_INTERNAL_CALL(CameraComponent_GetIsFixedAspectRato);
+  ADD_INTERNAL_CALL(CameraComponent_SetIsFixedAspectRato);
+
+  // Begin Material
+  ADD_INTERNAL_CALL(Material_GetAlbedo);
+  ADD_INTERNAL_CALL(Material_SetAlbedo);
+
+  ADD_INTERNAL_CALL(Material_GetMetallic);
+  ADD_INTERNAL_CALL(Material_SetMetallic);
+
+  ADD_INTERNAL_CALL(Material_GetRoughness);
+  ADD_INTERNAL_CALL(Material_SetRoughness);
+
+  ADD_INTERNAL_CALL(Material_GetAO);
+  ADD_INTERNAL_CALL(Material_SetAO);
+
+  // Begin Scene Manager
   ADD_INTERNAL_CALL(SceneManager_SetActive);
   ADD_INTERNAL_CALL(SceneManager_GetActiveIndex);
 
+  // Begin Input
   ADD_INTERNAL_CALL(Input_IsKeyPressed);
   ADD_INTERNAL_CALL(Input_IsKeyReleased);
+  ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
+  ADD_INTERNAL_CALL(Input_IsMouseButtonReleased);
+  ADD_INTERNAL_CALL(Input_GetMousePosition);
 }

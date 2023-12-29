@@ -12,5 +12,4 @@ namespace EveEngine
       return InternalCalls.SceneManager_GetActiveIndex();
     }
   }
-
 }

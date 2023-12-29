@@ -56,7 +56,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
     fs::path pdb_path = assembly_path;
     pdb_path.replace_extension(".pdb");
 
-    if (std::filesystem::exists(pdb_path)) {
+    if (fs::exists(pdb_path)) {
       ScopedBuffer pdb_file_data = FileSystem::ReadFileBinary(pdb_path);
       mono_debug_open_image_from_memory(
           image, pdb_file_data.As<const mono_byte>(), pdb_file_data.Size());
@@ -123,9 +123,6 @@ struct ScriptEngineData {
   std::unordered_map<GUUID, ScriptFieldMap> entity_script_fields;
 
   std::vector<Scope<filewatch::FileWatch<std::string>>> script_file_watchers;
-  bool file_reload_pending = false;
-
-  Scope<filewatch::FileWatch<std::string>> app_assembly_file_watcher;
   bool assembly_reload_pending = false;
 
 #ifdef EVE_DEBUG
@@ -143,33 +140,23 @@ static void CreateProjectFiles();
 
 static void BuildScripts();
 
-static void OnAppAssemblyFileSystemEvent(const std::string& path,
-                                         const filewatch::Event change_type) {
-  if (!data->assembly_reload_pending &&
-      change_type == filewatch::Event::modified) {
-    data->assembly_reload_pending = true;
-
-    Instance::Get().EnqueueMain([]() {
-      data->app_assembly_file_watcher.reset();
-      ScriptEngine::ReloadAssembly();
-    });
-  }
-}
-
 static void OnScriptFileChanged(const std::string& path,
                                 const filewatch::Event change_type) {
   if (data->scene_context && data->scene_context->IsRunning()) {
     return;
   }
 
-  if (!data->file_reload_pending) {
-    data->file_reload_pending = true;
+  if (!data->assembly_reload_pending) {
+    data->assembly_reload_pending = true;
 
-    Instance::Get().EnqueueMain([]() {
-      data->app_assembly_file_watcher.reset();
+    Instance::Get().EnqueueMain([&]() {
+      for (auto& file_watcher : data->script_file_watchers) {
+        file_watcher.reset();
+      }
+
       CreateProjectFiles();
-      // TODO only do this if necessary
       BuildScripts();
+      ScriptEngine::ReloadAssembly();
     });
   }
 }
@@ -204,7 +191,7 @@ void ScriptEngine::Init() {
   ScriptGlue::RegisterComponents();
 
   // Retrieve and instantiate class
-  data->entity_class = ScriptClass("EveEngine", "Entity", true);
+  data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
 }
 
 void ScriptEngine::Shutdown() {
@@ -272,11 +259,6 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
 
   data->app_assembly_image = mono_assembly_get_image(data->app_assembly);
 
-  data->app_assembly_file_watcher =
-      CreateScope<filewatch::FileWatch<std::string>>(
-          filepath.string(), OnAppAssemblyFileSystemEvent);
-  data->assembly_reload_pending = false;
-
   for (const auto& entry :
        fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
     if (entry.is_directory()) {
@@ -287,7 +269,7 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
         data->script_file_watchers.push_back(
             CreateScope<filewatch::FileWatch<std::string>>(
                 entry.path().string(), OnScriptFileChanged));
-        data->file_reload_pending = false;
+        data->assembly_reload_pending = false;
       }
     }
   }
@@ -307,7 +289,7 @@ void ScriptEngine::ReloadAssembly() {
   ScriptGlue::RegisterComponents();
 
   // Retrieve and instantiate class
-  data->entity_class = ScriptClass("EveEngine", "Entity", true);
+  data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
 }
 
 bool ScriptEngine::EntityClassExists(const std::string& fullClassName) {
@@ -400,8 +382,8 @@ void ScriptEngine::LoadAssemblyClasses() {
   const MonoTableInfo* type_definitions_table =
       mono_image_get_table_info(data->app_assembly_image, MONO_TABLE_TYPEDEF);
   int num_types = mono_table_info_get_rows(type_definitions_table);
-  MonoClass* entity_class =
-      mono_class_from_name(data->core_assembly_image, "EveEngine", "Entity");
+  MonoClass* entity_class = mono_class_from_name(data->core_assembly_image,
+                                                 "EveEngine", "ScriptEntity");
 
   for (int32_t i = 0; i < num_types; i++) {
     uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -456,9 +438,6 @@ void ScriptEngine::LoadAssemblyClasses() {
       }
     }
   }
-
-  // auto& entity_classes = data->entity_classes;
-  //mono_field_get_value()
 }
 
 MonoImage* ScriptEngine::GetCoreAssemblyImage() {
@@ -485,58 +464,51 @@ MonoObject* ScriptEngine::InstantiateClass(MonoClass* mono_class) {
 }
 
 void CreateProjectFiles() {
-  std::ofstream csproj_file(
-      Project::GetProjectDirectory() /
-      std::format("{}.csproj", Project::GetProjectName()));
+  std::ofstream csproj_file(Project::GetProjectDirectory() /
+                            (Project::GetProjectName() + ".csproj"));
 
   if (!csproj_file.is_open()) {
     LOG_ERROR("Error: Unable to create .csproj file");
     return;
   }
 
-  csproj_file << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
-  csproj_file << "<Project Sdk=\"Microsoft.NET.Sdk\">" << std::endl;
-  csproj_file << "  <PropertyGroup>" << std::endl;
-  csproj_file << "    <OutputType>Library</OutputType>" << std::endl;
-  csproj_file << "    <TargetFramework>net8.0</TargetFramework>" << std::endl;
-  csproj_file << std::format("    <OutputPath>{}\\out</OutputPath>",
-                             Project::GetProjectDirectory().string())
-              << std::endl;
-  csproj_file << "    "
-                 "<AppendTargetFrameworkToOutputPath>false</"
-                 "AppendTargetFrameworkToOutputPath>"
-              << std::endl;
-  csproj_file << "  </PropertyGroup>" << std::endl;
-  csproj_file << "  <ItemGroup>" << std::endl;
+  const std::string project_dir = Project::GetProjectDirectory().string();
+  csproj_file << std::format(R"(<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputPath>{}\out</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+)",
+                             project_dir);
 
-  for (const auto& entry : std::filesystem::recursive_directory_iterator(
-           Project::GetAssetDirectory())) {
+  for (const auto& entry :
+       fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
     if (entry.is_regular_file() && entry.path().extension() == ".cs") {
-      csproj_file << "    <Compile Include=\"" << entry.path().string()
-                  << "\" />" << std::endl;
+      csproj_file << "       <Compile Include=\"" << entry.path().string()
+                  << "\" />";
     }
   }
 
-  csproj_file << "  </ItemGroup>" << std::endl;
-
-  // Link to core engine module.
-  csproj_file << "  <ItemGroup>" << std::endl;
-  csproj_file << "    <Reference Include=\"script-core\">" << std::endl;
-  csproj_file << std::format("      <HintPath>{}\\script-core.dll</HintPath>",
-                             fs::current_path().string())
-              << std::endl;
-  csproj_file << "    </Reference>" << std::endl;
-  csproj_file << "  </ItemGroup>" << std::endl;
-
-  csproj_file << "</Project>" << std::endl;
+  csproj_file << R"(</ItemGroup>
+  <ItemGroup>
+    <Reference Include="script-core">
+      <HintPath>)"
+              << fs::current_path().string() << R"(\script-core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>)";
 
   LOG_TRACE("{}.csproj file generated successfully.",
             Project::GetProjectName());
 }
 
 void BuildScripts() {
-  fs::path csproj_path = Project::GetProjectDirectory() /
-                         std::format("{}.csproj", Project::GetProjectName());
+  fs::path csproj_path =
+      Project::GetProjectDirectory() / (Project::GetProjectName() + ".csproj");
   if (!fs::exists(csproj_path)) {
     LOG_WARNING("Unable to find project files creating...");
     CreateProjectFiles();
@@ -545,14 +517,10 @@ void BuildScripts() {
   int result =
       std::system(std::format("dotnet build {}", csproj_path.string()).c_str());
   if (result == 0) {
-    // Build successful
-    LOG_INFO("Scripts builded successfully!");
+    LOG_INFO("Scripts built successfully!");
   } else {
-    // Build failed
     LOG_ERROR("Script building process failed!");
   }
-
-  data->file_reload_pending = false;
 }
 
 const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
@@ -590,7 +558,7 @@ const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
     case ScriptFieldType::kVector4:
       return "Vector4";
     case ScriptFieldType::kEntity:
-      return "Entity";
+      return "ScriptEntity";
   }
   ASSERT(false, "Unknown ScriptFieldType");
   return "None";
@@ -629,7 +597,7 @@ ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
     return ScriptFieldType::kVector3;
   if (field_type == "Vector4")
     return ScriptFieldType::kVector4;
-  if (field_type == "Entity")
+  if (field_type == "ScriptEntity")
     return ScriptFieldType::kEntity;
 
   ASSERT(false, "Unknown ScriptFieldType");

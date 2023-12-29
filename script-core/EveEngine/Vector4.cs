@@ -32,7 +32,7 @@ namespace EveEngine
             this.w = w;
         }
 
-        public Vector2 xy
+        public Vector2 XY
         {
             get => new Vector2(x, y);
             set
@@ -42,7 +42,7 @@ namespace EveEngine
             }
         }
 
-        public Vector3 xyz
+        public Vector3 XYZ
         {
             get => new Vector3(x, y, z);
             set
@@ -89,9 +89,8 @@ namespace EveEngine
 
         public override bool Equals(object obj)
         {
-            if (obj is Vector4)
+            if (obj is Vector4 other)
             {
-                Vector4 other = (Vector4)obj;
                 return this == other;
             }
             return false;
@@ -100,6 +99,11 @@ namespace EveEngine
         public override int GetHashCode()
         {
             return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode() ^ w.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Vector4({0}, {1}, {2}, {3})", x, y, z, w);
         }
     }
 }

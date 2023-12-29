@@ -29,7 +29,7 @@ namespace EveEngine
 			this.z = z;
 		}
 
-		public Vector2 xy
+		public Vector2 XY
 		{
 			get => new Vector2(x, y);
 			set
@@ -90,9 +90,8 @@ namespace EveEngine
 
 		public override bool Equals(object obj)
 		{
-			if (obj is Vector3)
+			if (obj is Vector3 other)
 			{
-				Vector3 other = (Vector3)obj;
 				return this == other;
 			}
 			return false;
@@ -101,6 +100,11 @@ namespace EveEngine
 		public override int GetHashCode()
 		{
 			return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return String.Format("Vector3({0}, {1}, {2})", x, y, z);
 		}
 	}
 }

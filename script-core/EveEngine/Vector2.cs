@@ -76,9 +76,8 @@ namespace EveEngine
 
 		public override bool Equals(object obj)
 		{
-			if (obj is Vector2)
+			if (obj is Vector2 other)
 			{
-				Vector2 other = (Vector2)obj;
 				return this == other;
 			}
 			return false;
@@ -87,6 +86,11 @@ namespace EveEngine
 		public override int GetHashCode()
 		{
 			return x.GetHashCode() ^ y.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return String.Format("Vector2({0}, {1})", x, y);
 		}
 	}
 }

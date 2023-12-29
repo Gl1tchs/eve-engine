@@ -2,63 +2,60 @@ namespace EveEngine
 {
   public class Transform : Component
   {
-    public Vector3 position
+    public Vector3 Position
     {
       get
       {
-        InternalCalls.TransformComponent_GetPosition(entity.id, out Vector3 position);
+        InternalCalls.TransformComponent_GetPosition(Entity.Id, out Vector3 position);
         return position;
       }
       set
       {
-        InternalCalls.TransformComponent_SetPosition(entity.id, ref value);
+        InternalCalls.TransformComponent_SetPosition(Entity.Id, ref value);
       }
     }
 
-    public Vector3 rotation
+    public Vector3 Rotation
     {
       get
       {
-        InternalCalls.TransformComponent_GetRotation(entity.id, out Vector3 rotation);
+        InternalCalls.TransformComponent_GetRotation(Entity.Id, out Vector3 rotation);
         return rotation;
       }
       set
       {
-        InternalCalls.TransformComponent_SetRotation(entity.id, ref value);
+        InternalCalls.TransformComponent_SetRotation(Entity.Id, ref value);
       }
     }
 
-    public Vector3 scale
+    public Vector3 Scale
     {
       get
       {
-        InternalCalls.TransformComponent_GetScale(entity.id, out Vector3 scale);
+        InternalCalls.TransformComponent_GetScale(Entity.Id, out Vector3 scale);
         return scale;
       }
       set
       {
-        InternalCalls.TransformComponent_SetScale(entity.id, ref value);
+        InternalCalls.TransformComponent_SetScale(Entity.Id, ref value);
       }
     }
 
     public Vector3 GetForward()
     {
-      Vector3 forward;
-      InternalCalls.TransformComponent_GetForward(entity.id, out forward);
+      InternalCalls.TransformComponent_GetForward(Entity.Id, out Vector3 forward);
       return forward;
     }
 
     public Vector3 GetRight()
     {
-      Vector3 right;
-      InternalCalls.TransformComponent_GetRight(entity.id, out right);
+      InternalCalls.TransformComponent_GetRight(Entity.Id, out Vector3 right);
       return right;
     }
 
     public Vector3 GetUp()
     {
-      Vector3 up;
-      InternalCalls.TransformComponent_GetUp(entity.id, out up);
+      InternalCalls.TransformComponent_GetUp(Entity.Id, out Vector3 up);
       return up;
     }
   }

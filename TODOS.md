@@ -22,6 +22,7 @@
 
 ## Scripting
 - [ ] Improve engine api for scripting.
+- [ ] Add mat4 data type
 
 ## Renderer
 - [ ] PBR.

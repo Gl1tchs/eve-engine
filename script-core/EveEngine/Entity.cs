@@ -3,35 +3,35 @@ using System.Runtime.CompilerServices;
 
 namespace EveEngine
 {
-	public class Entity
+	public class ScriptEntity
 	{
-		protected Entity() { id = 0; }
+		protected ScriptEntity() { Id = 0; }
 
-		internal Entity(ulong id)
+		internal ScriptEntity(ulong id)
 		{
-			this.id = id;
+			this.Id = id;
 		}
 
-		public readonly ulong id;
+		public ulong Id { get; private set; }
 
 		// TODO store directly transform
-		public Vector3 position
+		public Vector3 Position
 		{
 			get
 			{
-				InternalCalls.TransformComponent_GetPosition(id, out Vector3 result);
+				InternalCalls.TransformComponent_GetPosition(Id, out Vector3 result);
 				return result;
 			}
 			set
 			{
-				InternalCalls.TransformComponent_SetPosition(id, ref value);
+				InternalCalls.TransformComponent_SetPosition(Id, ref value);
 			}
 		}
 
 		public bool HasComponent<T>() where T : Component, new()
 		{
 			Type component_type = typeof(T);
-			return InternalCalls.Entity_HasComponent(id, component_type);
+			return InternalCalls.Entity_HasComponent(Id, component_type);
 		}
 
 		public T GetComponent<T>() where T : Component, new()
@@ -39,22 +39,22 @@ namespace EveEngine
 			if (!HasComponent<T>())
 				return null;
 
-			T component = new T() { entity = this };
+			T component = new T() { Entity = this };
 			return component;
 		}
 
-		public Entity FindEntityByName(string name)
+		public ScriptEntity FindEntityByName(string name)
 		{
 			ulong entity_id = InternalCalls.Entity_FindEntityByName(name);
 			if (entity_id == 0)
 				return null;
 
-			return new Entity(entity_id);
+			return new ScriptEntity(entity_id);
 		}
 
-		public T As<T>() where T : Entity, new()
+		public T As<T>() where T : ScriptEntity, new()
 		{
-			object instance = InternalCalls.GetScriptInstance(id);
+			object instance = InternalCalls.GetScriptInstance(Id);
 			return instance as T;
 		}
 
