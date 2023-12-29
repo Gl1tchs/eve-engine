@@ -58,6 +58,8 @@ build/bin/*
 !build/bin/assets
 !build/bin/docs
 !build/bin/mono
+!build/bin/mono/lib/mono/4.5/Facades/*.dll
+!build/bin/mono/lib/mono/4.5/*.dll
 !build/bin/imgui.ini
 
 !thirdparty/mono/bin/*.dll
