@@ -12,6 +12,10 @@ struct ProjectConfig {
 
 class Project {
  public:
+  [[nodiscard]] static std::string GetProjectName() {
+    ASSERT(active_project_)
+    return active_project_->config_.name;
+  }
   [[nodiscard]] static fs::path GetProjectDirectory() {
     ASSERT(active_project_)
     return active_project_->project_dir_;
@@ -20,10 +24,8 @@ class Project {
   // Relative to project directory
   [[nodiscard]] static fs::path GetAssetDirectory() {
     ASSERT(active_project_)
-    using std::filesystem::path;
-    return (path(active_project_->project_dir_) /
-            path(active_project_->config_.asset_directory))
-        .string();
+    return active_project_->project_dir_ /
+           active_project_->config_.asset_directory;
   }
 
   [[nodiscard]] ProjectConfig& GetConfig() { return config_; }

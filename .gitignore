@@ -45,17 +45,22 @@
 *.VC.db
 *.VC.opendb
 
+compile_commands.json
+
 # Builds
 [Bb]uild/*
-[Bb]in/
-[Ll]ib/
-[Bb]in-int/
-[Ii]ntermediate/
-
-# environment files
-.env
 
 # Imgui files
 imgui.ini
 
-compile_commands.json
+!build/bin/
+build/bin/*
+!build/bin/assets
+!build/bin/docs
+!build/bin/mono
+!build/bin/imgui.ini
+
+!thirdparty/mono/bin/*.dll
+!thirdparty/mono/bin/*.pdb
+!thirdparty/mono/lib/*.lib
+!thirdparty/mono/lib/*.pdb

@@ -4,7 +4,7 @@
 
 #include "project/project.h"
 
-std::filesystem::path AssetLibrary::GetAssetPath(std::string relative_path) {
+fs::path AssetLibrary::GetAssetPath(std::string relative_path) {
   std::string proj_substr = "prj://";
   std::string res_substr = "res://";
 

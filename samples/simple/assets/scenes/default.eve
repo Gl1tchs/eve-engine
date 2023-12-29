@@ -1,40 +1,5 @@
 scene: default
 entities:
-  - id: 54253711328505163
-    tag_component:
-      tag: Directional Light
-    transform:
-      position: [0, 0, 0]
-      rotation: [-48.4210472, -41.1133423, -39.9934387]
-      scale: [1, 1, 1]
-  - id: 1225455807429653547
-    tag_component:
-      tag: Main Camera
-    transform:
-      position: [-5.63062, 2.87215948, 11.0922642]
-      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
-      scale: [1, 1, 1]
-    script_component:
-      path: res://scripts/camera.lua
-  - id: 323468953567323581
-    tag_component:
-      tag: Monkey
-    transform:
-      position: [-2.53543591, 1.3428098, -1.81286752]
-      rotation: [2.00225735, -1.15031505, 2.17101574]
-      scale: [0.889997482, 0.712001324, 0.838704526]
-    model_component:
-      path: res://models/monkey.obj
-    material_component:
-      albedo: [0.00772202015, 1, 0.55175066]
-      metallic: 0.5
-      roughness: 1
-      ao: 1
-    script_component:
-      path: res://scripts/monkey.lua
-      fields:
-        - name: speed_
-          value: 50
   - id: 8234689535676734320
     tag_component:
       tag: Red Monkey
@@ -49,3 +14,45 @@ entities:
       metallic: 1
       roughness: 0
       ao: 1
+  - id: 323468953567323581
+    tag_component:
+      tag: Monkey
+    transform:
+      position: [-2.53543591, 1.3428098, -1.81286752]
+      rotation: [2.00225735, -1.15031505, 2.17101574]
+      scale: [0.889997482, 0.712001324, 0.838704526]
+    model_component:
+      path: res://models/monkey.obj
+    material_component:
+      albedo: [0.00772202015, 1, 0.55175066]
+      metallic: 0.5
+      roughness: 1
+      ao: 1
+  - id: 1225455807429653547
+    tag_component:
+      tag: Main Camera
+    transform:
+      position: [-5.63062, 2.87215948, 11.0922642]
+      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
+      scale: [1, 1, 1]
+    camera_component:
+      orthographic_camera:
+        aspect_ratio: 1.63625157
+        zoom_level: 1
+        near_clip: -1
+        far_clip: 1
+      perspective_camera:
+        aspect_ratio: 1.63625157
+        fov: 45
+        near_clip: 0.100000001
+        far_clip: 300
+      is_orthographic: false
+      is_primary: true
+      is_fixed_aspect_ratio: false
+  - id: 54253711328505163
+    tag_component:
+      tag: Directional Light
+    transform:
+      position: [0, 0, 0]
+      rotation: [-48.4210472, -41.1133423, -39.9934387]
+      scale: [1, 1, 1]

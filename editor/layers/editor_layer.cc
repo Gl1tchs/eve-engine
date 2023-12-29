@@ -17,6 +17,7 @@
 #include "scene/scene.h"
 #include "scene/scene_manager.h"
 #include "scene/scene_serializer.h"
+#include "scripting/script_engine.h"
 
 #include "utils/modify_info.h"
 #include "widgets/dock_space.h"
@@ -203,6 +204,10 @@ void EditorLayer::HandleShortcuts() {
         SaveScene();
       }
 
+      if (Input::IsKeyPressed(KeyCode::kR)) {
+        ScriptEngine::ReloadAssembly();
+      }
+
       if (Input::IsKeyPressed(KeyCode::kLeftShift)) {
         if (Input::IsKeyPressed(KeyCode::kS)) {
           SaveSceneAs();
@@ -264,6 +269,8 @@ void EditorLayer::OpenProject() {
   }
 
   if (Ref<Project> project = Project::Load(fs::path(path)); project) {
+    ScriptEngine::Init();
+
     // Open the first scene index
     OpenScene(0);
   }
@@ -336,6 +343,7 @@ void EditorLayer::OpenScene(const fs::path& path) {
     editor_scene_path_ = path;
 
     editor_camera_.ResetTransform();
+    hierarchy_panel_->selected_entity_ = Entity{};
   }
 }
 
@@ -511,13 +519,16 @@ void EditorLayer::SetupMenubar() {
     {
       MenuItem reload_scene("Reload Scene",
                             [this]() { OpenScene(editor_scene_path_); });
-
       base_group.PushMenuItem(reload_scene);
+
+      MenuItem reload_scripts(
+          "Reload Scripts", [this]() { ScriptEngine::ReloadAssembly(); },
+          "Ctrl+R");
+      base_group.PushMenuItem(reload_scripts);
 
       MenuItem advanced_inspector("Advanced Inspector", [this]() {
         inspector_panel_->ToggleAdvanced();
       });
-
       base_group.PushMenuItem(advanced_inspector);
 
       edit_menu.PushItemGroup(base_group);

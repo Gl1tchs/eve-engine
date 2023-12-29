@@ -3,7 +3,6 @@
 #include "core/event/event_handler.h"
 #include "core/event/window_event.h"
 #include "core/utils/timer.h"
-#include "instance.h"
 #include "scripting/script_engine.h"
 
 Instance* Instance::instance_ = nullptr;
@@ -33,12 +32,10 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 }
 
 Instance::~Instance() {
-  ScriptEngine::Deinit();
+  ScriptEngine::Shutdown();
 }
 
 void Instance::StartEventLoop() {
-  ScriptEngine::Init();
-
   Timer timer;
   while (state_->running) {
     float ds = timer.Tick();

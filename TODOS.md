@@ -9,7 +9,9 @@
 - [ ] Add content browser and use id based asset system.
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
     but should display the name of it based on the asset metadata.
-- [ ] Save editor state with cache and temp files
+- [ ] Save editor state with cache and temp files.
+- [ ] File/Open Scene not working.
+- [ ] While scripts are building show a loading thing for it.
 
 ## Asset
 - [ ] Asset compression for shipping.
@@ -19,9 +21,7 @@
 - [ ] Hot reload scene.
 
 ## Scripting
-- [ ] Hot reload script
-- [x] Scene management API
-- [ ] Start the script if added during runtime.
+- [ ] Improve engine api for scripting.
 
 ## Renderer
 - [ ] PBR.
@@ -36,10 +36,12 @@
 - [x] Add engine api to scripting
 - [x] Script editor interface
 - [x] Script serialize fields
-- [x] Script hot reload
 - [x] If script doesnt exist dont let user to start.
 - [x] Register entity type.
 - [x] Add an external scene renderer class.
+- [x] Scene management API
+- [x] Start the script if added during runtime.
+- [x] Hot reload script
 
 ## Fixed
 - [x] Editor closes very slowly

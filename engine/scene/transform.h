@@ -4,19 +4,19 @@
 
 #include "pch_shared.h"
 
-constexpr glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
-constexpr glm::vec3 kVec3Down = -kVec3Up;
+const glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
+const glm::vec3 kVec3Down = -kVec3Up;
 
-constexpr glm::vec3 kVec3Right(1.0f, 0.0f, 0.0f);
-constexpr glm::vec3 kVec3Left = -kVec3Right;
+const glm::vec3 kVec3Right(1.0f, 0.0f, 0.0f);
+const glm::vec3 kVec3Left = -kVec3Right;
 
-constexpr glm::vec3 kVec3Forward(0.0f, 0.0f, -1.0f);
-constexpr glm::vec3 kVec3Back = -kVec3Forward;
+const glm::vec3 kVec3Forward(0.0f, 0.0f, -1.0f);
+const glm::vec3 kVec3Back = -kVec3Forward;
 
-constexpr glm::vec3 kVec3Zero(0.0f, 0.0f, 0.0f);
-constexpr glm::vec3 kVec3One(1.0f, 1.0f, 1.0f);
+const glm::vec3 kVec3Zero(0.0f, 0.0f, 0.0f);
+const glm::vec3 kVec3One(1.0f, 1.0f, 1.0f);
 
-constexpr glm::vec3 kWorldUp = kVec3Up;
+const glm::vec3 kWorldUp = kVec3Up;
 
 struct Transform final {
   glm::vec3 position;

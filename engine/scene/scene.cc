@@ -6,6 +6,7 @@
 #include "scene/entity.h"
 #include "scene/transform.h"
 #include "scripting/script.h"
+#include "scripting/script_engine.h"
 
 Scene::Scene(Ref<State> state, std::string name) : state_(state), name_(name) {}
 
@@ -76,21 +77,12 @@ Ref<Scene> Scene::Copy(Ref<Scene> src) {
 bool Scene::OnRuntimeStart() {
   is_running_ = true;
 
-  for (auto& entity_id : GetAllEntitiesWith<ScriptComponent>()) {
-    Entity entity{entity_id, this};
+  ScriptEngine::OnRuntimeStart(this);
 
-    auto& script_comp = entity.GetComponent<ScriptComponent>();
-    Ref<Script>& script = script_comp.instance;
-    if (script) {
-      script->entity_ = entity;
-
-      if (!script->LoadScript()) {
-        is_running_ = false;
-        return false;
-      }
-
-      script->OnStart();
-    }
+  auto view = registry_.view<ScriptComponent>();
+  for (auto e : view) {
+    Entity entity = {e, this};
+    ScriptEngine::OnCreateEntity(entity);
   }
 
   return true;
@@ -99,13 +91,7 @@ bool Scene::OnRuntimeStart() {
 void Scene::OnRuntimeStop() {
   is_running_ = false;
 
-  GetAllEntitiesWith<ScriptComponent>().each(
-      [](entt::entity entity_id, ScriptComponent& sc) {
-        Ref<Script>& script = sc.instance;
-        if (script) {
-          script->OnDestroy();
-        }
-      });
+  ScriptEngine::OnRuntimeStop();
 }
 
 void Scene::OnUpdateRuntime(float ds) {
@@ -113,13 +99,11 @@ void Scene::OnUpdateRuntime(float ds) {
     return;
   }
 
-  GetAllEntitiesWith<ScriptComponent>().each(
-      [&ds](entt::entity entity_id, ScriptComponent& sc) {
-        Ref<Script>& script = sc.instance;
-        if (script) {
-          script->OnUpdate(ds);
-        }
-      });
+  auto view = registry_.view<ScriptComponent>();
+  for (auto e : view) {
+    Entity entity = {e, this};
+    ScriptEngine::OnUpdateEntity(entity, ds);
+  }
 }
 
 void Scene::Step(int frames) {
@@ -182,7 +166,7 @@ std::optional<Entity> Scene::FindEntityByUUID(GUUID uuid) {
   return std::optional<Entity>();
 }
 
-std::optional<Entity> Scene::FindEntityByName(std::string_view name) {
+std::optional<Entity> Scene::FindEntityByName(std::string name) {
   auto view = registry_.view<TagComponent>();
   for (auto entity : view) {
     const TagComponent& tc = view.get<TagComponent>(entity);

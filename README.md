@@ -6,13 +6,13 @@
 ![Scripting](.github/scripting.gif)
 
 ## Table Of Contents:
-  - [BUILDING](docs/BUILDING.md)
-  - [CODE_STYLE](docs/CODE_STYLE.md)
+  - [BUILDING](./BUILDING.md)
+  - [CODE_STYLE](./CODE_STYLE.md)
 
 ## Features:
 - Editor application
 - Asset and serialization system
-- Lua scripting
+- C# Mono scripting
 - ECS scene system
 - Dynamic batch renderer
 - Event and input system

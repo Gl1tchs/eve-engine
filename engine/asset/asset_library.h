@@ -18,7 +18,7 @@ class AssetLibrary {
   // Get the path with some predefined substrings
   // Use "res://" to get asset directory
   // Use "proj://" to get project directory
-  [[nodiscard]] static std::filesystem::path GetAssetPath(
+  [[nodiscard]] static fs::path GetAssetPath(
       std::string relative_path);
 };
 

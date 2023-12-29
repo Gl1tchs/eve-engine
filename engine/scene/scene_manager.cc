@@ -10,8 +10,6 @@ SceneManager::ActiveSceneInfo SceneManager::scene_info_{};
 
 void SceneManager::Init(Ref<Project> project) {
   project_ = project;
-
-  SetActive(0);
 }
 
 void SceneManager::SetActive(const uint32_t index) {
@@ -26,15 +24,14 @@ void SceneManager::SetActive(const uint32_t index) {
   ASSERT(serializer.Deserialize(GetActivePath()));
 
   // If scene is running enque the change to the next frame
-  auto& current_scene = scene_info_.scene;
-  if (current_scene && current_scene->IsRunning()) {
+  if (scene_info_.scene && scene_info_.scene->IsRunning()) {
     // Perform the scene change on the next frame
     Instance::Get().EnqueueMain([new_scene]() {
-      current_scene->OnRuntimeStop();
+      scene_info_.scene->OnRuntimeStop();
       new_scene->OnRuntimeStart();
-      current_scene = new_scene;
+      scene_info_.scene = new_scene;
     });
   } else {
-    current_scene = new_scene;
+    scene_info_.scene = new_scene;
   }
 }

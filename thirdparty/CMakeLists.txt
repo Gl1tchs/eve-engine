@@ -5,17 +5,9 @@ add_subdirectory(glfw)
 add_subdirectory(glm)
 add_subdirectory(imgui)
 add_subdirectory(ImGuizmo)
+add_subdirectory(Mono)
 
-option(YAML_CPP_BUILD_CONTRIB OFF)
 option(YAML_CPP_BUILD_TOOLS OFF)
-option(YAML_BUILD_SHARED_LIBS OFF)
-option(YAML_CPP_INSTALL OFF)
 add_subdirectory(yaml-cpp)
 
 add_subdirectory(tinyfiledialogs)
-
-add_subdirectory(lua)
-
-set(SOL2_LUA_VERSION "5.4.6" CACHE STRING "The version of Lua used")
-set(SOL2_BUILD_LUA FALSE CACHE BOOL "Always build Lua, do not search for it in the system")
-add_subdirectory(sol2)
