@@ -2,7 +2,7 @@
 
 #include "panels/debug_info_panel.h"
 
-#if defined(EVE_PLATFORM_WIN32)
+#if _WIN32
 #include <Windows.h>
 #endif
 
@@ -14,12 +14,12 @@ DebugInfoPanel::DebugInfoPanel(Ref<Renderer>& renderer)
     : Panel(false), renderer_(renderer) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
 
-#if defined(EVE_PLATFORM_WIN32)
+#if _WIN32
   MEMORYSTATUSEX status;
   status.dwLength = sizeof(status);
   GlobalMemoryStatusEx(&status);
   system_memory_ = status.ullTotalPhys;
-#elif defined(EVE_PLATFORM_LINUX)
+#elif __linux__ 
   // TODO testing required
   long pages = sysconf(_SC_PHYS_PAGES);
   long page_size = sysconf(_SC_PAGE_SIZE);

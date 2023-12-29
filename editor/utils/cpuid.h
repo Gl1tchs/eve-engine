@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-#ifdef EVE_PLATFORM_WIN32
+#ifdef _WIN32
 #include <intrin.h>
 #endif
 
@@ -12,7 +12,7 @@ class CPUInfo {
 
    public:
     explicit CPUID(uint32_t funcId, uint32_t subFuncId) {
-#ifdef EVE_PLATFORM_WIN32
+#ifdef _WIN32
       ::__cpuidex((int32_t*)regs_, (int32_t)funcId, (int32_t)subFuncId);
 #else
       asm volatile("cpuid"

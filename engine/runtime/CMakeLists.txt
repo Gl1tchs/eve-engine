@@ -3,12 +3,12 @@ set(SOURCES
   prelude.h
 )
 
-if(${EVE_PLATFORM} STREQUAL WIN32)
+if(WIN32)
   list(APPEND SOURCES
     launch/win32_main.cc
     launch/win32_main.h
   )
-elseif(${EVE_PLATFORM} STREQUAL LINUX)
+elseif(UNIX)
   list(APPEND SOURCES
     launch/linux_main.cc
     launch/linux_main.h

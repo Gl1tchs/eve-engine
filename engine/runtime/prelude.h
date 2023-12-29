@@ -2,9 +2,9 @@
 
 #pragma once
 
-#if defined(EVE_PLATFORM_WIN32)
+#if _WIN32
 #include "runtime/launch/win32_main.h"
-#elif defined(EVE_PLATFORM_LINUX)
+#elif __linux__
 #include "runtime/launch/linux_main.h"
 #endif
 

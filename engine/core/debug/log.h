@@ -44,9 +44,9 @@ class Logger {
     Logger::Log(level, __VA_ARGS__);  \
   }
 
-#if defined(EVE_PLATFORM_WIN32)
+#if _WIN32
 #define DEBUGBREAK() __debugbreak()
-#elif defined(EVE_PLATFORM_LINUX)
+#elif __linux__
 #include <signal.h>
 #define DEBUGBREAK() raise(SIGTRAP)
 #else

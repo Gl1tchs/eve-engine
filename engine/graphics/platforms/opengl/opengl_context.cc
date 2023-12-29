@@ -17,7 +17,7 @@ void OpenGLContext::Init() {
   int32_t status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
   ASSERT(status, "Failed to initialize Glad!");
 
-#ifdef EVE_DEBUG
+#ifdef _DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 #endif

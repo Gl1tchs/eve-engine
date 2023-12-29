@@ -27,22 +27,3 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/build/lib
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(EVE_DEBUG)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_definitions(EVE_RELEASE)
-elseif(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-    add_compile_definitions(EVE_DIST)
-endif()
-
-# Set definitions
-if(WIN32)
-    set(EVE_PLATFORM "WIN32")    
-    add_compile_definitions(EVE_PLATFORM_WIN32)
-elseif(UNIX AND NOT APPLE)
-    set(EVE_PLATFORM "LINUX")    
-    add_compile_definitions(EVE_PLATFORM_LINUX)
-else()
-    message(LOG_FATAL "Unsupported platform!")
-endif()

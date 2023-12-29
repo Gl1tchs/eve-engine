@@ -125,7 +125,7 @@ struct ScriptEngineData {
   std::vector<Scope<filewatch::FileWatch<std::string>>> script_file_watchers;
   bool assembly_reload_pending = false;
 
-#ifdef EVE_DEBUG
+#ifdef _DEBUG
   bool enable_debugging = true;
 #else
   bool enable_debugging = false;
