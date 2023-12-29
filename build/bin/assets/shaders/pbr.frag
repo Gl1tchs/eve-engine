@@ -2,8 +2,8 @@
 
 #version 450
 
-#include "material.glsl"
 #include "camera_data.glsl"
+#include "material.glsl"
 
 layout(location = 0) out vec4 o_color;
 
@@ -58,8 +58,10 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 void main() {
-  vec3 lightDirection = normalize(vec3(1.0, -1.0, 1.0)); // Direction of the global directional light
-  vec3 lightColor = vec3(1.0, 1.0, 1.0); // Color of the global directional light
+  vec3 lightDirection = normalize(
+      vec3(1.0, -1.0, 1.0));  // Direction of the global directional light
+  vec3 lightColor =
+      vec3(1.0, 1.0, 1.0);  // Color of the global directional light
 
   vec3 N = normalize(v_input.normal);
   vec3 V = normalize(u_camera.position - v_input.frag_pos);
@@ -69,7 +71,7 @@ void main() {
 
   vec3 Lo = vec3(0.0);
 
-  for(int i = 0; i < 4; ++i) {
+  for (int i = 0; i < 4; ++i) {
     // calculate per-light radiance
     vec3 L = normalize(lightDirection);
     vec3 H = normalize(V + L);
@@ -83,7 +85,8 @@ void main() {
     vec3 F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
 
     vec3 numerator = NDF * G * F;
-    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+    float denominator =
+        4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
     vec3 specular = numerator / denominator;
 
     vec3 kS = F;

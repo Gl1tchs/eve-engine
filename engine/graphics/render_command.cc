@@ -22,6 +22,11 @@ void RenderCommand::Clear(uint16_t bits) {
   renderer_api_->Clear(bits);
 }
 
+void RenderCommand::DrawArrays(const Ref<VertexArray>& vertex_array,
+                               uint32_t vertex_count) {
+  renderer_api_->DrawArrays(vertex_array, vertex_count);
+}
+
 void RenderCommand::DrawIndexed(const Ref<VertexArray>& vertex_array,
                                 uint32_t index_count) {
   renderer_api_->DrawIndexed(vertex_array, index_count);

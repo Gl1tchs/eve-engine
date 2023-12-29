@@ -12,6 +12,8 @@ class RenderCommand final {
   static void SetClearColor(const glm::vec4& color);
   static void Clear(uint16_t bits = BufferBits_kColor);
 
+  static void DrawArrays(const Ref<VertexArray>& vertex_array,
+                          uint32_t vertex_count);
   static void DrawIndexed(const Ref<VertexArray>& vertex_array,
                           uint32_t index_count);
 

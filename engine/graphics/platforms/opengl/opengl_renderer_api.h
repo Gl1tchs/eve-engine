@@ -12,6 +12,8 @@ class OpenGLRendererAPI final : public RendererAPI {
   void SetClearColor(const glm::vec4& color) override;
   void Clear(uint16_t bits = BufferBits_kColor) override;
 
+  void DrawArrays(const Ref<VertexArray>& vertex_array,
+                  uint32_t vertex_count) override;
   void DrawIndexed(const Ref<VertexArray>& vertex_array,
                    uint32_t index_Count = 0) override;
 

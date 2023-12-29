@@ -10,4 +10,4 @@ struct Material {
   float ao;
 };
 
-#endif // MATERIAL_GLSL_
+#endif  // MATERIAL_GLSL_

@@ -40,6 +40,12 @@ void OpenGLRendererAPI::Clear(uint16_t bits) {
   glClear(flags);
 }
 
+void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertex_array,
+                                   uint32_t vertex_count) {
+  vertex_array->Bind();
+  glDrawArrays(GL_TRIANGLES, 0, vertex_count);
+}
+
 void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertex_array,
                                     uint32_t index_count) {
   vertex_array->Bind();

@@ -11,7 +11,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t size) {
   glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 }
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, uint32_t count)
     : count_(count) {
   glCreateBuffers(1, &ibo_);
 

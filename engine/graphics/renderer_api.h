@@ -26,13 +26,17 @@ class RendererAPI {
   virtual void SetClearColor(const glm::vec4& color) = 0;
   virtual void Clear(uint16_t bits = BufferBits_kColor) = 0;
 
+  virtual void DrawArrays(const Ref<VertexArray>& vertex_array,
+                           uint32_t vertex_count) = 0;
   virtual void DrawIndexed(const Ref<VertexArray>& vertex_array,
                            uint32_t index_count = 0) = 0;
+
   virtual void DrawLines(const Ref<VertexArray>& vertex_array,
                          uint32_t vertex_count) = 0;
 
   virtual void DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
-                           uint32_t vertex_count, uint32_t instance_count) = 0;
+                                   uint32_t vertex_count,
+                                   uint32_t instance_count) = 0;
 
   virtual void SetLineWidth(float width) = 0;
 

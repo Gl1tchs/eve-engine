@@ -56,8 +56,6 @@ class Renderer final {
   void SetLineWidth(float width) { line_data_->line_width = width; }
 
  private:
-  bool NeedsNewBatch(uint32_t current_count, uint32_t index_count);
-
   void BeginBatch();
 
   void Flush();
