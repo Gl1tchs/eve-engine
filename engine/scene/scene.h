@@ -31,15 +31,14 @@ class Scene {
 
   void Step(int frames = 1);
 
-  Entity CreateEntity(const std::string& name = std::string());
-  Entity CreateEntityWithUUID(GUUID uuid,
-                              const std::string& name = std::string());
+  Entity CreateEntity(const std::string& name = "");
+  Entity CreateEntityWithUUID(GUUID uuid, const std::string& name = "");
 
   [[nodiscard]] bool Exists(Entity entity);
 
   void DestroyEntity(Entity entity);
 
-  [[nodiscard]] std::optional<Entity> FindEntityByName(std::string_view name);
+  [[nodiscard]] std::optional<Entity> FindEntityByName(std::string name);
   [[nodiscard]] std::optional<Entity> FindEntityByUUID(GUUID uuid);
 
   [[nodiscard]] std::optional<Entity> GetPrimaryCameraEntity();

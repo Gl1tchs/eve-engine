@@ -31,4 +31,6 @@ class HierarchyPanel : public Panel {
 
  private:
   Entity selected_entity_;
+
+  friend class EditorLayer;
 };

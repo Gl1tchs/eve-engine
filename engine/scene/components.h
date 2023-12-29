@@ -30,8 +30,7 @@ struct CameraComponent {
 class Script;
 
 struct ScriptComponent {
-  std::string path;
-  Ref<Script> instance;
+  std::string class_name;
 };
 
 template <typename... Component>

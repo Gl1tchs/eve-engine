@@ -8,8 +8,21 @@
 #include "core/utils/guuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
+#include "scripting/script.h"
 #include "scripting/script_engine.h"
 #include "yaml-cpp/emittermanip.h"
+
+#define WRITE_SCRIPT_FIELD(FieldType, Type) \
+  case ScriptFieldType::FieldType:          \
+    out << script_field.GetValue<Type>();   \
+    break
+
+#define READ_SCRIPT_FIELD(FieldType, Type)       \
+  case ScriptFieldType::FieldType: {             \
+    Type data = script_field["data"].as<Type>(); \
+    field_instance.SetValue(data);               \
+    break;                                       \
+  }
 
 namespace YAML {
 
@@ -215,39 +228,49 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
     out << YAML::Key << "script_component";
     out << YAML::BeginMap;
 
-    out << YAML::Key << "path" << YAML::Value << sc.path;
+    out << YAML::Key << "class_name" << YAML::Value << sc.class_name;
 
-    if (Ref<Script> script = sc.instance;
-        script && !script->GetSerializeMap().empty()) {
-      const auto& serialize_data = script->GetSerializeMap();
-
-      out << YAML::Key << "fields" << YAML::Value << YAML::BeginSeq;
-
-      for (const auto& [name, data] : serialize_data) {
-        if (!data.is_overrided) {
+    Ref<ScriptClass> entity_class = ScriptEngine::GetEntityClass(sc.class_name);
+    const auto& fields = entity_class->GetFields();
+    if (fields.size() > 0) {
+      out << YAML::Key << "script_fields" << YAML::Value;
+      auto& entity_fields = ScriptEngine::GetScriptFieldMap(entity);
+      out << YAML::BeginSeq;
+      for (const auto& [name, field] : fields) {
+        if (entity_fields.find(name) == entity_fields.end()) {
           continue;
         }
 
-        out << YAML::BeginMap;
-
-        std::string result;
-        std::visit(
-            [&](const auto& arg) {
-              using T = std::decay_t<decltype(arg)>;
-              if constexpr (!std::is_same_v<T, std::string>) {
-                result = std::to_string(arg);
-              } else {
-                result = arg;
-              }
-            },
-            data.value);
-
+        out << YAML::BeginMap;  // ScriptField
         out << YAML::Key << "name" << YAML::Value << name;
-        out << YAML::Key << "value" << YAML::Value << result;
+        out << YAML::Key << "type" << YAML::Value
+            << ScriptFieldTypeToString(field.type);
 
-        out << YAML::EndMap;
+        out << YAML::Key << "data" << YAML::Value;
+        ScriptFieldInstance& script_field = entity_fields.at(name);
+
+        switch (field.type) {
+          WRITE_SCRIPT_FIELD(kFloat, float);
+          WRITE_SCRIPT_FIELD(kDouble, double);
+          WRITE_SCRIPT_FIELD(kBool, bool);
+          WRITE_SCRIPT_FIELD(kChar, char);
+          WRITE_SCRIPT_FIELD(kByte, int8_t);
+          WRITE_SCRIPT_FIELD(kShort, int16_t);
+          WRITE_SCRIPT_FIELD(kInt, int32_t);
+          WRITE_SCRIPT_FIELD(kLong, int64_t);
+          WRITE_SCRIPT_FIELD(kUByte, uint8_t);
+          WRITE_SCRIPT_FIELD(kUShort, uint16_t);
+          WRITE_SCRIPT_FIELD(kUInt, uint32_t);
+          WRITE_SCRIPT_FIELD(kULong, uint64_t);
+          WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
+          WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
+          WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
+          WRITE_SCRIPT_FIELD(kEntity, GUUID);
+          default:
+            break;
+        }
+        out << YAML::EndMap;  // ScriptFields
       }
-
       out << YAML::EndSeq;
     }
 
@@ -373,28 +396,53 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
     if (script_component_yaml) {
       auto& sc = deserialing_entity.AddComponent<ScriptComponent>();
 
-      sc.path = script_component_yaml["path"].as<std::string>();
-      sc.instance = ScriptEngine::CreateScript(sc.path);
+      sc.class_name = script_component_yaml["class_name"].as<std::string>();
 
-      if (Ref<Script>& script = sc.instance; script) {
-        auto fields_yaml = script_component_yaml["fields"];
-        for (auto field_yaml : fields_yaml) {
-          std::string name = field_yaml["name"].as<std::string>();
-          std::string value_str = field_yaml["value"].as<std::string>();
+      auto script_fields = script_component_yaml["script_fields"];
+      if (script_fields) {
+        Ref<ScriptClass> entity_class =
+            ScriptEngine::GetEntityClass(sc.class_name);
+        if (entity_class) {
+          const auto& fields = entity_class->GetFields();
+          auto& entity_fields =
+              ScriptEngine::GetScriptFieldMap(deserialing_entity);
 
-          ScriptDataType value{};
-          if (IsFloat(value_str)) {
-            float value_float = std::stof(value_str);
-            if (IsInteger(value_float)) {
-              value = (int)value_float;
-            } else {
-              value = value_float;
+          for (auto script_field : script_fields) {
+            std::string name = script_field["name"].as<std::string>();
+            std::string type_string = script_field["type"].as<std::string>();
+            ScriptFieldType type = ScriptFieldTypeFromString(type_string);
+
+            ScriptFieldInstance& field_instance = entity_fields[name];
+
+            ASSERT(fields.find(name) != fields.end());
+
+            if (fields.find(name) == fields.end()) {
+              continue;
             }
-          } else {
-            value = value_str;
-          }
 
-          script->SetSerializeDataField(name, value);
+            field_instance.field = fields.at(name);
+
+            switch (type) {
+              READ_SCRIPT_FIELD(kFloat, float);
+              READ_SCRIPT_FIELD(kDouble, double);
+              READ_SCRIPT_FIELD(kBool, bool);
+              READ_SCRIPT_FIELD(kChar, char);
+              READ_SCRIPT_FIELD(kByte, int8_t);
+              READ_SCRIPT_FIELD(kShort, int16_t);
+              READ_SCRIPT_FIELD(kInt, int32_t);
+              READ_SCRIPT_FIELD(kLong, int64_t);
+              READ_SCRIPT_FIELD(kUByte, uint8_t);
+              READ_SCRIPT_FIELD(kUShort, uint16_t);
+              READ_SCRIPT_FIELD(kUInt, uint32_t);
+              READ_SCRIPT_FIELD(kULong, uint64_t);
+              READ_SCRIPT_FIELD(kVector2, glm::vec2);
+              READ_SCRIPT_FIELD(kVector3, glm::vec3);
+              READ_SCRIPT_FIELD(kVector4, glm::vec4);
+              READ_SCRIPT_FIELD(kEntity, GUUID);
+              default:
+                break;
+            }
+          }
         }
       }
     }

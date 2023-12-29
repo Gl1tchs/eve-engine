@@ -9,6 +9,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 #include "scene/components.h"
+#include "scene/scene_manager.h"
 #include "scene/static_mesh.h"
 #include "scripting/script_engine.h"
 
@@ -18,8 +19,7 @@
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
     : Panel(true),
       hierarchy_panel_(hierarchy_panel),
-      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh),
-      script_importer_(BIND_FUNC(OnScriptPathWrite), AssetType::kScript) {}
+      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh) {}
 
 void InspectorPanel::Draw() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
@@ -28,7 +28,6 @@ void InspectorPanel::Draw() {
   }
 
   model_importer_.Render();
-  script_importer_.Render();
 
   RenderComponentProperties(selected_entity);
 
@@ -72,7 +71,7 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
     }
 
     if (ImGui::Button("Script")) {
-      script_importer_.SetActive(true);
+      selected_entity.AddComponent<ScriptComponent>();
     }
 
     ImGui::EndPopup();
@@ -83,360 +82,339 @@ void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
   }
 }
 
-#define COMPONENT_HEADER(name)                                \
-  ImGui::Separator();                                         \
-  bool should_remove = false;                                 \
-  ImGui::Text(name);                                          \
-  ImGui::PushID(name "_remove_button");                       \
-  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30); \
-  if (ImGui::ButtonTransparent(ICON_FA_MINUS, 30, 0)) {       \
-    should_remove = true;                                     \
-  }                                                           \
-  ImGui::PopID();
+template <typename T, typename UIFunction>
+static void DrawComponent(const std::string& name, Entity entity,
+                          UIFunction ui_function) {
+  const ImGuiTreeNodeFlags tree_node_flags =
+      ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
+      ImGuiTreeNodeFlags_FramePadding;
+  if (entity.HasComponent<T>()) {
+    auto& component = entity.GetComponent<T>();
+    ImVec2 content_region_available = ImGui::GetContentRegionAvail();
 
-#define REMOVE_COMPONENT_IF_NEEDED(ComponentType)     \
-  if (should_remove) {                                \
-    selected_entity.RemoveComponent<ComponentType>(); \
-    modify_info.SetModified();                        \
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+
+    float line_height = ImGui::GetIO().FontDefault->FontSize +
+                        ImGui::GetStyle().FramePadding.y * 2.0f;
+    ImGui::Separator();
+    bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), tree_node_flags,
+                                  "%s", name.c_str());
+    ImGui::PopStyleVar();
+    ImGui::SameLine(content_region_available.x - line_height * 0.5f);
+    if (ImGui::Button("+", ImVec2{line_height, line_height})) {
+      ImGui::OpenPopup("ComponentSettings");
+    }
+
+    bool remove_component = false;
+    if (ImGui::BeginPopup("ComponentSettings")) {
+      if (ImGui::MenuItem("Remove component"))
+        remove_component = true;
+
+      ImGui::EndPopup();
+    }
+
+    if (open) {
+      ui_function(component);
+      ImGui::TreePop();
+    }
+
+    if (remove_component)
+      entity.RemoveComponent<T>();
   }
+}
 
 void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   ImGui::PushID((uint32_t)selected_entity);
 
-  // TODO if advanced
   if (advanced_) {
-    ImGui::Separator();
-    ImGui::Text(ICON_FA_ID_BADGE " Id Component");
-    {
-      auto& id_comp = selected_entity.GetComponent<IdComponent>();
-
-      ImGui::Text("ID:");
-      ImGui::SameLine();
-      ImGui::Text("%" PRIu64, (uint64_t)id_comp.id);
-    }
+    DrawComponent<IdComponent>(ICON_FA_ID_BADGE " Id Component",
+                               selected_entity, [](IdComponent& id_comp) {
+                                 ImGui::Text("ID:");
+                                 ImGui::SameLine();
+                                 ImGui::Text("%" PRIu64, (uint64_t)id_comp.id);
+                               });
   }
 
-  ImGui::Separator();
-  ImGui::Text(ICON_FA_TAG " Tag Component");
-  {
-    auto& tag_comp = selected_entity.GetComponent<TagComponent>();
+  DrawComponent<TagComponent>(
+      ICON_FA_TAG " Tag Component", selected_entity, [](TagComponent& tag_comp) {
+        ImGui::Text("Tag:");
+        ImGui::SameLine();
+        // TODO only accept unique names
+        if (ImGui::InputText("##tag_input", &tag_comp.tag)) {
+          modify_info.SetModified();
+        }
+      });
 
-    ImGui::Text("Tag:");
-    ImGui::SameLine();
-    // TODO only accept unique names
-    if (ImGui::InputText("##tag_input", &tag_comp.tag)) {
-      modify_info.SetModified();
-    }
-  }
+  DrawComponent<Transform>(
+      ICON_FA_ARROWS_ALT " Transform", selected_entity,
+      [](Transform& transform) {
+        ImGui::Columns(2, "Transform Settings Columns");
 
-  ImGui::Separator();
-  ImGui::Text(ICON_FA_ARROWS_ALT " Transform");
-  {
-    auto& transform = selected_entity.GetTransform();
-
-    ImGui::Columns(2, "Transform Settings Columns");
-
-    ImGui::Text("Position:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat3("##transform_position",
-                          glm::value_ptr(transform.position), 0.05f)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Rotation:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat3("##transform_rotation",
-                          glm::value_ptr(transform.rotation), 0.05f)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Scale:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat3("##transform_scale", glm::value_ptr(transform.scale),
-                          0.05f)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::Columns();
-  }
-
-  if (selected_entity.HasComponent<CameraComponent>()) {
-    COMPONENT_HEADER(ICON_FA_CAMERA_RETRO " Camera Component")
-
-    auto& camera_comp = selected_entity.GetComponent<CameraComponent>();
-
-    ImGui::Columns(2, "Camera Settings Columns");
-
-    if (camera_comp.is_orthographic) {
-      auto& camera = camera_comp.ortho_camera;
-
-      ImGui::Text("Zoom Level:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##ortho_zoom_level", &camera.zoom_level)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::NextColumn();
-
-      ImGui::Text("Near Clip:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##ortho_near_clip", &camera.near_clip)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::NextColumn();
-
-      ImGui::Text("Far Clip:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##ortho_far_clip", &camera.far_clip)) {
-        modify_info.SetModified();
-      }
-    } else {
-      auto& camera = camera_comp.persp_camera;
-
-      ImGui::Text("FOV:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##persp_fov", &camera.fov)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::NextColumn();
-
-      ImGui::Text("Near Clip:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##persp_near_clip", &camera.near_clip)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::NextColumn();
-
-      ImGui::Text("Far Clip:");
-      ImGui::NextColumn();
-      if (ImGui::DragFloat("##persp_far_clip", &camera.far_clip)) {
-        modify_info.SetModified();
-      }
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Is Orthographic");
-    ImGui::NextColumn();
-    if (ImGui::Checkbox("##is_orthographic", &camera_comp.is_orthographic)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Primary:");
-    ImGui::NextColumn();
-    if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Fixed");
-    ImGui::NextColumn();
-    if (ImGui::Checkbox("##fixed_aspect_ratio",
-                        &camera_comp.is_fixed_aspect_ratio)) {
-      modify_info.SetModified();
-    }
-
-    if (camera_comp.is_fixed_aspect_ratio) {
-      ImGui::NextColumn();
-      ImGui::Text("Aspect Ratio:");
-      ImGui::NextColumn();
-      float aspect_ratio;
-      if (ImGui::DragFloat("##camera_aspect_ratio", &aspect_ratio, 0.05f)) {
-        camera_comp.ortho_camera.aspect_ratio = aspect_ratio;
-        camera_comp.persp_camera.aspect_ratio = aspect_ratio;
-        modify_info.SetModified();
-      }
-    }
-
-    ImGui::Columns();
-
-    REMOVE_COMPONENT_IF_NEEDED(CameraComponent)
-  }
-
-  if (selected_entity.HasComponent<ModelComponent>()) {
-    COMPONENT_HEADER(ICON_FA_CUBES " Model Component")
-
-    auto& model_comp = selected_entity.GetComponent<ModelComponent>();
-
-    ImGui::Columns(2, "Directional Light Columns");
-
-    ImGui::Text("Model Path:");
-    ImGui::NextColumn();
-
-    std::string path = model_comp.model->info.GetAssetPath();
-    if (ImGui::InputText("##model_path_input", &path,
-                         ImGuiInputTextFlags_EnterReturnsTrue)) {
-      auto asset = AssetLibrary::LoadFromPath<Model>(path);
-      if (asset) {
-        model_comp.model = asset;
-        modify_info.SetModified();
-      } else {
-        model_importer_.SetActive(true);
-      }
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Columns();
-
-    REMOVE_COMPONENT_IF_NEEDED(ModelComponent)
-  }
-
-  if (selected_entity.HasComponent<Material>()) {
-    COMPONENT_HEADER(ICON_FA_PICTURE_O " Material Component")
-
-    auto& material = selected_entity.GetComponent<Material>();
-
-    ImGui::Columns(2, "Material Columns");
-
-    ImGui::Text("Albedo:");
-    ImGui::NextColumn();
-    if (ImGui::ColorEdit3("##material_albedo",
-                          glm::value_ptr(material.albedo))) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Metallic:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat("##material_metallic", &material.metallic)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("Roughness:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat("##material_roughness", &material.roughness)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::NextColumn();
-
-    ImGui::Text("AO:");
-    ImGui::NextColumn();
-    if (ImGui::DragFloat("##material_ao", &material.ao, 0.05f)) {
-      modify_info.SetModified();
-    }
-
-    ImGui::Columns();
-
-    REMOVE_COMPONENT_IF_NEEDED(Material)
-  }
-
-  if (selected_entity.HasComponent<ScriptComponent>()) {
-    COMPONENT_HEADER(ICON_FA_FILE_CODE_O " Script Component")
-
-    auto& script_comp = selected_entity.GetComponent<ScriptComponent>();
-
-    ImGui::Columns(2, "Script Field Columns");
-
-    ImGui::Text("Script Path:");
-    ImGui::NextColumn();
-    if (ImGui::InputText("##script_path_input", &script_comp.path,
-                         ImGuiInputTextFlags_EnterReturnsTrue)) {
-      Ref<Script> script_instance =
-          ScriptEngine::CreateScript(script_comp.path);
-      // only update if instance exists
-      if (script_instance) {
-        script_comp.instance = script_instance;
-        modify_info.SetModified();
-      } else {
-        script_comp.instance = nullptr;
-        script_comp.path = "";
-      }
-    }
-
-    ImGui::NextColumn();
-
-    if (script_comp.instance) {
-      auto& serialize_map = script_comp.instance->GetSerializeMap();
-
-      for (auto& [name, data] : serialize_map) {
-
-        // remove trailing "_"
-        std::string var_name = name;
-        if (var_name.ends_with("_")) {
-          var_name.pop_back();
+        ImGui::Text("Position:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat3("##transform_position",
+                              glm::value_ptr(transform.position))) {
+          modify_info.SetModified();
         }
 
-        // put an "*" to show field overrided.
-        ImGui::Text("%s %s", data.is_overrided ? "*" : "", var_name.c_str());
         ImGui::NextColumn();
 
-        if (std::holds_alternative<int>(data.value)) {
-          int int_value = std::get<int>(data.value);
-          if (ImGui::InputInt(
-                  std::format(
-                      "##{}_field_{}",
-                      std::filesystem::path(script_comp.path).stem().string(),
-                      name)
-                      .c_str(),
-                  &int_value)) {
+        ImGui::Text("Rotation:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat3("##transform_rotation",
+                              glm::value_ptr(transform.rotation))) {
+          modify_info.SetModified();
+        }
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Scale:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat3("##transform_scale",
+                              glm::value_ptr(transform.scale))) {
+          modify_info.SetModified();
+        }
+
+        ImGui::Columns();
+      });
+
+  DrawComponent<CameraComponent>(
+      ICON_FA_CAMERA_RETRO " Camera", selected_entity,
+      [](CameraComponent& camera_comp) {
+        ImGui::Columns(2, "Camera Settings Columns");
+
+        if (camera_comp.is_orthographic) {
+          auto& camera = camera_comp.ortho_camera;
+
+          ImGui::Text("Zoom Level:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##ortho_zoom_level", &camera.zoom_level)) {
             modify_info.SetModified();
-            // Update the value in the serialize_map
-            script_comp.instance->SetSerializeDataField(name, int_value);
           }
-        } else if (std::holds_alternative<float>(data.value)) {
-          float float_value = std::get<float>(data.value);
-          if (ImGui::InputFloat(
-                  std::format(
-                      "##{}_field_{}",
-                      std::filesystem::path(script_comp.path).stem().string(),
-                      name)
-                      .c_str(),
-                  &float_value)) {
+
+          ImGui::NextColumn();
+
+          ImGui::Text("Near Clip:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##ortho_near_clip", &camera.near_clip)) {
             modify_info.SetModified();
-            // Update the value in the serialize_map
-            script_comp.instance->SetSerializeDataField(name, float_value);
           }
-        } else if (std::holds_alternative<std::string>(data.value)) {
-          std::string string_value = std::get<std::string>(data.value);
-          if (ImGui::InputText(
-                  std::format(
-                      "##{}_field_{}",
-                      std::filesystem::path(script_comp.path).stem().string(),
-                      name)
-                      .c_str(),
-                  &string_value)) {
+
+          ImGui::NextColumn();
+
+          ImGui::Text("Far Clip:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##ortho_far_clip", &camera.far_clip)) {
             modify_info.SetModified();
-            // Update the value in the serialize_map
-            script_comp.instance->SetSerializeDataField(name, string_value);
           }
         } else {
-          // Handle additional types as needed
-          // You may want to log an error or provide a default case
-          LOG_ERROR("Unsupported variable type");
+          auto& camera = camera_comp.persp_camera;
+
+          ImGui::Text("FOV:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##persp_fov", &camera.fov)) {
+            modify_info.SetModified();
+          }
+
+          ImGui::NextColumn();
+
+          ImGui::Text("Near Clip:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##persp_near_clip", &camera.near_clip)) {
+            modify_info.SetModified();
+          }
+
+          ImGui::NextColumn();
+
+          ImGui::Text("Far Clip:");
+          ImGui::NextColumn();
+          if (ImGui::DragFloat("##persp_far_clip", &camera.far_clip)) {
+            modify_info.SetModified();
+          }
         }
 
         ImGui::NextColumn();
-      }
 
-      // skip two columns with this
-      ImGui::NextColumn();
+        ImGui::Text("Is Orthographic");
+        ImGui::NextColumn();
+        if (ImGui::Checkbox("##is_orthographic",
+                            &camera_comp.is_orthographic)) {
+          modify_info.SetModified();
+        }
 
-      if (ImGui::Button("Reload")) {
-        script_comp.instance->Reload();
-      }
+        ImGui::NextColumn();
 
-      ImGui::NextColumn();
-    }
+        ImGui::Text("Primary:");
+        ImGui::NextColumn();
+        if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
+          modify_info.SetModified();
+        }
 
-    ImGui::Columns();
+        ImGui::NextColumn();
 
-    REMOVE_COMPONENT_IF_NEEDED(ScriptComponent)
-  }
+        ImGui::Text("Fixed");
+        ImGui::NextColumn();
+        if (ImGui::Checkbox("##fixed_aspect_ratio",
+                            &camera_comp.is_fixed_aspect_ratio)) {
+          modify_info.SetModified();
+        }
+
+        if (camera_comp.is_fixed_aspect_ratio) {
+          ImGui::NextColumn();
+          ImGui::Text("Aspect Ratio:");
+          ImGui::NextColumn();
+          float aspect_ratio;
+          if (ImGui::DragFloat("##camera_aspect_ratio", &aspect_ratio, 0.05f)) {
+            camera_comp.ortho_camera.aspect_ratio = aspect_ratio;
+            camera_comp.persp_camera.aspect_ratio = aspect_ratio;
+            modify_info.SetModified();
+          }
+        }
+
+        ImGui::Columns();
+      });
+
+  DrawComponent<ModelComponent>(
+      ICON_FA_CUBES " Model Component", selected_entity,
+      [this](ModelComponent& model_comp) {
+        ImGui::Columns(2, "Model Component Columns");
+
+        ImGui::Text("Model Path:");
+        ImGui::NextColumn();
+
+        std::string path = model_comp.model->info.GetAssetPath();
+        if (ImGui::InputText("##model_path_input", &path,
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+          auto asset = AssetLibrary::LoadFromPath<Model>(path);
+          if (asset) {
+            model_comp.model = asset;
+            modify_info.SetModified();
+          } else {
+            model_importer_.SetActive(true);
+          }
+        }
+
+        ImGui::NextColumn();
+
+        ImGui::Columns();
+      });
+
+  DrawComponent<Material>(
+      ICON_FA_PICTURE_O " Material Component", selected_entity,
+      [this](Material& material) {
+        ImGui::Columns(2, "Material Columns");
+
+        ImGui::Text("Albedo:");
+        ImGui::NextColumn();
+        if (ImGui::ColorEdit3("##material_albedo",
+                              glm::value_ptr(material.albedo))) {
+          modify_info.SetModified();
+        }
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Metallic:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##material_metallic", &material.metallic)) {
+          modify_info.SetModified();
+        }
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Roughness:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##material_roughness", &material.roughness)) {
+          modify_info.SetModified();
+        }
+
+        ImGui::NextColumn();
+
+        ImGui::Text("AO:");
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##material_ao", &material.ao, 0.05f)) {
+          modify_info.SetModified();
+        }
+
+        ImGui::Columns();
+      });
+
+  DrawComponent<ScriptComponent>(
+      "Script", selected_entity,
+      [selected_entity,
+       scene = SceneManager::GetActive()](auto& component) mutable {
+        bool script_class_exists =
+            ScriptEngine::EntityClassExists(component.class_name);
+
+        static char buffer[64];
+        strcpy_s(buffer, sizeof(buffer), component.class_name.c_str());
+
+        // TODO
+        // UI::ScopedStyleColor textColor(
+        //     ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !script_class_exists);
+
+        if (ImGui::InputText("Class", buffer, sizeof(buffer))) {
+          component.class_name = buffer;
+          return;
+        }
+
+        // Fields
+        bool is_scene_running = scene->IsRunning();
+        if (is_scene_running) {
+          Ref<ScriptInstance> script_instance =
+              ScriptEngine::GetEntityScriptInstance(selected_entity.GetUUID());
+          if (script_instance) {
+            const auto& fields = script_instance->GetScriptClass()->GetFields();
+            for (const auto& [name, field] : fields) {
+              if (field.type == ScriptFieldType::kFloat) {
+                float data = script_instance->GetFieldValue<float>(name);
+                if (ImGui::DragFloat(name.c_str(), &data)) {
+                  script_instance->SetFieldValue(name, data);
+                }
+              }
+              // TODO other types
+            }
+          }
+        } else {
+          if (script_class_exists) {
+            Ref<ScriptClass> entity_class =
+                ScriptEngine::GetEntityClass(component.class_name);
+            const auto& fields = entity_class->GetFields();
+
+            auto& entity_fields =
+                ScriptEngine::GetScriptFieldMap(selected_entity);
+            for (const auto& [name, field] : fields) {
+              // Field has been set in editor
+              if (entity_fields.find(name) != entity_fields.end()) {
+                ScriptFieldInstance& script_field = entity_fields.at(name);
+
+                // Display control to set it maybe
+                if (field.type == ScriptFieldType::kFloat) {
+                  float data = script_field.GetValue<float>();
+                  if (ImGui::DragFloat(name.c_str(), &data)) {
+                    script_field.SetValue(data);
+
+                    modify_info.SetModified();
+                  }
+                }
+
+              } else {
+                // Display control to set it maybe
+                if (field.type == ScriptFieldType::kFloat) {
+                  float data = 0.0f;
+                  if (ImGui::DragFloat(name.c_str(), &data)) {
+                    ScriptFieldInstance& field_instance = entity_fields[name];
+                    field_instance.field = field;
+                    field_instance.SetValue(data);
+
+                    modify_info.SetModified();
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
 
   ImGui::PopID();
 }
@@ -449,12 +427,4 @@ void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
 
   auto& modal_component = selected_entity.AddComponent<ModelComponent>();
   modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);
-}
-
-void InspectorPanel::OnScriptPathWrite(const std::string& script_path) {
-  Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
-
-  auto& script_component = selected_entity.AddComponent<ScriptComponent>();
-  script_component.path = script_path;
-  script_component.instance = ScriptEngine::CreateScript(script_path);
 }

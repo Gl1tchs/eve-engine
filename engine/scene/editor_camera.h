@@ -9,10 +9,7 @@ class EditorCamera : public PerspectiveCamera {
  public:
   EditorCamera();
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverloaded-virtual"
   [[nodiscard]] glm::mat4 GetViewMatrix();
-#pragma clang diagnostic pop
 
   [[nodiscard]] Transform& GetTransform() { return transform_; }
   [[nodiscard]] const Transform& GetTransform() const { return transform_; }

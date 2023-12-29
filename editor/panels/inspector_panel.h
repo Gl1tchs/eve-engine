@@ -28,13 +28,10 @@ class InspectorPanel : public Panel {
 
   void OnModelMetaWrite(const std::string& meta_path);
 
-  void OnScriptPathWrite(const std::string& script_path);
-
  private:
   Ref<HierarchyPanel> hierarchy_panel_;
 
   ImporterModal model_importer_;
-  ImporterModal script_importer_;
 
   bool advanced_ = false;
 

@@ -17,7 +17,10 @@ set(SOURCES
   utils/memory.inl
   utils/timer.cc
   utils/timer.h
+  buffer.h
   core_minimal.h
+  file_system.cc
+  file_system.h
   instance.cc
   instance.h
   layer_stack.cc

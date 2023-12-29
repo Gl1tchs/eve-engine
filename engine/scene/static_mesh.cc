@@ -40,7 +40,7 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
 
     mesh.indices = mesh_loaded.Indices;
 
-    Material material;
+    Material material{};
     // material.ambient = ToGLM3(mesh_loaded.MeshMaterial.);
     // material.diffuse = ToGLM3(mesh_loaded.MeshMaterial.Kd);
     // material.specular = ToGLM3(mesh_loaded.MeshMaterial.Ks);

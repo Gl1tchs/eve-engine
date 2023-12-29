@@ -2,132 +2,93 @@
 
 #include "scripting/script.h"
 
-#include <sol/error.hpp>
-#include <sol/forward.hpp>
-#include <sol/load_result.hpp>
-#include <sol/overload.hpp>
-#include <sol/sol.hpp>
-#include <sol/state_handling.hpp>
-#include <sol/types.hpp>
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/object.h>
+#include <mono/metadata/threads.h>
 
-#include "core/debug/log.h"
-#include "graphics/material.h"
-#include "scene/components.h"
-#include "scene/entity.h"
-#include "scene/scene.h"
-#include "scene/transform.h"
+#include "scripting/script_engine.h"
 
-Script::Script(Ref<sol::state> lua, const std::string& path)
-    : lua_(lua), file_path_(path), preprocessor_(path) {
-  preprocessor_.Process();
-  serialize_fields_ = preprocessor_.GetSerializeMap();
-
-  env_ = CreateScope<sol::environment>(lua_->lua_state(), sol::create,
-                                       lua_->globals());
+ScriptClass::ScriptClass(const std::string& class_namespace,
+                         const std::string& class_name, bool is_core)
+    : class_namespace_(class_namespace), class_name_(class_name) {
+  mono_class_ =
+      mono_class_from_name(is_core ? ScriptEngine::GetCoreAssemblyImage()
+                                   : ScriptEngine::GetAppAssemblyImage(),
+                           class_namespace.c_str(), class_name.c_str());
 }
 
-void Script::Reload() {
-  preprocessor_.Process();
+MonoObject* ScriptClass::Instantiate() {
+  return ScriptEngine::InstantiateClass(mono_class_);
 }
 
-void Script::OnStart() {
-  if (!on_start_) {
-    return;
-  }
-
-  on_start_();
+MonoMethod* ScriptClass::GetMethod(const std::string& name,
+                                   int parameterCount) {
+  return mono_class_get_method_from_name(mono_class_, name.c_str(),
+                                         parameterCount);
 }
 
-void Script::OnUpdate(float ds) {
-  if (!on_update_) {
-    return;
-  }
-
-  on_update_(ds);
+MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method,
+                                      void** params) {
+  MonoObject* exception = nullptr;
+  return mono_runtime_invoke(method, instance, params, &exception);
 }
 
-void Script::OnDestroy() {
-  if (!on_destroy_) {
-    return;
-  }
+ScriptInstance::ScriptInstance(Ref<ScriptClass> script_class, Entity entity)
+    : script_class_(script_class) {
+  instance_ = script_class->Instantiate();
 
-  on_destroy_();
-}
+  ctor_ = ScriptEngine::GetEntityClass().GetMethod(".ctor", 1);
+  on_create_method_ = script_class->GetMethod("OnCreate", 0);
+  on_update_method_ = script_class->GetMethod("OnUpdate", 1);
+  on_destroy_method_ = script_class->GetMethod("OnDestroy", 0);
 
-void Script::SetSerializeDataField(std::string name, ScriptDataType value) {
-  // check if key exists
-  auto it = serialize_fields_.find(name);
-  if (it == serialize_fields_.end()) {
-    return;
-  }
-
-  it->second = {value, true};
-
-  // Set the state to affect it immediately
-  if (env_) {
-    env_->set(name, value);
+  // Call Entity constructor
+  {
+    GUUID entityID = entity.GetUUID();
+    void* param = &entityID;
+    script_class_->InvokeMethod(instance_, ctor_, &param);
   }
 }
 
-template <typename T>
-void RegisterComponentFunction(const std::string_view& name,
-                               sol::environment& env, Entity* entity) {
-  const auto kFormatCompName = [&name](const std::string_view& func_name) {
-    return std::format("{}_{}", func_name, name);
-  };
-
-  env.set_function(kFormatCompName("AddComponent"), &Entity::AddComponent<T>,
-                   entity);
-  env.set_function(kFormatCompName("AddOrReplaceComponent"),
-                   &Entity::AddOrReplaceComponent<T>, entity);
-  env.set_function(kFormatCompName("GetComponent"), &Entity::GetComponent<T>,
-                   entity);
-  env.set_function(kFormatCompName("HasComponent"), &Entity::HasComponent<T>,
-                   entity);
-  env.set_function(kFormatCompName("RemoveComponent"),
-                   &Entity::RemoveComponent<T>, entity);
+void ScriptInstance::InvokeOnCreate() {
+  if (on_create_method_)
+    script_class_->InvokeMethod(instance_, on_create_method_);
 }
 
-void RegisterComponentFunctions(sol::environment& env, Entity* entity) {
-  RegisterComponentFunction<IdComponent>("IdComponent", env, entity);
-  RegisterComponentFunction<TagComponent>("TagComponent", env, entity);
-  RegisterComponentFunction<Transform>("Transform", env, entity);
-  RegisterComponentFunction<CameraComponent>("CameraComponent", env, entity);
-  RegisterComponentFunction<Material>("Material", env, entity);
+void ScriptInstance::InvokeOnUpdate(float ts) {
+  if (on_update_method_) {
+    void* param = &ts;
+    script_class_->InvokeMethod(instance_, on_update_method_, &param);
+  }
 }
 
-bool Script::LoadScript() {
-  if (!env_) {
-    LOG_ERROR("Failed to get environment.");
+void ScriptInstance::InvokeOnDestroy() {
+  if (on_destroy_method_)
+    script_class_->InvokeMethod(instance_, on_destroy_method_);
+}
+
+bool ScriptInstance::GetFieldValueInternal(const std::string& name,
+                                           void* buffer) {
+  const auto& fields = script_class_->GetFields();
+  auto it = fields.find(name);
+  if (it == fields.end())
     return false;
-  }
 
-  auto& env = *env_;
+  const ScriptField& field = it->second;
+  mono_field_get_value(instance_, field.class_field, buffer);
+  return true;
+}
 
-  env.set_function("GetTransform", &Entity::GetTransform, entity_);
-  env.set_function("GetName", &Entity::GetName, entity_);
-  env.set_function("GetUUID", &Entity::GetUUID, entity_);
-
-  RegisterComponentFunctions(env, &entity_);
-
-  const auto script_result =
-      lua_->safe_script_file(file_path_, env, sol::script_pass_on_error);
-  if (!script_result.valid()) {
-    LOG_ERROR("Error interpretting script file at: {}\n{}", file_path_,
-              ((sol::error)script_result).what());
+bool ScriptInstance::SetFieldValueInternal(const std::string& name,
+                                           const void* value) {
+  const auto& fields = script_class_->GetFields();
+  auto it = fields.find(name);
+  if (it == fields.end())
     return false;
-  }
 
-  // Set overrided values
-  for (auto& [name, data] : serialize_fields_) {
-    if (data.is_overrided) {
-      env.set(name, data.value);
-    }
-  }
-
-  on_start_ = (sol::function)env["OnStart"];
-  on_update_ = (sol::function)env["OnUpdate"];
-  on_destroy_ = (sol::function)env["OnDestroy"];
-
+  const ScriptField& field = it->second;
+  mono_field_set_value(instance_, field.class_field, (void*)value);
   return true;
 }

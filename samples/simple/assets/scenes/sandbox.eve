@@ -1,12 +1,26 @@
 scene: sandbox
 entities:
-  - id: 18348502279451749786
+  - id: 1225455807429653547
     tag_component:
-      tag: Spot Light
+      tag: Main Camera
     transform:
-      position: [2.02203438e-07, -0.0337756723, 7.0463953]
-      rotation: [0, 0, 90]
+      position: [-5.63062, 2.87215948, 11.0922642]
+      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
       scale: [1, 1, 1]
+    camera_component:
+      orthographic_camera:
+        aspect_ratio: 1.63625157
+        zoom_level: 1
+        near_clip: -1
+        far_clip: 1
+      perspective_camera:
+        aspect_ratio: 1.63625157
+        fov: 45
+        near_clip: 0.100000001
+        far_clip: 300
+      is_orthographic: false
+      is_primary: true
+      is_fixed_aspect_ratio: false
   - id: 11386622121855246634
     tag_component:
       tag: Cube
@@ -22,19 +36,11 @@ entities:
       roughness: 0
       ao: 1
     script_component:
-      path: res://scripts/cube.lua
-      fields:
-        - name: speed_
-          value: 20
-  - id: 1225455807429653547
-    tag_component:
-      tag: Main Camera
-    transform:
-      position: [-5.63062, 2.87215948, 11.0922642]
-      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
-      scale: [1, 1, 1]
-    script_component:
-      path: res://scripts/camera.lua
+      class_name: Simple.Cube
+      script_fields:
+        - name: speed
+          type: Float
+          data: 10
   - id: 5195349964288604196
     tag_component:
       tag: Sphere

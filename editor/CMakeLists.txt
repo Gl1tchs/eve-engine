@@ -35,7 +35,7 @@ set(SOURCES
 
 list(APPEND SOURCES ${IMGUI_OPENGL_SOURCES})
 
-if(${EVE_PLATFORM} STREQUAL WIN32 AND ${CMAKE_BUILD_TYPE} STREQUAL "Dist")
+if(${EVE_PLATFORM} STREQUAL WIN32 AND CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
   add_executable(eve_editor WIN32 ${SOURCES})
 elseif(${EVE_PLATFORM} STREQUAL LINUX OR ${EVE_PLATFORM} STREQUAL WIN32)
   add_executable(eve_editor ${SOURCES})
@@ -68,6 +68,11 @@ target_link_libraries(eve_editor PRIVATE
 target_precompile_headers(eve_editor PUBLIC pch.h)
 
 add_custom_command(TARGET eve_editor PRE_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
-  COMMENT "Copying assets to the build destination."
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/LICENSE
+  COMMENT "Copying LICENSE to the build destination."
+)
+
+add_custom_command(TARGET eve_editor PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${VENDOR_DIR}/mono/bin/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  COMMENT "Copying LICENSE to the build destination."
 )
