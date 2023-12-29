@@ -76,6 +76,10 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
 }
 
 void SceneRenderer::OnViewportResize(glm::uvec2 size) {
+  if (viewport_size_ == size) {
+    return;
+  }
+
   auto& scene = SceneManager::GetActive();
   if (!scene) {
     return;

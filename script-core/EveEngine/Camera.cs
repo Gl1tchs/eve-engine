@@ -2,8 +2,9 @@ namespace EveEngine
 {
   public abstract class Camera
   {
-    protected ScriptEntity entity;
     public float aspectRatio;
+
+    protected ScriptEntity entity;
 
     public void SetEntity(ScriptEntity entity)
     {

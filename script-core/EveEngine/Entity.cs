@@ -5,6 +5,10 @@ namespace EveEngine
 {
 	public class ScriptEntity
 	{
+		public ulong Id { get; private set; }
+
+		public static ScriptEntity InvalidEntity = new ScriptEntity();
+
 		protected ScriptEntity() { Id = 0; }
 
 		internal ScriptEntity(ulong id)
@@ -12,7 +16,6 @@ namespace EveEngine
 			this.Id = id;
 		}
 
-		public ulong Id { get; private set; }
 
 		// TODO store directly transform
 		public Vector3 Position
@@ -46,9 +49,6 @@ namespace EveEngine
 		public ScriptEntity FindEntityByName(string name)
 		{
 			ulong entity_id = InternalCalls.Entity_FindEntityByName(name);
-			if (entity_id == 0)
-				return null;
-
 			return new ScriptEntity(entity_id);
 		}
 
@@ -58,6 +58,9 @@ namespace EveEngine
 			return instance as T;
 		}
 
+		public static implicit operator bool(ScriptEntity entity)
+		{
+			return entity.Id != 0;
+		}
 	}
-
 }

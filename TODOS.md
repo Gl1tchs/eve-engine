@@ -29,6 +29,7 @@
 - [ ] Improve engine api for scripting.
 - [ ] Add mat4 data type
 - [ ] API Documentation / code + markdown
+- [ ] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
 
 ## Renderer
 - [ ] PBR.
