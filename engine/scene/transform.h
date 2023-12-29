@@ -19,32 +19,21 @@ const glm::vec3 kVec3One(1.0f, 1.0f, 1.0f);
 const glm::vec3 kWorldUp = kVec3Up;
 
 struct Transform final {
-  glm::vec3 position;
-  glm::vec3 rotation;
-  glm::vec3 scale;
-
-  Transform(glm::vec3 position = kVec3Zero, glm::vec3 rotation = kVec3Zero,
-            glm::vec3 scale = kVec3One);
+  glm::vec3 position = kVec3Zero;
+  glm::vec3 rotation = kVec3Zero;
+  glm::vec3 scale = kVec3One;
 
   void Translate(glm::vec3 translation);
 
   void Rotate(float angle, glm::vec3 axis);
 
-  [[nodiscard]] glm::vec3 GetForward();
+  [[nodiscard]] glm::vec3 GetForward() const;
 
-  [[nodiscard]] glm::vec3 GetRight();
+  [[nodiscard]] glm::vec3 GetRight() const;
 
-  [[nodiscard]] glm::vec3 GetUp();
+  [[nodiscard]] glm::vec3 GetUp() const;
 
   [[nodiscard]] glm::mat4 GetModelMatrix() const;
 
-  [[nodiscard]] glm::vec3 GetDirection();
-
- private:
-  void UpdateVectors();
-
- private:
-  glm::vec3 forward_;
-  glm::vec3 right_;
-  glm::vec3 up_;
+  [[nodiscard]] glm::vec3 GetDirection() const;
 };

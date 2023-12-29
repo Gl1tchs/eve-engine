@@ -2,14 +2,6 @@
 
 #include "scene/transform.h"
 
-Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-    : position(position),
-      rotation(rotation),
-      scale(scale),
-      forward_(kVec3Forward),
-      right_(kVec3Right),
-      up_(kVec3Up) {}
-
 void Transform::Translate(glm::vec3 translation) {
   position += translation;
 }
@@ -18,19 +10,19 @@ void Transform::Rotate(const float angle, const glm::vec3 axis) {
   rotation += angle * axis;
 }
 
-glm::vec3 Transform::GetForward() {
-  UpdateVectors();
-  return forward_;
+glm::vec3 Transform::GetForward() const {
+  glm::fquat orientation = glm::fquat(glm::radians(rotation));
+  return glm::normalize(orientation * kVec3Forward);
 }
 
-glm::vec3 Transform::GetRight() {
-  UpdateVectors();
-  return right_;
+glm::vec3 Transform::GetRight() const {
+  glm::fquat orientation = glm::fquat(glm::radians(rotation));
+  return glm::normalize(orientation * kVec3Right);
 }
 
-glm::vec3 Transform::GetUp() {
-  UpdateVectors();
-  return up_;
+glm::vec3 Transform::GetUp() const {
+  glm::fquat orientation = glm::fquat(glm::radians(rotation));
+  return glm::normalize(orientation * kVec3Up);
 }
 
 glm::mat4 Transform::GetModelMatrix() const {
@@ -45,17 +37,9 @@ glm::mat4 Transform::GetModelMatrix() const {
   return transform;
 }
 
-glm::vec3 Transform::GetDirection() {
+glm::vec3 Transform::GetDirection() const {
   glm::vec3 dir(cos(rotation.x) * cos(rotation.y), sin(rotation.x),
                 cos(rotation.x) * sin(rotation.y));
   dir = glm::normalize(dir);
   return dir;
-}
-
-void Transform::UpdateVectors() {
-  glm::fquat orientation = glm::fquat(glm::radians(rotation));
-
-  forward_ = glm::normalize(orientation * kVec3Forward);
-  right_ = glm::normalize(orientation * kVec3Right);
-  up_ = glm::normalize(glm::cross(right_, forward_));
 }
