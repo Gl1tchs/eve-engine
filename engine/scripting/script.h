@@ -33,7 +33,7 @@ enum class ScriptFieldType {
   kVector2,
   kVector3,
   kVector4,
-  kEntity
+  kScriptEntity
 };
 
 struct ScriptField {

@@ -265,7 +265,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
           WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
           WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
           WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
-          WRITE_SCRIPT_FIELD(kEntity, GUUID);
+          WRITE_SCRIPT_FIELD(kScriptEntity, GUUID);
           default:
             break;
         }
@@ -438,7 +438,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
               READ_SCRIPT_FIELD(kVector2, glm::vec2);
               READ_SCRIPT_FIELD(kVector3, glm::vec3);
               READ_SCRIPT_FIELD(kVector4, glm::vec4);
-              READ_SCRIPT_FIELD(kEntity, GUUID);
+              READ_SCRIPT_FIELD(kScriptEntity, GUUID);
               default:
                 break;
             }

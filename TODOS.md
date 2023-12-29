@@ -10,8 +10,9 @@
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
     but should display the name of it based on the asset metadata.
 - [ ] Save editor state with cache and temp files.
-- [ ] File/Open Scene not working.
 - [ ] While scripts are building show a loading thing for it.
+- [ ] Better toolbar.
+- [ ] Inspector script entity field
 
 ## Asset
 - [ ] Asset compression for shipping.
@@ -43,6 +44,7 @@
 - [x] Scene management API
 - [x] Start the script if added during runtime.
 - [x] Hot reload script
+- [x] File/Open Scene not working.
 
 ## Fixed
 - [x] Editor closes very slowly

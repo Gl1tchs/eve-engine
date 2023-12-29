@@ -6,6 +6,27 @@
 
 namespace ImGui {
 
+ScopedStyleColor::ScopedStyleColor(int idx, const glm::vec4& color,
+                                   bool condition)
+    : set_(condition) {
+  if (condition) {
+    ImGui::PushStyleColor(idx, ImVec4(color.r, color.g, color.b, color.a));
+  }
+}
+
+ScopedStyleColor::ScopedStyleColor(int idx, uint32_t color, bool condition)
+    : set_(condition) {
+  if (condition) {
+    ImGui::PushStyleColor(idx, color);
+  }
+}
+
+ScopedStyleColor::~ScopedStyleColor() {
+  if (set_) {
+    ImGui::PopStyleColor();
+  }
+}
+
 bool ButtonTransparent(const std::string& text, float w, float h) {
   // Save the current style
   ImGuiStyle& style = ImGui::GetStyle();

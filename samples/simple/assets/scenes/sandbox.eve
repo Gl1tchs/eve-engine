@@ -1,5 +1,46 @@
 scene: sandbox
 entities:
+  - id: 1225455807429653547
+    tag_component:
+      tag: Main Camera
+    transform:
+      position: [-5.63062, 2.87215948, 11.0922642]
+      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
+      scale: [1, 1, 1]
+    camera_component:
+      orthographic_camera:
+        aspect_ratio: 1.07458568
+        zoom_level: 1
+        near_clip: -1
+        far_clip: 1
+      perspective_camera:
+        aspect_ratio: 1.07458568
+        fov: 45
+        near_clip: 0.100000001
+        far_clip: 300
+      is_orthographic: false
+      is_primary: true
+      is_fixed_aspect_ratio: false
+  - id: 11386622121855246634
+    tag_component:
+      tag: Cube
+    transform:
+      position: [1.84022474, 0.55829668, 2.60207748]
+      rotation: [0, -17.7267761, 0]
+      scale: [1, 1, 1]
+    model_component:
+      path: res://models/cube.obj
+    material_component:
+      albedo: [0.490196079, 0, 0]
+      metallic: 1
+      roughness: 0
+      ao: 1
+    script_component:
+      class_name: Simple.Cube
+      script_fields:
+        - name: speed
+          type: Float
+          data: 10
   - id: 5195349964288604196
     tag_component:
       tag: Sphere
@@ -16,44 +57,7 @@ entities:
       ao: 1
     script_component:
       class_name: Simple.Sphere
-  - id: 11386622121855246634
-    tag_component:
-      tag: Cube
-    transform:
-      position: [1.84022474, 0.55829668, 2.60207748]
-      rotation: [0, 0, 0]
-      scale: [1, 1, 1]
-    model_component:
-      path: res://models/cube.obj
-    material_component:
-      albedo: [0.490196079, 0, 0]
-      metallic: 1
-      roughness: 0
-      ao: 1
-    script_component:
-      class_name: Simple.Cube
       script_fields:
-        - name: speed
-          type: Float
-          data: 10
-  - id: 1225455807429653547
-    tag_component:
-      tag: Main Camera
-    transform:
-      position: [-5.63062, 2.87215948, 11.0922642]
-      rotation: [-8.86102009, -29.999979, 8.43928717e-07]
-      scale: [1, 1, 1]
-    camera_component:
-      orthographic_camera:
-        aspect_ratio: 1.63625157
-        zoom_level: 1
-        near_clip: -1
-        far_clip: 1
-      perspective_camera:
-        aspect_ratio: 1.63625157
-        fov: 45
-        near_clip: 0.100000001
-        far_clip: 300
-      is_orthographic: false
-      is_primary: true
-      is_fixed_aspect_ratio: false
+        - name: color
+          type: Vector3
+          data: [1, 0, 1]

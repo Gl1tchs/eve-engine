@@ -124,167 +124,110 @@ static void DrawComponent(const std::string& name, Entity entity,
   }
 }
 
+static void DrawScriptField(const std::string& name,
+                            ScriptFieldInstance& script_field,
+                            bool use_default = false);
+
+static void DrawScriptFieldRuntime(const std::string& name,
+                                   const ScriptField& field,
+                                   Ref<ScriptInstance>& script_instance);
+
 void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   ImGui::PushID((uint32_t)selected_entity);
 
   if (advanced_) {
-    DrawComponent<IdComponent>(ICON_FA_ID_BADGE " Id Component",
-                               selected_entity, [](IdComponent& id_comp) {
-                                 ImGui::Text("ID:");
-                                 ImGui::SameLine();
-                                 ImGui::Text("%" PRIu64, (uint64_t)id_comp.id);
-                               });
+    DrawComponent<IdComponent>(
+        ICON_FA_ID_BADGE " Id Component", selected_entity,
+        [](IdComponent& id_comp) {
+          auto id_str = std::format("%" PRIu64, (uint64_t)id_comp.id);
+          ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
+        });
   }
 
-  DrawComponent<TagComponent>(
-      ICON_FA_TAG " Tag Component", selected_entity, [](TagComponent& tag_comp) {
-        ImGui::Text("Tag:");
-        ImGui::SameLine();
-        // TODO only accept unique names
-        if (ImGui::InputText("##tag_input", &tag_comp.tag)) {
-          modify_info.SetModified();
-        }
-      });
+  DrawComponent<TagComponent>(ICON_FA_TAG " Tag Component", selected_entity,
+                              [](TagComponent& tag_comp) {
+                                // TODO only accept unique names
+                                if (ImGui::InputText("Tag", &tag_comp.tag)) {
+                                  modify_info.SetModified();
+                                }
+                              });
 
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,
       [](Transform& transform) {
-        ImGui::Columns(2, "Transform Settings Columns");
-
-        ImGui::Text("Position:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat3("##transform_position",
-                              glm::value_ptr(transform.position))) {
+        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position))) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Rotation:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat3("##transform_rotation",
-                              glm::value_ptr(transform.rotation))) {
+        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation))) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Scale:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat3("##transform_scale",
-                              glm::value_ptr(transform.scale))) {
+        if (ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale))) {
           modify_info.SetModified();
         }
-
-        ImGui::Columns();
       });
 
   DrawComponent<CameraComponent>(
       ICON_FA_CAMERA_RETRO " Camera", selected_entity,
       [](CameraComponent& camera_comp) {
-        ImGui::Columns(2, "Camera Settings Columns");
-
         if (camera_comp.is_orthographic) {
           auto& camera = camera_comp.ortho_camera;
 
-          ImGui::Text("Zoom Level:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##ortho_zoom_level", &camera.zoom_level)) {
+          if (ImGui::DragFloat("Zoom Level", &camera.zoom_level)) {
             modify_info.SetModified();
           }
 
-          ImGui::NextColumn();
-
-          ImGui::Text("Near Clip:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##ortho_near_clip", &camera.near_clip)) {
+          if (ImGui::DragFloat("Near Clip", &camera.near_clip)) {
             modify_info.SetModified();
           }
 
-          ImGui::NextColumn();
-
-          ImGui::Text("Far Clip:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##ortho_far_clip", &camera.far_clip)) {
+          if (ImGui::DragFloat("Far Clip", &camera.far_clip)) {
             modify_info.SetModified();
           }
         } else {
           auto& camera = camera_comp.persp_camera;
 
-          ImGui::Text("FOV:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##persp_fov", &camera.fov)) {
+          if (ImGui::DragFloat("FOV", &camera.fov)) {
             modify_info.SetModified();
           }
 
-          ImGui::NextColumn();
-
-          ImGui::Text("Near Clip:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##persp_near_clip", &camera.near_clip)) {
+          if (ImGui::DragFloat("Near Clip", &camera.near_clip)) {
             modify_info.SetModified();
           }
 
-          ImGui::NextColumn();
-
-          ImGui::Text("Far Clip:");
-          ImGui::NextColumn();
-          if (ImGui::DragFloat("##persp_far_clip", &camera.far_clip)) {
+          if (ImGui::DragFloat("Far Clip", &camera.far_clip)) {
             modify_info.SetModified();
           }
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Is Orthographic");
-        ImGui::NextColumn();
-        if (ImGui::Checkbox("##is_orthographic",
-                            &camera_comp.is_orthographic)) {
+        if (ImGui::Checkbox("Is Orthographic", &camera_comp.is_orthographic)) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Primary:");
-        ImGui::NextColumn();
-        if (ImGui::Checkbox("##is_primary", &camera_comp.is_primary)) {
+        if (ImGui::Checkbox("Is Primary", &camera_comp.is_primary)) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Fixed");
-        ImGui::NextColumn();
-        if (ImGui::Checkbox("##fixed_aspect_ratio",
-                            &camera_comp.is_fixed_aspect_ratio)) {
+        if (ImGui::Checkbox("Is Fixed", &camera_comp.is_fixed_aspect_ratio)) {
           modify_info.SetModified();
         }
 
         if (camera_comp.is_fixed_aspect_ratio) {
-          ImGui::NextColumn();
-          ImGui::Text("Aspect Ratio:");
-          ImGui::NextColumn();
           float aspect_ratio;
-          if (ImGui::DragFloat("##camera_aspect_ratio", &aspect_ratio, 0.05f)) {
+          if (ImGui::DragFloat("Aspect Ratio", &aspect_ratio, 0.05f)) {
             camera_comp.ortho_camera.aspect_ratio = aspect_ratio;
             camera_comp.persp_camera.aspect_ratio = aspect_ratio;
             modify_info.SetModified();
           }
         }
-
-        ImGui::Columns();
       });
 
   DrawComponent<ModelComponent>(
       ICON_FA_CUBES " Model Component", selected_entity,
       [this](ModelComponent& model_comp) {
-        ImGui::Columns(2, "Model Component Columns");
-
-        ImGui::Text("Model Path:");
-        ImGui::NextColumn();
-
         std::string path = model_comp.model->info.GetAssetPath();
-        if (ImGui::InputText("##model_path_input", &path,
+        if (ImGui::InputText("Path", &path,
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
           auto asset = AssetLibrary::LoadFromPath<Model>(path);
           if (asset) {
@@ -294,49 +237,26 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
             model_importer_.SetActive(true);
           }
         }
-
-        ImGui::NextColumn();
-
-        ImGui::Columns();
       });
 
   DrawComponent<Material>(
       ICON_FA_PICTURE_O " Material Component", selected_entity,
       [this](Material& material) {
-        ImGui::Columns(2, "Material Columns");
-
-        ImGui::Text("Albedo:");
-        ImGui::NextColumn();
-        if (ImGui::ColorEdit3("##material_albedo",
-                              glm::value_ptr(material.albedo))) {
+        if (ImGui::ColorEdit3("Albedo", glm::value_ptr(material.albedo))) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Metallic:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat("##material_metallic", &material.metallic)) {
+        if (ImGui::DragFloat("Metallic", &material.metallic)) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("Roughness:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat("##material_roughness", &material.roughness)) {
+        if (ImGui::DragFloat("Roughness", &material.roughness)) {
           modify_info.SetModified();
         }
 
-        ImGui::NextColumn();
-
-        ImGui::Text("AO:");
-        ImGui::NextColumn();
-        if (ImGui::DragFloat("##material_ao", &material.ao, 0.05f)) {
+        if (ImGui::DragFloat("AO", &material.ao, 0.05f)) {
           modify_info.SetModified();
         }
-
-        ImGui::Columns();
       });
 
   DrawComponent<ScriptComponent>(
@@ -346,15 +266,14 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
         bool script_class_exists =
             ScriptEngine::EntityClassExists(component.class_name);
 
-        static char buffer[64];
-        strcpy_s(buffer, sizeof(buffer), component.class_name.c_str());
+        // if script class doesn't exists make the color red
+        ImGui::ScopedStyleColor _color(ImGuiCol_Text,
+                                       glm::vec4(0.9f, 0.2f, 0.3f, 1.0f),
+                                       !script_class_exists);
 
-        // TODO
-        // UI::ScopedStyleColor textColor(
-        //     ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !script_class_exists);
-
-        if (ImGui::InputText("Class", buffer, sizeof(buffer))) {
-          component.class_name = buffer;
+        std::string class_name = component.class_name;
+        if (ImGui::InputText("Class Name", &class_name)) {
+          component.class_name = class_name;
           return;
         }
 
@@ -366,51 +285,26 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
           if (script_instance) {
             const auto& fields = script_instance->GetScriptClass()->GetFields();
             for (const auto& [name, field] : fields) {
-              if (field.type == ScriptFieldType::kFloat) {
-                float data = script_instance->GetFieldValue<float>(name);
-                if (ImGui::DragFloat(name.c_str(), &data)) {
-                  script_instance->SetFieldValue(name, data);
-                }
-              }
-              // TODO other types
+              DrawScriptFieldRuntime(name, field, script_instance);
             }
           }
-        } else {
-          if (script_class_exists) {
-            Ref<ScriptClass> entity_class =
-                ScriptEngine::GetEntityClass(component.class_name);
-            const auto& fields = entity_class->GetFields();
+        } else if (!is_scene_running && script_class_exists) {
+          Ref<ScriptClass> entity_class =
+              ScriptEngine::GetEntityClass(component.class_name);
+          const auto& fields = entity_class->GetFields();
 
-            auto& entity_fields =
-                ScriptEngine::GetScriptFieldMap(selected_entity);
-            for (const auto& [name, field] : fields) {
-              // Field has been set in editor
-              if (entity_fields.find(name) != entity_fields.end()) {
-                ScriptFieldInstance& script_field = entity_fields.at(name);
+          auto& entity_fields =
+              ScriptEngine::GetScriptFieldMap(selected_entity);
+          for (const auto& [name, field] : fields) {
+            // Field has been set in editor
+            if (entity_fields.find(name) != entity_fields.end()) {
+              ScriptFieldInstance& script_field = entity_fields.at(name);
+              DrawScriptField(name, script_field);
+            } else {
+              ScriptFieldInstance& script_field = entity_fields[name];
+              script_field.field = field;
 
-                // Display control to set it maybe
-                if (field.type == ScriptFieldType::kFloat) {
-                  float data = script_field.GetValue<float>();
-                  if (ImGui::DragFloat(name.c_str(), &data)) {
-                    script_field.SetValue(data);
-
-                    modify_info.SetModified();
-                  }
-                }
-
-              } else {
-                // Display control to set it maybe
-                if (field.type == ScriptFieldType::kFloat) {
-                  float data = 0.0f;
-                  if (ImGui::DragFloat(name.c_str(), &data)) {
-                    ScriptFieldInstance& field_instance = entity_fields[name];
-                    field_instance.field = field;
-                    field_instance.SetValue(data);
-
-                    modify_info.SetModified();
-                  }
-                }
-              }
+              DrawScriptField(name, script_field, true);
             }
           }
         }
@@ -427,4 +321,273 @@ void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
 
   auto& modal_component = selected_entity.AddComponent<ModelComponent>();
   modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);
+}
+
+void DrawScriptField(const std::string& name, ScriptFieldInstance& script_field,
+                     bool use_default) {
+  switch (script_field.field.type) {
+    case ScriptFieldType::kFloat: {
+      float data = !use_default ? script_field.GetValue<float>() : 0.0f;
+      if (ImGui::DragFloat(name.c_str(), &data)) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kDouble: {
+      double data = !use_default ? script_field.GetValue<double>() : 0.0;
+      if (ImGui::DragFloat(name.c_str(), (float*)&data)) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kBool: {
+      bool data = !use_default ? script_field.GetValue<bool>() : false;
+      if (ImGui::Checkbox(name.c_str(), &data)) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kChar: {
+      break;
+    }
+    case ScriptFieldType::kByte: {
+      int8_t data = !use_default ? script_field.GetValue<int8_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int8_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kShort: {
+      int16_t data = !use_default ? script_field.GetValue<int16_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int16_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kInt: {
+      int data = !use_default ? script_field.GetValue<int>() : 0;
+      if (ImGui::DragInt(name.c_str(), &data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kLong: {
+      int64_t data = !use_default ? script_field.GetValue<int64_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int64_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kUByte: {
+      uint8_t data = !use_default ? script_field.GetValue<uint8_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint8_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kUShort: {
+      uint16_t data = !use_default ? script_field.GetValue<uint16_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint16_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kUInt: {
+      uint32_t data = !use_default ? script_field.GetValue<uint32_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint32_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kULong: {
+      uint64_t data = !use_default ? script_field.GetValue<uint64_t>() : 0;
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint64_t>::max())) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kVector2: {
+      glm::vec2 data =
+          !use_default ? script_field.GetValue<glm::vec2>() : glm::vec2(0.0f);
+      if (ImGui::DragFloat2(name.c_str(), &data[0])) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kVector3: {
+      glm::vec3 data =
+          !use_default ? script_field.GetValue<glm::vec3>() : glm::vec3(0.0f);
+      if (ImGui::DragFloat3(name.c_str(), &data[0])) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kVector4: {
+      glm::vec4 data =
+          !use_default ? script_field.GetValue<glm::vec4>() : glm::vec4(0.0f);
+      if (ImGui::DragFloat4(name.c_str(), &data[0])) {
+        script_field.SetValue(data);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kScriptEntity: {
+      break;
+    }
+  }
+}
+
+void DrawScriptFieldRuntime(const std::string& name, const ScriptField& field,
+                            Ref<ScriptInstance>& script_instance) {
+  switch (field.type) {
+    case ScriptFieldType::kFloat: {
+      float data = script_instance->GetFieldValue<float>(name);
+      if (ImGui::DragFloat(name.c_str(), &data)) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kDouble: {
+      double data = script_instance->GetFieldValue<double>(name);
+      if (ImGui::DragFloat(name.c_str(), (float*)&data)) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kBool: {
+      bool data = script_instance->GetFieldValue<bool>(name);
+      if (ImGui::Checkbox(name.c_str(), &data)) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kChar: {
+      break;
+    }
+    case ScriptFieldType::kByte: {
+      int8_t data = script_instance->GetFieldValue<int8_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int8_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kShort: {
+      int16_t data = script_instance->GetFieldValue<int16_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int16_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kInt: {
+      int data = script_instance->GetFieldValue<int>(name);
+      if (ImGui::DragInt(name.c_str(), &data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kLong: {
+      int64_t data = script_instance->GetFieldValue<int64_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<int64_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kUByte: {
+      uint8_t data = script_instance->GetFieldValue<uint8_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint8_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kUShort: {
+      uint16_t data = script_instance->GetFieldValue<uint16_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint16_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kUInt: {
+      uint32_t data = script_instance->GetFieldValue<uint32_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint32_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kULong: {
+      uint64_t data = script_instance->GetFieldValue<uint64_t>(name);
+      if (ImGui::DragInt(name.c_str(), (int*)&data, 1.0f,
+                         std::numeric_limits<int8_t>::min(),
+                         std::numeric_limits<uint64_t>::max())) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kVector2: {
+      glm::vec2 data = script_instance->GetFieldValue<glm::vec2>(name);
+      if (ImGui::DragFloat2(name.c_str(), &data[0])) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kVector3: {
+      glm::vec3 data = script_instance->GetFieldValue<glm::vec3>(name);
+      if (ImGui::DragFloat3(name.c_str(), &data[0])) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kVector4: {
+      glm::vec4 data = script_instance->GetFieldValue<glm::vec4>(name);
+      if (ImGui::DragFloat4(name.c_str(), &data[0])) {
+        script_instance->SetFieldValue(name, data);
+      }
+      break;
+    }
+    case ScriptFieldType::kScriptEntity: {
+      break;
+    }
+  }
 }

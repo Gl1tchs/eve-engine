@@ -34,7 +34,7 @@ static std::unordered_map<std::string, ScriptFieldType> script_field_type_map =
         {"EveEngine.Vector3", ScriptFieldType::kVector3},
         {"EveEngine.Vector4", ScriptFieldType::kVector4},
 
-        {"EveEngine.Entity", ScriptFieldType::kEntity},
+        {"EveEngine.Entity", ScriptFieldType::kScriptEntity},
 };
 
 static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
@@ -557,7 +557,7 @@ const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
       return "Vector3";
     case ScriptFieldType::kVector4:
       return "Vector4";
-    case ScriptFieldType::kEntity:
+    case ScriptFieldType::kScriptEntity:
       return "ScriptEntity";
   }
   ASSERT(false, "Unknown ScriptFieldType");
@@ -598,7 +598,7 @@ ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
   if (field_type == "Vector4")
     return ScriptFieldType::kVector4;
   if (field_type == "ScriptEntity")
-    return ScriptFieldType::kEntity;
+    return ScriptFieldType::kScriptEntity;
 
   ASSERT(false, "Unknown ScriptFieldType");
   return ScriptFieldType::kNone;
