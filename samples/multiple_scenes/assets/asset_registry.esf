@@ -1,0 +1,5 @@
+[asset]
+name = cube
+uuid = 0123456879
+path = res://models/cube.obj
+type = Model
