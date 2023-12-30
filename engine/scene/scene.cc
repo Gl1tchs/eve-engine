@@ -92,6 +92,12 @@ bool Scene::OnRuntimeStart() {
 void Scene::OnRuntimeStop() {
   is_running_ = false;
 
+  auto view = registry_.view<ScriptComponent>();
+  for (auto e : view) {
+    Entity entity = {e, this};
+    ScriptEngine::OnDestroyEntity(entity);
+  }
+
   ScriptEngine::OnRuntimeStop();
 }
 

@@ -264,6 +264,7 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
   data->app_assembly_image = mono_assembly_get_image(data->app_assembly);
 
   if (!data->is_runtime) {
+    // Create file watchers for script files.
     for (const auto& entry :
          fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
       if (entry.is_directory()) {
@@ -326,10 +327,18 @@ void ScriptEngine::OnCreateEntity(Entity entity) {
 
 void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
   UUID entity_uuid = entity.GetUUID();
-  if (data->entity_instances.find(entity_uuid) !=
-      data->entity_instances.end()) {
-    Ref<ScriptInstance> instance = data->entity_instances[entity_uuid];
+  if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
     instance->InvokeOnUpdate(ds);
+  } else {
+    LOG_ERROR("Could not find ScriptInstance for entity {}",
+              (uint64_t)entity_uuid);
+  }
+}
+
+void ScriptEngine::OnDestroyEntity(Entity entity) {
+  UUID entity_uuid = entity.GetUUID();
+  if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
+    instance->InvokeOnDestroy();
   } else {
     LOG_ERROR("Could not find ScriptInstance for entity {}",
               (uint64_t)entity_uuid);
@@ -366,7 +375,6 @@ void ScriptEngine::OnRuntimeStart(Scene* scene) {
 
 void ScriptEngine::OnRuntimeStop() {
   data->scene_context = nullptr;
-
   data->entity_instances.clear();
 }
 

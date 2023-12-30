@@ -1,3 +1,4 @@
+using System;
 using EveEngine;
 
 namespace MultipleScenes
@@ -28,6 +29,11 @@ namespace MultipleScenes
       }
 
       m_transform.Rotation += new Vector3(0, 45 * ds, 0);
+    }
+
+    private void OnDestroy()
+    {
+      Console.WriteLine("Destroyed!");
     }
   }
 }

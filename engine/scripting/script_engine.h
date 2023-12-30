@@ -22,8 +22,10 @@ class ScriptEngine {
   static void OnRuntimeStop();
 
   static bool EntityClassExists(const std::string& full_class_name);
+
   static void OnCreateEntity(Entity entity);
   static void OnUpdateEntity(Entity entity, float ds);
+  static void OnDestroyEntity(Entity entity);
 
   static Scene* GetSceneContext();
   static Ref<ScriptInstance> GetEntityScriptInstance(UUID entity_id);
@@ -46,6 +48,7 @@ class ScriptEngine {
   static void ShutdownMono();
 
   static MonoObject* InstantiateClass(MonoClass* mono_class);
+
   static void LoadAssemblyClasses();
 
   friend class ScriptClass;
