@@ -4,6 +4,7 @@
 
 #include "graphics/camera.h"
 
+namespace eve {
 struct OrthographicCamera : Camera {
   float zoom_level = 1.0f;
   float near_clip = -1.0f;
@@ -15,3 +16,4 @@ struct OrthographicCamera : Camera {
 
   [[nodiscard]] glm::mat4 GetViewMatrix(Transform& transform) override;
 };
+}  // namespace eve

@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t binding) {
   glCreateBuffers(1, &ubo_);
   glNamedBufferData(ubo_, size, nullptr, GL_DYNAMIC_DRAW);
@@ -18,3 +19,4 @@ void OpenGLUniformBuffer::SetData(const void* data, uint32_t size,
                                   uint32_t offset) {
   glNamedBufferSubData(ubo_, offset, size, data);
 }
+}  // namespace eve

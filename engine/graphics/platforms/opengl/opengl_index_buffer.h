@@ -4,6 +4,7 @@
 
 #include "graphics/index_buffer.h"
 
+namespace eve {
 class OpenGLIndexBuffer final : public IndexBuffer {
  public:
   OpenGLIndexBuffer(uint32_t size);
@@ -21,3 +22,4 @@ class OpenGLIndexBuffer final : public IndexBuffer {
   uint32_t ibo_;
   uint32_t count_;
 };
+}  // namespace eve

@@ -24,6 +24,7 @@ module_include_directories(scene PUBLIC
 
 module_include_directories(scene PRIVATE
   ${VENDOR_DIR}/entt/src
+  ${VENDOR_DIR}/OBJ-Loader
   ${VENDOR_DIR}/yaml-cpp/include
   ${VENDOR_DIR}/include
 )

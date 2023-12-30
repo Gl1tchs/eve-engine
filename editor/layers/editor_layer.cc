@@ -22,6 +22,7 @@
 #include "utils/modify_info.h"
 #include "widgets/dock_space.h"
 
+namespace eve {
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
 
@@ -566,3 +567,4 @@ void EditorLayer::SetupMenubar() {
     menu_bar_.PushMenu(view_menu);
   }
 }
+}  // namespace eve

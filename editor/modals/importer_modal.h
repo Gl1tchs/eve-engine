@@ -8,6 +8,7 @@
 
 #include "modals/modal.h"
 
+namespace eve {
 class ImporterModal : public Modal {
  public:
   ImporterModal(std::function<void(const std::string&)> submit_callback,
@@ -30,3 +31,4 @@ class ImporterModal : public Modal {
 
   std::function<void(const std::string&)> submit_callback_;
 };
+}  // namespace eve

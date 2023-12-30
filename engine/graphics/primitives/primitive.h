@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 struct RenderStats;
 
 template <typename VertexType>
@@ -66,3 +67,4 @@ class Primitive {
   size_t max_elements_;
   bool mutable_;
 };
+}  // namespace eve

@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+namespace eve {
+
 class Timer final {
  public:
   Timer();
@@ -13,3 +15,5 @@ class Timer final {
  private:
   std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time_;
 };
+
+}  // namespace eve

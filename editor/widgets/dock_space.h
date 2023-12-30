@@ -2,8 +2,10 @@
 
 #pragma once
 
+namespace eve {
 struct DockSpace final {
   static void Begin();
 
   static void End();
 };
+}  // namespace eve

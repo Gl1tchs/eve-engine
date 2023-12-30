@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 enum class TextureFormat {
   kRed,
   kRG,
@@ -54,3 +55,4 @@ class Texture {
   [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path,
                                            TextureMetadata metadata);
 };
+}  // namespace eve

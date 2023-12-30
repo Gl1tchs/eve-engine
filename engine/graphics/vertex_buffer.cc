@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_vertex_buffer.h"
 
+namespace eve {
 Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -30,3 +31,4 @@ Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size) {
       return nullptr;
   }
 }
+}  // namespace eve

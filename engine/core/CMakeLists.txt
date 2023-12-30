@@ -14,8 +14,6 @@ set(SOURCES
   serialization/ini_parser.cc
   serialization/ini_parser.h
   serialization/ini_parser.inl
-  utils/guuid.cc
-  utils/guuid.h
   utils/memory.h
   utils/memory.inl
   utils/timer.cc
@@ -31,6 +29,8 @@ set(SOURCES
   layer.cc
   layer.h
   state.h
+  uuid.cc
+  uuid.h
   window.cc
   window.h
 )

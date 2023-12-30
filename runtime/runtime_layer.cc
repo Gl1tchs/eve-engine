@@ -6,6 +6,7 @@
 #include "graphics/render_command.h"
 #include "scene/scene_manager.h"
 
+namespace eve {
 RuntimeLayer::RuntimeLayer(Ref<State>& state) : Layer(state) {}
 
 void RuntimeLayer::OnStart() {
@@ -36,3 +37,4 @@ void RuntimeLayer::OnUpdate(float ds) {
     scene_renderer_->RenderRuntime(ds);
   }
 }
+}  // namespace eve

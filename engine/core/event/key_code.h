@@ -2,6 +2,8 @@
 
 #pragma once
 
+namespace eve {
+
 enum class KeyCode : uint32_t {
   kNone = 0,
   kSpace = 32,
@@ -125,3 +127,5 @@ enum class KeyCode : uint32_t {
   kRightSuper = 347,
   kMenu = 348,
 };
+
+}

@@ -6,6 +6,7 @@
 
 #include "graphics/texture.h"
 
+namespace eve {
 class FrameBuffer {
  public:
   virtual void Bind() const = 0;
@@ -21,3 +22,4 @@ class FrameBuffer {
 
   [[nodiscard]] static Ref<FrameBuffer> Create(const glm::ivec2 size);
 };
+}  // namespace eve

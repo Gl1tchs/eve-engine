@@ -9,7 +9,6 @@
 #include "core/debug/log.h"
 
 namespace YAML {
-
 template <>
 struct convert<glm::ivec2> {
   static Node encode(const glm::ivec2& rhs) {
@@ -31,8 +30,8 @@ struct convert<glm::ivec2> {
 };
 
 template <>
-struct convert<TextureMetadata> {
-  static Node encode(const TextureMetadata& rhs) {
+struct convert<eve::TextureMetadata> {
+  static Node encode(const eve::TextureMetadata& rhs) {
     Node node;
     node["size"] = rhs.size;
     node["format"] = static_cast<int>(rhs.format);
@@ -44,7 +43,7 @@ struct convert<TextureMetadata> {
     return node;
   }
 
-  static bool decode(const Node& node, TextureMetadata& rhs) {
+  static bool decode(const Node& node, eve::TextureMetadata& rhs) {
     if (!node["size"] || !node["format"] || !node["min_filter"] ||
         !node["mag_filter"] || !node["wrap_s"] || !node["wrap_t"] ||
         !node["generate_mipmaps"]) {
@@ -52,13 +51,15 @@ struct convert<TextureMetadata> {
     }
 
     rhs.size = node["size"].as<glm::ivec2>();
-    rhs.format = static_cast<TextureFormat>(node["format"].as<int>());
+    rhs.format = static_cast<eve::TextureFormat>(node["format"].as<int>());
     rhs.min_filter =
-        static_cast<TextureFilteringMode>(node["min_filter"].as<int>());
+        static_cast<eve::TextureFilteringMode>(node["min_filter"].as<int>());
     rhs.mag_filter =
-        static_cast<TextureFilteringMode>(node["mag_filter"].as<int>());
-    rhs.wrap_s = static_cast<TextureWrappingMode>(node["wrap_s"].as<int>());
-    rhs.wrap_t = static_cast<TextureWrappingMode>(node["wrap_t"].as<int>());
+        static_cast<eve::TextureFilteringMode>(node["mag_filter"].as<int>());
+    rhs.wrap_s =
+        static_cast<eve::TextureWrappingMode>(node["wrap_s"].as<int>());
+    rhs.wrap_t =
+        static_cast<eve::TextureWrappingMode>(node["wrap_t"].as<int>());
     rhs.generate_mipmaps = node["generate_mipmaps"].as<bool>();
 
     return true;
@@ -67,9 +68,11 @@ struct convert<TextureMetadata> {
 
 }  // namespace YAML
 
+namespace eve {
+
 struct AssetInfoYAML {
   std::string asset_path;
-  GUUID id;
+  UUID id;
   YAML::Node metadata;
 };
 
@@ -100,9 +103,9 @@ struct AssetInfoYAML {
   info.asset_path = data["path"].as<std::string>();
 
   if (data["id"]) {
-    info.id = GUUID(data["id"].as<uint64_t>());
+    info.id = UUID(data["id"].as<uint64_t>());
   } else {
-    info.id = GUUID();
+    info.id = UUID();
   }
 
   info.metadata = data["metadata"];
@@ -180,3 +183,5 @@ AssetRef<Model> AssetLoader::LoadModel(const std::string& path) {
 
   return model;
 }
+
+}  // namespace eve

@@ -4,6 +4,7 @@
 
 #include "graphics/renderer_api.h"
 
+namespace eve {
 class RenderCommand final {
  public:
   static void Init();
@@ -13,7 +14,7 @@ class RenderCommand final {
   static void Clear(uint16_t bits = BufferBits_kColor);
 
   static void DrawArrays(const Ref<VertexArray>& vertex_array,
-                          uint32_t vertex_count);
+                         uint32_t vertex_count);
   static void DrawIndexed(const Ref<VertexArray>& vertex_array,
                           uint32_t index_count);
 
@@ -29,3 +30,4 @@ class RenderCommand final {
  private:
   static Scope<RendererAPI> renderer_api_;
 };
+}  // namespace eve

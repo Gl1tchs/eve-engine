@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_index_buffer.h"
 
+namespace eve {
 Ref<IndexBuffer> IndexBuffer::Create(uint32_t size) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -30,3 +31,4 @@ Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count) {
       return nullptr;
   }
 }
+}  // namespace eve

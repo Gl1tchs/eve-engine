@@ -4,6 +4,7 @@
 
 #include "graphics/texture.h"
 
+namespace eve {
 class OpenGLTexture2D final : public Texture {
  public:
   OpenGLTexture2D(const TextureMetadata& metadata,
@@ -25,3 +26,4 @@ class OpenGLTexture2D final : public Texture {
 
   uint32_t texture_id_;
 };
+}  // namespace eve

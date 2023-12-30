@@ -2,6 +2,8 @@
 
 #include "core/file_system.h"
 
+namespace eve {
+
 Buffer FileSystem::ReadFileBinary(const fs::path& filepath) {
   std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
 
@@ -24,3 +26,5 @@ Buffer FileSystem::ReadFileBinary(const fs::path& filepath) {
   stream.close();
   return buffer;
 }
+
+}  // namespace eve

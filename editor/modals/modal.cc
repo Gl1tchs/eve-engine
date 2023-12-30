@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+namespace eve {
 Modal::Modal(const std::string name, bool closable)
     : name_(name), closable_(closable) {}
 
@@ -28,3 +29,4 @@ void Modal::Render() {
     delete p_open;
   }
 }
+}  // namespace eve

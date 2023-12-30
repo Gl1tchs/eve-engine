@@ -5,6 +5,7 @@
 #include "graphics/perspective_camera.h"
 #include "scene/transform.h"
 
+namespace eve {
 class EditorCamera : public PerspectiveCamera {
  public:
   EditorCamera();
@@ -34,3 +35,4 @@ class EditorCamera : public PerspectiveCamera {
 
   glm::dvec2 last_mouse_pos_;
 };
+}  // namespace eve

@@ -4,6 +4,8 @@
 
 #include "project/project.h"
 
+namespace eve {
+
 fs::path AssetLibrary::GetAssetPath(std::string relative_path) {
   std::string proj_substr = "prj://";
   std::string res_substr = "res://";
@@ -25,3 +27,5 @@ fs::path AssetLibrary::GetAssetPath(std::string relative_path) {
 
   return relative_path;
 }
+
+}  // namespace eve

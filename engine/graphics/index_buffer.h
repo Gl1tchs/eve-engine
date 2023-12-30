@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 class IndexBuffer {
  public:
   virtual void Bind() = 0;
@@ -18,3 +19,4 @@ class IndexBuffer {
   [[nodiscard]] static Ref<IndexBuffer> Create(const uint32_t* indices,
                                                uint32_t count);
 };
+}  // namespace eve

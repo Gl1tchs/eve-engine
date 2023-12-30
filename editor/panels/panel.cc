@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+namespace eve {
 ImVec2 VecToImVec(const glm::vec2& lhs) {
   return ImVec2(lhs.x, lhs.y);
 }
@@ -68,3 +69,4 @@ void Panel::End() {
     ImGui::PopStyleVar(styles_.size());
   }
 }
+}  // namespace eve

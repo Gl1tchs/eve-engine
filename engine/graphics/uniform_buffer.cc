@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_uniform_buffer.h"
 
+namespace eve {
 Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -17,3 +18,4 @@ Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
       return nullptr;
   }
 }
+}  // namespace eve

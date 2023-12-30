@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+namespace eve {
+
 template <typename T>
 using Scope = std::unique_ptr<T>;
 
@@ -15,5 +17,7 @@ using Ref = std::shared_ptr<T>;
 
 template <typename T, typename... Args>
 constexpr Ref<T> CreateRef(Args&&... args);
+
+}  // namespace eve
 
 #include "core/utils/memory.inl"

@@ -6,6 +6,7 @@
 
 #include "graphics/buffer_layout.h"
 
+namespace eve {
 class VertexBuffer {
  public:
   virtual void Bind() = 0;
@@ -21,3 +22,4 @@ class VertexBuffer {
   [[nodiscard]] static Ref<VertexBuffer> Create(const void* vertices,
                                                 uint32_t size);
 };
+}  // namespace eve

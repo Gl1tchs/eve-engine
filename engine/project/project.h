@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 struct ProjectConfig {
   std::string name;
   fs::path asset_directory;
@@ -45,3 +46,4 @@ class Project {
   ProjectConfig config_;
   fs::path project_dir_;
 };
+}  // namespace eve

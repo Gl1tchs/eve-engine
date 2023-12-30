@@ -2,6 +2,8 @@
 
 #include "core/layer_stack.h"
 
+namespace eve {
+
 LayerStack::~LayerStack() {
   for (Layer* layer : layers_) {
     layer->OnDestroy();
@@ -40,3 +42,5 @@ void LayerStack::PopOverlay(Layer* overlay) {
     layers_.erase(it);
   }
 }
+
+}  // namespace eve

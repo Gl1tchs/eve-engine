@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 int DeserializeTextureFormat(TextureFormat format) {
   switch (format) {
     case TextureFormat::kRed:
@@ -89,7 +90,7 @@ void OpenGLTexture2D::SetData(void* data, uint32_t size) {
 
   uint32_t bpp = format == GL_RGBA ? 4 : 3;
   ASSERT(size == metadata_.size.x * metadata_.size.y * bpp,
-                "Data must be entire texture!")
+         "Data must be entire texture!")
 
   glTextureSubImage2D(texture_id_, 0, 0, 0, metadata_.size.x, metadata_.size.y,
                       format, GL_UNSIGNED_BYTE, data);
@@ -102,3 +103,4 @@ void OpenGLTexture2D::Bind(uint16_t slot) const {
 bool OpenGLTexture2D::operator==(const Texture& other) const {
   return texture_id_ == other.GetTextureID();
 }
+}  // namespace eve

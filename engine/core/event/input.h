@@ -7,6 +7,8 @@
 #include "core/event/key_code.h"
 #include "core/event/mouse_code.h"
 
+namespace eve {
+
 class Input {
  public:
   static void Init(const glm::dvec2& initial_mouse_pos);
@@ -30,3 +32,5 @@ class Input {
 
   static glm::dvec2 mouse_position_;
 };
+
+}  // namespace eve

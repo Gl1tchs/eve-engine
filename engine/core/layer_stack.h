@@ -6,6 +6,8 @@
 
 #include "core/layer.h"
 
+namespace eve {
+
 class LayerStack {
  public:
   LayerStack() = default;
@@ -34,3 +36,5 @@ class LayerStack {
   std::vector<Layer*> layers_;
   uint32_t layer_insert_idx_ = 0;
 };
+
+}  // namespace eve

@@ -2,6 +2,8 @@
 
 #include "asset/asset.h"
 
+namespace eve {
+
 std::string AssetInfo::GetAssetPath() const {
   std::string path = meta_path;
   size_t last_dot_pos = path.find_last_of('.');
@@ -13,3 +15,5 @@ std::string AssetInfo::GetAssetPath() const {
 
   return path;
 }
+
+}  // namespace eve

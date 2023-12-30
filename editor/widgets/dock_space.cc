@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+namespace eve {
 void DockSpace::Begin() {
   static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
@@ -43,3 +44,4 @@ void DockSpace::Begin() {
 void DockSpace::End() {
   ImGui::End();
 }
+}  // namespace eve

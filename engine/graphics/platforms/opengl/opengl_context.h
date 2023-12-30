@@ -6,9 +6,11 @@
 
 #include "graphics/graphics_context.h"
 
+namespace eve {
 class OpenGLContext final : public GraphicsContext {
  public:
   void Init() override;
 
   DeviceInformation GetDeviceInfo() const override;
 };
+}  // namespace eve

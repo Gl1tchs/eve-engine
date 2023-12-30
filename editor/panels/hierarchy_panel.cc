@@ -10,6 +10,7 @@
 #include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
+namespace eve {
 HierarchyPanel::HierarchyPanel() : Panel(true), selected_entity_({}) {}
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {
@@ -68,3 +69,4 @@ void HierarchyPanel::Draw() {
     modify_info.SetModified();
   }
 }
+}  // namespace eve

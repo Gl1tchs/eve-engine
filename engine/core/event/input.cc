@@ -6,6 +6,8 @@
 #include "core/event/key_event.h"
 #include "core/event/mouse_event.h"
 
+namespace eve {
+
 std::unordered_map<KeyCode, bool> Input::key_press_states_ = {};
 std::unordered_map<KeyCode, bool> Input::key_release_states_ = {};
 std::unordered_map<MouseCode, bool> Input::mouse_press_states_ = {};
@@ -77,3 +79,5 @@ bool Input::IsMouseButtonReleased(MouseCode button) {
 glm::dvec2 Input::GetMousePosition() {
   return mouse_position_;
 }
+
+}  // namespace eve

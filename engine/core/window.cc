@@ -10,6 +10,8 @@
 #include "core/event/mouse_event.h"
 #include "core/event/window_event.h"
 
+namespace eve {
+
 void GlfwErrorCallback(int error, const char* description);
 
 Window::Window(WindowProps props) {
@@ -238,3 +240,5 @@ void Window::InitEvents() {
 void GlfwErrorCallback(int error, const char* description) {
   LOG_ERROR("GLFW Error: (no:\"{0}\") {1}", error, description);
 }
+
+}  // namespace eve

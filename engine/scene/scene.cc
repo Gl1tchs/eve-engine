@@ -8,12 +8,13 @@
 #include "scripting/script.h"
 #include "scripting/script_engine.h"
 
+namespace eve {
 Scene::Scene(Ref<State> state, std::string name) : state_(state), name_(name) {}
 
 template <typename... Component>
 static void CopyComponent(
     entt::registry& dst, entt::registry& src,
-    const std::unordered_map<GUUID, entt::entity>& entt_map) {
+    const std::unordered_map<UUID, entt::entity>& entt_map) {
   (
       [&]() {
         auto view = src.view<Component>();
@@ -31,7 +32,7 @@ static void CopyComponent(
 template <typename... Component>
 static void CopyComponent(
     ComponentGroup<Component...>, entt::registry& dst, entt::registry& src,
-    const std::unordered_map<GUUID, entt::entity>& entt_map) {
+    const std::unordered_map<UUID, entt::entity>& entt_map) {
   CopyComponent<Component...>(dst, src, entt_map);
 }
 
@@ -56,12 +57,12 @@ Ref<Scene> Scene::Copy(Ref<Scene> src) {
 
   auto& src_scene_registry = src->registry_;
   auto& dst_scene_registry = dst_scene->registry_;
-  std::unordered_map<GUUID, entt::entity> entt_map;
+  std::unordered_map<UUID, entt::entity> entt_map;
 
   // Create entities in new scene
   auto id_view = src_scene_registry.view<IdComponent>();
   for (auto e : id_view) {
-    GUUID uuid = src_scene_registry.get<IdComponent>(e).id;
+    UUID uuid = src_scene_registry.get<IdComponent>(e).id;
     const auto& name = src_scene_registry.get<TagComponent>(e).tag;
     Entity new_entity = dst_scene->CreateEntityWithUUID(uuid, name);
     entt_map[uuid] = (entt::entity)new_entity;
@@ -111,10 +112,10 @@ void Scene::Step(int frames) {
 }
 
 Entity Scene::CreateEntity(const std::string& name) {
-  return CreateEntityWithUUID(GUUID(), name);
+  return CreateEntityWithUUID(UUID(), name);
 }
 
-Entity Scene::CreateEntityWithUUID(GUUID uuid, const std::string& name) {
+Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name) {
   Entity entity = {registry_.create(), this};
   entity.AddComponent<IdComponent>(uuid);
   entity.AddComponent<Transform>();
@@ -159,7 +160,7 @@ void Scene::DestroyEntity(Entity entity) {
   registry_.destroy(entity);
 }
 
-std::optional<Entity> Scene::FindEntityByUUID(GUUID uuid) {
+std::optional<Entity> Scene::FindEntityByUUID(UUID uuid) {
   if (entity_map_.find(uuid) != entity_map_.end()) {
     return std::optional<Entity>(Entity{entity_map_.at(uuid), this});
   }
@@ -200,3 +201,4 @@ bool Scene::EntityNameExists(const std::string& name) {
 
   return it != entity_map_.end();
 }
+}  // namespace eve

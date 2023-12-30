@@ -2,6 +2,8 @@
 
 #include "core/debug/log.h"
 
+namespace eve {
+
 static std::string GetTimestamp() {
   auto now =
       std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -69,3 +71,5 @@ std::string Logger::GetColoredMessage(const std::string& message,
 
   return message;  // No color for the default case
 }
+
+}  // namespace eve

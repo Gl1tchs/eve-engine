@@ -7,6 +7,7 @@
 #include "graphics/index_buffer.h"
 #include "graphics/vertex_buffer.h"
 
+namespace eve {
 class VertexArray {
  public:
   virtual void Bind() const = 0;
@@ -21,3 +22,4 @@ class VertexArray {
 
   [[nodiscard]] static Ref<VertexArray> Create();
 };
+}  // namespace eve

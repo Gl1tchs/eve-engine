@@ -6,6 +6,7 @@
 
 #include "panels/panel.h"
 
+namespace eve {
 enum class SceneState { kEdit, kPlay, kPaused };
 
 class ToolbarPanel : public Panel {
@@ -29,3 +30,4 @@ class ToolbarPanel : public Panel {
  private:
   SceneState state_ = SceneState::kEdit;
 };
+}  // namespace eve

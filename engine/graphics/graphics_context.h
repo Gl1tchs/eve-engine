@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 struct DeviceInformation {
   const char* vendor;
   const char* renderer;
@@ -17,3 +18,4 @@ class GraphicsContext {
 
   [[nodiscard]] static Ref<GraphicsContext> Create();
 };
+}  // namespace eve

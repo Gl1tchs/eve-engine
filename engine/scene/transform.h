@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 const glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
 const glm::vec3 kVec3Down = -kVec3Up;
 
@@ -37,3 +38,4 @@ struct Transform final {
 
   [[nodiscard]] glm::vec3 GetDirection() const;
 };
+}  // namespace eve

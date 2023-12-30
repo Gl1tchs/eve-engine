@@ -5,6 +5,7 @@
 #include "project/project_serializer.h"
 #include "scene/scene_manager.h"
 
+namespace eve {
 Ref<Project> Project::active_project_ = nullptr;
 
 Ref<Project> Project::New() {
@@ -35,3 +36,4 @@ void Project::SaveActive(const fs::path& path) {
   serializer.Serialize(path);
   active_project_->project_dir_ = path.parent_path();
 }
+}  // namespace eve

@@ -8,6 +8,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_texture.h"
 
+namespace eve {
 Ref<Texture> Texture::Create(const TextureMetadata& metadata,
                              const void* pixels) {
   switch (GetGraphicsAPI()) {
@@ -39,3 +40,4 @@ Ref<Texture> Texture::Create(const std::filesystem::path& path,
 
   return texture;
 }
+}  // namespace eve

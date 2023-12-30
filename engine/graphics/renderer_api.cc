@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_renderer_api.h"
 
+namespace eve {
 Scope<RendererAPI> RendererAPI::Create() {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -17,3 +18,4 @@ Scope<RendererAPI> RendererAPI::Create() {
       return nullptr;
   }
 }
+}  // namespace eve

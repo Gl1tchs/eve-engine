@@ -7,8 +7,9 @@
 #include <entt/entt.hpp>
 
 #include "core/state.h"
-#include "core/utils/guuid.h"
+#include "core/uuid.h"
 
+namespace eve {
 class Entity;
 
 class Scene {
@@ -32,14 +33,14 @@ class Scene {
   void Step(int frames = 1);
 
   Entity CreateEntity(const std::string& name = "");
-  Entity CreateEntityWithUUID(GUUID uuid, const std::string& name = "");
+  Entity CreateEntityWithUUID(UUID uuid, const std::string& name = "");
 
   [[nodiscard]] bool Exists(Entity entity);
 
   void DestroyEntity(Entity entity);
 
   [[nodiscard]] std::optional<Entity> FindEntityByName(std::string name);
-  [[nodiscard]] std::optional<Entity> FindEntityByUUID(GUUID uuid);
+  [[nodiscard]] std::optional<Entity> FindEntityByUUID(UUID uuid);
 
   [[nodiscard]] std::optional<Entity> GetPrimaryCameraEntity();
 
@@ -60,7 +61,7 @@ class Scene {
 
   // ECS stuff
   entt::registry registry_;
-  std::unordered_map<GUUID, Entity> entity_map_;
+  std::unordered_map<UUID, Entity> entity_map_;
 
   // scene properties
   std::string name_;
@@ -75,3 +76,4 @@ class Scene {
   friend class HierarchyPanel;
   friend class SceneSerializer;
 };
+}  // namespace eve

@@ -6,6 +6,7 @@
 
 #include <imgui.h>
 
+namespace eve {
 MenuItem::MenuItem(std::string p_name, std::function<void(void)> p_callback,
                    std::string p_shortcut)
     : name(p_name), shortcut(p_shortcut), callback(p_callback) {}
@@ -69,3 +70,4 @@ void MenuBar::Draw() {
     ImGui::EndMenuBar();
   }
 }
+}  // namespace eve

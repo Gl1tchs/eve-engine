@@ -10,6 +10,7 @@
 
 #include "runtime_layer.h"
 
+namespace eve {
 struct RuntimeArgumentPacket {
   std::optional<std::string> startup_project;
 };
@@ -78,3 +79,4 @@ std::optional<RuntimeArgumentPacket> ParseArgs(
 
   return packet;
 }
+}  // namespace eve

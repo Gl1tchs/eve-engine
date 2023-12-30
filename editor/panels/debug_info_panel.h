@@ -9,6 +9,7 @@
 #include "panels/panel.h"
 #include "utils/cpuid.h"
 
+namespace eve {
 class DebugInfoPanel : public Panel {
   IMPL_PANEL("Debug Info")
 
@@ -24,3 +25,4 @@ class DebugInfoPanel : public Panel {
   uint64_t system_memory_ = 0;
   CPUInfo cpu_info_;
 };
+}  // namespace eve

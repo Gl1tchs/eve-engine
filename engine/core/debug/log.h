@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 enum class LogLevel {
   Trace = 0,
   Info,
@@ -31,17 +32,22 @@ class Logger {
 
   static const char* s_log_level_strings[];
 };
+}  // namespace eve
 
-#define LOG_TRACE(...) Logger::Log(LogLevel::Trace, std::format(__VA_ARGS__))
-#define LOG_INFO(...) Logger::Log(LogLevel::Info, std::format(__VA_ARGS__))
+#define LOG_TRACE(...) \
+  ::eve::Logger::Log(::eve::LogLevel::Trace, std::format(__VA_ARGS__))
+#define LOG_INFO(...) \
+  ::eve::Logger::Log(::eve::LogLevel::Info, std::format(__VA_ARGS__))
 #define LOG_WARNING(...) \
-  Logger::Log(LogLevel::Warning, std::format(__VA_ARGS__))
-#define LOG_ERROR(...) Logger::Log(LogLevel::Error, std::format(__VA_ARGS__))
-#define LOG_FATAL(...) Logger::Log(LogLevel::Fatal, std::format(__VA_ARGS__))
+  ::eve::Logger::Log(::eve::LogLevel::Warning, std::format(__VA_ARGS__))
+#define LOG_ERROR(...) \
+  ::eve::Logger::Log(::eve::LogLevel::Error, std::format(__VA_ARGS__))
+#define LOG_FATAL(...) \
+  ::eve::Logger::Log(::eve::LogLevel::Fatal, std::format(__VA_ARGS__))
 
-#define LOG_IF(level, condition, ...) \
-  if (condition) {                    \
-    Logger::Log(level, __VA_ARGS__);  \
+#define LOG_IF(level, condition, ...)       \
+  if (condition) {                          \
+    ::eve::Logger::Log(level, __VA_ARGS__); \
   }
 
 #if _WIN32

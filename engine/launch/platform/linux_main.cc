@@ -2,8 +2,10 @@
 
 #include "core/core_minimal.h"
 
+namespace eve {
 extern int GuardedMain(CommandLineArguments args);
+}
 
 int main(int argc, const char* argv[]) {
-  return GuardedMain({argc, argv});
+  return eve::GuardedMain({argc, argv});
 }

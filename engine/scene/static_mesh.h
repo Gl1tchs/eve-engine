@@ -6,6 +6,7 @@
 
 #include "graphics/primitives/mesh.h"
 
+namespace eve {
 struct Model {
   std::vector<RenderData<MeshVertex>> meshes;
 
@@ -15,3 +16,4 @@ struct Model {
 struct ModelComponent {
   AssetRef<Model> model;
 };
+}  // namespace eve

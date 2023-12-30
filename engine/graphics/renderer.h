@@ -13,6 +13,7 @@
 #include "scene/static_mesh.h"
 #include "scene/transform.h"
 
+namespace eve {
 struct CameraData final {
   glm::mat4 view;
   glm::mat4 proj;
@@ -75,3 +76,4 @@ class Renderer final {
   // Misc
   RenderStats stats_;
 };
+}  // namespace eve

@@ -10,6 +10,8 @@
 #include "core/utils/memory.h"
 #include "ui/imgui_layer.h"
 
+namespace eve {
+
 struct InstanceSpecifications {
   std::string name;
   std::string description;
@@ -65,3 +67,5 @@ class Instance {
   std::vector<std::function<void()>> main_thread_queue_;
   std::mutex main_thread_queue_mutex_;
 };
+
+}  // namespace eve

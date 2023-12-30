@@ -4,6 +4,7 @@
 
 #include "pch.h"
 
+namespace eve {
 class Modal {
  public:
   Modal(const std::string name, bool closable = true);
@@ -25,3 +26,4 @@ class Modal {
   bool should_show_ = false;
   int window_flags_ = 0;
 };
+}  // namespace eve

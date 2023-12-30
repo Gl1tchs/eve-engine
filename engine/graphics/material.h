@@ -7,9 +7,11 @@
 #include "asset/asset.h"
 #include "graphics/texture.h"
 
+namespace eve {
 struct Material {
   glm::vec3 albedo;
   float metallic;
   float roughness;
   float ao;
 };
+}  // namespace eve

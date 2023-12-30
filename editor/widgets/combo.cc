@@ -6,6 +6,7 @@
 
 #include <imgui.h>
 
+namespace eve {
 void Combo::Draw(const char* id, std::vector<std::string> elements,
                  std::function<void(const std::string&)> callback) {
   static std::string current_element = elements[0];
@@ -25,3 +26,4 @@ void Combo::Draw(const char* id, std::vector<std::string> elements,
     ImGui::EndCombo();
   }
 }
+}  // namespace eve

@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 namespace ini {
 
 struct IniValue {
@@ -62,5 +63,6 @@ struct IniObject {
 IniObject ParseFile(const fs::path& path);
 
 }  // namespace ini
+}  // namespace eve
 
 #include "core/serialization/ini_parser.inl"

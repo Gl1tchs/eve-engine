@@ -6,6 +6,8 @@
 
 #include "core/state.h"
 
+namespace eve {
+
 class Layer {
  public:
   Layer(Ref<State>& state);
@@ -30,3 +32,5 @@ class Layer {
   friend class Instance;
   friend class LayerStack;
 };
+
+}  // namespace eve

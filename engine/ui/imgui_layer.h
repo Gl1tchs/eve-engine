@@ -4,6 +4,7 @@
 
 #include "core/layer.h"
 
+namespace eve {
 class ImGuiLayer : public Layer {
  public:
   ImGuiLayer(Ref<State>& state);
@@ -20,3 +21,4 @@ class ImGuiLayer : public Layer {
 
   void SetDarkThemeColors();
 };
+}  // namespace eve

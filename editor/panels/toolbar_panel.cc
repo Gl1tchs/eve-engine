@@ -7,6 +7,7 @@
 
 #include "utils/imgui_utils.h"
 
+namespace eve {
 ToolbarPanel::ToolbarPanel() : Panel(true) {
   SetFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar |
            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
@@ -50,3 +51,4 @@ void ToolbarPanel::Draw() {
     }
   }
 }
+}  // namespace eve

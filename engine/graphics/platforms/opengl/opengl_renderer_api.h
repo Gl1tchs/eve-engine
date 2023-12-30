@@ -4,6 +4,7 @@
 
 #include "graphics/renderer_api.h"
 
+namespace eve {
 class OpenGLRendererAPI final : public RendererAPI {
  public:
   void Init() override;
@@ -26,3 +27,4 @@ class OpenGLRendererAPI final : public RendererAPI {
 
   void SetLineWidth(float width) override;
 };
+}  // namespace eve

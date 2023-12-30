@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_shader.h"
 
+namespace eve {
 Ref<Shader> Shader::Create(const std::string& vs_path,
                            const std::string& fs_path,
                            const std::string& gs_path) {
@@ -19,3 +20,4 @@ Ref<Shader> Shader::Create(const std::string& vs_path,
       return nullptr;
   }
 }
+}  // namespace eve

@@ -8,6 +8,7 @@
 #include "graphics/shader.h"
 #include "graphics/vertex_array.h"
 
+namespace eve {
 static constexpr size_t kMeshMaxVertexCount = 4000;
 static constexpr size_t kMeshMaxIndexCount = 8000;
 static constexpr size_t kMeshMaxTextures = 32;
@@ -63,3 +64,4 @@ class MeshPrimitive : public Primitive<MeshVertex> {
   std::array<Ref<Texture>, kMeshMaxTextures> texture_slots_;
   uint32_t texture_slot_index_;
 };
+}  // namespace eve

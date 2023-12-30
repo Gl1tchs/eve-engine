@@ -3,6 +3,7 @@
 #include "core/serialization/ini_parser.h"
 #include "ini_parser.h"
 
+namespace eve {
 namespace ini {
 
 IniValue& IniValue::operator=(const std::string_view& other) {
@@ -98,3 +99,4 @@ IniObject ParseFile(const fs::path& path) {
 }
 
 }  // namespace ini
+}  // namespace eve

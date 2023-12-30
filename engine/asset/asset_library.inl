@@ -1,3 +1,5 @@
+namespace eve {
+
 template <typename T>
 inline AssetRef<T> AssetLibrary::LoadFromPath(const std::string& path) {
   std::string meta_path(std::format("{0}.meta", path));
@@ -21,3 +23,5 @@ template <>
 inline AssetRef<Model> AssetLibrary::LoadFromMeta(const std::string& path) {
   return AssetLoader::LoadModel(path);
 }
+
+}  // namespace eve

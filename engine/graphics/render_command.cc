@@ -2,6 +2,7 @@
 
 #include "graphics/render_command.h"
 
+namespace eve {
 Scope<RendererAPI> RenderCommand::renderer_api_ = nullptr;
 
 void RenderCommand::Init() {
@@ -47,3 +48,4 @@ void RenderCommand::DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
 void RenderCommand::SetLineWidth(float width) {
   renderer_api_->SetLineWidth(width);
 }
+}  // namespace eve

@@ -4,6 +4,7 @@
 
 #include "project/project.h"
 
+namespace eve {
 class ProjectSerializer {
  public:
   ProjectSerializer(Ref<Project> project);
@@ -15,3 +16,4 @@ class ProjectSerializer {
  private:
   Ref<Project> project_;
 };
+}  // namespace eve

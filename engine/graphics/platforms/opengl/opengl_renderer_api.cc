@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 void OpenGLRendererAPI::Init() {
   glEnable(GL_BLEND);
 
@@ -70,3 +71,4 @@ void OpenGLRendererAPI::DrawArraysInstanced(
 void OpenGLRendererAPI::SetLineWidth(float width) {
   glLineWidth(width);
 }
+}  // namespace eve

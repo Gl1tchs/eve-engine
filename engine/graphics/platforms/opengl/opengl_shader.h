@@ -4,6 +4,7 @@
 
 #include "graphics/shader.h"
 
+namespace eve {
 [[nodiscard]] std::string SerializeShaderType(ShaderType type);
 
 [[nodiscard]] ShaderType DeserializeShaderType(const std::string& value);
@@ -33,7 +34,8 @@ class OpenGLShader final : public Shader {
   [[nodiscard]] uint32_t GetProgramID() const { return program_; }
 
  private:
-  [[nodiscard]] static std::string LoadShaderSource(const std::filesystem::path& path);
+  [[nodiscard]] static std::string LoadShaderSource(
+      const std::filesystem::path& path);
 
   [[nodiscard]] int GetUniformLocation(const std::string& name) const;
 
@@ -46,3 +48,4 @@ class OpenGLShader final : public Shader {
  private:
   uint32_t program_;
 };
+}  // namespace eve

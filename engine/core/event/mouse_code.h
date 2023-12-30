@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+namespace eve {
+
 enum class MouseCode : uint32_t {
   k1 = 0,
   k2 = 1,
@@ -17,3 +19,5 @@ enum class MouseCode : uint32_t {
   kRight = k2,
   kMiddle = k3,
 };
+
+}

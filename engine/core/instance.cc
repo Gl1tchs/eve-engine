@@ -5,6 +5,8 @@
 #include "core/utils/timer.h"
 #include "scripting/script_engine.h"
 
+namespace eve {
+
 Instance* Instance::instance_ = nullptr;
 
 Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
@@ -88,3 +90,5 @@ void Instance::PopLayer(Layer* layer) {
 void Instance::PopOverlay(Layer* overlay) {
   layers_.PopOverlay(overlay);
 }
+
+}  // namespace eve

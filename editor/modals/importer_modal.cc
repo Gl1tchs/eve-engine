@@ -9,6 +9,7 @@
 #include "asset/asset.h"
 #include "widgets/combo.h"
 
+namespace eve {
 static AssetType DeserializeAssetType(const std::string& type);
 
 static TextureFormat DeserializeTextureFormat(const std::string& format);
@@ -230,3 +231,4 @@ TextureWrappingMode DeserializeTextureWrappingMode(const std::string& mode) {
   LOG_WARNING("Unable to deserialize texture wrapping mode of: {}", mode);
   return TextureWrappingMode::kClampToEdge;
 }
+}  // namespace eve

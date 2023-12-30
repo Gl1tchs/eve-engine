@@ -10,6 +10,7 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/panel.h"
 
+namespace eve {
 class InspectorPanel : public Panel {
   IMPL_PANEL("Inspector")
 
@@ -38,3 +39,4 @@ class InspectorPanel : public Panel {
   bool show_add_component_dialog_ = false;
   bool add_component_dialog_opened_ = false;
 };
+}  // namespace eve

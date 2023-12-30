@@ -18,6 +18,7 @@
 #include "panels/viewport_panel.h"
 #include "widgets/menu_bar.h"
 
+namespace eve {
 class EditorLayer : public Layer {
  public:
   EditorLayer(Ref<State>& state);
@@ -115,3 +116,4 @@ class EditorLayer : public Layer {
 
   CursorState old_cursor_state_ = CursorState::kNormal;
 };
+}  // namespace eve

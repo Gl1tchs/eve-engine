@@ -4,6 +4,7 @@
 
 #include "pch_shared.h"
 
+namespace eve {
 enum class ShaderDataType {
   kNone = 0,
   kFloat,
@@ -60,3 +61,4 @@ class BufferLayout final {
   std::vector<BufferElement> elements_;
   uint32_t stride_ = 0;
 };
+}  // namespace eve

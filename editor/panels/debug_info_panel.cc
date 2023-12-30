@@ -10,6 +10,7 @@
 
 #include "graphics/graphics_context.h"
 
+namespace eve {
 DebugInfoPanel::DebugInfoPanel(Ref<Renderer>& renderer)
     : Panel(false), renderer_(renderer) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
@@ -19,7 +20,7 @@ DebugInfoPanel::DebugInfoPanel(Ref<Renderer>& renderer)
   status.dwLength = sizeof(status);
   GlobalMemoryStatusEx(&status);
   system_memory_ = status.ullTotalPhys;
-#elif __linux__ 
+#elif __linux__
   // TODO testing required
   long pages = sysconf(_SC_PHYS_PAGES);
   long page_size = sysconf(_SC_PAGE_SIZE);
@@ -59,3 +60,4 @@ void DebugInfoPanel::Draw() {
 
   ImGui::Columns(1);
 }
+}  // namespace eve

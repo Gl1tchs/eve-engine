@@ -10,6 +10,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+namespace eve {
 ImGuiLayer::ImGuiLayer(Ref<State>& state) : Layer(state) {}
 
 void ImGuiLayer::Begin() {
@@ -73,6 +74,7 @@ void ImGuiLayer::OnDestroy() {
 
 void ImGuiLayer::SetDarkThemeColors() {
   ImGuiStyle& style = ImGui::GetStyle();
+
   ImVec4* colors = style.Colors;
 
   // Set your base color
@@ -119,5 +121,8 @@ void ImGuiLayer::SetDarkThemeColors() {
   colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
   colors[ImGuiCol_PlotHistogram] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
   colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
-  colors[ImGuiCol_TextSelectedBg] = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
+  colors[ImGuiCol_TextSelectedBg] =
+      ImVec4(0.0f, 0.0f, 1.0f, 0.5f);  // Blue background for selected text
 }
+
+}  // namespace eve

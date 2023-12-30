@@ -9,6 +9,7 @@
 
 #define BIT(x) 1 << x
 
+namespace eve {
 enum class GraphicsAPI { kNone = 0, kOpenGL, kVulkan };
 
 enum BufferBits : uint16_t {
@@ -27,7 +28,7 @@ class RendererAPI {
   virtual void Clear(uint16_t bits = BufferBits_kColor) = 0;
 
   virtual void DrawArrays(const Ref<VertexArray>& vertex_array,
-                           uint32_t vertex_count) = 0;
+                          uint32_t vertex_count) = 0;
   virtual void DrawIndexed(const Ref<VertexArray>& vertex_array,
                            uint32_t index_count = 0) = 0;
 
@@ -42,3 +43,4 @@ class RendererAPI {
 
   [[nodiscard]] static Scope<RendererAPI> Create();
 };
+}  // namespace eve

@@ -2,6 +2,7 @@
 
 #include "scene/transform.h"
 
+namespace eve {
 void Transform::Translate(glm::vec3 translation) {
   position += translation;
 }
@@ -43,3 +44,4 @@ glm::vec3 Transform::GetDirection() const {
   dir = glm::normalize(dir);
   return dir;
 }
+}  // namespace eve

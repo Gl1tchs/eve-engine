@@ -4,6 +4,7 @@
 
 #include "graphics/uniform_buffer.h"
 
+namespace eve {
 class OpenGLUniformBuffer final : public UniformBuffer {
  public:
   OpenGLUniformBuffer(uint32_t size, uint32_t binding);
@@ -14,3 +15,4 @@ class OpenGLUniformBuffer final : public UniformBuffer {
  private:
   uint32_t ubo_;
 };
+}  // namespace eve

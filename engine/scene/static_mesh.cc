@@ -6,6 +6,7 @@
 
 #include "core/debug/log.h"
 
+namespace eve {
 glm::vec2 ToGLM2(const objl::Vector2& from) {
   return glm::vec2{from.X, from.Y};
 }
@@ -54,3 +55,4 @@ Ref<Model> Model::Load(const std::filesystem::path& path) {
 
   return model;
 }
+}  // namespace eve

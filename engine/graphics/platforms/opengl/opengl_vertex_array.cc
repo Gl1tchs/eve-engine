@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type) {
   switch (type) {
     case ShaderDataType::kFloat:
@@ -133,3 +134,4 @@ void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& index_buffer) {
 
   index_buffer_ = index_buffer;
 }
+}  // namespace eve

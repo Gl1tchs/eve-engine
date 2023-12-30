@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 std::string SerializeShaderType(ShaderType type) {
   switch (type) {
     case ShaderType::kVertex:
@@ -43,7 +44,6 @@ OpenGLShader::OpenGLShader(const std::string& vs_path,
                            const std::string& fs_path,
                            const std::string& gs_path) {
   program_ = glCreateProgram();
-
 
   const std::string vertex_source = LoadShaderSource(vs_path);
   const uint32_t vertex_shader =
@@ -180,8 +180,8 @@ bool OpenGLShader::CheckCompileErrors(const uint32_t shader,
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, nullptr, info_log);
-    LOG_ERROR("Unable to link shader of type: ",
-                     SerializeShaderType(type), "\n", info_log);
+    LOG_ERROR("Unable to link shader of type: ", SerializeShaderType(type),
+              "\n", info_log);
     return false;
   }
 
@@ -201,3 +201,4 @@ uint32_t OpenGLShader::CompileShader(const std::string& source,
 
   return shader;
 }
+}  // namespace eve

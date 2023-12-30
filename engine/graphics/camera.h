@@ -6,6 +6,7 @@
 
 #include "scene/transform.h"
 
+namespace eve {
 struct Camera {
   float aspect_ratio;
 
@@ -15,3 +16,4 @@ struct Camera {
 
   [[nodiscard]] virtual glm::mat4 GetViewMatrix(Transform& transform) = 0;
 };
+}  // namespace eve

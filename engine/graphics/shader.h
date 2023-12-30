@@ -6,6 +6,7 @@
 
 enum class ShaderType { kNone = 0, kVertex, kFragment, kGeometry };
 
+namespace eve {
 class Shader {
  public:
   virtual void Bind() const = 0;
@@ -27,3 +28,4 @@ class Shader {
                                           const std::string& fs_path,
                                           const std::string& gs_path = "");
 };
+}  // namespace eve

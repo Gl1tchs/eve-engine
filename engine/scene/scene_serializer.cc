@@ -5,7 +5,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "asset/asset_library.h"
-#include "core/utils/guuid.h"
+#include "core/uuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
 #include "scripting/script.h"
@@ -93,14 +93,14 @@ struct convert<glm::vec4> {
 };
 
 template <>
-struct convert<GUUID> {
-  static Node encode(const GUUID& uuid) {
+struct convert<eve::UUID> {
+  static Node encode(const eve::UUID& uuid) {
     Node node;
     node.push_back((uint64_t)uuid);
     return node;
   }
 
-  static bool decode(const Node& node, GUUID& uuid) {
+  static bool decode(const Node& node, eve::UUID& uuid) {
     uuid = node.as<uint64_t>();
     return true;
   }
@@ -126,6 +126,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
   return out;
 }
 
+namespace eve {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(YAML::Emitter& out, Entity entity) {
@@ -265,7 +266,7 @@ static void SerializeEntity(YAML::Emitter& out, Entity entity) {
           WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
           WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
           WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
-          WRITE_SCRIPT_FIELD(kScriptEntity, GUUID);
+          WRITE_SCRIPT_FIELD(kScriptEntity, UUID);
           default:
             break;
         }
@@ -324,7 +325,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
   }
 
   for (auto entity : entities) {
-    uint64_t uuid = entity["id"].as<GUUID>();
+    uint64_t uuid = entity["id"].as<UUID>();
 
     std::string name;
     if (entity["tag_component"]) {
@@ -438,7 +439,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
               READ_SCRIPT_FIELD(kVector2, glm::vec2);
               READ_SCRIPT_FIELD(kVector3, glm::vec3);
               READ_SCRIPT_FIELD(kVector4, glm::vec4);
-              READ_SCRIPT_FIELD(kScriptEntity, GUUID);
+              READ_SCRIPT_FIELD(kScriptEntity, UUID);
               default:
                 break;
             }
@@ -450,3 +451,4 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
 
   return true;
 }
+}  // namespace eve

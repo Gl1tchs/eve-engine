@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size) {
   glCreateBuffers(1, &vbo_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
@@ -41,3 +42,4 @@ const BufferLayout& OpenGLVertexBuffer::GetLayout() {
 void OpenGLVertexBuffer::SetLayout(const BufferLayout& layout) {
   layout_ = layout;
 }
+}  // namespace eve

@@ -5,6 +5,7 @@
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
 
+namespace eve {
 MeshPrimitive::MeshPrimitive()
     : Primitive<MeshVertex>(kMeshMaxVertexCount),
       index_offset(0),
@@ -118,3 +119,4 @@ float MeshPrimitive::FindTexture(const Ref<Texture>& texture) {
 
   return texture_index;
 }
+}  // namespace eve

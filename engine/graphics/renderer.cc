@@ -7,6 +7,7 @@
 #include "graphics/primitives/primitive.h"
 #include "graphics/render_command.h"
 
+namespace eve {
 Renderer::Renderer() {
   graphics_context_ = GraphicsContext::Create();
   graphics_context_->Init();
@@ -152,3 +153,4 @@ void Renderer::NextBatch() {
   Flush();
   BeginBatch();
 }
+}  // namespace eve

@@ -16,6 +16,7 @@
 #include "project/project.h"
 #include "scripting/script_glue.h"
 
+namespace eve {
 static std::unordered_map<std::string, ScriptFieldType> script_field_type_map =
     {
         {"System.Single", ScriptFieldType::kFloat},
@@ -119,15 +120,13 @@ struct ScriptEngineData {
   ScriptClass entity_class;
 
   std::unordered_map<std::string, Ref<ScriptClass>> entity_classes;
-  std::unordered_map<GUUID, Ref<ScriptInstance>> entity_instances;
-  std::unordered_map<GUUID, ScriptFieldMap> entity_script_fields;
+  std::unordered_map<UUID, Ref<ScriptInstance>> entity_instances;
+  std::unordered_map<UUID, ScriptFieldMap> entity_script_fields;
 
   std::vector<Scope<filewatch::FileWatch<std::string>>> script_file_watchers;
   bool assembly_reload_pending = false;
 
   bool is_runtime = false;
-
-  bool initialized = false;
 
 #ifdef _DEBUG
   bool enable_debugging = true;
@@ -166,10 +165,6 @@ static void OnScriptFileChanged(const std::string& path,
 }
 
 void ScriptEngine::Init(bool is_runtime) {
-  if (data && data->initialized) {
-    ScriptEngine::Shutdown();
-  }
-
   data = new ScriptEngineData();
   data->is_runtime = is_runtime;
 
@@ -203,12 +198,6 @@ void ScriptEngine::Init(bool is_runtime) {
 
   // Retrieve and instantiate class
   data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
-
-  data->initialized = true;
-}
-
-bool IsInitialized() {
-  return data->initialized;
 }
 
 void ScriptEngine::Shutdown() {
@@ -316,7 +305,7 @@ bool ScriptEngine::EntityClassExists(const std::string& fullClassName) {
 void ScriptEngine::OnCreateEntity(Entity entity) {
   const auto& sc = entity.GetComponent<ScriptComponent>();
   if (ScriptEngine::EntityClassExists(sc.class_name)) {
-    GUUID entity_id = entity.GetUUID();
+    UUID entity_id = entity.GetUUID();
 
     Ref<ScriptInstance> instance =
         CreateRef<ScriptInstance>(data->entity_classes[sc.class_name], entity);
@@ -336,7 +325,7 @@ void ScriptEngine::OnCreateEntity(Entity entity) {
 }
 
 void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
-  GUUID entity_uuid = entity.GetUUID();
+  UUID entity_uuid = entity.GetUUID();
   if (data->entity_instances.find(entity_uuid) !=
       data->entity_instances.end()) {
     Ref<ScriptInstance> instance = data->entity_instances[entity_uuid];
@@ -351,7 +340,7 @@ Scene* ScriptEngine::GetSceneContext() {
   return data->scene_context;
 }
 
-Ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(GUUID entity_id) {
+Ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(UUID entity_id) {
   auto it = data->entity_instances.find(entity_id);
   if (it == data->entity_instances.end()) {
     return nullptr;
@@ -389,7 +378,7 @@ ScriptEngine::GetEntityClasses() {
 ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity) {
   ASSERT(entity);
 
-  GUUID entity_id = entity.GetUUID();
+  UUID entity_id = entity.GetUUID();
   return data->entity_script_fields[entity_id];
 }
 
@@ -465,7 +454,7 @@ MonoImage* ScriptEngine::GetAppAssemblyImage() {
   return data->app_assembly_image;
 }
 
-MonoObject* ScriptEngine::GetManagedInstance(GUUID uuid) {
+MonoObject* ScriptEngine::GetManagedInstance(UUID uuid) {
   ASSERT(data->entity_instances.find(uuid) != data->entity_instances.end());
   return data->entity_instances.at(uuid)->GetManagedObject();
 }
@@ -620,3 +609,4 @@ ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
   ASSERT(false, "Unknown ScriptFieldType");
   return ScriptFieldType::kNone;
 }
+}  // namespace eve

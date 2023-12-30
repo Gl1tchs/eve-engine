@@ -4,6 +4,7 @@
 
 #include "graphics/vertex_array.h"
 
+namespace eve {
 class OpenGLVertexArray final : public VertexArray {
  public:
   OpenGLVertexArray();
@@ -24,3 +25,4 @@ class OpenGLVertexArray final : public VertexArray {
   std::vector<Ref<VertexBuffer>> vertex_buffers_;
   Ref<IndexBuffer> index_buffer_;
 };
+}  // namespace eve

@@ -2,6 +2,8 @@
 
 #include "core/utils/timer.h"
 
+namespace eve {
+
 Timer::Timer() : last_frame_time_(std::chrono::high_resolution_clock::now()) {}
 
 float Timer::Tick() {
@@ -11,3 +13,5 @@ float Timer::Tick() {
   last_frame_time_ = current_time;
   return delta_time.count();
 }
+
+}  // namespace eve

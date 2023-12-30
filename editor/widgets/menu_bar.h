@@ -4,6 +4,7 @@
 
 #include "pch.h"
 
+namespace eve {
 struct MenuItem {
   std::string name;
   std::string shortcut;
@@ -74,3 +75,4 @@ class MenuBar final {
  private:
   std::vector<Menu> menus_;
 };
+}  // namespace eve

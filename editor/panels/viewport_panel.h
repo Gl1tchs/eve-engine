@@ -10,6 +10,7 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/panel.h"
 
+namespace eve {
 class ViewportPanel : public Panel {
   IMPL_PANEL("Viewport")
 
@@ -34,3 +35,4 @@ class ViewportPanel : public Panel {
 
   bool should_draw_gizmos_ = true;
 };
+}  // namespace eve

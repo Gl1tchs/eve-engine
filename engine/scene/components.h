@@ -4,14 +4,15 @@
 
 #include "pch_shared.h"
 
-#include "core/utils/guuid.h"
+#include "core/uuid.h"
 #include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
 #include "scene/static_mesh.h"
 
+namespace eve {
 struct IdComponent {
-  GUUID id;
+  UUID id;
 };
 
 struct TagComponent {
@@ -38,3 +39,4 @@ struct ComponentGroup {};
 
 using AllComponents = ComponentGroup<Transform, CameraComponent, ModelComponent,
                                      Material, ScriptComponent>;
+}  // namespace eve

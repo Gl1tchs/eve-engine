@@ -4,6 +4,7 @@
 
 #include "modals/modal.h"
 
+namespace eve {
 enum class ExitModalAnswer {
   kSaveAndExit,
   kExitWithoutSaving,
@@ -20,3 +21,4 @@ class ExitModal : public Modal {
  protected:
   void Draw() override;
 };
+}  // namespace eve

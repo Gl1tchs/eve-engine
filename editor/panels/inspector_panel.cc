@@ -16,6 +16,7 @@
 #include "utils/imgui_utils.h"
 #include "utils/modify_info.h"
 
+namespace eve {
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
     : Panel(true),
       hierarchy_panel_(hierarchy_panel),
@@ -591,3 +592,4 @@ void DrawScriptFieldRuntime(const std::string& name, const ScriptField& field,
     }
   }
 }
+}  // namespace eve

@@ -12,6 +12,7 @@
 
 #include "layers/editor_layer.h"
 
+namespace eve {
 struct EditorArgumentPacket {
   std::optional<std::string> startup_project;
 };
@@ -72,3 +73,4 @@ std::optional<EditorArgumentPacket> ParseArgs(
 
   return packet;
 }
+}  // namespace eve

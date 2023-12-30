@@ -2,6 +2,7 @@
 
 #include "graphics/buffer_layout.h"
 
+namespace eve {
 uint32_t GetShaderDataTypeSize(ShaderDataType type) {
   switch (type) {
     case ShaderDataType::kFloat:
@@ -85,3 +86,4 @@ void BufferLayout::CalculateOffsetAndStride() {
     stride_ += element.size;
   }
 }
+}  // namespace eve

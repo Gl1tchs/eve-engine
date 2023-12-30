@@ -1,5 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
+namespace eve {
 template <EventDerived T>
 inline void SubscribeEvent(const EventCallbackFn<T>& callback) {
   event_callbacks<T>.push_back(callback);
@@ -21,3 +22,5 @@ inline void NotifyEvent(T& event) {
     callback(event);
   }
 }
+
+}  // namespace eve

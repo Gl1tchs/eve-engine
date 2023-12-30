@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+namespace eve {
+
 struct Buffer {
   uint8_t* data = nullptr;
   uint64_t size = 0;
@@ -63,3 +65,5 @@ struct ScopedBuffer {
  private:
   Buffer buffer_;
 };
+
+}  // namespace eve

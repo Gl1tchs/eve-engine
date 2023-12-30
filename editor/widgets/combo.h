@@ -4,7 +4,9 @@
 
 #include "pch.h"
 
+namespace eve {
 struct Combo {
   static void Draw(const char* name, std::vector<std::string> elements,
                    std::function<void(const std::string&)> callback);
 };
+}  // namespace eve

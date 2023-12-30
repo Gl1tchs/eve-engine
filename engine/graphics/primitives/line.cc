@@ -5,6 +5,7 @@
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
 
+namespace eve {
 LinePrimitive::LinePrimitive() : Primitive<LineVertex>(kMaxLines) {
   vertex_array_ = VertexArray::Create();
 
@@ -36,3 +37,4 @@ void LinePrimitive::Render(RenderStats& stats) {
 bool LinePrimitive::NeedsNewBatch() {
   return (BatchCount() + 2) >= kMaxLines;
 }
+}  // namespace eve

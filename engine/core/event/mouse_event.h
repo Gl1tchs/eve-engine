@@ -7,6 +7,8 @@
 #include "core/event/event_handler.h"
 #include "core/event/mouse_code.h"
 
+namespace eve {
+
 class MouseMoveEvent final : public Event {
  public:
   explicit MouseMoveEvent(const float x, const float y) : position_(x, y) {}
@@ -57,3 +59,5 @@ class MouseButtonReleaseEvent final : public MouseButtonEvent {
   explicit MouseButtonReleaseEvent(const int button_code)
       : MouseButtonEvent(button_code) {}
 };
+
+}  // namespace eve

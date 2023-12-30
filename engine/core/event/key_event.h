@@ -7,6 +7,8 @@
 #include "core/event/event_handler.h"
 #include "core/event/key_code.h"
 
+namespace eve {
+
 class KeyEvent : public Event {
  protected:
   explicit KeyEvent(const uint32_t key_code) : key_code_(key_code) {}
@@ -39,3 +41,5 @@ class KeyTypeEvent final : public KeyEvent {
  public:
   explicit KeyTypeEvent(const uint32_t key_code) : KeyEvent(key_code) {}
 };
+
+}  // namespace eve

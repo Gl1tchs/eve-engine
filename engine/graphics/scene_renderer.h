@@ -7,6 +7,7 @@
 #include "core/state.h"
 #include "scene/editor_camera.h"
 
+namespace eve {
 class SceneRenderer {
  public:
   SceneRenderer(const Ref<State>& state);
@@ -37,3 +38,4 @@ class SceneRenderer {
   bool editor_primary_used_ = false;
   Transform last_primary_transform_;
 };
+}  // namespace eve

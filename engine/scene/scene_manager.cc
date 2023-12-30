@@ -5,6 +5,7 @@
 #include "core/instance.h"
 #include "scene/scene_serializer.h"
 
+namespace eve {
 Ref<Project> SceneManager::project_ = nullptr;
 SceneManager::ActiveSceneInfo SceneManager::scene_info_{};
 
@@ -35,3 +36,4 @@ void SceneManager::SetActive(const uint32_t index) {
     scene_info_.scene = new_scene;
   }
 }
+}  // namespace eve

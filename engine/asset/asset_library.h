@@ -7,6 +7,8 @@
 #include "asset/asset.h"
 #include "asset/asset_loader.h"
 
+namespace eve {
+
 class AssetLibrary {
  public:
   template <typename T>
@@ -18,8 +20,9 @@ class AssetLibrary {
   // Get the path with some predefined substrings
   // Use "res://" to get asset directory
   // Use "proj://" to get project directory
-  [[nodiscard]] static fs::path GetAssetPath(
-      std::string relative_path);
+  [[nodiscard]] static fs::path GetAssetPath(std::string relative_path);
 };
+
+}  // namespace eve
 
 #include "asset/asset_library.inl"

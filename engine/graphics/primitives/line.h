@@ -7,6 +7,7 @@
 #include "graphics/shader.h"
 #include "graphics/vertex_array.h"
 
+namespace eve {
 constexpr size_t kMaxLines = 2000;
 
 struct LineVertex {
@@ -35,3 +36,4 @@ class LinePrimitive : public Primitive<LineVertex> {
   Ref<VertexBuffer> vertex_buffer_;
   Ref<Shader> shader_;
 };
+}  // namespace eve

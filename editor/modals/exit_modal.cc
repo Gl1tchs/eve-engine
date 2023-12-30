@@ -6,6 +6,7 @@
 
 #include "core/event/input.h"
 
+namespace eve {
 ExitModal::ExitModal() : Modal("Exit", false) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
@@ -44,3 +45,4 @@ void ExitModal::Draw() {
     ImGui::CloseCurrentPopup();
   }
 }
+}  // namespace eve

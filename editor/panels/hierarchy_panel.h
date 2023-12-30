@@ -10,6 +10,7 @@
 
 #include "panels/panel.h"
 
+namespace eve {
 class HierarchyPanel : public Panel {
   IMPL_PANEL("Hierarchy")
 
@@ -34,3 +35,4 @@ class HierarchyPanel : public Panel {
 
   friend class EditorLayer;
 };
+}  // namespace eve

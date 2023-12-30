@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+namespace eve {
 OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t size) {
   glCreateBuffers(1, &ibo_);
   glBindBuffer(GL_ARRAY_BUFFER, ibo_);
@@ -42,3 +43,4 @@ void OpenGLIndexBuffer::SetData(const void* data, uint32_t size) {
 uint32_t OpenGLIndexBuffer::GetCount() {
   return count_;
 }
+}  // namespace eve

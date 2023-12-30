@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_vertex_array.h"
 
+namespace eve {
 Ref<VertexArray> VertexArray::Create() {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -17,3 +18,4 @@ Ref<VertexArray> VertexArray::Create() {
       return nullptr;
   }
 }
+}  // namespace eve

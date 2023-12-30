@@ -10,6 +10,7 @@
 - [ ] Sounds
 
 ## Editor
+- [ ] New Project
 - [ ] Inspector script entity field
 - [ ] Better toolbar.
 - [ ] Add content browser and use id based asset system.

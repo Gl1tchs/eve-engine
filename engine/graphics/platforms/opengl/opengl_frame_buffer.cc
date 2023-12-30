@@ -6,6 +6,7 @@
 
 #include "graphics/platforms/opengl/opengl_texture.h"
 
+namespace eve {
 OpenGLFrameBuffer::OpenGLFrameBuffer(const glm::ivec2& size) : size_(size) {
   glGenFramebuffers(1, &fbo_);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -67,3 +68,4 @@ void OpenGLFrameBuffer::SetSize(glm::ivec2 size) {
 Ref<Texture> OpenGLFrameBuffer::GetTexture() {
   return texture_;
 }
+}  // namespace eve

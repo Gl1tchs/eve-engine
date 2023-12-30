@@ -6,6 +6,8 @@
 
 #include "core/event/event_handler.h"
 
+namespace eve {
+
 class WindowResizeEvent final : public Event {
  public:
   explicit WindowResizeEvent(const int width, const int height)
@@ -18,3 +20,5 @@ class WindowResizeEvent final : public Event {
 };
 
 class WindowCloseEvent final : public Event {};
+
+}  // namespace eve

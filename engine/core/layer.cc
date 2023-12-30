@@ -2,4 +2,8 @@
 
 #include "core/layer.h"
 
+namespace eve {
+
 Layer::Layer(Ref<State>& state) : state_(state) {}
+
+}  // namespace eve

@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_frame_buffer.h"
 
+namespace eve {
 Ref<FrameBuffer> FrameBuffer::Create(const glm::ivec2 size) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -17,3 +18,4 @@ Ref<FrameBuffer> FrameBuffer::Create(const glm::ivec2 size) {
       return nullptr;
   }
 }
+}  // namespace eve

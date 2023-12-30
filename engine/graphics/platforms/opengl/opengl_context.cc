@@ -11,7 +11,7 @@ static void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
                                              int32_t length,
                                              const char* message,
                                              const void* user_param);
-
+namespace eve {
 void OpenGLContext::Init() {
   // TODO if you add different window classes update this
   int32_t status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -37,6 +37,7 @@ DeviceInformation OpenGLContext::GetDeviceInfo() const {
   info.renderer = (const char*)glGetString(GL_RENDERER);
   return info;
 }
+}  // namespace eve
 
 void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
                                       uint32_t id, uint32_t severity, int32_t,

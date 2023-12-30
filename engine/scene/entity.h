@@ -6,10 +6,11 @@
 
 #include <entt/entt.hpp>
 
-#include "core/utils/guuid.h"
+#include "core/uuid.h"
 #include "scene/components.h"
 #include "scene/scene.h"
 
+namespace eve {
 class Entity {
  public:
   Entity() = default;
@@ -54,7 +55,7 @@ class Entity {
   operator entt::entity() const { return entity_handle_; }
   operator uint32_t() const { return (uint32_t)entity_handle_; }
 
-  [[nodiscard]] GUUID GetUUID() { return GetComponent<IdComponent>().id; }
+  [[nodiscard]] UUID GetUUID() { return GetComponent<IdComponent>().id; }
   [[nodiscard]] const std::string& GetName() {
     return GetComponent<TagComponent>().tag;
   }
@@ -75,3 +76,4 @@ class Entity {
 
   friend class HierarchyPanel;
 };
+}  // namespace eve

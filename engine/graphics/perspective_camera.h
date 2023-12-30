@@ -4,6 +4,7 @@
 
 #include "graphics/camera.h"
 
+namespace eve {
 struct PerspectiveCamera : Camera {
   float fov = 45.0f;
   float near_clip = 0.1f;
@@ -15,3 +16,4 @@ struct PerspectiveCamera : Camera {
 
   [[nodiscard]] glm::mat4 GetProjectionMatrix() const override;
 };
+}  // namespace eve

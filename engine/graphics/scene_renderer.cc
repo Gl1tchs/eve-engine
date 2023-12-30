@@ -6,6 +6,7 @@
 #include "scene/entity.h"
 #include "scene/scene_manager.h"
 
+namespace eve {
 SceneRenderer::SceneRenderer(const Ref<State>& state) : state_(state) {}
 
 void SceneRenderer::RenderRuntime(float ds) {
@@ -295,3 +296,4 @@ void SceneRenderer::RenderCameraBounds() {
     renderer->DrawLine(near_box.bottom_right, far_box.bottom_right, color);
   }
 }
+}  // namespace eve

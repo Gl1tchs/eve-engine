@@ -2,8 +2,10 @@
 
 #pragma once
 
+namespace eve {
 class ScriptGlue {
  public:
   static void RegisterComponents();
   static void RegisterFunctions();
 };
+}  // namespace eve

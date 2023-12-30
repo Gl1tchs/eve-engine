@@ -4,6 +4,7 @@
 
 #include "core/event/input.h"
 
+namespace eve {
 EditorCamera::EditorCamera() : PerspectiveCamera() {
   ResetTransform();
 
@@ -36,7 +37,7 @@ void EditorCamera::Update(float ds) {
   if (Input::IsKeyPressed(KeyCode::kS)) {
     transform_.position -= transform_.GetForward() * speed_ * ds;
   }
-  
+
   // right / left controls
   if (Input::IsKeyPressed(KeyCode::kD)) {
     transform_.position += transform_.GetRight() * speed_ * ds;
@@ -44,7 +45,7 @@ void EditorCamera::Update(float ds) {
   if (Input::IsKeyPressed(KeyCode::kA)) {
     transform_.position -= transform_.GetRight() * speed_ * ds;
   }
-  
+
   // up / down controls
   if (Input::IsKeyPressed(KeyCode::kE)) {
     transform_.position += kWorldUp * speed_ * ds;
@@ -63,3 +64,4 @@ void EditorCamera::ResetTransform() {
 void EditorCamera::ResetMousePos() {
   last_mouse_pos_ = Input::GetMousePosition();
 }
+}  // namespace eve

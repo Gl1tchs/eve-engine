@@ -6,6 +6,8 @@
 
 struct GLFWwindow;
 
+namespace eve {
+
 enum class CursorState { kNormal, kHidden };
 
 enum class WindowMode {
@@ -59,3 +61,5 @@ class Window final {
   bool vsync_;
   WindowMode mode_;
 };
+
+}  // namespace eve

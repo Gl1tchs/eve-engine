@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+namespace eve {
+
 class Event {
  protected:
   Event() = default;
@@ -29,5 +31,7 @@ void PopEvent();
 
 template <EventDerived T>
 void NotifyEvent(T& event);
+
+}  // namespace eve
 
 #include "core/event/event_handler.inl"

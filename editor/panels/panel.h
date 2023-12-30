@@ -4,6 +4,7 @@
 
 #include "pch.h"
 
+namespace eve {
 #define IMPL_PANEL(name)                         \
   [[nodiscard]] std::string GetName() override { \
     return name;                                 \
@@ -58,3 +59,4 @@ class Panel {
   glm::vec2 panel_size_;
   glm::vec2 panel_pos_;
 };
+}  // namespace eve

@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 #include "graphics/platforms/opengl/opengl_context.h"
 
+namespace eve {
 Ref<GraphicsContext> GraphicsContext::Create() {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
@@ -17,3 +18,4 @@ Ref<GraphicsContext> GraphicsContext::Create() {
       return nullptr;
   }
 }
+}  // namespace eve

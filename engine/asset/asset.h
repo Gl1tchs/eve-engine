@@ -4,13 +4,14 @@
 
 #include "pch_shared.h"
 
-#include "core/utils/guuid.h"
-#include "core/utils/memory.h"
+#include "core/uuid.h"
+
+namespace eve {
 
 enum class AssetType { kTexture, kFont, kScene, kStaticMesh, kScript, kNone };
 
 struct AssetInfo {
-  GUUID id;
+  UUID id;
   AssetType type;
   std::string meta_path;
 
@@ -27,3 +28,5 @@ struct Asset {
 
 template <typename T>
 using AssetRef = Ref<Asset<T>>;
+
+}  // namespace eve

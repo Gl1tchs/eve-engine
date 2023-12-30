@@ -9,6 +9,7 @@
 #include "scene/entity.h"
 #include "scene/scene.h"
 
+namespace eve {
 class SceneManager {
  public:
   static void Init(Ref<Project> project);
@@ -45,3 +46,4 @@ class SceneManager {
   };
   static ActiveSceneInfo scene_info_;
 };
+}  // namespace eve

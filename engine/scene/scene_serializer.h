@@ -6,6 +6,7 @@
 
 #include "scene/scene.h"
 
+namespace eve {
 class SceneSerializer {
  public:
   SceneSerializer(const Ref<Scene>& scene);
@@ -17,3 +18,4 @@ class SceneSerializer {
  private:
   Ref<Scene> scene_;
 };
+}  // namespace eve

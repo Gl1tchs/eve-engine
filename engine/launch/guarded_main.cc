@@ -6,6 +6,7 @@
 #include "core/debug/log.h"
 #include "core/instance.h"
 
+namespace eve {
 extern Instance* CreateInstance(CommandLineArguments args);
 
 int GuardedMain(CommandLineArguments args) {
@@ -28,3 +29,4 @@ int GuardedMain(CommandLineArguments args) {
 
   return 0;
 }
+}  // namespace eve

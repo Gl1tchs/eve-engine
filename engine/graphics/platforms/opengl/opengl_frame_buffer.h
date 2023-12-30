@@ -4,6 +4,7 @@
 
 #include "graphics/frame_buffer.h"
 
+namespace eve {
 class OpenGLFrameBuffer final : public FrameBuffer {
  public:
   OpenGLFrameBuffer(const glm::ivec2& size);
@@ -28,3 +29,4 @@ class OpenGLFrameBuffer final : public FrameBuffer {
 
   Ref<Texture> texture_;
 };
+}  // namespace eve

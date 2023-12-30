@@ -4,8 +4,7 @@
 
 #include "core/serialization/ini_parser.h"
 
-#include "yaml-cpp/yaml.h"
-
+namespace eve {
 ProjectSerializer::ProjectSerializer(Ref<Project> project)
     : project_(project) {}
 
@@ -58,3 +57,4 @@ bool ProjectSerializer::Deserialize(const fs::path& path) {
 
   return true;
 }
+}  // namespace eve

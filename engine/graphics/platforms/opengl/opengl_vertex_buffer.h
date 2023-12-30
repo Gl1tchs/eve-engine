@@ -4,6 +4,7 @@
 
 #include "graphics/vertex_buffer.h"
 
+namespace eve {
 class OpenGLVertexBuffer final : public VertexBuffer {
  public:
   OpenGLVertexBuffer(uint32_t size);
@@ -22,3 +23,4 @@ class OpenGLVertexBuffer final : public VertexBuffer {
   uint32_t vbo_;
   BufferLayout layout_;
 };
+}  // namespace eve
