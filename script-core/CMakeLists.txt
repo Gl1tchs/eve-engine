@@ -9,7 +9,7 @@ set(CMAKE_CSharp_FLAGS "/langversion:latest")
 set(SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/EveEngine/Camera.cs
     ${CMAKE_CURRENT_LIST_DIR}/EveEngine/Components.cs
-    ${CMAKE_CURRENT_LIST_DIR}/EveEngine/Entity.cs
+    ${CMAKE_CURRENT_LIST_DIR}/EveEngine/ScriptEntity.cs
     ${CMAKE_CURRENT_LIST_DIR}/EveEngine/Input.cs
     ${CMAKE_CURRENT_LIST_DIR}/EveEngine/InternalCalls.cs
     ${CMAKE_CURRENT_LIST_DIR}/EveEngine/KeyCode.cs
