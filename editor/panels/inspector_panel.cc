@@ -103,7 +103,7 @@ static void DrawComponent(const std::string& name, Entity entity,
                                   "%s", name.c_str());
     ImGui::PopStyleVar();
     ImGui::SameLine(content_region_available.x - line_height * 0.5f);
-    if (ImGui::Button("+", ImVec2{line_height, line_height})) {
+    if (ImGui::Button(ICON_FA_ELLIPSIS_H, ImVec2{line_height, line_height})) {
       ImGui::OpenPopup("ComponentSettings");
     }
 
