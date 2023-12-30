@@ -28,7 +28,7 @@ namespace MultipleScenes
         m_keyPressed = true;
       }
 
-      m_transform.Rotation += new Vector3(0, 45 * ds, 0);
+      m_transform.Rotation += Vector3.Up * 45 * ds;
     }
 
     private void OnDestroy()

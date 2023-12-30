@@ -28,7 +28,7 @@ namespace Simple
         private void OnUpdate(float ds)
         {
             GetComponent<Transform>().Rotation
-                += new Vector3(0, 20 * ds, 0);
+                += Vector3.Up * 20 * ds;
         }
     }
 }

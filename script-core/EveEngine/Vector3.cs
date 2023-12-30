@@ -7,6 +7,12 @@ namespace EveEngine
 		public float x, y, z;
 
 		public static Vector3 Zero => new Vector3(0.0f);
+		public static Vector3 One => new Vector3(1.0f);
+		public static Vector3 Front => new Vector3(0.0f, 0.0f, -1.0f);
+		public static Vector3 Back => new Vector3(0.0f, 0.0f, 1.0f);
+		public static Vector3 Up => new Vector3(0.0f, 1.0f, 0.0f);
+		public static Vector3 Down => new Vector3(0.0f, -1.0f, 0.0f);
+		public static Vector3 Left => new Vector3(-1.0f, 0.0f, 0.0f);
 
 		public Vector3(float scalar)
 		{
