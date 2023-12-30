@@ -1,4 +1,3 @@
-add_subdirectory(cxxopts)
 add_subdirectory(entt)
 add_subdirectory(glad)
 add_subdirectory(glfw)

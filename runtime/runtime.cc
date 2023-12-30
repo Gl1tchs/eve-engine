@@ -2,8 +2,6 @@
 
 #include "launch/prelude.h"
 
-#include <cxxopts.hpp>
-
 #include "project/project.h"
 #include "scene/scene_manager.h"
 #include "scripting/script_engine.h"
@@ -11,13 +9,6 @@
 #include "runtime_layer.h"
 
 namespace eve {
-struct RuntimeArgumentPacket {
-  std::optional<std::string> startup_project;
-};
-
-std::optional<RuntimeArgumentPacket> ParseArgs(
-    const CommandLineArguments& args);
-
 class EditorInstance : public Instance {
  public:
   EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
@@ -34,49 +25,24 @@ Instance* CreateInstance(CommandLineArguments args) {
   specs.description = "Runtime application for the eve engine.";
   specs.args = args;
 
-  std::optional<RuntimeArgumentPacket> packet = ParseArgs(args);
-  if (!packet.has_value()) {
+  if (args.argc == 1 || args.argc > 2) {
     return nullptr;
   }
 
-  std::optional<std::string> project_path = packet.value().startup_project;
-  if (!project_path.has_value()) {
+  std::string project_path = args.argv[1];
+  if (project_path.empty()) {
     return nullptr;
   }
 
-  if (std::isspace(project_path.value()[0])) {
-    project_path.value().erase(0, project_path.value().find_first_not_of(" "));
+  if (std::isspace(project_path[0])) {
+    project_path.erase(0, project_path.find_first_not_of(" "));
   }
 
-  Ref<Project> project = Project::Load(project_path.value());
+  Ref<Project> project = Project::Load(project_path);
   if (!project) {
     return nullptr;
   }
 
   return new EditorInstance(specs);
-}
-
-std::optional<RuntimeArgumentPacket> ParseArgs(
-    const CommandLineArguments& args) {
-  cxxopts::Options options("Eve Runtime",
-                           "The eve engine runtime application.");
-
-  options.add_options()("p,project", "Default project to start editor",
-                        cxxopts::value<std::string>())("h,help", "Print usage");
-
-  auto result = options.parse(args.argc, args.argv);
-
-  if (result.count("help")) {
-    LOG_INFO("{}", options.help());
-    return {};
-  }
-
-  RuntimeArgumentPacket packet;
-
-  if (result.count("project")) {
-    packet.startup_project = result["project"].as<std::string>();
-  }
-
-  return packet;
 }
 }  // namespace eve

@@ -4,8 +4,6 @@
 
 #include "launch/prelude.h"
 
-#include <cxxopts.hpp>
-
 #include "project/project.h"
 #include "scene/scene_manager.h"
 #include "scripting/script_engine.h"
@@ -13,12 +11,6 @@
 #include "layers/editor_layer.h"
 
 namespace eve {
-struct EditorArgumentPacket {
-  std::optional<std::string> startup_project;
-};
-
-std::optional<EditorArgumentPacket> ParseArgs(const CommandLineArguments& args);
-
 class EditorInstance : public Instance {
  public:
   EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
@@ -38,39 +30,17 @@ Instance* CreateInstance(CommandLineArguments args) {
   specs.description = "Editor application for the eve engine.";
   specs.args = args;
 
-  std::optional<EditorArgumentPacket> packet = ParseArgs(args);
-  if (packet.has_value() && packet->startup_project.has_value()) {
-    if (std::isspace(packet->startup_project.value()[0])) {
-      packet->startup_project.value().erase(
-          0, packet->startup_project.value().find_first_not_of(" "));
-    }
+  if (args.argc == 2) {
+    std::string startup_project = args.argv[1];
+    if (!startup_project.empty()) {
+      if (std::isspace(startup_project[0])) {
+        startup_project.erase(0, startup_project.find_first_not_of(" "));
+      }
 
-    Project::Load(packet->startup_project.value());
+      Project::Load(startup_project);
+    }
   }
 
   return new EditorInstance(specs);
-}
-
-std::optional<EditorArgumentPacket> ParseArgs(
-    const CommandLineArguments& args) {
-  cxxopts::Options options("Eve Editor", "The eve engine editor application.");
-
-  options.add_options()("p,project", "Default project to start editor",
-                        cxxopts::value<std::string>())("h,help", "Print usage");
-
-  auto result = options.parse(args.argc, args.argv);
-
-  if (result.count("help")) {
-    LOG_INFO("{}", options.help());
-    return {};
-  }
-
-  EditorArgumentPacket packet;
-
-  if (result.count("project")) {
-    packet.startup_project = result["project"].as<std::string>();
-  }
-
-  return packet;
 }
 }  // namespace eve
