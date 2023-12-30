@@ -2,7 +2,7 @@
 
 #include "scene/static_mesh.h"
 
-#include <OBJ-Loader/OBJ_Loader.h>
+#include <OBJ_Loader.h>
 
 #include "core/debug/log.h"
 

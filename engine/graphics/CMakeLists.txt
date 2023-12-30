@@ -74,7 +74,7 @@ module_include_directories(graphics PRIVATE
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/glad/include/
   ${VENDOR_DIR}/glfw/include
-  ${VENDOR_DIR}/include
+  ${VENDOR_DIR}/stb
 )
 
 module_link_libraries(graphics PRIVATE
