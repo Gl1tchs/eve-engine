@@ -11,6 +11,9 @@ set(SOURCES
   event/mouse_event.h
   event/window_event.h
   math/box.h
+  serialization/ini_parser.cc
+  serialization/ini_parser.h
+  serialization/ini_parser.inl
   utils/guuid.cc
   utils/guuid.h
   utils/memory.h

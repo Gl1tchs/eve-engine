@@ -1,0 +1,7 @@
+[project]
+name = multiple_scenes
+asset_directory = assets
+
+[scenes]
+scene1 = res://scenes/scene1.escn
+scene2 = res://scenes/scene2.escn

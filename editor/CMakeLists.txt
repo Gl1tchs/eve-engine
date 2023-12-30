@@ -51,6 +51,7 @@ target_include_directories(eve_editor PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/tinyfiledialogs
+  ${VENDOR_DIR}/yaml-cpp/include
 )
 
 target_link_libraries(eve_editor PRIVATE
@@ -61,6 +62,7 @@ target_link_libraries(eve_editor PRIVATE
   ImGuizmo
   EnTT
   tinyfiledialogs
+  yaml-cpp
 )
 
 target_precompile_headers(eve_editor PUBLIC pch.h)

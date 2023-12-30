@@ -16,6 +16,7 @@ class Project {
     ASSERT(active_project_)
     return active_project_->config_.name;
   }
+
   [[nodiscard]] static fs::path GetProjectDirectory() {
     ASSERT(active_project_)
     return active_project_->project_dir_;

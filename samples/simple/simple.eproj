@@ -1,0 +1,7 @@
+[project]
+name = simple
+asset_directory = assets
+
+[scenes]
+sandbox = res://scenes/sandbox.escn
+default = res://scenes/default.escn

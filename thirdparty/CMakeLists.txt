@@ -5,7 +5,7 @@ add_subdirectory(glfw)
 add_subdirectory(glm)
 add_subdirectory(imgui)
 add_subdirectory(ImGuizmo)
-add_subdirectory(Mono)
+add_subdirectory(mono)
 
 option(YAML_CPP_BUILD_TOOLS OFF)
 add_subdirectory(yaml-cpp)

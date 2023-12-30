@@ -258,7 +258,7 @@ void EditorLayer::HandleShortcuts() {
 }
 
 void EditorLayer::OpenProject() {
-  const char* filter_patterns[1] = {"*.eproject"};
+  const char* filter_patterns[1] = {"*.eproj"};
   const char* path = tinyfd_openFileDialog(
       "Open Project", "", 1, filter_patterns, "Eve Project Files", 0);
 
@@ -296,8 +296,8 @@ void EditorLayer::SaveScene() {
 }
 
 void EditorLayer::SaveSceneAs() {
-  const char* filter_patterns[1] = {"*.eve"};
-  const char* path = tinyfd_saveFileDialog("Save Scene", "scene.eve", 1,
+  const char* filter_patterns[1] = {"*.escn"};
+  const char* path = tinyfd_saveFileDialog("Save Scene", "scene.escn", 1,
                                            filter_patterns, "Eve Scene Files");
 
   if (!path) {
@@ -314,7 +314,7 @@ void EditorLayer::SaveSceneAs() {
 }
 
 void EditorLayer::OpenScene() {
-  const char* filter_patterns[1] = {"*.eve"};
+  const char* filter_patterns[1] = {"*.escn"};
   const char* path = tinyfd_openFileDialog("Open Scene", "", 1, filter_patterns,
                                            "Eve Scene Files", 0);
 
@@ -360,7 +360,6 @@ void EditorLayer::OpenScene(const uint32_t index) {
   SceneManager::SetActive(index);
 
   editor_scene_ = SceneManager::GetActive();
-
   editor_scene_path_ = SceneManager::GetActivePath();
 
   editor_camera_.ResetTransform();
