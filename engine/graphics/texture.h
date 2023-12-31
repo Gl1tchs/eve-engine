@@ -52,7 +52,6 @@ class Texture {
   [[nodiscard]] static Ref<Texture> Create(const TextureMetadata& metadata,
                                            const void* pixels);
 
-  [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path,
-                                           TextureMetadata metadata);
+  [[nodiscard]] static Ref<Texture> Create(const std::filesystem::path& path);
 };
 }  // namespace eve

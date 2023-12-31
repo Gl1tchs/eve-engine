@@ -525,12 +525,17 @@ void EditorLayer::SetupMenubar() {
           "Ctrl+R");
       base_group.PushMenuItem(reload_scripts);
 
-      MenuItem advanced_inspector("Advanced Inspector", [this]() {
-        inspector_panel_->ToggleAdvanced();
-      });
-      base_group.PushMenuItem(advanced_inspector);
-
       edit_menu.PushItemGroup(base_group);
+    }
+
+    MenuItemGroup renderer_group;
+    {
+      MenuItem recompile_shaders("Recompile Shaders", [this]() {
+        GetState()->renderer->RecompileShaders();
+      });
+      renderer_group.PushMenuItem(recompile_shaders);
+
+      edit_menu.PushItemGroup(renderer_group);
     }
 
     menu_bar_.PushMenu(edit_menu);
@@ -551,6 +556,11 @@ void EditorLayer::SetupMenubar() {
       MenuItem inspector("Inspector",
                          [this]() { inspector_panel_->SetActive(true); });
       base_group.PushMenuItem(inspector);
+
+      MenuItem advanced_inspector("Advanced Inspector", [this]() {
+        inspector_panel_->ToggleAdvanced();
+      });
+      base_group.PushMenuItem(advanced_inspector);
 
       view_menu.PushItemGroup(base_group);
     }

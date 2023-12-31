@@ -78,6 +78,11 @@ Ref<Scene> Scene::Copy(Ref<Scene> src) {
 bool Scene::OnRuntimeStart() {
   is_running_ = true;
 
+  auto& renderer = state_->renderer;
+  if (renderer->CustomShadersProvided()) {
+    renderer->ResetShaderData();
+  }
+
   ScriptEngine::OnRuntimeStart(this);
 
   auto view = registry_.view<ScriptComponent>();

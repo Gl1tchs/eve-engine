@@ -6,6 +6,7 @@
 #include "graphics/primitives/mesh.h"
 #include "graphics/primitives/primitive.h"
 #include "graphics/render_command.h"
+#include "renderer.h"
 
 namespace eve {
 Renderer::Renderer() {
@@ -15,7 +16,7 @@ Renderer::Renderer() {
   RenderCommand::Init();
 
   // Create render datas
-  mesh_data_ = CreateScope<MeshPrimitive>();
+  mesh_data_ = CreateRef<MeshPrimitive>();
   line_data_ = CreateScope<LinePrimitive>();
 
   // Create uniform buffers
@@ -68,14 +69,19 @@ void Renderer::Draw(const RenderData<MeshVertex>& data,
 }
 
 void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
-                    const std::optional<Material>& material) {
+                    const Material& material,
+                    CustomShaderComponent* custom_shader) {
+  if (!model) {
+    return;
+  }
+
+  Ref<MeshPrimitive> mesh_data =
+      !custom_shader ? mesh_data_ : AddMeshPrimitiveIfNotExists(custom_shader);
+
   for (auto mesh : model->meshes) {
-    if (mesh_data_->NeedsNewBatch(mesh.vertices.size(), mesh.indices.size())) {
+    if (mesh_data->NeedsNewBatch(mesh.vertices.size(), mesh.indices.size())) {
       NextBatch();
     }
-
-    Material material_in_use =
-        material.has_value() ? material.value() : mesh.material;
 
     float texture_index = 0.0f;
     for (MeshVertex vertex : mesh.vertices) {
@@ -83,23 +89,23 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
       vertex.position = model_matrix * vertex.position;
 
       // set material values
-      vertex.albedo = material_in_use.albedo;
-      vertex.metallic = material_in_use.metallic;
-      vertex.roughness = material_in_use.roughness;
-      vertex.ao = material_in_use.ao;
+      vertex.albedo = material.albedo;
+      vertex.metallic = material.metallic;
+      vertex.roughness = material.roughness;
+      vertex.ao = material.ao;
 
       vertex.tex_index = texture_index;
       vertex.normal_matrix =
           glm::transpose(glm::inverse(glm::mat3(model_matrix)));
 
-      mesh_data_->AddVertex(vertex);
+      mesh_data->AddVertex(vertex);
     }
 
     for (const uint32_t& index : mesh.indices) {
-      mesh_data_->AddIndex(index);
+      mesh_data->AddIndex(index);
     }
 
-    mesh_data_->index_offset += mesh.vertices.size();
+    mesh_data->index_offset += mesh.vertices.size();
 
     stats_.index_count += mesh.indices.size();
     stats_.vertex_count += mesh.vertices.size();
@@ -136,9 +142,30 @@ void Renderer::ResetStats() {
   memset(&stats_, 0, sizeof(RenderStats));
 }
 
+bool Renderer::CustomShadersProvided() const {
+  return custom_meshes_.size() > 0;
+}
+
+void Renderer::ResetShaderData() {
+  custom_meshes_.clear();
+}
+
+void Renderer::RecompileShaders() const {
+  if (custom_meshes_.size() <= 0) {
+    return;
+  }
+
+  for (auto& [id, mesh] : custom_meshes_) {
+    mesh->RecompileShaders();
+  }
+}
+
 void Renderer::BeginBatch() {
   // Reset mesh data
   mesh_data_->Reset();
+  for (auto& [id, mesh] : custom_meshes_) {
+    mesh->Reset();
+  }
 
   // Reset line data
   line_data_->Reset();
@@ -146,6 +173,10 @@ void Renderer::BeginBatch() {
 
 void Renderer::Flush() {
   mesh_data_->Render(stats_);
+  for (auto& [id, mesh] : custom_meshes_) {
+    mesh->Render(stats_);
+  }
+
   line_data_->Render(stats_);
 }
 
@@ -153,4 +184,23 @@ void Renderer::NextBatch() {
   Flush();
   BeginBatch();
 }
+
+Ref<MeshPrimitive> Renderer::AddMeshPrimitiveIfNotExists(
+    CustomShaderComponent* custom_shader) {
+  const auto it = std::find_if(custom_meshes_.begin(), custom_meshes_.end(),
+                               [custom_shader](const auto& pair) {
+                                 return custom_shader->id == pair.first;
+                               });
+  if (it == custom_meshes_.end()) {
+    Ref<MeshPrimitive> mesh = CreateRef<MeshPrimitive>();
+    mesh->SetCustomShader(custom_shader);
+    mesh->RecompileShaders();
+    custom_meshes_[custom_shader->id] = mesh;
+    return mesh;
+  }
+
+  it->second->SetCustomShader(custom_shader);
+  return it->second;
+}
+
 }  // namespace eve

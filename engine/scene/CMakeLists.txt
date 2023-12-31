@@ -24,9 +24,9 @@ module_include_directories(scene PUBLIC
 
 module_include_directories(scene PRIVATE
   ${VENDOR_DIR}/entt/src
-  ${VENDOR_DIR}/OBJ-Loader
-  ${VENDOR_DIR}/yaml-cpp/include
+  ${VENDOR_DIR}/json/include
   ${VENDOR_DIR}/include
+  ${VENDOR_DIR}/OBJ-Loader
 )
 
 module_link_libraries(scene PRIVATE
@@ -34,7 +34,6 @@ module_link_libraries(scene PRIVATE
   eve::core
   eve::scripting
   EnTT
-  yaml-cpp
 )
 
 module_precompile_headers(scene PUBLIC ${ENGINE_DIR}/pch_shared.h)

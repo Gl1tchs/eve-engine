@@ -3,8 +3,6 @@ set(SOURCES
   layers/editor_layer.h
   modals/exit_modal.cc
   modals/exit_modal.h
-  modals/importer_modal.cc
-  modals/importer_modal.h
   modals/modal.cc
   modals/modal.h
   panels/debug_info_panel.cc
@@ -50,7 +48,6 @@ target_include_directories(eve_editor PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/tinyfiledialogs
-  ${VENDOR_DIR}/yaml-cpp/include
 )
 
 target_link_libraries(eve_editor PRIVATE
@@ -59,7 +56,6 @@ target_link_libraries(eve_editor PRIVATE
   ImGui
   ImGuizmo
   tinyfiledialogs
-  yaml-cpp
 )
 
 target_precompile_headers(eve_editor PUBLIC pch.h)

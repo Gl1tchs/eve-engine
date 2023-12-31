@@ -3,5 +3,5 @@ name = simple
 asset_directory = assets
 
 [scenes]
-sandbox = res://scenes/sandbox.escn
-default = res://scenes/default.escn
+sandbox = res://scenes/scene1.escn
+default = res://scenes/scene2.escn

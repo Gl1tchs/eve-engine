@@ -1,0 +1,141 @@
+{
+  "entities": [
+    {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 1225455807429653547,
+      "tag_component": {
+        "tag": "Main Camera"
+      },
+      "transform": {
+        "position": [
+          -5.630620002746582,
+          2.872159481048584,
+          11.092264175415039
+        ],
+        "rotation": [
+          -8.8610200881958,
+          -29.99997901916504,
+          8.439287171313481e-07
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": 490489011960975594,
+      "material_component": {
+        "albedo": [
+          0.0635581687092781,
+          0.2698293924331665,
+          0.9957447052001953
+        ],
+        "ao": 1.0,
+        "metallic": 0.25,
+        "roughness": 0.75
+      },
+      "model_component": {
+        "path": "res://models/sphere.obj"
+      },
+      "script_component": {
+        "class_name": "Simple.Sphere",
+        "script_fields": [
+          {
+            "data": [
+              0.8899999856948853,
+              0.11999999731779099,
+              0.3199999928474426
+            ],
+            "name": "color",
+            "type": "Vector3"
+          }
+        ]
+      },
+      "tag_component": {
+        "tag": "Sphere"
+      },
+      "transform": {
+        "position": [
+          -2.843006134033203,
+          0.6773110032081604,
+          -1.8187865018844604
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": 4147500373297138652,
+      "material_component": {
+        "albedo": [
+          1.0,
+          0.05106383562088013,
+          0.05106383562088013
+        ],
+        "ao": 1.0,
+        "metallic": 0.0,
+        "roughness": 1.0
+      },
+      "model_component": {
+        "path": "res://models/cube.obj"
+      },
+      "script_component": {
+        "class_name": "Simple.Cube",
+        "script_fields": [
+          {
+            "data": 10.0,
+            "name": "speed",
+            "type": "Float"
+          }
+        ]
+      },
+      "tag_component": {
+        "tag": "Cube"
+      },
+      "transform": {
+        "position": [
+          2.7812576293945313,
+          -0.2859038710594177,
+          1.6942291259765625
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.75,
+          0.75,
+          0.75
+        ]
+      }
+    }
+  ],
+  "scene": "scene1"
+}

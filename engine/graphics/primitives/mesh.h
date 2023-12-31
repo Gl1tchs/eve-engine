@@ -38,6 +38,7 @@ class MeshPrimitive : public Primitive<MeshVertex> {
   uint32_t index_offset;
 
   MeshPrimitive();
+
   virtual ~MeshPrimitive() = default;
 
   void Render(RenderStats& stats) override;
@@ -49,13 +50,22 @@ class MeshPrimitive : public Primitive<MeshVertex> {
 
   void Reset() override;
 
+  void SetCustomShader(CustomShaderComponent* custom_shader);
+
+  void RecompileShaders();
+
   [[nodiscard]] float FindTexture(const Ref<Texture>& texture);
 
  private:
   Ref<VertexArray> vertex_array_;
   Ref<VertexBuffer> vertex_buffer_;
   Ref<IndexBuffer> index_buffer_;
+
   Ref<Shader> shader_;
+  std::string vertex_path_;
+  std::string fragment_path_;
+
+  CustomShaderComponent* custom_shader_ = nullptr;
 
   std::vector<uint32_t> indices_;
 

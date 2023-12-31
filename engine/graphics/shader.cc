@@ -8,10 +8,10 @@
 namespace eve {
 Ref<Shader> Shader::Create(const std::string& vs_path,
                            const std::string& fs_path,
-                           const std::string& gs_path) {
+                           const std::string& custom_shader) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
-      return CreateRef<OpenGLShader>(vs_path, fs_path, gs_path);
+      return CreateRef<OpenGLShader>(vs_path, fs_path, custom_shader);
     case GraphicsAPI::kVulkan:
       ASSERT(false, "Vulkan not supported yet!");
       return nullptr;

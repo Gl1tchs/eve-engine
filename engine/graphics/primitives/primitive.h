@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+#include "core/uuid.h"
+
 namespace eve {
 struct RenderStats;
 
@@ -14,9 +16,12 @@ template <typename VertexType>
 class Primitive {
  public:
   Primitive(std::vector<VertexType>& vertices)
-      : vertices_(vertices), max_elements_(vertices_.size()), mutable_(false) {}
+      : id_(),
+        vertices_(vertices),
+        max_elements_(vertices_.size()),
+        mutable_(false) {}
 
-  Primitive(size_t count) : max_elements_(count), mutable_(true) {
+  Primitive(size_t count) : id_(), max_elements_(count), mutable_(true) {
     vertices_.reserve(count);
   }
 
@@ -62,7 +67,11 @@ class Primitive {
 
   [[nodiscard]] size_t BatchCount() const { return vertices_.size(); }
 
+  [[nodiscard]] const UUID& GetUUID() const { return id_; }
+
  private:
+  UUID id_;
+
   std::vector<VertexType> vertices_;
   size_t max_elements_;
   bool mutable_;

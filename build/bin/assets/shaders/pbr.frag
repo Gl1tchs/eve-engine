@@ -17,8 +17,11 @@ struct VertexOutput {
 
 layout(location = 0) in VertexOutput v_input;
 
-layout(set = 0, binding = 0) uniform sampler2D u_textures[32];
+uniform sampler2D u_textures[32];
 
+// here `vec3 fragment(vec3 color_in)` will be defined
+#pragma custom
+ 
 const float PI = 3.14159265359;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -104,6 +107,10 @@ void main() {
 
   color = color / (color + vec3(1.0));
   color = pow(color, vec3(1.0 / 2.2));
+
+#ifdef CUSTOM_SHADER
+  color = fragment(color);
+#endif
 
   o_color = vec4(color, 1.0);
 }

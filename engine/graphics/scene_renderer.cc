@@ -128,17 +128,18 @@ void SceneRenderer::RenderScene() {
   auto& scene = SceneManager::GetActive();
   auto& renderer = state_->renderer;
 
-  scene->GetAllEntitiesWith<Transform, ModelComponent>().each(
+  scene->GetAllEntitiesWith<Transform, ModelComponent, Material>().each(
       [&](entt::entity entity_id, const Transform& transform,
-          const ModelComponent& model_comp) {
+          const ModelComponent& model_comp, const Material& material) {
         Entity entity{entity_id, scene.get()};
 
-        std::optional<Material> material{};
-        if (entity.HasComponent<Material>()) {
-          material = entity.GetComponent<Material>();
-        }
+        CustomShaderComponent* custom_shader =
+            entity.HasComponent<CustomShaderComponent>()
+                ? &entity.GetComponent<CustomShaderComponent>()
+                : nullptr;
 
-        renderer->Draw(model_comp.model->asset, transform, material);
+        renderer->Draw(model_comp.model->asset, transform, material,
+                       custom_shader);
       });
 }
 

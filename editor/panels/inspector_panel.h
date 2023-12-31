@@ -6,7 +6,6 @@
 
 #include "scene/entity.h"
 
-#include "modals/importer_modal.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/panel.h"
 
@@ -23,20 +22,13 @@ class InspectorPanel : public Panel {
   void Draw() override;
 
  private:
-  void RenderAddComponentDialog(Entity selected_entity);
+  void RenderEntityHeader(Entity selected_entity);
 
   void RenderComponentProperties(Entity selected_entity);
-
-  void OnModelMetaWrite(const std::string& meta_path);
 
  private:
   Ref<HierarchyPanel> hierarchy_panel_;
 
-  ImporterModal model_importer_;
-
   bool advanced_ = false;
-
-  bool show_add_component_dialog_ = false;
-  bool add_component_dialog_opened_ = false;
 };
 }  // namespace eve

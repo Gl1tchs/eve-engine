@@ -2,6 +2,8 @@
 
 #include "graphics/primitives/mesh.h"
 
+#include "asset/asset_library.h"
+#include "core/file_system.h"
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
 
@@ -32,8 +34,9 @@ MeshPrimitive::MeshPrimitive()
   index_buffer_ = IndexBuffer::Create(kMeshMaxIndexCount * sizeof(uint32_t));
   vertex_array_->SetIndexBuffer(index_buffer_);
 
-  shader_ =
-      Shader::Create("assets/shaders/pbr.vert", "assets/shaders/pbr.frag");
+  vertex_path_ = "assets/shaders/pbr.vert";
+  fragment_path_ = "assets/shaders/pbr.frag";
+  shader_ = Shader::Create(vertex_path_, fragment_path_);
 
   // fill the textures with empty values (which is default white texture)
   {
@@ -76,6 +79,12 @@ void MeshPrimitive::Render(RenderStats& stats) {
   }
 
   shader_->Bind();
+  if (custom_shader_) {
+    for (auto& uniform : custom_shader_->uniforms) {
+      shader_->SetUniform(uniform.name, uniform.value);
+    }
+  }
+
   RenderCommand::DrawIndexed(vertex_array_, index_count);
 
   stats.draw_calls++;
@@ -102,6 +111,40 @@ void MeshPrimitive::Reset() {
   index_offset = 0;
 
   texture_slot_index_ = 1;
+}
+
+void MeshPrimitive::SetCustomShader(CustomShaderComponent* custom_shader) {
+  custom_shader_ = custom_shader;
+}
+
+void MeshPrimitive::RecompileShaders() {
+  if (!custom_shader_) {
+    return;
+  }
+
+  std::string custom_shader_source;
+  if (!custom_shader_->shader_path.empty()) {
+    custom_shader_source = FileSystem::ReadFileString(
+        AssetLibrary::GetAssetPath(custom_shader_->shader_path).string());
+  }
+
+  shader_->Recompile(vertex_path_, fragment_path_, custom_shader_source);
+
+  auto uniforms = custom_shader_->uniforms;
+  custom_shader_->uniforms.clear();
+  for (auto uniform : shader_->GetUniformFields()) {
+    auto it = std::find_if(uniforms.begin(), uniforms.end(),
+                           [uniform](const auto& it_uniform) {
+                             return uniform.name == it_uniform.name &&
+                                    uniform.type == it_uniform.type;
+                           });
+    if (it == uniforms.end()) {
+      custom_shader_->uniforms.push_back(uniform);
+      continue;
+    }
+
+    custom_shader_->uniforms.push_back(*it);
+  }
 }
 
 float MeshPrimitive::FindTexture(const Ref<Texture>& texture) {

@@ -2,7 +2,7 @@
 
 #include "scene/scene_serializer.h"
 
-#include <yaml-cpp/yaml.h>
+#include <nlohmann/json.hpp>
 
 #include "asset/asset_library.h"
 #include "core/uuid.h"
@@ -10,397 +10,362 @@
 #include "scene/entity.h"
 #include "scripting/script.h"
 #include "scripting/script_engine.h"
-#include "yaml-cpp/emittermanip.h"
 
-#define WRITE_SCRIPT_FIELD(FieldType, Type) \
-  case ScriptFieldType::FieldType:          \
-    out << script_field.GetValue<Type>();   \
+using json = nlohmann::json;
+
+#define WRITE_SCRIPT_FIELD(FieldType, Type)                    \
+  case ScriptFieldType::FieldType:                             \
+    script_field_json["data"] = script_field.GetValue<Type>(); \
     break
 
-#define READ_SCRIPT_FIELD(FieldType, Type)       \
-  case ScriptFieldType::FieldType: {             \
-    Type data = script_field["data"].as<Type>(); \
-    field_instance.SetValue(data);               \
-    break;                                       \
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+  case ScriptFieldType::FieldType: {                   \
+    Type data = script_field_json["data"].get<Type>(); \
+    field_instance.SetValue(data);                     \
+    break;                                             \
   }
 
-namespace YAML {
-
-template <>
-struct convert<glm::vec2> {
-  static Node encode(const glm::vec2& rhs) {
-    Node node;
-    node.push_back(rhs.x);
-    node.push_back(rhs.y);
-    node.SetStyle(EmitterStyle::Flow);
-    return node;
-  }
-
-  static bool decode(const Node& node, glm::vec2& rhs) {
-    if (!node.IsSequence() || node.size() != 2)
-      return false;
-
-    rhs.x = node[0].as<float>();
-    rhs.y = node[1].as<float>();
-    return true;
-  }
-};
-
-template <>
-struct convert<glm::vec3> {
-  static Node encode(const glm::vec3& rhs) {
-    Node node;
-    node.push_back(rhs.x);
-    node.push_back(rhs.y);
-    node.push_back(rhs.z);
-    node.SetStyle(EmitterStyle::Flow);
-    return node;
-  }
-
-  static bool decode(const Node& node, glm::vec3& rhs) {
-    if (!node.IsSequence() || node.size() != 3)
-      return false;
-
-    rhs.x = node[0].as<float>();
-    rhs.y = node[1].as<float>();
-    rhs.z = node[2].as<float>();
-    return true;
-  }
-};
-
-template <>
-struct convert<glm::vec4> {
-  static Node encode(const glm::vec4& rhs) {
-    Node node;
-    node.push_back(rhs.x);
-    node.push_back(rhs.y);
-    node.push_back(rhs.z);
-    node.push_back(rhs.w);
-    node.SetStyle(EmitterStyle::Flow);
-    return node;
-  }
-
-  static bool decode(const Node& node, glm::vec4& rhs) {
-    if (!node.IsSequence() || node.size() != 4)
-      return false;
-
-    rhs.x = node[0].as<float>();
-    rhs.y = node[1].as<float>();
-    rhs.z = node[2].as<float>();
-    rhs.w = node[3].as<float>();
-    return true;
-  }
-};
-
-template <>
-struct convert<eve::UUID> {
-  static Node encode(const eve::UUID& uuid) {
-    Node node;
-    node.push_back((uint64_t)uuid);
-    return node;
-  }
-
-  static bool decode(const Node& node, eve::UUID& uuid) {
-    uuid = node.as<uint64_t>();
-    return true;
-  }
-};
-
-}  // namespace YAML
-
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v) {
-  out << YAML::Flow;
-  out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-  return out;
+namespace glm {
+void to_json(json& j, const glm::vec2& vec) {
+  j.push_back(vec.x);
+  j.push_back(vec.y);
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
-  out << YAML::Flow;
-  out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-  return out;
+void from_json(const json& j, glm::vec2& vec) {
+  j[0].get_to(vec.x);
+  j[1].get_to(vec.y);
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
-  out << YAML::Flow;
-  out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-  return out;
+void to_json(json& j, const glm::vec3& vec) {
+  j.push_back(vec.x);
+  j.push_back(vec.y);
+  j.push_back(vec.z);
 }
+
+void from_json(const json& j, glm::vec3& vec) {
+  j[0].get_to(vec.x);
+  j[1].get_to(vec.y);
+  j[2].get_to(vec.z);
+}
+
+void to_json(json& j, const glm::vec4& vec) {
+  j.push_back(vec.x);
+  j.push_back(vec.y);
+  j.push_back(vec.z);
+  j.push_back(vec.w);
+}
+
+void from_json(const json& j, glm::vec4& vec) {
+  j[0].get_to(vec.x);
+  j[1].get_to(vec.y);
+  j[3].get_to(vec.z);
+  j[3].get_to(vec.w);
+}
+}  // namespace glm
 
 namespace eve {
+
+void to_json(json& j, const UUID& id) {
+  j = (uint64_t)id;
+}
+
+void from_json(const json& j, UUID& id) {
+  id = j.get<uint64_t>();
+}
+
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
-static void SerializeEntity(YAML::Emitter& out, Entity entity) {
+static void SerializeEntity(json& out, Entity entity) {
   ASSERT(entity.HasComponent<IdComponent>())
 
-  out << YAML::BeginMap;
-  out << YAML::Key << "id" << YAML::Value << entity.GetUUID();
+  out["id"] = entity.GetUUID();
 
   if (entity.HasComponent<TagComponent>()) {
     auto& tag = entity.GetComponent<TagComponent>().tag;
 
-    out << YAML::Key << "tag_component";
-    out << YAML::BeginMap;  // TagComponent
-
-    out << YAML::Key << "tag" << YAML::Value << tag;
-
-    out << YAML::EndMap;  // TagComponent
+    out["tag_component"] = json{{"tag", tag}};
   }
 
   if (entity.HasComponent<Transform>()) {
     auto& tc = entity.GetComponent<Transform>();
 
-    out << YAML::Key << "transform";
-    out << YAML::BeginMap;  // Transform
+    json transform_json = {{"position", tc.position},
+                           {"rotation", tc.rotation},
+                           {"scale", tc.scale}};
 
-    out << YAML::Key << "position" << YAML::Value << tc.position;
-    out << YAML::Key << "rotation" << YAML::Value << tc.rotation;
-    out << YAML::Key << "scale" << YAML::Value << tc.scale;
-
-    out << YAML::EndMap;  // Transform
+    out["transform"] = transform_json;
   }
 
   if (entity.HasComponent<CameraComponent>()) {
     auto& camera_component = entity.GetComponent<CameraComponent>();
 
-    out << YAML::Key << "camera_component";
-    out << YAML::BeginMap;  // CameraComponent
-
-    auto& ortho_camera = camera_component.ortho_camera;
-    auto& persp_camera = camera_component.persp_camera;
-
-    out << YAML::Key << "orthographic_camera" << YAML::Value;
-    out << YAML::BeginMap;  // OrthographicCamera
-    out << YAML::Key << "aspect_ratio" << YAML::Value
-        << ortho_camera.aspect_ratio;
-    out << YAML::Key << "zoom_level" << YAML::Value << ortho_camera.zoom_level;
-    out << YAML::Key << "near_clip" << YAML::Value << ortho_camera.near_clip;
-
-    out << YAML::Key << "far_clip" << YAML::Value << ortho_camera.far_clip;
-    out << YAML::EndMap;  // OrthographicCamera
-
-    out << YAML::Key << "perspective_camera" << YAML::Value;
-    out << YAML::BeginMap;  // PerspectiveCamera
-    out << YAML::Key << "aspect_ratio" << YAML::Value
-        << persp_camera.aspect_ratio;
-    out << YAML::Key << "fov" << YAML::Value << persp_camera.fov;
-    out << YAML::Key << "near_clip" << YAML::Value << persp_camera.near_clip;
-    out << YAML::Key << "far_clip" << YAML::Value << persp_camera.far_clip;
-    out << YAML::EndMap;  // PerspectiveCamera
-
-    out << YAML::Key << "is_orthographic" << YAML::Value
-        << camera_component.is_orthographic;
-    out << YAML::Key << "is_primary" << YAML::Value
-        << camera_component.is_primary;
-    out << YAML::Key << "is_fixed_aspect_ratio" << YAML::Value
-        << camera_component.is_fixed_aspect_ratio;
-
-    out << YAML::EndMap;  // CameraComponent
+    out["camera_component"] =
+        json{{"orthographic_camera",
+              {{"aspect_ratio", camera_component.ortho_camera.aspect_ratio},
+               {"zoom_level", camera_component.ortho_camera.zoom_level},
+               {"near_clip", camera_component.ortho_camera.near_clip},
+               {"far_clip", camera_component.ortho_camera.far_clip}}},
+             {"perspective_camera",
+              {{"aspect_ratio", camera_component.persp_camera.aspect_ratio},
+               {"fov", camera_component.persp_camera.fov},
+               {"near_clip", camera_component.persp_camera.near_clip},
+               {"far_clip", camera_component.persp_camera.far_clip}}},
+             {"is_orthographic", camera_component.is_orthographic},
+             {"is_primary", camera_component.is_primary},
+             {"is_fixed_aspect_ratio", camera_component.is_fixed_aspect_ratio}};
   }
 
   if (entity.HasComponent<ModelComponent>()) {
     auto& model_component = entity.GetComponent<ModelComponent>();
 
-    out << YAML::Key << "model_component";
-    out << YAML::BeginMap;
-
-    out << YAML::Key << "path" << YAML::Value
-        << model_component.model->info.GetAssetPath();
-
-    out << YAML::EndMap;
+    out["model_component"] = json{{"path", model_component.model->path}};
   }
 
   if (entity.HasComponent<Material>()) {
     auto& material = entity.GetComponent<Material>();
 
-    out << YAML::Key << "material_component";
-    out << YAML::BeginMap;
+    out["material_component"] = json{{"albedo", material.albedo},
+                                     {"metallic", material.metallic},
+                                     {"roughness", material.roughness},
+                                     {"ao", material.ao}};
+  }
 
-    out << YAML::Key << "albedo" << YAML::Value << material.albedo;
-    out << YAML::Key << "metallic" << YAML::Value << material.metallic;
-    out << YAML::Key << "roughness" << YAML::Value << material.roughness;
-    out << YAML::Key << "ao" << YAML::Value << material.ao;
+  if (entity.HasComponent<CustomShaderComponent>()) {
+    auto& custom_shader = entity.GetComponent<CustomShaderComponent>();
 
-    out << YAML::EndMap;
+    json custom_shader_component_json = {
+        {"shader_path", custom_shader.shader_path},
+        {"uniform_fields", json::array()}};
+
+    for (auto& uniform : custom_shader.uniforms) {
+      json uniform_json = {{"name", uniform.name},
+                           {"type", ConvertUniformTypeToString(uniform.type)},
+                           {"value", nullptr}};
+
+      std::visit(
+          [&](const auto& val) {
+            using ValueType = std::decay_t<decltype(val)>;
+            if constexpr (std::is_same_v<ValueType, float> ||
+                          std::is_same_v<ValueType, glm::vec2> ||
+                          std::is_same_v<ValueType, glm::vec3> ||
+                          std::is_same_v<ValueType, glm::vec4> ||
+                          std::is_same_v<ValueType, int> ||
+                          std::is_same_v<ValueType, bool>) {
+              uniform_json["value"] = val;
+            }
+          },
+          uniform.value);
+
+      custom_shader_component_json["uniform_fields"].push_back(uniform_json);
+    }
+
+    out["custom_shader_component"] = custom_shader_component_json;
   }
 
   if (entity.HasComponent<ScriptComponent>()) {
     auto& sc = entity.GetComponent<ScriptComponent>();
 
-    out << YAML::Key << "script_component";
-    out << YAML::BeginMap;
-
-    out << YAML::Key << "class_name" << YAML::Value << sc.class_name;
+    json script_component_json = {{"class_name", sc.class_name},
+                                  {"script_fields", json::array()}};
 
     Ref<ScriptClass> entity_class = ScriptEngine::GetEntityClass(sc.class_name);
     const auto& fields = entity_class->GetFields();
-    if (fields.size() > 0) {
-      out << YAML::Key << "script_fields" << YAML::Value;
-      auto& entity_fields = ScriptEngine::GetScriptFieldMap(entity);
-      out << YAML::BeginSeq;
+    if (!fields.empty()) {
       for (const auto& [name, field] : fields) {
-        if (entity_fields.find(name) == entity_fields.end()) {
-          continue;
+        auto& entity_fields = ScriptEngine::GetScriptFieldMap(entity);
+
+        if (entity_fields.find(name) != entity_fields.end()) {
+          json script_field_json = {
+              {"name", name},
+              {"type", ScriptFieldTypeToString(field.type)},
+              {"data", nullptr}  // Placeholder for the data
+          };
+
+          ScriptFieldInstance& script_field = entity_fields.at(name);
+
+          switch (field.type) {
+            WRITE_SCRIPT_FIELD(kFloat, float);
+            WRITE_SCRIPT_FIELD(kDouble, double);
+            WRITE_SCRIPT_FIELD(kBool, bool);
+            WRITE_SCRIPT_FIELD(kChar, char);
+            WRITE_SCRIPT_FIELD(kByte, int8_t);
+            WRITE_SCRIPT_FIELD(kShort, int16_t);
+            WRITE_SCRIPT_FIELD(kInt, int32_t);
+            WRITE_SCRIPT_FIELD(kLong, int64_t);
+            WRITE_SCRIPT_FIELD(kUByte, uint8_t);
+            WRITE_SCRIPT_FIELD(kUShort, uint16_t);
+            WRITE_SCRIPT_FIELD(kUInt, uint32_t);
+            WRITE_SCRIPT_FIELD(kULong, uint64_t);
+            WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
+            WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
+            WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
+            WRITE_SCRIPT_FIELD(kScriptEntity, UUID);
+            default:
+              break;
+          }
+
+          script_component_json["script_fields"].push_back(script_field_json);
         }
-
-        out << YAML::BeginMap;  // ScriptField
-        out << YAML::Key << "name" << YAML::Value << name;
-        out << YAML::Key << "type" << YAML::Value
-            << ScriptFieldTypeToString(field.type);
-
-        out << YAML::Key << "data" << YAML::Value;
-        ScriptFieldInstance& script_field = entity_fields.at(name);
-
-        switch (field.type) {
-          WRITE_SCRIPT_FIELD(kFloat, float);
-          WRITE_SCRIPT_FIELD(kDouble, double);
-          WRITE_SCRIPT_FIELD(kBool, bool);
-          WRITE_SCRIPT_FIELD(kChar, char);
-          WRITE_SCRIPT_FIELD(kByte, int8_t);
-          WRITE_SCRIPT_FIELD(kShort, int16_t);
-          WRITE_SCRIPT_FIELD(kInt, int32_t);
-          WRITE_SCRIPT_FIELD(kLong, int64_t);
-          WRITE_SCRIPT_FIELD(kUByte, uint8_t);
-          WRITE_SCRIPT_FIELD(kUShort, uint16_t);
-          WRITE_SCRIPT_FIELD(kUInt, uint32_t);
-          WRITE_SCRIPT_FIELD(kULong, uint64_t);
-          WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
-          WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
-          WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
-          WRITE_SCRIPT_FIELD(kScriptEntity, UUID);
-          default:
-            break;
-        }
-        out << YAML::EndMap;  // ScriptFields
       }
-      out << YAML::EndSeq;
     }
 
-    out << YAML::EndMap;
+    out["script_component"] = script_component_json;
   }
-
-  out << YAML::EndMap;
 }
 
 void SceneSerializer::Serialize(const fs::path& file_path) {
-  YAML::Emitter out;
-  out << YAML::BeginMap;
-  out << YAML::Key << "scene" << YAML::Value << file_path.stem().string();
-  out << YAML::Key << "entities" << YAML::Value << YAML::BeginSeq;
+  json scene_json;
+  scene_json["scene"] = file_path.stem().string();
+  scene_json["entities"] = json::array();
+
   scene_->registry_.view<entt::entity>().each([&](auto entity_id) {
     Entity entity = {entity_id, scene_.get()};
     if (!entity)
       return;
 
-    SerializeEntity(out, entity);
+    json entity_json;
+    SerializeEntity(entity_json, entity);
+
+    scene_json["entities"].push_back(entity_json);
   });
-  out << YAML::EndSeq;
-  out << YAML::EndMap;
 
   std::ofstream fout(file_path);
-  fout << out.c_str();
+  fout << scene_json.dump(2);
 }
 
 bool SceneSerializer::Deserialize(const fs::path& file_path) {
-  YAML::Node data;
-  try {
-    data = YAML::LoadFile(file_path.string());
-  } catch (YAML::ParserException e) {
-    LOG_ERROR("Failed to load scene file '{0}'\n\t{1}", file_path.string(),
-              e.what());
+  json data;
+  std::ifstream file(file_path);
+  if (!file.is_open()) {
+    LOG_ERROR("Failed to load scene file '{0}'", file_path.string());
+    return false;
+  }
+  file >> data;
+
+  if (!data.contains("scene")) {
     return false;
   }
 
-  if (!data["scene"]) {
-    return false;
-  }
-
-  std::string scene_name = data["scene"].as<std::string>();
+  std::string scene_name = data["scene"].get<std::string>();
   LOG_TRACE("Deserializing scene: {0}", scene_name);
 
   scene_->name_ = scene_name;
 
-  auto entities = data["entities"];
-  if (!entities) {
+  if (!data.contains("entities")) {
     return false;
   }
 
+  json entities = data["entities"];
   for (auto entity : entities) {
-    uint64_t uuid = entity["id"].as<UUID>();
+    uint64_t uuid = entity["id"].get<UUID>();
 
     std::string name;
-    if (entity["tag_component"]) {
-      name = entity["tag_component"]["tag"].as<std::string>();
+    if (entity.contains("tag_component")) {
+      name = entity["tag_component"]["tag"].get<std::string>();
     }
 
     Entity deserialing_entity = scene_->CreateEntityWithUUID(uuid, name);
 
-    auto transform_yaml = entity["transform"];
-    if (transform_yaml) {
+    if (auto transform_json = entity["transform"]; !transform_json.is_null()) {
       auto& tc = deserialing_entity.GetComponent<Transform>();
 
-      tc.position = transform_yaml["position"].as<glm::vec3>();
-      tc.rotation = transform_yaml["rotation"].as<glm::vec3>();
-      tc.scale = transform_yaml["scale"].as<glm::vec3>();
+      tc.position = transform_json["position"].get<glm::vec3>();
+      tc.rotation = transform_json["rotation"].get<glm::vec3>();
+      tc.scale = transform_json["scale"].get<glm::vec3>();
     }
 
-    auto camera_comp_yaml = entity["camera_component"];
-    if (camera_comp_yaml) {
+    if (auto camera_comp_json = entity["camera_component"];
+        !camera_comp_json.is_null()) {
       auto& camera_component =
           deserialing_entity.AddComponent<CameraComponent>();
 
-      auto ortho_camera_yaml = camera_comp_yaml["orthographic_camera"];
+      auto ortho_camera_json = camera_comp_json["orthographic_camera"];
       camera_component.ortho_camera.aspect_ratio =
-          ortho_camera_yaml["aspect_ratio"].as<float>();
+          ortho_camera_json["aspect_ratio"].get<float>();
       camera_component.ortho_camera.zoom_level =
-          ortho_camera_yaml["zoom_level"].as<float>();
+          ortho_camera_json["zoom_level"].get<float>();
       camera_component.ortho_camera.near_clip =
-          ortho_camera_yaml["near_clip"].as<float>();
+          ortho_camera_json["near_clip"].get<float>();
       camera_component.ortho_camera.far_clip =
-          ortho_camera_yaml["far_clip"].as<float>();
+          ortho_camera_json["far_clip"].get<float>();
 
-      auto persp_camera_yaml = camera_comp_yaml["perspective_camera"];
-
+      auto persp_camera_json = camera_comp_json["perspective_camera"];
       camera_component.persp_camera.aspect_ratio =
-          persp_camera_yaml["aspect_ratio"].as<float>();
-      camera_component.persp_camera.fov = persp_camera_yaml["fov"].as<float>();
+          persp_camera_json["aspect_ratio"].get<float>();
+      camera_component.persp_camera.fov = persp_camera_json["fov"].get<float>();
       camera_component.persp_camera.near_clip =
-          persp_camera_yaml["near_clip"].as<float>();
+          persp_camera_json["near_clip"].get<float>();
       camera_component.persp_camera.far_clip =
-          persp_camera_yaml["far_clip"].as<float>();
+          persp_camera_json["far_clip"].get<float>();
 
       camera_component.is_orthographic =
-          camera_comp_yaml["is_orthographic"].as<bool>();
-      camera_component.is_primary = camera_comp_yaml["is_primary"].as<bool>();
+          camera_comp_json["is_orthographic"].get<bool>();
+      camera_component.is_primary = camera_comp_json["is_primary"].get<bool>();
       camera_component.is_fixed_aspect_ratio =
-          camera_comp_yaml["is_fixed_aspect_ratio"].as<bool>();
+          camera_comp_json["is_fixed_aspect_ratio"].get<bool>();
     }
 
-    auto model_comp_yaml = entity["model_component"];
-    if (model_comp_yaml) {
+    if (auto model_comp_json = entity["model_component"];
+        !model_comp_json.is_null()) {
       auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
-      model_component.model = AssetLibrary::LoadFromPath<Model>(
-          model_comp_yaml["path"].as<std::string>());
+      model_component.model =
+          AssetLibrary::Load<Model>(model_comp_json["path"].get<std::string>());
     }
 
-    auto material_yaml = entity["material_component"];
-    if (material_yaml) {
+    if (auto material_json = entity["material_component"];
+        !material_json.is_null()) {
       auto& material = deserialing_entity.AddComponent<Material>();
 
-      material.albedo = material_yaml["albedo"].as<glm::vec3>();
-      material.metallic = material_yaml["metallic"].as<float>();
-      material.roughness = material_yaml["roughness"].as<float>();
-      material.ao = material_yaml["ao"].as<float>();
+      material.albedo = material_json["albedo"].get<glm::vec3>();
+      material.metallic = material_json["metallic"].get<float>();
+      material.roughness = material_json["roughness"].get<float>();
+      material.ao = material_json["ao"].get<float>();
     }
 
-    auto script_component_yaml = entity["script_component"];
-    if (script_component_yaml) {
+    if (auto custom_shader_json = entity["custom_shader_component"];
+        !custom_shader_json.is_null()) {
+      auto& custom_shader =
+          deserialing_entity.AddComponent<CustomShaderComponent>();
+
+      custom_shader.shader_path =
+          custom_shader_json["shader_path"].get<std::string>();
+
+      auto uniforms_json = custom_shader_json["uniform_fields"];
+      for (const auto& uniform_json : uniforms_json) {
+        ShaderUniform uniform;
+        uniform.name = uniform_json["name"].get<std::string>();
+        uniform.type = ConvertStringToShaderUniformType(
+            uniform_json["type"].get<std::string>());
+
+        // necessary for std::visit
+        uniform.value = GetDefaultShaderValue(uniform.type);
+        std::visit(
+            [&](auto& val) {
+              using ValueType = std::decay_t<decltype(val)>;
+              if constexpr (std::is_same_v<ValueType, float> ||
+                            std::is_same_v<ValueType, glm::vec2> ||
+                            std::is_same_v<ValueType, glm::vec3> ||
+                            std::is_same_v<ValueType, glm::vec4> ||
+                            std::is_same_v<ValueType, int> ||
+                            std::is_same_v<ValueType, bool>) {
+                val = uniform_json["value"].get<ValueType>();
+              }
+            },
+            uniform.value);
+
+        custom_shader.uniforms.push_back(uniform);
+      }
+    }
+
+    if (auto script_component_json = entity["script_component"];
+        !script_component_json.is_null()) {
       auto& sc = deserialing_entity.AddComponent<ScriptComponent>();
 
-      sc.class_name = script_component_yaml["class_name"].as<std::string>();
+      sc.class_name = script_component_json["class_name"].get<std::string>();
 
-      auto script_fields = script_component_yaml["script_fields"];
-      if (script_fields) {
+      auto script_fields_json = script_component_json["script_fields"];
+      if (!script_fields_json.is_null()) {
         Ref<ScriptClass> entity_class =
             ScriptEngine::GetEntityClass(sc.class_name);
         if (entity_class) {
@@ -408,9 +373,10 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
           auto& entity_fields =
               ScriptEngine::GetScriptFieldMap(deserialing_entity);
 
-          for (auto script_field : script_fields) {
-            std::string name = script_field["name"].as<std::string>();
-            std::string type_string = script_field["type"].as<std::string>();
+          for (const auto& script_field_json : script_fields_json) {
+            std::string name = script_field_json["name"].get<std::string>();
+            std::string type_string =
+                script_field_json["type"].get<std::string>();
             ScriptFieldType type = ScriptFieldTypeFromString(type_string);
 
             ScriptFieldInstance& field_instance = entity_fields[name];

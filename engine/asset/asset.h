@@ -10,18 +10,11 @@ namespace eve {
 
 enum class AssetType { kTexture, kFont, kScene, kStaticMesh, kScript, kNone };
 
-struct AssetInfo {
-  UUID id;
-  AssetType type;
-  std::string meta_path;
-
-  [[nodiscard]] std::string GetAssetPath() const;
-};
-
 template <typename T>
 struct Asset {
-  AssetInfo info;
+  UUID id;
   Ref<T> asset;
+  std::string path;
 
   [[nodiscard]] operator bool() const { return (bool)asset; }
 };

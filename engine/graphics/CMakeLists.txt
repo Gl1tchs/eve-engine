@@ -14,6 +14,7 @@ set(SOURCES
   graphics.h
   index_buffer.cc
   index_buffer.h
+  material.cc
   material.h
   orthographic_camera.cc
   orthographic_camera.h

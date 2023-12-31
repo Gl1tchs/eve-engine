@@ -18,9 +18,7 @@
 
 namespace eve {
 InspectorPanel::InspectorPanel(Ref<HierarchyPanel> hierarchy_panel)
-    : Panel(true),
-      hierarchy_panel_(hierarchy_panel),
-      model_importer_(BIND_FUNC(OnModelMetaWrite), AssetType::kStaticMesh) {}
+    : Panel(true), hierarchy_panel_(hierarchy_panel) {}
 
 void InspectorPanel::Draw() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
@@ -28,58 +26,18 @@ void InspectorPanel::Draw() {
     return;
   }
 
-  model_importer_.Render();
-
+  RenderEntityHeader(selected_entity);
   RenderComponentProperties(selected_entity);
-
-  ImGui::Separator();
-
-  RenderAddComponentDialog(selected_entity);
 }
 
-void InspectorPanel::RenderAddComponentDialog(Entity selected_entity) {
-  ImGui::Button("Add Component", ImVec2(-1, 0));  // Full width button
-  if (ImGui::IsItemClicked()) {
-    // Get the mouse position
-    ImVec2 mouse_pos = ImGui::GetMousePos();
-
-    // Open the popup under the cursor
-    ImGui::OpenPopup("AddComponentPopup");
-    ImGui::SetNextWindowPos(mouse_pos);
-
-    // Reset the flag
-    show_add_component_dialog_ = false;
-  }
-
-  // Check if the dialog is open and render it
-  if (ImGui::BeginPopup(
-          "AddComponentPopup",
-          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize |
-              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking |
-              ImGuiWindowFlags_NoMove)) {
-    ImGui::Text("Choose a component to add:");
-
-    if (ImGui::Button("Camera")) {
-      selected_entity.AddComponent<CameraComponent>();
+template <typename T>
+void DisplayAddComponentEntry(Entity& selected_entity,
+                              const std::string& component_name) {
+  if (!selected_entity.HasComponent<T>()) {
+    if (ImGui::MenuItem(component_name.c_str())) {
+      selected_entity.AddComponent<T>();
+      ImGui::CloseCurrentPopup();
     }
-
-    if (ImGui::Button("Material")) {
-      selected_entity.AddComponent<Material>();
-    }
-
-    if (ImGui::Button("Model")) {
-      model_importer_.SetActive(true);
-    }
-
-    if (ImGui::Button("Script")) {
-      selected_entity.AddComponent<ScriptComponent>();
-    }
-
-    ImGui::EndPopup();
-    add_component_dialog_opened_ = true;
-  } else {
-    // Close the window if clicked elsewhere
-    add_component_dialog_opened_ = false;
   }
 }
 
@@ -125,6 +83,44 @@ static void DrawComponent(const std::string& name, Entity entity,
   }
 }
 
+void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
+  if (advanced_) {
+    DrawComponent<IdComponent>(
+        ICON_FA_ID_BADGE " Id Component", selected_entity,
+        [](IdComponent& id_comp) {
+          auto id_str = std::format("%" PRIu64, (uint64_t)id_comp.id);
+          ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
+        });
+  }
+
+  if (selected_entity.HasComponent<TagComponent>()) {
+    auto& tag_comp = selected_entity.GetComponent<TagComponent>();
+
+    ImGui::InputText("##tag", &tag_comp.tag);
+  }
+
+  ImGui::SameLine();
+  ImGui::PushItemWidth(-1);
+
+  if (ImGui::Button("Add Component"))
+    ImGui::OpenPopup("AddComponent");
+
+  if (ImGui::BeginPopup("AddComponent")) {
+    DisplayAddComponentEntry<CameraComponent>(selected_entity, "Camera");
+    DisplayAddComponentEntry<ScriptComponent>(selected_entity, "Script");
+    DisplayAddComponentEntry<ModelComponent>(selected_entity, "Model");
+    DisplayAddComponentEntry<Material>(selected_entity, "Material");
+    DisplayAddComponentEntry<CustomShaderComponent>(selected_entity,
+                                                    "Custom Shader");
+
+    ImGui::EndPopup();
+  }
+
+  ImGui::PopItemWidth();
+}
+
+static void DrawUniformField(ShaderUniform& uniform);
+
 static void DrawScriptField(const std::string& name,
                             ScriptFieldInstance& script_field,
                             bool use_default = false);
@@ -135,23 +131,6 @@ static void DrawScriptFieldRuntime(const std::string& name,
 
 void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   ImGui::PushID((uint32_t)selected_entity);
-
-  if (advanced_) {
-    DrawComponent<IdComponent>(
-        ICON_FA_ID_BADGE " Id Component", selected_entity,
-        [](IdComponent& id_comp) {
-          auto id_str = std::format("%" PRIu64, (uint64_t)id_comp.id);
-          ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
-        });
-  }
-
-  DrawComponent<TagComponent>(ICON_FA_TAG " Tag Component", selected_entity,
-                              [](TagComponent& tag_comp) {
-                                // TODO only accept unique names
-                                if (ImGui::InputText("Tag", &tag_comp.tag)) {
-                                  modify_info.SetModified();
-                                }
-                              });
 
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,
@@ -227,15 +206,21 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<ModelComponent>(
       ICON_FA_CUBES " Model Component", selected_entity,
       [this](ModelComponent& model_comp) {
-        std::string path = model_comp.model->info.GetAssetPath();
-        if (ImGui::InputText("Path", &path,
+        bool model_exists =
+            model_comp.model
+                ? fs::exists(AssetLibrary::GetAssetPath(model_comp.model->path))
+                : false;
+
+        ImGui::ScopedStyleColor _color(
+            ImGuiCol_Text, glm::vec4(0.9f, 0.2f, 0.3f, 1.0f), !model_exists);
+
+        std::string model_path = model_exists ? model_comp.model->path : "";
+        if (ImGui::InputText("Model Path", &model_path,
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
-          auto asset = AssetLibrary::LoadFromPath<Model>(path);
+          auto asset = AssetLibrary::Load<Model>(model_path);
           if (asset) {
             model_comp.model = asset;
             modify_info.SetModified();
-          } else {
-            model_importer_.SetActive(true);
           }
         }
       });
@@ -257,6 +242,26 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
 
         if (ImGui::DragFloat("AO", &material.ao, 0.05f)) {
           modify_info.SetModified();
+        }
+      });
+
+  DrawComponent<CustomShaderComponent>(
+      ICON_FA_PAINT_BRUSH " Custom Shader Component", selected_entity,
+      [this](CustomShaderComponent& custom_shader) {
+        bool shader_exists =
+            fs::exists(AssetLibrary::GetAssetPath(custom_shader.shader_path));
+
+        ImGui::ScopedStyleColor _color(
+            ImGuiCol_Text, glm::vec4(0.9f, 0.2f, 0.3f, 1.0f), !shader_exists);
+
+        std::string shader_path = custom_shader.shader_path;
+        if (ImGui::InputText("Shader Path", &shader_path)) {
+          custom_shader.shader_path = shader_path;
+          return;
+        }
+
+        for (auto& uniform : custom_shader.uniforms) {
+          DrawUniformField(uniform);
         }
       });
 
@@ -314,14 +319,39 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   ImGui::PopID();
 }
 
-void InspectorPanel::OnModelMetaWrite(const std::string& meta_path) {
-  Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
-  if (selected_entity.HasComponent<ModelComponent>()) {
-    return;
-  }
+void DrawUniformField(ShaderUniform& uniform) {
+  std::string uniform_name = uniform.name;
 
-  auto& modal_component = selected_entity.AddComponent<ModelComponent>();
-  modal_component.model = AssetLibrary::LoadFromMeta<Model>(meta_path);
+  std::visit(
+      [&](auto&& value) {
+        using ValueType = std::decay_t<decltype(value)>;
+        if constexpr (std::is_same_v<ValueType, float>) {
+          if (ImGui::DragFloat(uniform_name.c_str(), &value)) {
+            modify_info.SetModified();
+          }
+        } else if constexpr (std::is_same_v<ValueType, glm::vec2>) {
+          if (ImGui::DragFloat2(uniform_name.c_str(), &value[0])) {
+            modify_info.SetModified();
+          }
+        } else if constexpr (std::is_same_v<ValueType, glm::vec3>) {
+          if (ImGui::DragFloat3(uniform_name.c_str(), &value[0])) {
+            modify_info.SetModified();
+          }
+        } else if constexpr (std::is_same_v<ValueType, glm::vec4>) {
+          if (ImGui::DragFloat4(uniform_name.c_str(), &value[0])) {
+            modify_info.SetModified();
+          }
+        } else if constexpr (std::is_same_v<ValueType, int>) {
+          if (ImGui::DragInt(uniform_name.c_str(), &value)) {
+            modify_info.SetModified();
+          }
+        } else if constexpr (std::is_same_v<ValueType, bool>) {
+          if (ImGui::Checkbox(uniform_name.c_str(), &value)) {
+            modify_info.SetModified();
+          }
+        }
+      },
+      uniform.value);
 }
 
 void DrawScriptField(const std::string& name, ScriptFieldInstance& script_field,

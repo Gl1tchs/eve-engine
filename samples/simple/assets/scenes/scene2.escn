@@ -1,0 +1,117 @@
+{
+  "entities": [
+    {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 1225455807429653547,
+      "tag_component": {
+        "tag": "Main Camera"
+      },
+      "transform": {
+        "position": [
+          -5.630620002746582,
+          2.872159481048584,
+          11.092264175415039
+        ],
+        "rotation": [
+          -8.8610200881958,
+          -29.99997901916504,
+          8.439287171313481e-07
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": 323468953567323581,
+      "material_component": {
+        "albedo": [
+          0.007722020149230957,
+          1.0,
+          0.551750659942627
+        ],
+        "ao": 1.0,
+        "metallic": 0.5,
+        "roughness": 1.0
+      },
+      "model_component": {
+        "path": "res://models/monkey.obj"
+      },
+      "tag_component": {
+        "tag": "Monkey"
+      },
+      "transform": {
+        "position": [
+          -2.535435914993286,
+          1.342809796333313,
+          -1.812867522239685
+        ],
+        "rotation": [
+          2.0022573471069336,
+          -1.1503150463104248,
+          2.171015739440918
+        ],
+        "scale": [
+          0.8899974822998047,
+          0.7120013236999512,
+          0.838704526424408
+        ]
+      }
+    },
+    {
+      "id": 8234689535676734320,
+      "material_component": {
+        "albedo": [
+          0.7799227833747864,
+          0.05119183287024498,
+          0.05119183287024498
+        ],
+        "ao": 1.0,
+        "metallic": 1.0,
+        "roughness": 0.0
+      },
+      "model_component": {
+        "path": "res://models/monkey.obj"
+      },
+      "tag_component": {
+        "tag": "Red Monkey"
+      },
+      "transform": {
+        "position": [
+          3.2808175086975098,
+          0.3055403232574463,
+          1.488966703414917
+        ],
+        "rotation": [
+          2.785411879813182e-06,
+          -50.8162956237793,
+          -4.11800783695071e-06
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  ],
+  "scene": "sandbox"
+}

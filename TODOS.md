@@ -6,7 +6,6 @@
     - Create template scripts
 - [ ] In Game UI
 - [ ] Physics
-- [ ] Use a custom format rather yaml.
 - [ ] Sounds
 
 ## Editor
@@ -20,6 +19,7 @@
 - [ ] While scripts are building show a loading thing for it.
 
 ## Asset
+- [ ] Better asset system with proper registry and metadata caching.
 - [ ] Asset compression for shipping.
 
 ## Scene
@@ -27,6 +27,7 @@
 - [ ] Make EnTT library private.
 
 ## Scripting
+- [ ] Asset system scripting API.
 - [ ] Add new scenes to the build on create. 
 - [ ] Script lifetime multiple scenes (kinda like unity's DontDestroyOnLoad)
 - [ ] Add mat4 data type
@@ -34,12 +35,17 @@
 - [ ] API Documentation / code + markdown
 
 ## Renderer
+- [ ] Custom shaders with scripting API.
+    - [x] Custom shaders
+    - [ ] Scripting api (requires proper asset system)
 - [ ] Text rendering
 - [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.)
 - [ ] Texture rendering in detail (normal maps, height maps, materials).
 - [ ] PBR.
 - [ ] Other light sources
-- [ ] Custom shaders with scripting API.
+
+## Shaders
+- [ ] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
 
 ## Bugs
 - [ ] Cannot switch between projects.
@@ -58,6 +64,7 @@
 - [x] File/Open Scene not working.
 - [x] An runtime application
 - [x] Improve engine api for scripting.
+- [x] Use a custom format rather yaml.
 
 ## Fixed
 - [x] Editor closes very slowly

@@ -1,43 +1,101 @@
-scene: scene1
-entities:
-  - id: 11448520095847974562
-    tag_component:
-      tag: Camera
-    transform:
-      position: [0, 0, 4]
-      rotation: [0, 0, 0]
-      scale: [1, 1, 1]
-    camera_component:
-      orthographic_camera:
-        aspect_ratio: 1.53514183
-        zoom_level: 1
-        near_clip: -1
-        far_clip: 2
-      perspective_camera:
-        aspect_ratio: 1.53514183
-        fov: 45
-        near_clip: 0.100000001
-        far_clip: 300
-      is_orthographic: false
-      is_primary: true
-      is_fixed_aspect_ratio: false
-  - id: 11156390280603850414
-    tag_component:
-      tag: Entity
-    transform:
-      position: [0, 0, 0]
-      rotation: [0, 0, 0]
-      scale: [0.25, 0.25, 0.25]
-    model_component:
-      path: res://models/cube.obj
-    material_component:
-      albedo: [0, 0.177606106, 1]
-      metallic: 0
-      roughness: 1
-      ao: 1
-    script_component:
-      class_name: MultipleScenes.SceneTranslator
-      script_fields:
-        - name: isScene1
-          type: Bool
-          data: true
+{
+  "entities": [
+    {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 9378468046714055176,
+      "tag_component": {
+        "tag": "Camera"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          4.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "custom_shader_component": {
+        "shader_path": "res://shaders/custom.glsl",
+        "uniform_fields": [
+          {
+            "name": "square_size",
+            "type": "float",
+            "value": 20.0
+          }
+        ]
+      },
+      "id": 3657232952556252100,
+      "material_component": {
+        "albedo": [
+          0.9021276831626892,
+          0.22703073918819427,
+          0.053743790835142136
+        ],
+        "ao": 1.0,
+        "metallic": 0.0,
+        "roughness": 1.0
+      },
+      "model_component": {
+        "path": "res://models/cube.obj"
+      },
+      "script_component": {
+        "class_name": "MultipleScenes.SceneTranslator",
+        "script_fields": [
+          {
+            "data": true,
+            "name": "isScene1",
+            "type": "Bool"
+          }
+        ]
+      },
+      "tag_component": {
+        "tag": "Cube"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.25,
+          0.25,
+          0.25
+        ]
+      }
+    }
+  ],
+  "scene": "scene1"
+}
