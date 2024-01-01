@@ -6,12 +6,13 @@
 
 #include "asset/asset.h"
 #include "core/buffer.h"
+#include "core/color.h"
 #include "graphics/texture.h"
 
 namespace eve {
 
 struct Material {
-  glm::vec3 albedo;
+  Color albedo;
   float metallic;
   float roughness;
   float ao;

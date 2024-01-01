@@ -7,6 +7,7 @@
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
 
+#include "core/color.h"
 #include "core/event/input.h"
 #include "core/event/key_code.h"
 #include "core/uuid.h"
@@ -377,7 +378,7 @@ static void CameraComponent_SetIsFixedAspectRato(UUID entity_id,
       *is_fixed_aspect_ratio;
 }
 
-static void Material_GetAlbedo(UUID entity_id, glm::vec3* out_albedo) {
+static void Material_GetAlbedo(UUID entity_id, Color* out_albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
@@ -386,7 +387,7 @@ static void Material_GetAlbedo(UUID entity_id, glm::vec3* out_albedo) {
   *out_albedo = entity.GetComponent<Material>().albedo;
 }
 
-static void Material_SetAlbedo(UUID entity_id, glm::vec3* albedo) {
+static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);

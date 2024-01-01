@@ -3,35 +3,33 @@ using EveEngine;
 
 namespace MultipleScenes
 {
-  public class SceneTranslator : ScriptEntity
+  public class SceneTranslator : Entity
   {
     public bool isScene1 = false;
 
-    private Transform m_transform;
-    private bool m_keyPressed = false;
+    private bool _keyPressed = false;
 
-    private void OnCreate()
+    protected override void OnCreate()
     {
-      m_transform = GetComponent<Transform>();
     }
 
-    private void OnUpdate(float ds)
+    protected override void OnUpdate(float ds)
     {
-      if (isScene1 && !m_keyPressed && Input.IsKeyPressed(KeyCode.Num2))
+      if (isScene1 && !_keyPressed && Input.IsKeyPressed(KeyCode.Num2))
       {
         SceneManager.SetActive(1);
-        m_keyPressed = true;
+        _keyPressed = true;
       }
-      else if (!isScene1 && !m_keyPressed && Input.IsKeyPressed(KeyCode.Num1))
+      else if (!isScene1 && !_keyPressed && Input.IsKeyPressed(KeyCode.Num1))
       {
         SceneManager.SetActive(0);
-        m_keyPressed = true;
+        _keyPressed = true;
       }
 
-      m_transform.Rotation += Vector3.Up * 45 * ds;
+      Transform.Rotation += Vector3.Up * 45 * ds;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
       Console.WriteLine("Destroyed!");
     }

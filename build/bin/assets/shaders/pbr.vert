@@ -6,7 +6,7 @@
 #include "material.glsl"
 
 layout(location = 0) in vec4 a_pos;
-layout(location = 1) in vec3 a_albedo;
+layout(location = 1) in vec4 a_albedo;
 layout(location = 2) in float a_metallic;
 layout(location = 3) in float a_roughness;
 layout(location = 4) in float a_ao;
@@ -28,7 +28,7 @@ layout(location = 0) out VertexOutput v_output;
 void main() {
   // assign material values
   Material material;
-  material.albedo = a_albedo;
+  material.albedo = a_albedo.rgb;
   material.roughness = a_roughness;
   material.ao = a_ao;
 

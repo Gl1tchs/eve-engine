@@ -88,9 +88,9 @@ namespace EveEngine
 
 		#region Material
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_GetAlbedo(ulong entityId, out Vector3 albedo);
+		internal extern static void Material_GetAlbedo(ulong entityId, out Color albedo);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_SetAlbedo(ulong entityId, ref Vector3 albedo);
+		internal extern static void Material_SetAlbedo(ulong entityId, ref Color albedo);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Material_GetMetallic(ulong entityId, out float metallic);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]

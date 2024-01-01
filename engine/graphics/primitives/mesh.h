@@ -15,7 +15,7 @@ static constexpr size_t kMeshMaxTextures = 32;
 
 struct MeshVertex final {
   glm::vec4 position;
-  glm::vec3 albedo;
+  Color albedo;
   float metallic;
   float roughness;
   float ao;

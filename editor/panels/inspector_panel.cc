@@ -8,6 +8,7 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "core/color.h"
 #include "scene/components.h"
 #include "scene/scene_manager.h"
 #include "scene/static_mesh.h"
@@ -228,7 +229,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<Material>(
       ICON_FA_PICTURE_O " Material Component", selected_entity,
       [this](Material& material) {
-        if (ImGui::ColorEdit3("Albedo", glm::value_ptr(material.albedo))) {
+        if (ImGui::ColorEdit3("Albedo", &material.albedo.r)) {
           modify_info.SetModified();
         }
 
@@ -491,7 +492,15 @@ void DrawScriptField(const std::string& name, ScriptFieldInstance& script_field,
       }
       break;
     }
-    case ScriptFieldType::kScriptEntity: {
+    case ScriptFieldType::kColor: {
+      Color color = !use_default ? script_field.GetValue<Color>() : Color(0.0f);
+      if (ImGui::ColorEdit4(name.c_str(), &color.r)) {
+        script_field.SetValue(color);
+        modify_info.SetModified();
+      }
+      break;
+    }
+    case ScriptFieldType::kEntity: {
       break;
     }
   }
@@ -617,7 +626,14 @@ void DrawScriptFieldRuntime(const std::string& name, const ScriptField& field,
       }
       break;
     }
-    case ScriptFieldType::kScriptEntity: {
+    case ScriptFieldType::kColor: {
+      Color color = script_instance->GetFieldValue<Color>(name);
+      if (ImGui::ColorEdit4(name.c_str(), &color.r)) {
+        script_instance->SetFieldValue(name, color);
+      }
+      break;
+    }
+    case ScriptFieldType::kEntity: {
       break;
     }
   }

@@ -19,6 +19,7 @@ set(SOURCES
   utils/timer.cc
   utils/timer.h
   buffer.h
+  color.h
   core_minimal.h
   file_system.cc
   file_system.h

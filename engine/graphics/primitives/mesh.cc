@@ -19,7 +19,7 @@ MeshPrimitive::MeshPrimitive()
       VertexBuffer::Create(kMeshMaxVertexCount * sizeof(MeshVertex));
   vertex_buffer_->SetLayout({
       {ShaderDataType::kFloat4, "a_pos"},
-      {ShaderDataType::kFloat3, "a_albedo"},
+      {ShaderDataType::kFloat4, "a_albedo"},
       {ShaderDataType::kFloat, "a_metallic"},
       {ShaderDataType::kFloat, "a_roughness"},
       {ShaderDataType::kFloat, "a_ao"},

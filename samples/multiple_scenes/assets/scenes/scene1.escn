@@ -1,53 +1,13 @@
 {
   "entities": [
     {
-      "camera_component": {
-        "is_fixed_aspect_ratio": false,
-        "is_orthographic": false,
-        "is_primary": true,
-        "orthographic_camera": {
-          "aspect_ratio": 1.4696789979934692,
-          "far_clip": 1.0,
-          "near_clip": -1.0,
-          "zoom_level": 1.0
-        },
-        "perspective_camera": {
-          "aspect_ratio": 1.4696789979934692,
-          "far_clip": 300.0,
-          "fov": 45.0,
-          "near_clip": 0.10000000149011612
-        }
-      },
-      "id": 9378468046714055176,
-      "tag_component": {
-        "tag": "Camera"
-      },
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          4.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      }
-    },
-    {
       "custom_shader_component": {
         "shader_path": "res://shaders/custom.glsl",
         "uniform_fields": [
           {
             "name": "square_size",
             "type": "float",
-            "value": 20.0
+            "value": 0.0
           }
         ]
       },
@@ -56,7 +16,8 @@
         "albedo": [
           0.9021276831626892,
           0.22703073918819427,
-          0.053743790835142136
+          0.053743790835142136,
+          1.0
         ],
         "ao": 1.0,
         "metallic": 0.0,
@@ -93,6 +54,46 @@
           0.25,
           0.25,
           0.25
+        ]
+      }
+    },
+    {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.4696789979934692,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 9378468046714055176,
+      "tag_component": {
+        "tag": "Camera"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          4.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
         ]
       }
     }

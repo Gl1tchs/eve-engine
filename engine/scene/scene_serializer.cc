@@ -73,6 +73,20 @@ void from_json(const json& j, UUID& id) {
   id = j.get<uint64_t>();
 }
 
+void to_json(json& j, const Color& color) {
+  j.push_back(color.r);
+  j.push_back(color.g);
+  j.push_back(color.b);
+  j.push_back(color.a);
+}
+
+void from_json(const json& j, Color& color) {
+  j[0].get_to(color.r);
+  j[1].get_to(color.g);
+  j[2].get_to(color.b);
+  j[3].get_to(color.a);
+}
+
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(json& out, Entity entity) {
@@ -199,7 +213,8 @@ static void SerializeEntity(json& out, Entity entity) {
             WRITE_SCRIPT_FIELD(kVector2, glm::vec2);
             WRITE_SCRIPT_FIELD(kVector3, glm::vec3);
             WRITE_SCRIPT_FIELD(kVector4, glm::vec4);
-            WRITE_SCRIPT_FIELD(kScriptEntity, UUID);
+            WRITE_SCRIPT_FIELD(kColor, Color);
+            WRITE_SCRIPT_FIELD(kEntity, UUID);
             default:
               break;
           }
@@ -317,7 +332,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
         !material_json.is_null()) {
       auto& material = deserialing_entity.AddComponent<Material>();
 
-      material.albedo = material_json["albedo"].get<glm::vec3>();
+      material.albedo = material_json["albedo"].get<Color>();
       material.metallic = material_json["metallic"].get<float>();
       material.roughness = material_json["roughness"].get<float>();
       material.ao = material_json["ao"].get<float>();
@@ -405,7 +420,8 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
               READ_SCRIPT_FIELD(kVector2, glm::vec2);
               READ_SCRIPT_FIELD(kVector3, glm::vec3);
               READ_SCRIPT_FIELD(kVector4, glm::vec4);
-              READ_SCRIPT_FIELD(kScriptEntity, UUID);
+              READ_SCRIPT_FIELD(kColor, Color);
+              READ_SCRIPT_FIELD(kEntity, UUID);
               default:
                 break;
             }

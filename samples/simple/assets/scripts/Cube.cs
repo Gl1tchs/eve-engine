@@ -3,51 +3,48 @@ using EveEngine;
 
 namespace Simple
 {
-    public class Cube : ScriptEntity
+    public class Cube : Entity
     {
-        private Transform m_transform;
-        private bool m_spacePressed = false;
+        private bool _spacePressed = false;
 
         public float speed = 10.0f;
 
-        private void OnCreate()
+        protected override void OnCreate()
         {
             Console.WriteLine("Hello, World!");
-
-            m_transform = GetComponent<Transform>();
         }
 
-        private void OnUpdate(float ds)
+        protected override void OnUpdate(float ds)
         {
             Vector3 direction = Vector3.Zero;
 
             if (Input.IsKeyPressed(KeyCode.W))
             {
-                direction += m_transform.GetForward();
+                direction += Transform.GetForward();
             }
             if (Input.IsKeyPressed(KeyCode.S))
             {
-                direction -= m_transform.GetForward();
+                direction -= Transform.GetForward();
             }
 
             if (Input.IsKeyPressed(KeyCode.D))
             {
-                direction += m_transform.GetRight();
+                direction += Transform.GetRight();
             }
             if (Input.IsKeyPressed(KeyCode.A))
             {
-                direction -= m_transform.GetRight();
+                direction -= Transform.GetRight();
             }
 
-            if (!m_spacePressed && Input.IsKeyPressed(KeyCode.Space))
+            if (!_spacePressed && Input.IsKeyPressed(KeyCode.Space))
             {
                 SceneManager.SetActive(1);
-                m_spacePressed = true;
+                _spacePressed = true;
             }
 
             if (direction != Vector3.Zero)
             {
-                m_transform.Position += Mathf.Normalize(direction) * speed * ds;
+                Transform.Position += Mathf.Normalize(direction) * speed * ds;
             }
         }
     }

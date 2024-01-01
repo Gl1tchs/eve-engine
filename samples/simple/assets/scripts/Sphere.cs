@@ -3,13 +3,13 @@ using EveEngine;
 
 namespace Simple
 {
-    public class Sphere : ScriptEntity
+    public class Sphere : Entity
     {
-        private ScriptEntity m_cube;
+        private Entity m_cube;
 
-        public Vector3 color;
+        public Color color;
 
-        private void OnCreate()
+        protected override void OnCreate()
         {
             m_cube = TryGetEntityByName("Cube");
             if (!m_cube)
@@ -25,7 +25,7 @@ namespace Simple
             }
         }
 
-        private void OnUpdate(float ds)
+        protected override void OnUpdate(float ds)
         {
             GetComponent<Transform>().Rotation
                 += Vector3.Up * 20 * ds;

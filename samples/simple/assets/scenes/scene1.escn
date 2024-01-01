@@ -6,13 +6,13 @@
         "is_orthographic": false,
         "is_primary": true,
         "orthographic_camera": {
-          "aspect_ratio": 1.4696789979934692,
+          "aspect_ratio": 1.4679335355758667,
           "far_clip": 1.0,
           "near_clip": -1.0,
           "zoom_level": 1.0
         },
         "perspective_camera": {
-          "aspect_ratio": 1.4696789979934692,
+          "aspect_ratio": 1.4679335355758667,
           "far_clip": 300.0,
           "fov": 45.0,
           "near_clip": 0.10000000149011612
@@ -46,7 +46,8 @@
         "albedo": [
           0.0635581687092781,
           0.2698293924331665,
-          0.9957447052001953
+          1.0,
+          1.0
         ],
         "ao": 1.0,
         "metallic": 0.25,
@@ -60,12 +61,13 @@
         "script_fields": [
           {
             "data": [
-              0.8899999856948853,
-              0.11999999731779099,
-              0.3199999928474426
+              0.9531915187835693,
+              1.0,
+              0.0,
+              1.0
             ],
             "name": "color",
-            "type": "Vector3"
+            "type": "Color"
           }
         ]
       },
@@ -96,7 +98,8 @@
         "albedo": [
           1.0,
           0.05106383562088013,
-          0.05106383562088013
+          1.0,
+          1.0
         ],
         "ao": 1.0,
         "metallic": 0.0,

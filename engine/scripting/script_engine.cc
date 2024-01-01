@@ -34,8 +34,9 @@ static std::unordered_map<std::string, ScriptFieldType> script_field_type_map =
         {"EveEngine.Vector2", ScriptFieldType::kVector2},
         {"EveEngine.Vector3", ScriptFieldType::kVector3},
         {"EveEngine.Vector4", ScriptFieldType::kVector4},
+        {"EveEngine.Color", ScriptFieldType::kColor},
 
-        {"EveEngine.Entity", ScriptFieldType::kScriptEntity},
+        {"EveEngine.Entity", ScriptFieldType::kEntity},
 };
 
 static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
@@ -197,7 +198,7 @@ void ScriptEngine::Init(bool is_runtime) {
   ScriptGlue::RegisterComponents();
 
   // Retrieve and instantiate class
-  data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
+  data->entity_class = ScriptClass("EveEngine", "Entity", true);
 }
 
 void ScriptEngine::Shutdown() {
@@ -296,7 +297,7 @@ void ScriptEngine::ReloadAssembly() {
   ScriptGlue::RegisterComponents();
 
   // Retrieve and instantiate class
-  data->entity_class = ScriptClass("EveEngine", "ScriptEntity", true);
+  data->entity_class = ScriptClass("EveEngine", "Entity", true);
 }
 
 bool ScriptEngine::EntityClassExists(const std::string& fullClassName) {
@@ -396,8 +397,8 @@ void ScriptEngine::LoadAssemblyClasses() {
   const MonoTableInfo* type_definitions_table =
       mono_image_get_table_info(data->app_assembly_image, MONO_TABLE_TYPEDEF);
   int num_types = mono_table_info_get_rows(type_definitions_table);
-  MonoClass* entity_class = mono_class_from_name(data->core_assembly_image,
-                                                 "EveEngine", "ScriptEntity");
+  MonoClass* entity_class =
+      mono_class_from_name(data->core_assembly_image, "EveEngine", "Entity");
 
   for (int32_t i = 0; i < num_types; i++) {
     uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -571,8 +572,10 @@ const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
       return "Vector3";
     case ScriptFieldType::kVector4:
       return "Vector4";
-    case ScriptFieldType::kScriptEntity:
-      return "ScriptEntity";
+    case ScriptFieldType::kColor:
+      return "Color";
+    case ScriptFieldType::kEntity:
+      return "Entity";
   }
   ASSERT(false, "Unknown ScriptFieldType");
   return "None";
@@ -611,8 +614,10 @@ ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
     return ScriptFieldType::kVector3;
   if (field_type == "Vector4")
     return ScriptFieldType::kVector4;
-  if (field_type == "ScriptEntity")
-    return ScriptFieldType::kScriptEntity;
+  if (field_type == "Color")
+    return ScriptFieldType::kColor;
+  if (field_type == "Entity")
+    return ScriptFieldType::kEntity;
 
   ASSERT(false, "Unknown ScriptFieldType");
   return ScriptFieldType::kNone;

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EveEngine
+﻿namespace EveEngine
 {
 	public abstract class Component
 	{
-		public ScriptEntity Entity { get; internal set; }
+		public Entity Entity { get; internal set; }
 	}
 
 	public class CameraComponent : Component
@@ -69,11 +63,11 @@ namespace EveEngine
 
 	public class Material : Component
 	{
-		public Vector3 Albedo
+		public Color Albedo
 		{
 			get
 			{
-				InternalCalls.Material_GetAlbedo(Entity.Id, out Vector3 albedo);
+				InternalCalls.Material_GetAlbedo(Entity.Id, out Color albedo);
 				return albedo;
 			}
 			set
