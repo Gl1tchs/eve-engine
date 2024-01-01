@@ -47,3 +47,5 @@
 #include "core/core_minimal.h"
 
 namespace fs = std::filesystem;
+
+#define BIT(x) 1 << x

@@ -49,6 +49,8 @@ void EditorLayer::OnStart() {
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
                                                &editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
+
+  console_panel_ = CreateScope<ConsolePanel>();
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
   // If scene alredy loaded register it.
@@ -93,6 +95,7 @@ void EditorLayer::OnGUI(float ds) {
     viewport_panel_->Render();
     hierarchy_panel_->Render();
     inspector_panel_->Render();
+    console_panel_->Render();
     debug_info_panel_->Render();
 
     // Render modals
@@ -264,7 +267,7 @@ void EditorLayer::OpenProject() {
       "Open Project", "", 1, filter_patterns, "Eve Project Files", 0);
 
   if (!path) {
-    LOG_ERROR("Unable to open project from path.");
+    LOG_EDITOR_ERROR("Unable to open project from path.");
     return;
   }
 
@@ -302,7 +305,7 @@ void EditorLayer::SaveSceneAs() {
                                            filter_patterns, "Eve Scene Files");
 
   if (!path) {
-    LOG_ERROR("Unable to save scene to path.");
+    LOG_EDITOR_ERROR("Unable to save scene to path.");
     return;
   }
 
@@ -320,7 +323,7 @@ void EditorLayer::OpenScene() {
                                            "Eve Scene Files", 0);
 
   if (!path) {
-    LOG_ERROR("Unable to open scene from path.");
+    LOG_EDITOR_ERROR("Unable to open scene from path.");
     return;
   }
 

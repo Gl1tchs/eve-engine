@@ -2,15 +2,53 @@
 
 #pragma once
 
-#include "pch_shared.h"
+#include <cstdint>
+#include <string>
+
+#include "core/utils/memory.h"
 
 namespace eve {
+
+enum class LogSender { kEngine, kEditor, kRuntime, kClient };
+
 enum class LogLevel {
-  Trace = 0,
-  Info,
-  Warning,
-  Error,
-  Fatal,
+  kTrace = 0,
+  kInfo,
+  kWarning,
+  kError,
+  kFatal,
+};
+
+std::string GetLogLevelString(LogLevel level);
+
+struct LogMessage {
+  LogSender sender;
+  LogLevel level;
+  std::string time_stamp;
+  std::string string;
+};
+
+std::string GetLogSenderString(LogSender sender);
+
+class LogBuffer {
+ public:
+  LogBuffer(uint32_t max_messages);
+
+  void Log(LogSender sender, LogLevel level, const std::string& time_stamp,
+           const std::string& m1essage);
+
+  void Clear();
+
+  std::deque<LogMessage>::iterator begin() { return messages_.begin(); }
+  std::deque<LogMessage>::iterator end() { return messages_.end(); }
+  std::deque<LogMessage>::const_iterator begin() const {
+    return messages_.begin();
+  }
+  std::deque<LogMessage>::const_iterator end() const { return messages_.end(); }
+
+ private:
+  uint32_t max_messages_ = 1000;
+  std::deque<LogMessage> messages_;
 };
 
 class Logger {
@@ -19,36 +57,85 @@ class Logger {
 
   static void Deinit();
 
-  static void Log(LogLevel level, const std::string& fmt);
+  static void Log(LogSender sender, LogLevel level, const std::string& fmt);
+
+  static void PushBuffer(Ref<LogBuffer>& buffer);
 
  private:
   static std::string GetColoredMessage(const std::string& message,
                                        LogLevel level);
 
  private:
-  static std::unordered_map<LogLevel, std::string> s_verbosity_colors;
+  static std::unordered_map<LogLevel, std::string> verbosity_colors_;
 
-  static std::ofstream s_log_file;
-
-  static const char* s_log_level_strings[];
+  static std::ofstream log_file_;
+  static std::vector<Ref<LogBuffer>> log_buffers_;
 };
 }  // namespace eve
 
-#define LOG_TRACE(...) \
-  ::eve::Logger::Log(::eve::LogLevel::Trace, std::format(__VA_ARGS__))
-#define LOG_INFO(...) \
-  ::eve::Logger::Log(::eve::LogLevel::Info, std::format(__VA_ARGS__))
-#define LOG_WARNING(...) \
-  ::eve::Logger::Log(::eve::LogLevel::Warning, std::format(__VA_ARGS__))
-#define LOG_ERROR(...) \
-  ::eve::Logger::Log(::eve::LogLevel::Error, std::format(__VA_ARGS__))
-#define LOG_FATAL(...) \
-  ::eve::Logger::Log(::eve::LogLevel::Fatal, std::format(__VA_ARGS__))
+#define LOG_ENGINE_TRACE(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kTrace, \
+                     std::format(__VA_ARGS__))
+#define LOG_ENGINE_INFO(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kInfo, \
+                     std::format(__VA_ARGS__))
+#define LOG_ENGINE_WARNING(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kWarning, \
+                     std::format(__VA_ARGS__))
+#define LOG_ENGINE_ERROR(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kError, \
+                     std::format(__VA_ARGS__))
+#define LOG_ENGINE_FATAL(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kFatal, \
+                     std::format(__VA_ARGS__))
 
-#define LOG_IF(level, condition, ...)       \
-  if (condition) {                          \
-    ::eve::Logger::Log(level, __VA_ARGS__); \
-  }
+#define LOG_EDITOR_TRACE(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kTrace, \
+                     std::format(__VA_ARGS__))
+#define LOG_EDITOR_INFO(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kInfo, \
+                     std::format(__VA_ARGS__))
+#define LOG_EDITOR_WARNING(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kWarning, \
+                     std::format(__VA_ARGS__))
+#define LOG_EDITOR_ERROR(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kError, \
+                     std::format(__VA_ARGS__))
+#define LOG_EDITOR_FATAL(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kFatal, \
+                     std::format(__VA_ARGS__))
+
+#define LOG_RUNTIME_TRACE(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kTrace, \
+                     std::format(__VA_ARGS__))
+#define LOG_RUNTIME_INFO(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kInfo, \
+                     std::format(__VA_ARGS__))
+#define LOG_RUNTIME_WARNING(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kWarning, \
+                     std::format(__VA_ARGS__))
+#define LOG_RUNTIME_ERROR(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kError, \
+                     std::format(__VA_ARGS__))
+#define LOG_RUNTIME_FATAL(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kFatal, \
+                     std::format(__VA_ARGS__))
+
+#define LOG_CLIENT_TRACE(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kTrace, \
+                     std::format(__VA_ARGS__))
+#define LOG_CLIENT_INFO(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kInfo, \
+                     std::format(__VA_ARGS__))
+#define LOG_CLIENT_WARNING(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kWarning, \
+                     std::format(__VA_ARGS__))
+#define LOG_CLIENT_ERROR(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kError, \
+                     std::format(__VA_ARGS__))
+#define LOG_CLIENT_FATAL(...)                                            \
+  ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kFatal, \
+                     std::format(__VA_ARGS__))
 
 #if _WIN32
 #define DEBUGBREAK() __debugbreak()
@@ -64,7 +151,7 @@ class Logger {
 
 #define INTERNAL_ASSERT_IMPL(check, msg, ...) \
   if (!(check)) {                             \
-    LOG_FATAL(msg, __VA_ARGS__);              \
+    LOG_ENGINE_FATAL(msg, __VA_ARGS__);       \
     DEBUGBREAK();                             \
   }
 

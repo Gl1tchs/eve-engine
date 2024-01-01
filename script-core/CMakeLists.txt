@@ -10,6 +10,7 @@ set(SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/Camera.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Color.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Components.cs
+    ${CMAKE_CURRENT_LIST_DIR}/src/Debug.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Entity.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Input.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/InternalCalls.cs

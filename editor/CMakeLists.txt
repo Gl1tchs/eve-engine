@@ -5,6 +5,8 @@ set(SOURCES
   modals/exit_modal.h
   modals/modal.cc
   modals/modal.h
+  panels/console_panel.cc
+  panels/console_panel.h
   panels/debug_info_panel.cc
   panels/debug_info_panel.h
   panels/hierarchy_panel.cc

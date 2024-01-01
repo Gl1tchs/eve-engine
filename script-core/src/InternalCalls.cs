@@ -5,6 +5,24 @@ namespace EveEngine
 {
 	static partial class InternalCalls
 	{
+		#region Debug
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Debug_Log(string message);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Debug_LogInfo(string message);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Debug_LogWarning(string message);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Debug_LogError(string message);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Debug_LogFatal(string message);
+		#endregion
+
+
 		#region Entity
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityId, Type component_type);

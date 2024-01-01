@@ -11,6 +11,8 @@
 ## Editor
 - [ ] New Project
 - [ ] Inspector script entity field
+  - [ ] Prefabs
+  - [ ] Use ImGui::DragAndDropField
 - [ ] Better toolbar.
 - [ ] Add content browser and use id based asset system.
     - When using an asset inside of the inspector it should keep the id and find that asset in asset manager

@@ -33,7 +33,7 @@ bool ProjectSerializer::Deserialize(const fs::path& path) {
 
   auto obj = ini::ParseFile(path);
   if (!obj) {
-    LOG_ERROR("Failed to load project file '{}'", path.string());
+    LOG_ENGINE_ERROR("Failed to load project file '{}'", path.string());
     return false;
   }
 

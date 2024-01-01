@@ -101,7 +101,7 @@ std::string OpenGLShader::LoadShaderSource(const fs::path& path,
                                            bool is_fragment,
                                            const std::string& custom_shader) {
   if (!fs::exists(path)) {
-    LOG_ERROR("Shader file not found at: {0}", path.string());
+    LOG_ENGINE_ERROR("Shader file not found at: {0}", path.string());
     return "";
   }
 
@@ -113,7 +113,7 @@ std::string OpenGLShader::LoadShaderSource(const fs::path& path,
   std::ifstream file(path);
 
   if (!file.is_open()) {
-    LOG_ERROR("Could not open the shader at: {0}", path.string());
+    LOG_ENGINE_ERROR("Could not open the shader at: {0}", path.string());
     return full_source_code;
   }
 
@@ -267,7 +267,7 @@ bool OpenGLShader::CheckCompileErrors(const uint32_t shader,
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, nullptr, info_log);
-    LOG_ERROR("Unable to link shader of type: ", SerializeShaderType(type),
+    LOG_ENGINE_ERROR("Unable to link shader of type: ", SerializeShaderType(type),
               "\n", info_log);
     return false;
   }
@@ -285,7 +285,7 @@ uint32_t OpenGLShader::CompileShader(const std::string& source,
   glCompileShader(shader);
 
   if (!CheckCompileErrors(shader, type)) {
-    LOG_ERROR("Unable to compile shader:\n{0}", source);
+    LOG_ENGINE_ERROR("Unable to compile shader:\n{0}", source);
     ASSERT(false);
   }
 

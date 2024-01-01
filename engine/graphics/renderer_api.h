@@ -7,8 +7,6 @@
 #include "core/utils/memory.h"
 #include "graphics/vertex_array.h"
 
-#define BIT(x) 1 << x
-
 namespace eve {
 enum class GraphicsAPI { kNone = 0, kOpenGL, kVulkan };
 

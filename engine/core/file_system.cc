@@ -31,7 +31,7 @@ Buffer FileSystem::ReadFileBinary(const fs::path& filepath) {
 std::string FileSystem::ReadFileString(const fs::path& filepath) {
   std::ifstream t(filepath);
   if (!t.is_open()) {
-    LOG_ERROR("Unable to load file from: {}", filepath.string());
+    LOG_ENGINE_ERROR("Unable to load file from: {}", filepath.string());
     return "";
   }
 

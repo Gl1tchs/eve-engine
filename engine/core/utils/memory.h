@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "pch_shared.h"
+#include <memory>
 
 namespace eve {
 

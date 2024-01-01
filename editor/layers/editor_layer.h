@@ -11,6 +11,7 @@
 #include "scene/scene.h"
 
 #include "modals/exit_modal.h"
+#include "panels/console_panel.h"
 #include "panels/debug_info_panel.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
@@ -102,11 +103,12 @@ class EditorLayer : public Layer {
   MenuBar menu_bar_;
 
   // panels
-  Scope<ToolbarPanel> toolbar_panel_;
-  Scope<ViewportPanel> viewport_panel_;
+  Scope<ConsolePanel> console_panel_;
+  Scope<DebugInfoPanel> debug_info_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
-  Scope<DebugInfoPanel> debug_info_panel_;
+  Scope<ToolbarPanel> toolbar_panel_;
+  Scope<ViewportPanel> viewport_panel_;
 
   // is camera ejected
   bool is_ejected_;

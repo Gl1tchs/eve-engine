@@ -16,7 +16,7 @@ OpenGLFrameBuffer::OpenGLFrameBuffer(const glm::ivec2& size) : size_(size) {
   Refresh();
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    LOG_ERROR("Framebuffer is not complete!");
+    LOG_ENGINE_ERROR("Framebuffer is not complete!");
 
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);

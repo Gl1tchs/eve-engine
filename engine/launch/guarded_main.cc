@@ -10,11 +10,7 @@ namespace eve {
 extern Instance* CreateInstance(CommandLineArguments args);
 
 int GuardedMain(CommandLineArguments args) {
-  if (!fs::exists(".eve/")) {
-    fs::create_directory(".eve/");
-  }
-
-  Logger::Init(".eve/engine.log");
+  Logger::Init("engine.log");
 
   Instance* instance = CreateInstance(args);
   if (!instance) {
