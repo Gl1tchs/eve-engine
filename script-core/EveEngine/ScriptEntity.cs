@@ -46,9 +46,9 @@ namespace EveEngine
 			return component;
 		}
 
-		public ScriptEntity FindEntityByName(string name)
+		public ScriptEntity TryGetEntityByName(string name)
 		{
-			ulong entity_id = InternalCalls.Entity_FindEntityByName(name);
+			ulong entity_id = InternalCalls.Entity_TryGetEntityByName(name);
 			return new ScriptEntity(entity_id);
 		}
 

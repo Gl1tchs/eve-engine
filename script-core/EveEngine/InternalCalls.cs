@@ -9,7 +9,7 @@ namespace EveEngine
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityId, Type component_type);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static ulong Entity_FindEntityByName(string name);
+		internal extern static ulong Entity_TryGetEntityByName(string name);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static object GetScriptInstance(ulong entityId);
 		#endregion

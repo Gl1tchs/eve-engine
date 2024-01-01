@@ -23,6 +23,7 @@
 - [ ] Asset compression for shipping.
 
 ## Scene
+- [ ] Add parent / child entity system.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
 

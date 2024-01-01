@@ -10,6 +10,7 @@
 #include "core/uuid.h"
 
 namespace eve {
+
 class Entity;
 
 class Scene {
@@ -39,10 +40,10 @@ class Scene {
 
   void DestroyEntity(Entity entity);
 
-  [[nodiscard]] std::optional<Entity> FindEntityByName(std::string name);
-  [[nodiscard]] std::optional<Entity> FindEntityByUUID(UUID uuid);
+  [[nodiscard]] Entity TryGetEntityByUUID(UUID uuid);
+  [[nodiscard]] Entity TryGetEntityByName(std::string name);
 
-  [[nodiscard]] std::optional<Entity> GetPrimaryCameraEntity();
+  [[nodiscard]] Entity GetPrimaryCameraEntity();
 
   template <typename... Components>
   [[nodiscard]] auto GetAllEntitiesWith() {

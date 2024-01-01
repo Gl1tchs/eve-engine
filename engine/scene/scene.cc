@@ -171,31 +171,31 @@ void Scene::DestroyEntity(Entity entity) {
   registry_.destroy(entity);
 }
 
-std::optional<Entity> Scene::FindEntityByUUID(UUID uuid) {
+Entity Scene::TryGetEntityByUUID(UUID uuid) {
   if (entity_map_.find(uuid) != entity_map_.end()) {
-    return std::optional<Entity>(Entity{entity_map_.at(uuid), this});
+    return {entity_map_.at(uuid), this};
   }
-  return std::optional<Entity>();
+  return {};
 }
 
-std::optional<Entity> Scene::FindEntityByName(std::string name) {
+Entity Scene::TryGetEntityByName(std::string name) {
   auto view = registry_.view<TagComponent>();
   for (auto entity : view) {
     const TagComponent& tc = view.get<TagComponent>(entity);
     if (tc.tag == name)
-      return std::optional<Entity>(Entity{entity, this});
+      return {entity, this};
   }
-  return std::optional<Entity>();
+  return {};
 }
 
-std::optional<Entity> Scene::GetPrimaryCameraEntity() {
+Entity Scene::GetPrimaryCameraEntity() {
   auto view = registry_.view<CameraComponent>();
   for (auto entity : view) {
     const auto& camera = view.get<CameraComponent>(entity);
     if (camera.is_primary)
-      return std::optional<Entity>(Entity{entity, this});
+      return {entity, this};
   }
-  return std::optional<Entity>();
+  return {};
 }
 
 Entity Scene::GetSelectedEntity() {
@@ -209,7 +209,7 @@ bool Scene::EntityNameExists(const std::string& name) {
             pair.second.template GetComponent<TagComponent>();
         return tag_comp.tag == name;
       });
-
   return it != entity_map_.end();
 }
+
 }  // namespace eve

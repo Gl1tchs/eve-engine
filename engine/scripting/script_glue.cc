@@ -39,134 +39,134 @@ static bool Entity_HasComponent(UUID entity_id,
                                 MonoReflectionType* component_type) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   MonoType* managed_type = mono_reflection_type_get_type(component_type);
   ASSERT(entity_has_component_funcs.find(managed_type) !=
          entity_has_component_funcs.end());
-  return entity_has_component_funcs.at(managed_type)(entity.value());
+  return entity_has_component_funcs.at(managed_type)(entity);
 }
 
-static uint64_t Entity_FindEntityByName(MonoString* name) {
+static uint64_t Entity_TryGetEntityByName(MonoString* name) {
   char* name_cstr = mono_string_to_utf8(name);
 
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByName(name_cstr);
+  auto entity = scene->TryGetEntityByName(name_cstr);
   mono_free(name_cstr);
 
   if (!entity)
     return 0;
 
-  return entity->GetUUID();
+  return entity.GetUUID();
 }
 
 static void TransformComponent_GetPosition(UUID entity_id,
                                            glm::vec3* out_position) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_position = entity->GetComponent<Transform>().position;
+  *out_position = entity.GetComponent<Transform>().position;
 }
 
 static void TransformComponent_SetPosition(UUID entity_id,
                                            glm::vec3* position) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Transform>().position = *position;
+  entity.GetComponent<Transform>().position = *position;
 }
 
 static void TransformComponent_GetRotation(UUID entity_id,
                                            glm::vec3* out_rotation) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_rotation = entity->GetComponent<Transform>().rotation;
+  *out_rotation = entity.GetComponent<Transform>().rotation;
 }
 
 static void TransformComponent_SetRotation(UUID entity_id,
                                            glm::vec3* rotation) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Transform>().rotation = *rotation;
+  entity.GetComponent<Transform>().rotation = *rotation;
 }
 
 static void TransformComponent_GetScale(UUID entity_id, glm::vec3* out_scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_scale = entity->GetComponent<Transform>().scale;
+  *out_scale = entity.GetComponent<Transform>().scale;
 }
 
 static void TransformComponent_SetScale(UUID entity_id, glm::vec3* scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Transform>().scale = *scale;
+  entity.GetComponent<Transform>().scale = *scale;
 }
 
 static void TransformComponent_GetForward(UUID entity_id,
                                           glm::vec3* out_forward) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_forward = entity->GetComponent<Transform>().GetForward();
+  *out_forward = entity.GetComponent<Transform>().GetForward();
 }
 
 static void TransformComponent_GetRight(UUID entity_id, glm::vec3* out_right) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_right = entity->GetComponent<Transform>().GetRight();
+  *out_right = entity.GetComponent<Transform>().GetRight();
 }
 
 static void TransformComponent_GetUp(UUID entity_id, glm::vec3* out_up) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_up = entity->GetComponent<Transform>().GetUp();
+  *out_up = entity.GetComponent<Transform>().GetUp();
 }
 
 static void CameraComponent_OrthographicCamera_GetAspectRatio(
     UUID entity_id, float* out_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_aspect_ratio =
-      entity->GetComponent<CameraComponent>().ortho_camera.aspect_ratio;
+      entity.GetComponent<CameraComponent>().ortho_camera.aspect_ratio;
 }
 
 static void CameraComponent_OrthographicCamera_SetAspectRatio(
     UUID entity_id, float* aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().ortho_camera.aspect_ratio =
+  entity.GetComponent<CameraComponent>().ortho_camera.aspect_ratio =
       *aspect_ratio;
 }
 
@@ -174,83 +174,83 @@ static void CameraComponent_OrthographicCamera_GetZoomLevel(
     UUID entity_id, float* out_zoom_level) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_zoom_level =
-      entity->GetComponent<CameraComponent>().ortho_camera.zoom_level;
+      entity.GetComponent<CameraComponent>().ortho_camera.zoom_level;
 }
 
 static void CameraComponent_OrthographicCamera_SetZoomLevel(UUID entity_id,
                                                             float* zoom_level) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().ortho_camera.zoom_level = *zoom_level;
+  entity.GetComponent<CameraComponent>().ortho_camera.zoom_level = *zoom_level;
 }
 
 static void CameraComponent_OrthographicCamera_GetNearClip(
     UUID entity_id, float* out_near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_near_clip =
-      entity->GetComponent<CameraComponent>().ortho_camera.near_clip;
+      entity.GetComponent<CameraComponent>().ortho_camera.near_clip;
 }
 
 static void CameraComponent_OrthographicCamera_SetNearClip(UUID entity_id,
                                                            float* near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().ortho_camera.near_clip = *near_clip;
+  entity.GetComponent<CameraComponent>().ortho_camera.near_clip = *near_clip;
 }
 
 static void CameraComponent_OrthographicCamera_GetFarClip(UUID entity_id,
                                                           float* out_far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_far_clip = entity->GetComponent<CameraComponent>().ortho_camera.far_clip;
+  *out_far_clip = entity.GetComponent<CameraComponent>().ortho_camera.far_clip;
 }
 
 static void CameraComponent_OrthographicCamera_SetFarClip(UUID entity_id,
                                                           float* far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().ortho_camera.far_clip = *far_clip;
+  entity.GetComponent<CameraComponent>().ortho_camera.far_clip = *far_clip;
 }
 
 static void CameraComponent_PerspectiveCamera_GetAspectRatio(
     UUID entity_id, float* out_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_aspect_ratio =
-      entity->GetComponent<CameraComponent>().persp_camera.aspect_ratio;
+      entity.GetComponent<CameraComponent>().persp_camera.aspect_ratio;
 }
 
 static void CameraComponent_PerspectiveCamera_SetAspectRatio(
     UUID entity_id, float* aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().persp_camera.aspect_ratio =
+  entity.GetComponent<CameraComponent>().persp_camera.aspect_ratio =
       *aspect_ratio;
 }
 
@@ -258,61 +258,61 @@ static void CameraComponent_PerspectiveCamera_GetFov(UUID entity_id,
                                                      float* out_fov) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_fov = entity->GetComponent<CameraComponent>().persp_camera.fov;
+  *out_fov = entity.GetComponent<CameraComponent>().persp_camera.fov;
 }
 
 static void CameraComponent_PerspectiveCamera_SetFov(UUID entity_id,
                                                      float* fov) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().persp_camera.fov = *fov;
+  entity.GetComponent<CameraComponent>().persp_camera.fov = *fov;
 }
 
 static void CameraComponent_PerspectiveCamera_GetNearClip(
     UUID entity_id, float* out_near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_near_clip =
-      entity->GetComponent<CameraComponent>().persp_camera.near_clip;
+      entity.GetComponent<CameraComponent>().persp_camera.near_clip;
 }
 
 static void CameraComponent_PerspectiveCamera_SetNearClip(UUID entity_id,
                                                           float* near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().persp_camera.near_clip = *near_clip;
+  entity.GetComponent<CameraComponent>().persp_camera.near_clip = *near_clip;
 }
 
 static void CameraComponent_PerspectiveCamera_GetFarClip(UUID entity_id,
                                                          float* out_far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_far_clip = entity->GetComponent<CameraComponent>().persp_camera.far_clip;
+  *out_far_clip = entity.GetComponent<CameraComponent>().persp_camera.far_clip;
 }
 
 static void CameraComponent_PerspectiveCamera_SetFarClip(UUID entity_id,
                                                          float* far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().persp_camera.far_clip = *far_clip;
+  entity.GetComponent<CameraComponent>().persp_camera.far_clip = *far_clip;
   ;
 }
 
@@ -320,134 +320,133 @@ static void CameraComponent_GetIsOrthographic(UUID entity_id,
                                               float* out_is_orthographic) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_is_orthographic =
-      entity->GetComponent<CameraComponent>().is_orthographic;
+  *out_is_orthographic = entity.GetComponent<CameraComponent>().is_orthographic;
 }
 
 static void CameraComponent_SetIsOrthographic(UUID entity_id,
                                               float* is_orthographic) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().is_orthographic = *is_orthographic;
+  entity.GetComponent<CameraComponent>().is_orthographic = *is_orthographic;
 }
 
 static void CameraComponent_GetIsPrimary(UUID entity_id,
                                          float* out_is_primary) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_is_primary = entity->GetComponent<CameraComponent>().is_primary;
+  *out_is_primary = entity.GetComponent<CameraComponent>().is_primary;
 }
 
 static void CameraComponent_SetIsPrimary(UUID entity_id, float* is_primary) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().is_primary = *is_primary;
+  entity.GetComponent<CameraComponent>().is_primary = *is_primary;
 }
 
 static void CameraComponent_GetIsFixedAspectRato(
     UUID entity_id, float* out_is_fixed_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
   *out_is_fixed_aspect_ratio =
-      entity->GetComponent<CameraComponent>().is_fixed_aspect_ratio;
+      entity.GetComponent<CameraComponent>().is_fixed_aspect_ratio;
 }
 
 static void CameraComponent_SetIsFixedAspectRato(UUID entity_id,
                                                  float* is_fixed_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<CameraComponent>().is_fixed_aspect_ratio =
+  entity.GetComponent<CameraComponent>().is_fixed_aspect_ratio =
       *is_fixed_aspect_ratio;
 }
 
 static void Material_GetAlbedo(UUID entity_id, glm::vec3* out_albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_albedo = entity->GetComponent<Material>().albedo;
+  *out_albedo = entity.GetComponent<Material>().albedo;
 }
 
 static void Material_SetAlbedo(UUID entity_id, glm::vec3* albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Material>().albedo = *albedo;
+  entity.GetComponent<Material>().albedo = *albedo;
 }
 
 static void Material_GetMetallic(UUID entity_id, float* out_metallic) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_metallic = entity->GetComponent<Material>().metallic;
+  *out_metallic = entity.GetComponent<Material>().metallic;
 }
 
 static void Material_SetMetallic(UUID entity_id, float* metallic) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Material>().metallic = *metallic;
+  entity.GetComponent<Material>().metallic = *metallic;
 }
 
 static void Material_GetRoughness(UUID entity_id, float* out_roughness) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_roughness = entity->GetComponent<Material>().roughness;
+  *out_roughness = entity.GetComponent<Material>().roughness;
 }
 
 static void Material_SetRoughness(UUID entity_id, float* roughness) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Material>().roughness = *roughness;
+  entity.GetComponent<Material>().roughness = *roughness;
 }
 
 static void Material_GetAO(UUID entity_id, float* out_ao) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  *out_ao = entity->GetComponent<Material>().ao;
+  *out_ao = entity.GetComponent<Material>().ao;
 }
 
 static void Material_SetAO(UUID entity_id, float* ao) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
-  auto entity = scene->FindEntityByUUID(entity_id);
-  ASSERT(entity.has_value());
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
 
-  entity->GetComponent<Material>().ao = *ao;
+  entity.GetComponent<Material>().ao = *ao;
 }
 
 static bool Input_IsKeyPressed(KeyCode keycode) {
@@ -516,7 +515,7 @@ void ScriptGlue::RegisterFunctions() {
 
   // Begin Entity
   ADD_INTERNAL_CALL(Entity_HasComponent);
-  ADD_INTERNAL_CALL(Entity_FindEntityByName);
+  ADD_INTERNAL_CALL(Entity_TryGetEntityByName);
 
   // Begin Transform Component
   ADD_INTERNAL_CALL(TransformComponent_GetPosition);

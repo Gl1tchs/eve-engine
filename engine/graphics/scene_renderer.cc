@@ -16,9 +16,9 @@ void SceneRenderer::RenderRuntime(float ds) {
   }
 
   auto camera = scene->GetPrimaryCameraEntity();
-  if (camera.has_value() && camera.value().HasComponent<CameraComponent>()) {
-    auto& cc = camera.value().GetComponent<CameraComponent>();
-    auto& tc = camera.value().GetTransform();
+  if (camera && camera.HasComponent<CameraComponent>()) {
+    auto& cc = camera.GetComponent<CameraComponent>();
+    auto& tc = camera.GetTransform();
 
     CameraData data;
     if (cc.is_orthographic) {
@@ -50,10 +50,9 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
   CameraData data;
   if (use_primary_if_exists) {
     auto primary_camera = scene->GetPrimaryCameraEntity();
-    if (primary_camera.has_value() &&
-        primary_camera.value().HasComponent<CameraComponent>()) {
-      auto& cc = primary_camera.value().GetComponent<CameraComponent>();
-      auto& tc = primary_camera.value().GetTransform();
+    if (primary_camera && primary_camera.HasComponent<CameraComponent>()) {
+      auto& cc = primary_camera.GetComponent<CameraComponent>();
+      auto& tc = primary_camera.GetTransform();
 
       if (cc.is_orthographic) {
         data = {cc.ortho_camera.GetViewMatrix(tc),

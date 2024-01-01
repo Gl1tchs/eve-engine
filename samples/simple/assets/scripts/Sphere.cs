@@ -11,7 +11,7 @@ namespace Simple
 
         private void OnCreate()
         {
-            m_cube = FindEntityByName("Cube");
+            m_cube = TryGetEntityByName("Cube");
             if (!m_cube)
             {
                 Console.WriteLine("Unable to find cube!");
