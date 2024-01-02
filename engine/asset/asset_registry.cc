@@ -8,7 +8,6 @@
 #include "asset_registry.h"
 #include "project/project.h"
 
-
 using json = nlohmann::json;
 
 namespace eve {
@@ -16,7 +15,6 @@ namespace eve {
 NLOHMANN_JSON_SERIALIZE_ENUM(AssetType, {{AssetType::kNone, nullptr},
                                          {AssetType::kTexture, "Texture"},
                                          {AssetType::kFont, "Font"},
-                                         {AssetType::kScene, "Scene"},
                                          {AssetType::kStaticMesh, "StaticMesh"},
                                          {AssetType::kScript, "Script"}});
 
@@ -33,14 +31,23 @@ Ref<Asset> AssetRegistry::Get(const AssetHandle& handle) {
   return it->second;
 }
 
+void AssetRegistry::Register(Ref<Asset> asset) {
+  assets_[asset->handle] = asset;
+}
+
 AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
                                 const std::string& name, AssetHandle handle) {
   const fs::path path_abs = GetAssetPath(path);
 
   Ref<Asset> asset = nullptr;
   switch (type) {
+    case AssetType::kTexture:
+      asset = AssetLoader::LoadTexture(path_abs);
+      break;
     case AssetType::kStaticMesh:
       asset = AssetLoader::LoadModel(path_abs);
+      break;
+      break;
     default:
       break;
   }

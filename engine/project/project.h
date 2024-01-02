@@ -24,6 +24,11 @@ class Project {
     return active_project_->project_dir_;
   }
 
+  [[nodiscard]] static fs::path GetProjectPath() {
+    ASSERT(active_project_);
+    return active_project_->project_path_;
+  }
+
   [[nodiscard]] static fs::path GetAssetRegistryPath() {
     ASSERT(active_project_);
     return active_project_->project_dir_ /
@@ -52,5 +57,6 @@ class Project {
 
   ProjectConfig config_;
   fs::path project_dir_;
+  fs::path project_path_ = ""; 
 };
 }  // namespace eve

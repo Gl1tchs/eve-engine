@@ -1,42 +1,49 @@
 {
   "entities": [
     {
-      "camera_component": {
-        "is_fixed_aspect_ratio": false,
-        "is_orthographic": false,
-        "is_primary": true,
-        "orthographic_camera": {
-          "aspect_ratio": 2.3570094108581543,
-          "far_clip": 1.0,
-          "near_clip": -1.0,
-          "zoom_level": 1.0
-        },
-        "perspective_camera": {
-          "aspect_ratio": 2.3570094108581543,
-          "far_clip": 300.0,
-          "fov": 45.0,
-          "near_clip": 0.10000000149011612
-        }
+      "id": 4147500373297138652,
+      "material_component": {
+        "albedo": [
+          1.0,
+          0.05106383562088013,
+          1.0,
+          1.0
+        ],
+        "ao": 1.0,
+        "metallic": 0.0,
+        "roughness": 1.0
       },
-      "id": 1225455807429653547,
+      "model_component": {
+        "model": 5585700724317691323
+      },
+      "script_component": {
+        "class_name": "Simple.Cube",
+        "script_fields": [
+          {
+            "data": 10.0,
+            "name": "speed",
+            "type": "Float"
+          }
+        ]
+      },
       "tag_component": {
-        "tag": "Main Camera"
+        "tag": "Cube"
       },
       "transform": {
         "position": [
-          -5.630620002746582,
-          2.872159481048584,
-          11.092264175415039
+          2.7812576293945313,
+          -0.2859038710594177,
+          1.6942291259765625
         ],
         "rotation": [
-          -8.8610200881958,
-          -29.99997901916504,
-          8.439287171313481e-07
+          0.0,
+          0.0,
+          0.0
         ],
         "scale": [
-          1.0,
-          1.0,
-          1.0
+          0.75,
+          0.75,
+          0.75
         ]
       }
     },
@@ -93,49 +100,42 @@
       }
     },
     {
-      "id": 4147500373297138652,
-      "material_component": {
-        "albedo": [
-          1.0,
-          0.05106383562088013,
-          1.0,
-          1.0
-        ],
-        "ao": 1.0,
-        "metallic": 0.0,
-        "roughness": 1.0
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 2.39776349067688,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 2.39776349067688,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
       },
-      "model_component": {
-        "model": 5585700724317691323
-      },
-      "script_component": {
-        "class_name": "Simple.Cube",
-        "script_fields": [
-          {
-            "data": 10.0,
-            "name": "speed",
-            "type": "Float"
-          }
-        ]
-      },
+      "id": 1225455807429653547,
       "tag_component": {
-        "tag": "Cube"
+        "tag": "Main Camera"
       },
       "transform": {
         "position": [
-          2.7812576293945313,
-          -0.2859038710594177,
-          1.6942291259765625
+          -5.630620002746582,
+          2.872159481048584,
+          11.092264175415039
         ],
         "rotation": [
-          0.0,
-          0.0,
-          0.0
+          -8.8610200881958,
+          -29.99997901916504,
+          8.439287171313481e-07
         ],
         "scale": [
-          0.75,
-          0.75,
-          0.75
+          1.0,
+          1.0,
+          1.0
         ]
       }
     }

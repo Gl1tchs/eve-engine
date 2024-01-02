@@ -24,6 +24,8 @@ class AssetRegistry {
 
   static Ref<Asset> Get(const AssetHandle& id);
 
+  static void Register(Ref<Asset> asset);
+
   static AssetHandle Load(const std::string& path, AssetType type,
                           const std::string& name, AssetHandle id = {});
 

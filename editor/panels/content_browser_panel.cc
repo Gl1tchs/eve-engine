@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include "project/project.h"
+#include "scene/scene_manager.h"
 
 namespace eve {
 
@@ -126,8 +127,12 @@ void ContentBrowserPanel::Draw() {
 
       if (ImGui::IsItemHovered() &&
           ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-        if (directory_entry.is_directory())
+        if (directory_entry.is_directory()) {
           current_directory_ /= path.filename();
+        }
+        if (on_scene_open && path.extension() == ".escn") {
+          on_scene_open(path);
+        }
       }
     }
 

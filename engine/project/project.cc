@@ -17,6 +17,7 @@ Ref<Project> Project::New() {
 
 Ref<Project> Project::Load(const fs::path& path) {
   Ref<Project> project = CreateRef<Project>();
+  project->project_path_ = path;
 
   ProjectSerializer serializer(project);
   if (serializer.Deserialize(path)) {
@@ -36,7 +37,11 @@ Ref<Project> Project::Load(const fs::path& path) {
 void Project::SaveActive(const fs::path& path) {
   ProjectSerializer serializer(active_project_);
   serializer.Serialize(path);
+
   AssetRegistry::Serialize(GetAssetRegistryPath());
+
   active_project_->project_dir_ = path.parent_path();
+  active_project_->project_path_ = path;
 }
+
 }  // namespace eve

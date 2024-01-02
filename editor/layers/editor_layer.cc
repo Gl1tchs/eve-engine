@@ -59,6 +59,12 @@ void EditorLayer::OnStart() {
 
     editor_scene_ = SceneManager::GetActive();
     editor_scene_path_ = SceneManager::GetActivePath();
+
+    // Content browser depends on project
+    if (!content_browser_) {
+      content_browser_ = CreateScope<ContentBrowserPanel>();
+      content_browser_->on_scene_open = BIND_FUNC(OpenScene);
+    }
   }
 
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
@@ -281,6 +287,7 @@ void EditorLayer::OpenProject() {
     // Content browser depends on project
     if (!content_browser_) {
       content_browser_ = CreateScope<ContentBrowserPanel>();
+      content_browser_->on_scene_open = BIND_FUNC(OpenScene);
     }
   }
 }
@@ -324,6 +331,10 @@ void EditorLayer::SaveSceneAs() {
 }
 
 void EditorLayer::OpenScene() {
+  if (scene_state_ != SceneState::kEdit) {
+    return;
+  }
+
   const char* filter_patterns[1] = {"*.escn"};
   const char* path = tinyfd_openFileDialog("Open Scene", "", 1, filter_patterns,
                                            "Eve Scene Files", 0);
@@ -338,7 +349,7 @@ void EditorLayer::OpenScene() {
 
 void EditorLayer::OpenScene(const fs::path& path) {
   if (scene_state_ != SceneState::kEdit) {
-    OnScenePause();
+    return;
   }
 
   SetSceneTitle();
@@ -358,7 +369,7 @@ void EditorLayer::OpenScene(const fs::path& path) {
 
 void EditorLayer::OpenScene(const uint32_t index) {
   if (scene_state_ != SceneState::kEdit) {
-    OnScenePause();
+    return;
   }
 
   if (index >= SceneManager::GetRegisteredSceneCount()) {

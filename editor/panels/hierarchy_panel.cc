@@ -61,6 +61,12 @@ void HierarchyPanel::Draw() {
       ImGui::EndPopup();
     }
 
+    if (ImGui::BeginDragDropSource()) {
+      ImGui::SetDragDropPayload("DND_PAYLOAD_ENTITY", &entity.GetUUID(),
+                                sizeof(UUID));
+      ImGui::EndDragDropSource();
+    }
+
     ImGui::PopID();
   }
 

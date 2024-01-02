@@ -19,14 +19,6 @@ ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
       editor_camera_(editor_camera) {
   PushStyle(ImGuiStyleVar_WindowPadding, glm::vec2{0, 0});
   SetFlags(ImGuiWindowFlags_NoCollapse);
-
-  // SetStatic(true);
-  //   const ImVec2 pos(0.0f, 50.0f);
-  //   ImVec2 size = ImGui::GetWindowSize();
-  //   size.y -= pos.y * 2;
-
-  //   SetPos(pos);
-  //   ImGui::SetNextWindowSize(size);
 }
 
 void ViewportPanel::Draw() {

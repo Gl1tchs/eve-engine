@@ -16,6 +16,8 @@ class ContentBrowserPanel : public Panel {
   ContentBrowserPanel();
   virtual ~ContentBrowserPanel() = default;
 
+  std::function<void(const fs::path& path)> on_scene_open; 
+
  protected:
   void Draw() override;
 

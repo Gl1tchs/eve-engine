@@ -4,6 +4,8 @@
 
 #include "pch_shared.h"
 
+#include "asset/asset.h"
+
 namespace eve {
 enum class TextureFormat {
   kRed,
@@ -37,8 +39,10 @@ struct TextureMetadata final {
   bool generate_mipmaps = true;
 };
 
-class Texture {
+class Texture : public Asset {
  public:
+  IMPL_ASSET(AssetType::kTexture)
+
   virtual const TextureMetadata& GetMetadata() const = 0;
 
   virtual uint32_t GetTextureID() const = 0;
