@@ -6,11 +6,7 @@ set(SOURCES
 
 list(APPEND SOURCES ${IMGUI_OPENGL_SOURCES})
 
-if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-  add_executable(eve_runtime WIN32 ${SOURCES})
-else()
-  add_executable(eve_runtime ${SOURCES})
-endif()
+add_executable(eve_runtime ${SOURCES})
 
 target_include_directories(eve_runtime PRIVATE
   ${CMAKE_SOURCE_DIR}/runtime
