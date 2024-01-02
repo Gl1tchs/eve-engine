@@ -13,10 +13,12 @@ class ContentBrowserPanel : public Panel {
   IMPL_PANEL("Content Browser")
 
  public:
+  std::function<void(const fs::path& path)> on_scene_open;
+
   ContentBrowserPanel();
   virtual ~ContentBrowserPanel() = default;
 
-  std::function<void(const fs::path& path)> on_scene_open; 
+  void Reload();
 
  protected:
   void Draw() override;
@@ -45,6 +47,7 @@ class ContentBrowserPanel : public Panel {
   Ref<Texture> icon_script_;
   Ref<Texture> icon_texture_;
   Ref<Texture> icon_audio_;
+  Ref<Texture> icon_shader_;
 };
 
 }  // namespace eve

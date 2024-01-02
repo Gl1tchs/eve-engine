@@ -10,6 +10,7 @@ Ref<Project> Project::active_project_ = nullptr;
 
 Ref<Project> Project::New() {
   active_project_ = CreateRef<Project>();
+  
   SceneManager::Init(active_project_);
 
   return active_project_;

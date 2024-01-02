@@ -4,6 +4,7 @@
 
 #include "core/instance.h"
 #include "scene/scene_serializer.h"
+#include "scene_manager.h"
 
 namespace eve {
 Ref<Project> SceneManager::project_ = nullptr;
@@ -15,7 +16,7 @@ void SceneManager::Init(Ref<Project> project) {
 
 void SceneManager::SetActive(const uint32_t index) {
   // Best code I've written to this day
-  ASSERT(project_->GetConfig().scenes.size() > index);
+  ASSERT(DoesIndexExists(index));
 
   scene_info_.index = index;
   scene_info_.path = project_->GetConfig().scenes[scene_info_.index];
@@ -36,4 +37,9 @@ void SceneManager::SetActive(const uint32_t index) {
     scene_info_.scene = new_scene;
   }
 }
+
+bool SceneManager::DoesIndexExists(const uint32_t index) {
+  return project_->GetConfig().scenes.size() > index;
+}
+
 }  // namespace eve

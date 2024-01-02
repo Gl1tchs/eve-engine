@@ -53,6 +53,11 @@ void EditorLayer::OnStart() {
   console_panel_ = CreateScope<ConsolePanel>();
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
+  content_browser_ = CreateScope<ContentBrowserPanel>();
+  content_browser_->on_scene_open = BIND_FUNC(OpenScene);
+
+  about_panel_ = CreateScope<AboutPanel>();
+
   // If scene alredy loaded register it.
   if (auto& active_scene = SceneManager::GetActive(); active_scene) {
     SetSceneTitle();
@@ -90,6 +95,8 @@ void EditorLayer::OnGUI(float ds) {
   DockSpace::Begin();
   {
     menu_bar_.Draw();
+
+    about_panel_->Render();
 
     if (!SceneManager::GetActive()) {
       DockSpace::End();
@@ -219,6 +226,10 @@ void EditorLayer::HandleShortcuts() {
       }
 
       if (Input::IsKeyPressed(KeyCode::kLeftShift)) {
+        if (Input::IsKeyPressed(KeyCode::kO)) {
+          OpenProject();
+        }
+
         if (Input::IsKeyPressed(KeyCode::kS)) {
           SaveSceneAs();
         }
@@ -279,16 +290,21 @@ void EditorLayer::OpenProject() {
   }
 
   if (Ref<Project> project = Project::Load(fs::path(path)); project) {
-    ScriptEngine::Init();
+    if (!ScriptEngine::IsInitialized()) {
+      ScriptEngine::Init();
+    } else {
+      hierarchy_panel_->SetSelectedEntity(Entity{});
+      ScriptEngine::Reinit();
+    }
 
     // Open the first scene index
-    OpenScene(0);
-
-    // Content browser depends on project
-    if (!content_browser_) {
-      content_browser_ = CreateScope<ContentBrowserPanel>();
-      content_browser_->on_scene_open = BIND_FUNC(OpenScene);
+    if (SceneManager::DoesIndexExists(0)) {
+      OpenScene(0);
+    } else {
+      NewScene();
     }
+
+    content_browser_->Reload();
   }
 }
 
@@ -492,7 +508,7 @@ void EditorLayer::SetupMenubar() {
     MenuItemGroup project_group;
     {
       MenuItem open_project(
-          "Open Project", [&]() { OpenProject(); }, "Ctrl+Shift+O");
+          "Open Project", [&]() { OpenProject(); }, "Ctrl+O");
       project_group.PushMenuItem(open_project);
 
       file_menu.PushItemGroup(project_group);
@@ -577,6 +593,14 @@ void EditorLayer::SetupMenubar() {
                          [this]() { inspector_panel_->SetActive(true); });
       base_group.PushMenuItem(inspector);
 
+      MenuItem console("Console",
+                       [this]() { console_panel_->SetActive(true); });
+      base_group.PushMenuItem(console);
+
+      MenuItem content_browser("Content Browser",
+                               [this]() { content_browser_->SetActive(true); });
+      base_group.PushMenuItem(content_browser);
+
       MenuItem advanced_inspector("Advanced Inspector", [this]() {
         inspector_panel_->ToggleAdvanced();
       });
@@ -595,6 +619,19 @@ void EditorLayer::SetupMenubar() {
     }
 
     menu_bar_.PushMenu(view_menu);
+  }
+
+  Menu help_menu("Help");
+  {
+    MenuItemGroup base_group;
+    {
+      MenuItem inspector("About", [this]() { about_panel_->SetActive(true); });
+      base_group.PushMenuItem(inspector);
+
+      help_menu.PushItemGroup(base_group);
+    }
+
+    menu_bar_.PushMenu(help_menu);
   }
 }
 }  // namespace eve

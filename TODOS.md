@@ -1,6 +1,7 @@
 # EVE Todo
 
 ## General
+- [ ] Continius integration and testing.
 - [ ] Register eve_editor to windows in order to open .eproject files directly. 
 - [ ] Project opener / creater application
     - Create template scripts
@@ -32,6 +33,7 @@
 ## Scripting
 - [ ] Asset system scripting API.
 - [ ] Add new scenes to the build on create. 
+- [ ] Current way to compile script project is not good.
 - [ ] Script lifetime multiple scenes (kinda like unity's DontDestroyOnLoad)
 - [ ] Add mat4 data type
 - [ ] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
@@ -51,7 +53,6 @@
 - [ ] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
 
 ## Bugs
-- [ ] Cannot switch between projects.
 - [ ] Scenes that are not in project file couldn't open. 
 
 ## Done
@@ -70,4 +71,5 @@
 - [x] Use a custom format rather yaml.
 
 ## Fixed
+- [x] Cannot switch between projects.
 - [x] Editor closes very slowly

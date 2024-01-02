@@ -30,19 +30,33 @@ std::string GetAssetTypeString(AssetType type) {
 }
 
 ContentBrowserPanel::ContentBrowserPanel()
-    : Panel(true),
-      base_directory_(Project::GetAssetDirectory()),
-      current_directory_(base_directory_) {
+    : Panel(true), base_directory_(""), current_directory_("") {
   icon_file_ = Texture::Create("assets/branding/icon_file.png");
   icon_folder_ = Texture::Create("assets/branding/icon_folder.png");
   icon_mesh_ = Texture::Create("assets/branding/icon_mesh.png");
   icon_script_ = Texture::Create("assets/branding/icon_script.png");
   icon_texture_ = Texture::Create("assets/branding/icon_texture.png");
+  icon_shader_ = Texture::Create("assets/branding/icon_shader.png");
+
+  if (!Project::GetActive()) {
+    return;
+  }
+
+  Reload();
 
   RefreshAssetTree();
 }
 
+void ContentBrowserPanel::Reload() {
+  base_directory_ = Project::GetAssetDirectory();
+  current_directory_ = base_directory_;
+}
+
 void ContentBrowserPanel::Draw() {
+  if (current_directory_.empty() || base_directory_.empty()) {
+    return;
+  }
+
   if (ImGui::Button("assets")) {
     current_directory_ = base_directory_;
   }
@@ -189,6 +203,8 @@ Ref<Texture> ContentBrowserPanel::GetFileIcon(AssetType type) {
       return icon_mesh_;
     case AssetType::kScript:
       return icon_script_;
+    case AssetType::kShader:
+      return icon_shader_;
     default:
       return icon_file_;
   }
@@ -205,6 +221,8 @@ Ref<Texture> ContentBrowserPanel::GetFileIcon(const std::string& extension) {
   } else if (extension == ".png" || extension == ".jpg" ||
              extension == ".jpeg" || extension == ".webp") {
     return icon_texture_;
+  } else if (extension == ".glsl" || extension == ".esh") {
+    return icon_shader_;
   } else {
     return icon_file_;
   }

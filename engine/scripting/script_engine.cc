@@ -14,6 +14,7 @@
 #include "core/file_system.h"
 #include "core/instance.h"
 #include "project/project.h"
+#include "script_engine.h"
 #include "scripting/script_glue.h"
 
 namespace eve {
@@ -172,6 +173,10 @@ static void OnScriptFileChanged(const std::string& path,
 }
 
 void ScriptEngine::Init(bool is_runtime) {
+  if (data) {
+    return;
+  }
+
   data = new ScriptEngineData();
   data->is_runtime = is_runtime;
 
@@ -207,9 +212,25 @@ void ScriptEngine::Init(bool is_runtime) {
   data->entity_class = ScriptClass("EveEngine", "Entity", true);
 }
 
+void ScriptEngine::Reinit() {
+  if (!data) {
+    return;
+  }
+
+  data->app_assembly_path =
+      Project::GetProjectDirectory() /
+      std::format("out/{}.dll", Project::GetProjectName());
+  ReloadAssembly();
+}
+
 void ScriptEngine::Shutdown() {
   ShutdownMono();
   delete data;
+  data = nullptr;
+}
+
+bool ScriptEngine::IsInitialized() {
+  return data != nullptr;
 }
 
 void ScriptEngine::InitMono() {
@@ -225,14 +246,12 @@ void ScriptEngine::InitMono() {
     mono_debug_init(MONO_DEBUG_FORMAT_MONO);
   }
 
-  MonoDomain* root_domain = mono_jit_init("EveJITRuntime");
-  ASSERT(root_domain);
+  data->root_domain = mono_jit_init("EveJITRuntime");
+  ASSERT(data->root_domain);
 
-  // Store the root domain pointer
-  data->root_domain = root_domain;
-
-  if (data->enable_debugging)
+  if (data->enable_debugging) {
     mono_debug_domain_create(data->root_domain);
+  }
 
   mono_thread_set_main(mono_thread_current());
 }
@@ -245,6 +264,10 @@ void ScriptEngine::ShutdownMono() {
 
   mono_jit_cleanup(data->root_domain);
   data->root_domain = nullptr;
+
+  if (data->enable_debugging) {
+    mono_debug_cleanup();
+  }
 }
 
 bool ScriptEngine::LoadAssembly(const fs::path& filepath) {

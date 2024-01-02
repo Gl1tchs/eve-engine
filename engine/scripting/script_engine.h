@@ -11,7 +11,11 @@ class ScriptEngine {
  public:
   static void Init(bool is_runtime = false);
 
+  static void Reinit();
+
   static void Shutdown();
+
+  static bool IsInitialized();
 
   static bool LoadAssembly(const fs::path& filepath);
   static bool LoadAppAssembly(const fs::path& filepath);

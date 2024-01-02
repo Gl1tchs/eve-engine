@@ -11,6 +11,7 @@
 #include "scene/scene.h"
 
 #include "modals/exit_modal.h"
+#include "panels/about_panel.h"
 #include "panels/console_panel.h"
 #include "panels/content_browser_panel.h"
 #include "panels/debug_info_panel.h"
@@ -111,6 +112,7 @@ class EditorLayer : public Layer {
   Scope<InspectorPanel> inspector_panel_;
   Scope<ToolbarPanel> toolbar_panel_;
   Scope<ViewportPanel> viewport_panel_;
+  Scope<AboutPanel> about_panel_;
 
   // is camera ejected
   bool is_ejected_;

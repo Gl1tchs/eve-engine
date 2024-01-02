@@ -5,6 +5,7 @@
 #include "pch_shared.h"
 
 namespace eve {
+
 struct Color {
   float r = 0.0f;
   float g = 0.0f;
@@ -34,4 +35,5 @@ constexpr Color kCyan(0.0f, 1.0f, 1.0f, 1.0f);
 constexpr Color kMagenta(1.0f, 0.0f, 1.0f, 1.0f);
 constexpr Color kGray(0.5f, 0.5f, 0.5f, 1.0f);
 constexpr Color kOrange(1.0f, 0.5f, 0.0f, 1.0f);
+
 }  // namespace eve

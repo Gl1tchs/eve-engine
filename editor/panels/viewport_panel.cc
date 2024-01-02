@@ -10,6 +10,7 @@
 #include "utils/modify_info.h"
 
 namespace eve {
+  
 ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
                              Ref<HierarchyPanel> hierarchy_panel,
                              EditorCamera* editor_camera)
@@ -96,4 +97,5 @@ void ViewportPanel::Draw() {
     }
   }
 }
+
 }  // namespace eve

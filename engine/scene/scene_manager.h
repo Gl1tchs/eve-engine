@@ -22,6 +22,8 @@ class SceneManager {
    */
   static void SetActive(uint32_t index);
 
+  static bool DoesIndexExists(uint32_t index);
+
   [[nodiscard]] static const uint32_t GetRegisteredSceneCount() {
     return project_->GetConfig().scenes.size();
   }

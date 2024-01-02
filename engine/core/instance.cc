@@ -34,6 +34,10 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 }
 
 Instance::~Instance() {
+  if (!ScriptEngine::IsInitialized()) {
+    return;
+  }
+
   ScriptEngine::Shutdown();
 }
 

@@ -16,7 +16,8 @@ enum class AssetType {
   kFont,
   kScene,
   kStaticMesh,
-  kScript
+  kScript,
+  kShader,
 };
 
 #define IMPL_ASSET(type)               \
