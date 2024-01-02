@@ -43,36 +43,54 @@ ContentBrowserPanel::ContentBrowserPanel()
 }
 
 void ContentBrowserPanel::Draw() {
-  if (current_directory_ != fs::path(base_directory_)) {
-    if (ImGui::Button(ICON_FA_LONG_ARROW_LEFT)) {
-      current_directory_ = current_directory_.parent_path();
+  if (ImGui::Button("assets")) {
+    current_directory_ = base_directory_;
+  }
+
+  ImGui::SameLine();
+
+  ImGui::TextUnformatted("/");
+
+  ImGui::SameLine();
+
+  // Render each directory in the path
+  fs::path relative_path = fs::relative(current_directory_, base_directory_);
+
+  if (current_directory_ != base_directory_) {
+    for (const auto& part : relative_path) {
+      if (ImGui::Button(part.string().c_str())) {
+        std::string rel_string = relative_path.string();
+        const std::string part_str = part.string();
+
+        size_t pos = rel_string.find(part_str);
+        if (pos != std::string::npos) {
+          fs::path path_without = rel_string.substr(0, pos + part_str.length());
+
+          // Clicking on a directory navigates into it
+          current_directory_ = base_directory_ / path_without;
+        }
+      }
+      ImGui::SameLine();
+
+      ImGui::TextUnformatted("/");
+
+      ImGui::SameLine();
     }
-
-    ImGui::SameLine();
-
-    std::string relative_path =
-        fs::relative(current_directory_, base_directory_).string();
-
-    ImGui::Text("assets/%s", relative_path.c_str());
-  } else {
-    ImGui::TextUnformatted("assets/");
   }
 
   static float padding = 16.0f;
   static float thumbnail_size = 100.0f;
   float cell_size = padding + thumbnail_size;
 
-  static constexpr int settings_size = 25;
-  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - settings_size);
+  ImGui::SameLine(ImGui::GetContentRegionMax().x -
+                  ImGui::CalcTextSize("Settings").x);
 
   if (ImGui::BeginPopup("Settings")) {
-    ImGui::Text("Asset Size");
-    ImGui::SliderFloat("##AssetSizeSlider", &thumbnail_size, 1, 512);
-
+    ImGui::SliderFloat("Asset Size", &thumbnail_size, 1, 512);
     ImGui::EndPopup();
   }
 
-  if (ImGui::Button(ICON_FA_COG, ImVec2(settings_size, settings_size))) {
+  if (ImGui::Button("Settings")) {
     ImGui::OpenPopup("Settings");
   }
 
@@ -86,6 +104,8 @@ void ContentBrowserPanel::Draw() {
 
   ImGui::Columns(column_count, 0, false);
 
+  int i = 0;
+  static int selected_idx = -1;
   for (auto& directory_entry : fs::directory_iterator(current_directory_)) {
     const fs::path& path = directory_entry.path();
     std::string filename_str = path.filename().string();
@@ -94,16 +114,29 @@ void ContentBrowserPanel::Draw() {
 
     fs::path relative_path = fs::relative(path, Project::GetAssetDirectory());
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    // Clicked somewhere else, reset selected_idx to -1
+    if (!ImGui::IsItemHovered() &&
+        ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+      selected_idx = -1;
+    }
+
+    if (selected_idx == i) {
+      ImGui::PushStyleColor(ImGuiCol_Button,
+                            ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+    } else {
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    }
 
     ImGuiIO& io = ImGui::GetIO();
     ImFont* originalFont = io.FontDefault;
 
     if (const auto it = asset_paths_.find(directory_entry);
         it != asset_paths_.end()) {
-      ImGui::ImageButton(
-          (ImTextureID)GetFileIcon(it->second.type)->GetTextureID(),
-          ImVec2(thumbnail_size, thumbnail_size));
+      if (ImGui::ImageButton(
+              (ImTextureID)GetFileIcon(it->second.type)->GetTextureID(),
+              ImVec2(thumbnail_size, thumbnail_size))) {
+        selected_idx = (selected_idx == i) ? -1 : i;
+      }
 
       if (ImGui::BeginDragDropSource()) {
         std::string payload_name =
@@ -113,17 +146,15 @@ void ContentBrowserPanel::Draw() {
         ImGui::EndDragDropSource();
       }
 
-      ImGui::PopStyleColor();
-
     } else {
-      ImGui::ImageButton(
-          (ImTextureID)(directory_entry.is_directory()
-                            ? icon_folder_
-                            : GetFileIcon(path.extension().string()))
-              ->GetTextureID(),
-          ImVec2(thumbnail_size, thumbnail_size));
-
-      ImGui::PopStyleColor();
+      if (ImGui::ImageButton(
+              (ImTextureID)(directory_entry.is_directory()
+                                ? icon_folder_
+                                : GetFileIcon(path.extension().string()))
+                  ->GetTextureID(),
+              ImVec2(thumbnail_size, thumbnail_size))) {
+        selected_idx = (selected_idx == i) ? -1 : i;
+      }
 
       if (ImGui::IsItemHovered() &&
           ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
@@ -136,11 +167,15 @@ void ContentBrowserPanel::Draw() {
       }
     }
 
+    ImGui::PopStyleColor();
+
     ImGui::TextWrapped(filename_str.c_str());
 
     ImGui::NextColumn();
 
     ImGui::PopID();
+
+    i++;
   }
 
   ImGui::Columns();
