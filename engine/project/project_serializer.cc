@@ -2,59 +2,57 @@
 
 #include "project/project_serializer.h"
 
-#include "core/serialization/ini_parser.h"
+#include <nlohmann/json.hpp>
+
+#include "asset/asset_registry.h"
+
+using json = nlohmann::json;
 
 namespace eve {
+
 ProjectSerializer::ProjectSerializer(Ref<Project> project)
     : project_(project) {}
 
 void ProjectSerializer::Serialize(const fs::path& path) {
+  json j{};
+
   const auto& config = project_->GetConfig();
 
-  ini::IniObject obj;
+  j = json{{"name", config.name},
+           {"asset_directory", config.asset_directory},
+           {"asset_registry", config.asset_registry},
+           {"scenes", json::array()}};
 
-  ini::IniSection project_section{"project", {}};
-  project_section.Add("name", config.name);
-  project_section.Add("asset_directory", config.asset_directory.string());
-  obj.AddSection(project_section);
-
-  ini::IniSection scenes_section{"scenes", {}};
   for (const auto& scene : config.scenes) {
-    scenes_section.Add(fs::path(scene).stem().string(), scene);
+    j["scenes"].push_back(scene);
   }
-  obj.AddSection(scenes_section);
 
   std::ofstream fout(path);
-  fout << obj.ToString();
+  fout << j.dump(2);
 }
 
 bool ProjectSerializer::Deserialize(const fs::path& path) {
   auto& config = project_->GetConfig();
 
-  auto obj = ini::ParseFile(path);
-  if (!obj) {
-    LOG_ENGINE_ERROR("Failed to load project file '{}'", path.string());
+  std::ifstream file(path);
+  if (!file.is_open()) {
+    LOG_ENGINE_ERROR("Failed to load project file from: {}", path.string());
     return false;
   }
 
-  ini::IniSection& project_section = obj.GetSection("project");
-  if (!project_section) {
-    return false;
-  }
+  json j;
+  file >> j;
 
-  config.name = project_section.values["name"].As<std::string>();
-  config.asset_directory =
-      project_section.values["asset_directory"].As<fs::path>();
+  config.name = j["name"].get<std::string>();
+  config.asset_directory = j["asset_directory"].get<fs::path>();
+  config.asset_registry = j["asset_registry"].get<fs::path>();
 
-  ini::IniSection& scenes_section = obj.GetSection("scenes");
-  if (!scenes_section) {
-    return false;
-  }
-
-  for (auto& [key, value] : scenes_section.values) {
-    config.scenes.push_back(value.As<std::string>());
+  auto scenes_json = j["scenes"];
+  for (auto& scene : scenes_json) {
+    config.scenes.push_back(scene.get<std::string>());
   }
 
   return true;
 }
+
 }  // namespace eve

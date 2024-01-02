@@ -12,6 +12,7 @@
 
 #include "modals/exit_modal.h"
 #include "panels/console_panel.h"
+#include "panels/content_browser_panel.h"
 #include "panels/debug_info_panel.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
@@ -104,6 +105,7 @@ class EditorLayer : public Layer {
 
   // panels
   Scope<ConsolePanel> console_panel_;
+  Scope<ContentBrowserPanel> content_browser_;
   Scope<DebugInfoPanel> debug_info_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;

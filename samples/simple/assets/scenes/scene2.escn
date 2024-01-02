@@ -54,7 +54,7 @@
         "roughness": 1.0
       },
       "model_component": {
-        "path": "res://models/monkey.obj"
+        "model": 16996734589929948027
       },
       "tag_component": {
         "tag": "Monkey"
@@ -91,7 +91,7 @@
         "roughness": 0.0
       },
       "model_component": {
-        "path": "res://models/monkey.obj"
+        "model": 16996734589929948027
       },
       "tag_component": {
         "tag": "Red Monkey"

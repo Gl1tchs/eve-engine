@@ -25,7 +25,6 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
 
 Ref<Texture> Texture::Create(const std::filesystem::path& path) {
   int width, height, channels;
-  stbi_set_flip_vertically_on_load(true);
   stbi_uc* data =
       stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
@@ -33,12 +32,29 @@ Ref<Texture> Texture::Create(const std::filesystem::path& path) {
 
   TextureMetadata metadata;
   metadata.size = glm::ivec2{width, height};
-  metadata.format = TextureFormat::kRGB;
   metadata.min_filter = TextureFilteringMode::kLinear;
   metadata.mag_filter = TextureFilteringMode::kLinear;
   metadata.wrap_s = TextureWrappingMode::kClampToEdge;
   metadata.wrap_t = TextureWrappingMode::kClampToEdge;
   metadata.generate_mipmaps = true;
+
+  switch (channels) {
+    case 1:
+      metadata.format = TextureFormat::kRed;
+      break;
+    case 2:
+      metadata.format = TextureFormat::kRG;
+      break;
+    case 3:
+      metadata.format = TextureFormat::kRGB;
+      break;
+    case 4:
+      metadata.format = TextureFormat::kRGBA;
+      break;
+    default:
+      ASSERT(false, "Unsupported number of channels in the image");
+      break;
+  }
 
   Ref<Texture> texture = Texture::Create(metadata, data);
 

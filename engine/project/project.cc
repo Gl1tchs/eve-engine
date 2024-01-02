@@ -23,6 +23,8 @@ Ref<Project> Project::Load(const fs::path& path) {
     project->project_dir_ = path.parent_path();
     active_project_ = project;
 
+    AssetRegistry::Deserialize(GetAssetRegistryPath());
+
     SceneManager::Init(active_project_);
 
     return active_project_;
@@ -34,6 +36,7 @@ Ref<Project> Project::Load(const fs::path& path) {
 void Project::SaveActive(const fs::path& path) {
   ProjectSerializer serializer(active_project_);
   serializer.Serialize(path);
+  AssetRegistry::Serialize(GetAssetRegistryPath());
   active_project_->project_dir_ = path.parent_path();
 }
 }  // namespace eve

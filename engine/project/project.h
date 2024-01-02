@@ -8,24 +8,31 @@ namespace eve {
 struct ProjectConfig {
   std::string name;
   fs::path asset_directory;
+  fs::path asset_registry;
   std::vector<std::string> scenes;
 };
 
 class Project {
  public:
   [[nodiscard]] static std::string GetProjectName() {
-    ASSERT(active_project_)
+    ASSERT(active_project_);
     return active_project_->config_.name;
   }
 
   [[nodiscard]] static fs::path GetProjectDirectory() {
-    ASSERT(active_project_)
+    ASSERT(active_project_);
     return active_project_->project_dir_;
+  }
+
+  [[nodiscard]] static fs::path GetAssetRegistryPath() {
+    ASSERT(active_project_);
+    return active_project_->project_dir_ /
+           active_project_->config_.asset_registry;
   }
 
   // Relative to project directory
   [[nodiscard]] static fs::path GetAssetDirectory() {
-    ASSERT(active_project_)
+    ASSERT(active_project_);
     return active_project_->project_dir_ /
            active_project_->config_.asset_directory;
   }

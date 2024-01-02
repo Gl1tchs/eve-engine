@@ -1,0 +1,20 @@
+[
+  {
+    "handle": 5585700724317691323,
+    "name": "Cube",
+    "path": "res://models/cube.obj",
+    "type": "StaticMesh"
+  },
+  {
+    "handle": 16996734589929948027,
+    "name": "Monkey",
+    "path": "res://models/monkey.obj",
+    "type": "StaticMesh"
+  },
+  {
+    "handle": 6973021750130516789,
+    "name": "Sphere",
+    "path": "res://models/sphere.obj",
+    "type": "StaticMesh"
+  }
+]

@@ -4,7 +4,7 @@
 
 #include "pch_shared.h"
 
-#include "asset/asset_library.h"
+#include "asset/asset_registry.h"
 #include "project/project.h"
 #include "scene/entity.h"
 #include "scene/scene.h"
@@ -29,7 +29,7 @@ class SceneManager {
   [[nodiscard]] static Ref<Scene>& GetActive() { return scene_info_.scene; }
 
   [[nodiscard]] static const std::string GetActivePath() {
-    return AssetLibrary::GetAssetPath(scene_info_.path).string();
+    return AssetRegistry::GetAssetPath(scene_info_.path).string();
   }
 
   [[nodiscard]] static const uint32_t& GetActiveIndex() {

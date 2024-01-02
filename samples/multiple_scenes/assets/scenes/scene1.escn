@@ -24,7 +24,7 @@
         "roughness": 1.0
       },
       "model_component": {
-        "path": "res://models/cube.obj"
+        "model": 11448458562645017180
       },
       "script_component": {
         "class_name": "MultipleScenes.SceneTranslator",

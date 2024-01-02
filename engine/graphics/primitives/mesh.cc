@@ -2,7 +2,7 @@
 
 #include "graphics/primitives/mesh.h"
 
-#include "asset/asset_library.h"
+#include "asset/asset_registry.h"
 #include "core/file_system.h"
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
@@ -125,7 +125,7 @@ void MeshPrimitive::RecompileShaders() {
   std::string custom_shader_source;
   if (!custom_shader_->shader_path.empty()) {
     custom_shader_source = FileSystem::ReadFileString(
-        AssetLibrary::GetAssetPath(custom_shader_->shader_path).string());
+        AssetRegistry::GetAssetPath(custom_shader_->shader_path).string());
   }
 
   shader_->Recompile(vertex_path_, fragment_path_, custom_shader_source);

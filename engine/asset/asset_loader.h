@@ -12,9 +12,9 @@
 namespace eve {
 
 struct AssetLoader {
-  static AssetRef<Texture> LoadTexture(const std::string& path);
+  static Ref<Texture> LoadTexture(const fs::path& path);
 
-  static AssetRef<Model> LoadModel(const std::string& path);
+  static Ref<Model> LoadModel(const fs::path& path);
 };
 
 }  // namespace eve

@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "asset/asset_library.h"
+#include "asset/asset_registry.h"
 #include "core/uuid.h"
 #include "scene/components.h"
 #include "scene/entity.h"
@@ -132,7 +132,7 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<ModelComponent>()) {
     auto& model_component = entity.GetComponent<ModelComponent>();
 
-    out["model_component"] = json{{"path", model_component.model->path}};
+    out["model_component"] = json{{"model", model_component.model}};
   }
 
   if (entity.HasComponent<Material>()) {
@@ -324,8 +324,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
         !model_comp_json.is_null()) {
       auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
-      model_component.model =
-          AssetLibrary::Load<Model>(model_comp_json["path"].get<std::string>());
+      model_component.model = model_comp_json["model"].get<UUID>();
     }
 
     if (auto material_json = entity["material_component"];

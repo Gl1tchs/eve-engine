@@ -21,6 +21,8 @@ class UUID {
   UUID& operator=(const uint64_t& other);
   UUID& operator=(uint64_t&& other);
 
+  [[nodiscard]] bool IsValid() const { return uuid_ != 0; }
+  
   operator uint64_t() const { return uuid_; }
 
  private:

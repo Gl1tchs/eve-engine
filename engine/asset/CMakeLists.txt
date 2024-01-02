@@ -1,9 +1,8 @@
 set(SOURCES
-  asset_library.cc
-  asset_library.h
-  asset_library.inl
   asset_loader.cc
   asset_loader.h
+  asset_registry.cc
+  asset_registry.h
   asset.h
 )
 
@@ -11,6 +10,10 @@ add_module(asset STATIC ${SOURCES})
 
 module_include_directories(asset PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
+)
+
+module_include_directories(asset PRIVATE
+  ${VENDOR_DIR}/json/include
 )
 
 module_link_libraries(asset PRIVATE

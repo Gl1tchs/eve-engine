@@ -2,35 +2,15 @@
 
 #include "asset/asset_loader.h"
 
-#include "asset/asset_library.h"
-
 namespace eve {
 
-AssetRef<Texture> AssetLoader::LoadTexture(const std::string& path) {
-  auto path_abs = AssetLibrary::GetAssetPath(path);
-  if (!fs::exists(path_abs)) {
-    return nullptr;
-  }
-
-  AssetRef<Texture> texture = CreateRef<Asset<Texture>>();
-  texture->id = UUID();
-  texture->path = path;
-  texture->asset = Texture::Create(path_abs);
-
+Ref<Texture> AssetLoader::LoadTexture(const fs::path& path) {
+  Ref<Texture> texture = Texture::Create(path);
   return texture;
 }
 
-AssetRef<Model> AssetLoader::LoadModel(const std::string& path) {
-  auto path_abs = AssetLibrary::GetAssetPath(path);
-  if (!fs::exists(path_abs)) {
-    return nullptr;
-  }
-
-  AssetRef<Model> model = CreateRef<Asset<Model>>();
-  model->id = UUID();
-  model->path = path;
-  model->asset = Model::Load(path_abs);
-
+Ref<Model> AssetLoader::LoadModel(const fs::path& path) {
+  Ref<Model> model = Model::Create(path);
   return model;
 }
 

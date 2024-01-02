@@ -95,6 +95,7 @@ void EditorLayer::OnGUI(float ds) {
     viewport_panel_->Render();
     hierarchy_panel_->Render();
     inspector_panel_->Render();
+    content_browser_->Render();
     console_panel_->Render();
     debug_info_panel_->Render();
 
@@ -276,6 +277,11 @@ void EditorLayer::OpenProject() {
 
     // Open the first scene index
     OpenScene(0);
+
+    // Content browser depends on project
+    if (!content_browser_) {
+      content_browser_ = CreateScope<ContentBrowserPanel>();
+    }
   }
 }
 

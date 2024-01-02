@@ -2,6 +2,7 @@
 
 #include "graphics/scene_renderer.h"
 
+#include "asset/asset_registry.h"
 #include "graphics/renderer.h"
 #include "scene/entity.h"
 #include "scene/scene_manager.h"
@@ -137,8 +138,8 @@ void SceneRenderer::RenderScene() {
                 ? &entity.GetComponent<CustomShaderComponent>()
                 : nullptr;
 
-        renderer->Draw(model_comp.model->asset, transform, material,
-                       custom_shader);
+        renderer->Draw(AssetRegistry::Get<Model>(model_comp.model), transform,
+                       material, custom_shader);
       });
 }
 

@@ -6,13 +6,13 @@
         "is_orthographic": false,
         "is_primary": true,
         "orthographic_camera": {
-          "aspect_ratio": 1.4679335355758667,
+          "aspect_ratio": 2.3570094108581543,
           "far_clip": 1.0,
           "near_clip": -1.0,
           "zoom_level": 1.0
         },
         "perspective_camera": {
-          "aspect_ratio": 1.4679335355758667,
+          "aspect_ratio": 2.3570094108581543,
           "far_clip": 300.0,
           "fov": 45.0,
           "near_clip": 0.10000000149011612
@@ -54,7 +54,7 @@
         "roughness": 0.75
       },
       "model_component": {
-        "path": "res://models/sphere.obj"
+        "model": 6973021750130516789
       },
       "script_component": {
         "class_name": "Simple.Sphere",
@@ -106,7 +106,7 @@
         "roughness": 1.0
       },
       "model_component": {
-        "path": "res://models/cube.obj"
+        "model": 5585700724317691323
       },
       "script_component": {
         "class_name": "Simple.Cube",

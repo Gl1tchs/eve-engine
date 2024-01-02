@@ -8,6 +8,7 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "asset/asset_registry.h"
 #include "core/color.h"
 #include "scene/components.h"
 #include "scene/scene_manager.h"
@@ -207,22 +208,32 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<ModelComponent>(
       ICON_FA_CUBES " Model Component", selected_entity,
       [this](ModelComponent& model_comp) {
-        bool model_exists =
-            model_comp.model
-                ? fs::exists(AssetLibrary::GetAssetPath(model_comp.model->path))
-                : false;
+        Ref<Model> model = AssetRegistry::Get<Model>(model_comp.model);
 
-        ImGui::ScopedStyleColor _color(
-            ImGuiCol_Text, glm::vec4(0.9f, 0.2f, 0.3f, 1.0f), !model_exists);
+        if (!model) {
+          ImGui::Selectable("Model Path");
 
-        std::string model_path = model_exists ? model_comp.model->path : "";
-        if (ImGui::InputText("Model Path", &model_path,
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
-          auto asset = AssetLibrary::Load<Model>(model_path);
-          if (asset) {
-            model_comp.model = asset;
-            modify_info.SetModified();
+          if (ImGui::BeginDragDropSource(
+                  ImGuiDragDropFlags_SourceNoDisableHover ||
+                  ImGuiDragDropFlags_SourceNoPreviewTooltip)) {
+            ImGui::SetDragDropPayload("DND_PAYLOAD_MESH", &model->handle,
+                                      sizeof(AssetHandle));
+            ImGui::EndDragDropSource();
           }
+        } else {
+          ImGui::InputText("Model", &model->name, ImGuiInputTextFlags_ReadOnly);
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+          if (const ImGuiPayload* payload =
+                  ImGui::AcceptDragDropPayload("DND_PAYLOAD_MESH")) {
+            const AssetHandle handle = *(const AssetHandle*)payload->Data;
+            if (AssetRegistry::Exists(handle)) {
+              model_comp.model = handle;
+              modify_info.SetModified();
+            }
+          }
+          ImGui::EndDragDropTarget();
         }
       });
 
@@ -250,7 +261,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       ICON_FA_PAINT_BRUSH " Custom Shader Component", selected_entity,
       [this](CustomShaderComponent& custom_shader) {
         bool shader_exists =
-            fs::exists(AssetLibrary::GetAssetPath(custom_shader.shader_path));
+            fs::exists(AssetRegistry::GetAssetPath(custom_shader.shader_path));
 
         ImGui::ScopedStyleColor _color(
             ImGuiCol_Text, glm::vec4(0.9f, 0.2f, 0.3f, 1.0f), !shader_exists);

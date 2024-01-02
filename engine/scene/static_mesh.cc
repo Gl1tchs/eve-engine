@@ -15,7 +15,7 @@ glm::vec3 ToGLM3(const objl::Vector3& from) {
   return glm::vec3{from.X, from.Y, from.Z};
 }
 
-Ref<Model> Model::Load(const std::filesystem::path& path) {
+Ref<Model> Model::Create(const std::filesystem::path& path) {
   objl::Loader loader;
 
   bool success = loader.LoadFile(path.string());

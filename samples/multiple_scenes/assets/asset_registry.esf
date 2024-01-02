@@ -1,5 +1,8 @@
-[asset]
-name = cube
-uuid = 0123456879
-path = res://models/cube.obj
-type = Model
+[
+  {
+    "handle": 11448458562645017180,
+    "name": "Cube",
+    "path": "res://models/cube.obj",
+    "type": "StaticMesh"
+  }
+]

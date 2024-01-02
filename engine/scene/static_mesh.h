@@ -4,16 +4,19 @@
 
 #include "pch_shared.h"
 
+#include "asset/asset.h"
 #include "graphics/primitives/mesh.h"
 
 namespace eve {
-struct Model {
+struct Model : Asset {
+  IMPL_ASSET(AssetType::kStaticMesh)
+
   std::vector<RenderData<MeshVertex>> meshes;
 
-  static Ref<Model> Load(const fs::path& path);
+  static Ref<Model> Create(const fs::path& path);
 };
 
 struct ModelComponent {
-  AssetRef<Model> model;
+  UUID model;
 };
 }  // namespace eve
