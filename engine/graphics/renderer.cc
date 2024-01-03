@@ -2,11 +2,10 @@
 
 #include "graphics/renderer.h"
 
-#include "glm/matrix.hpp"
+#include "asset/asset_registry.h"
 #include "graphics/primitives/mesh.h"
 #include "graphics/primitives/primitive.h"
 #include "graphics/render_command.h"
-#include "renderer.h"
 
 namespace eve {
 Renderer::Renderer() {
@@ -69,14 +68,15 @@ void Renderer::Draw(const RenderData<MeshVertex>& data,
 }
 
 void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
-                    const Material& material,
-                    CustomShaderComponent* custom_shader) {
+                    const Material& material) {
   if (!model) {
     return;
   }
 
   Ref<MeshPrimitive> mesh_data =
-      !custom_shader ? mesh_data_ : AddMeshPrimitiveIfNotExists(custom_shader);
+      (material.shader == 0 || !AssetRegistry::Exists(material.shader))
+          ? mesh_data_
+          : AddMeshPrimitiveIfNotExists(material.shader);
 
   for (auto mesh : model->meshes) {
     if (mesh_data->NeedsNewBatch(mesh.vertices.size(), mesh.indices.size())) {
@@ -186,20 +186,24 @@ void Renderer::NextBatch() {
 }
 
 Ref<MeshPrimitive> Renderer::AddMeshPrimitiveIfNotExists(
-    CustomShaderComponent* custom_shader) {
+    AssetHandle shader_handle) {
   const auto it = std::find_if(custom_meshes_.begin(), custom_meshes_.end(),
-                               [custom_shader](const auto& pair) {
-                                 return custom_shader->id == pair.first;
+                               [shader_handle](const auto& pair) {
+                                 return pair.first == shader_handle;
                                });
+
+  Ref<ShaderInstance> shader_instance =
+      AssetRegistry::Get<ShaderInstance>(shader_handle);
+
   if (it == custom_meshes_.end()) {
     Ref<MeshPrimitive> mesh = CreateRef<MeshPrimitive>();
-    mesh->SetCustomShader(custom_shader);
+    mesh->SetCustomShader(shader_instance);
     mesh->RecompileShaders();
-    custom_meshes_[custom_shader->id] = mesh;
+    custom_meshes_[shader_handle] = mesh;
     return mesh;
   }
 
-  it->second->SetCustomShader(custom_shader);
+  it->second->SetCustomShader(shader_instance);
   return it->second;
 }
 

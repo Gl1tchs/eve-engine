@@ -14,4 +14,9 @@ Ref<Model> AssetLoader::LoadModel(const fs::path& path) {
   return model;
 }
 
+Ref<ShaderInstance> AssetLoader::LoadShader(const fs::path& path) {
+  Ref<ShaderInstance> shader = CreateRef<ShaderInstance>();
+  return shader;
+}
+
 }  // namespace eve

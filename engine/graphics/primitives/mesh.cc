@@ -113,7 +113,7 @@ void MeshPrimitive::Reset() {
   texture_slot_index_ = 1;
 }
 
-void MeshPrimitive::SetCustomShader(CustomShaderComponent* custom_shader) {
+void MeshPrimitive::SetCustomShader(Ref<ShaderInstance> custom_shader) {
   custom_shader_ = custom_shader;
 }
 
@@ -123,9 +123,9 @@ void MeshPrimitive::RecompileShaders() {
   }
 
   std::string custom_shader_source;
-  if (!custom_shader_->shader_path.empty()) {
+  if (!custom_shader_->path.empty()) {
     custom_shader_source = FileSystem::ReadFileString(
-        AssetRegistry::GetAssetPath(custom_shader_->shader_path).string());
+        AssetRegistry::GetAssetPath(custom_shader_->path).string());
   }
 
   shader_->Recompile(vertex_path_, fragment_path_, custom_shader_source);

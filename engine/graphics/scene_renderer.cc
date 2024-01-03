@@ -133,13 +133,8 @@ void SceneRenderer::RenderScene() {
           const ModelComponent& model_comp, const Material& material) {
         Entity entity{entity_id, scene.get()};
 
-        CustomShaderComponent* custom_shader =
-            entity.HasComponent<CustomShaderComponent>()
-                ? &entity.GetComponent<CustomShaderComponent>()
-                : nullptr;
-
         renderer->Draw(AssetRegistry::Get<Model>(model_comp.model), transform,
-                       material, custom_shader);
+                       material);
       });
 }
 

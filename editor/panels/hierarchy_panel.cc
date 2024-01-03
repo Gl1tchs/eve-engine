@@ -15,7 +15,9 @@ HierarchyPanel::HierarchyPanel() : Panel(true), selected_entity_({}) {}
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {
   selected_entity_ = entity;
-  SceneManager::GetActive()->selected_entity_ = &selected_entity_;
+  if (auto& active_scene = SceneManager::GetActive(); active_scene) {
+    active_scene ->selected_entity_ = &selected_entity_;
+  }
 }
 
 void HierarchyPanel::Draw() {

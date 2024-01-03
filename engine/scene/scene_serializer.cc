@@ -138,20 +138,17 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<Material>()) {
     auto& material = entity.GetComponent<Material>();
 
-    out["material_component"] = json{{"albedo", material.albedo},
-                                     {"metallic", material.metallic},
-                                     {"roughness", material.roughness},
-                                     {"ao", material.ao}};
-  }
+    out["material_component"] = json{
+        {"albedo", material.albedo},       {"metallic", material.metallic},
+        {"roughness", material.roughness}, {"ao", material.ao},
+        {"shader", material.shader},       {"uniform_fields", json::array()}};
 
-  if (entity.HasComponent<CustomShaderComponent>()) {
-    auto& custom_shader = entity.GetComponent<CustomShaderComponent>();
+    Ref<ShaderInstance> shader_instance =
+        AssetRegistry::Get<ShaderInstance>(material.shader);
 
-    json custom_shader_component_json = {
-        {"shader_path", custom_shader.shader_path},
-        {"uniform_fields", json::array()}};
+    json uniform_fields = json::array();
 
-    for (auto& uniform : custom_shader.uniforms) {
+    for (auto& uniform : shader_instance->uniforms) {
       json uniform_json = {{"name", uniform.name},
                            {"type", ConvertUniformTypeToString(uniform.type)},
                            {"value", nullptr}};
@@ -170,10 +167,10 @@ static void SerializeEntity(json& out, Entity entity) {
           },
           uniform.value);
 
-      custom_shader_component_json["uniform_fields"].push_back(uniform_json);
+      uniform_fields.push_back(uniform_json);
     }
 
-    out["custom_shader_component"] = custom_shader_component_json;
+    out["material_component"]["uniform_fields"] = uniform_fields;
   }
 
   if (entity.HasComponent<ScriptComponent>()) {
@@ -335,40 +332,42 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       material.metallic = material_json["metallic"].get<float>();
       material.roughness = material_json["roughness"].get<float>();
       material.ao = material_json["ao"].get<float>();
-    }
+      if (material_json.contains("shader")) {
+        material.shader = material_json["shader"].get<UUID>();
+      } else {
+        material.shader = 0;
+      }
 
-    if (auto custom_shader_json = entity["custom_shader_component"];
-        !custom_shader_json.is_null()) {
-      auto& custom_shader =
-          deserialing_entity.AddComponent<CustomShaderComponent>();
+      Ref<ShaderInstance> shader_instance =
+          material.shader != 0
+              ? AssetRegistry::Get<ShaderInstance>(material.shader)
+              : nullptr;
+      if (shader_instance) {
+        auto uniforms_json = material_json["uniform_fields"];
+        for (const auto& uniform_json : uniforms_json) {
+          ShaderUniform uniform;
+          uniform.name = uniform_json["name"].get<std::string>();
+          uniform.type = ConvertStringToShaderUniformType(
+              uniform_json["type"].get<std::string>());
 
-      custom_shader.shader_path =
-          custom_shader_json["shader_path"].get<std::string>();
+          // necessary for std::visit
+          uniform.value = GetDefaultShaderValue(uniform.type);
+          std::visit(
+              [&](auto& val) {
+                using ValueType = std::decay_t<decltype(val)>;
+                if constexpr (std::is_same_v<ValueType, float> ||
+                              std::is_same_v<ValueType, glm::vec2> ||
+                              std::is_same_v<ValueType, glm::vec3> ||
+                              std::is_same_v<ValueType, glm::vec4> ||
+                              std::is_same_v<ValueType, int> ||
+                              std::is_same_v<ValueType, bool>) {
+                  val = uniform_json["value"].get<ValueType>();
+                }
+              },
+              uniform.value);
 
-      auto uniforms_json = custom_shader_json["uniform_fields"];
-      for (const auto& uniform_json : uniforms_json) {
-        ShaderUniform uniform;
-        uniform.name = uniform_json["name"].get<std::string>();
-        uniform.type = ConvertStringToShaderUniformType(
-            uniform_json["type"].get<std::string>());
-
-        // necessary for std::visit
-        uniform.value = GetDefaultShaderValue(uniform.type);
-        std::visit(
-            [&](auto& val) {
-              using ValueType = std::decay_t<decltype(val)>;
-              if constexpr (std::is_same_v<ValueType, float> ||
-                            std::is_same_v<ValueType, glm::vec2> ||
-                            std::is_same_v<ValueType, glm::vec3> ||
-                            std::is_same_v<ValueType, glm::vec4> ||
-                            std::is_same_v<ValueType, int> ||
-                            std::is_same_v<ValueType, bool>) {
-                val = uniform_json["value"].get<ValueType>();
-              }
-            },
-            uniform.value);
-
-        custom_shader.uniforms.push_back(uniform);
+          shader_instance->uniforms.push_back(uniform);
+        }
       }
     }
 

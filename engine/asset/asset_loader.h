@@ -15,6 +15,8 @@ struct AssetLoader {
   static Ref<Texture> LoadTexture(const fs::path& path);
 
   static Ref<Model> LoadModel(const fs::path& path);
+
+  static Ref<ShaderInstance> LoadShader(const fs::path& path);
 };
 
 }  // namespace eve

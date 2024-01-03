@@ -16,7 +16,9 @@ NLOHMANN_JSON_SERIALIZE_ENUM(AssetType, {{AssetType::kNone, nullptr},
                                          {AssetType::kTexture, "Texture"},
                                          {AssetType::kFont, "Font"},
                                          {AssetType::kStaticMesh, "StaticMesh"},
-                                         {AssetType::kScript, "Script"}});
+                                         {AssetType::kScript, "Script"},
+                                         {AssetType::kMaterial, "Material"},
+                                         {AssetType::kShader, "Shader"}});
 
 std::unordered_map<AssetHandle, Ref<Asset>> AssetRegistry::assets_ = {};
 
@@ -47,6 +49,8 @@ AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
     case AssetType::kStaticMesh:
       asset = AssetLoader::LoadModel(path_abs);
       break;
+    case AssetType::kShader:
+      asset = AssetLoader::LoadShader(path_abs);
       break;
     default:
       break;

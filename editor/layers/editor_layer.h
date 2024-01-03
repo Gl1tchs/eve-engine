@@ -105,14 +105,15 @@ class EditorLayer : public Layer {
   MenuBar menu_bar_;
 
   // panels
-  Scope<ConsolePanel> console_panel_;
-  Scope<ContentBrowserPanel> content_browser_;
   Scope<DebugInfoPanel> debug_info_panel_;
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
-  Scope<ToolbarPanel> toolbar_panel_;
   Scope<ViewportPanel> viewport_panel_;
-  Scope<AboutPanel> about_panel_;
+
+  ToolbarPanel toolbar_panel_;
+  ConsolePanel console_panel_;
+  ContentBrowserPanel content_browser_;
+  AboutPanel about_panel_;
 
   // is camera ejected
   bool is_ejected_;

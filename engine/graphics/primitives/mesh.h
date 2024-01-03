@@ -50,7 +50,7 @@ class MeshPrimitive : public Primitive<MeshVertex> {
 
   void Reset() override;
 
-  void SetCustomShader(CustomShaderComponent* custom_shader);
+  void SetCustomShader(Ref<ShaderInstance> custom_shader);
 
   void RecompileShaders();
 
@@ -65,7 +65,7 @@ class MeshPrimitive : public Primitive<MeshVertex> {
   std::string vertex_path_;
   std::string fragment_path_;
 
-  CustomShaderComponent* custom_shader_ = nullptr;
+  Ref<ShaderInstance> custom_shader_ = nullptr;
 
   std::vector<uint32_t> indices_;
 

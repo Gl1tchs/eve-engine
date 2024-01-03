@@ -17,6 +17,6 @@ struct Model : Asset {
 };
 
 struct ModelComponent {
-  UUID model;
+  AssetHandle model = 0;
 };
 }  // namespace eve

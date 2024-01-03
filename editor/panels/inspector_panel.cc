@@ -112,8 +112,6 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
     DisplayAddComponentEntry<ScriptComponent>(selected_entity, "Script");
     DisplayAddComponentEntry<ModelComponent>(selected_entity, "Model");
     DisplayAddComponentEntry<Material>(selected_entity, "Material");
-    DisplayAddComponentEntry<CustomShaderComponent>(selected_entity,
-                                                    "Custom Shader");
 
     ImGui::EndPopup();
   }
@@ -208,7 +206,9 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<ModelComponent>(
       ICON_FA_CUBES " Model Component", selected_entity,
       [this](ModelComponent& model_comp) {
-        Ref<Model> model = AssetRegistry::Get<Model>(model_comp.model);
+        Ref<Model> model = model_comp.model != 0
+                               ? AssetRegistry::Get<Model>(model_comp.model)
+                               : nullptr;
 
         if (!model) {
           ImGui::Selectable("Model Path");
@@ -255,25 +255,44 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
         if (ImGui::DragFloat("AO", &material.ao, 0.05f)) {
           modify_info.SetModified();
         }
-      });
 
-  DrawComponent<CustomShaderComponent>(
-      ICON_FA_PAINT_BRUSH " Custom Shader Component", selected_entity,
-      [this](CustomShaderComponent& custom_shader) {
-        bool shader_exists =
-            fs::exists(AssetRegistry::GetAssetPath(custom_shader.shader_path));
+        Ref<ShaderInstance> shader_instance =
+            material.shader != 0
+                ? AssetRegistry::Get<ShaderInstance>(material.shader)
+                : nullptr;
 
-        ImGui::ScopedStyleColor _color(
-            ImGuiCol_Text, glm::vec4(0.9f, 0.2f, 0.3f, 1.0f), !shader_exists);
-
-        std::string shader_path = custom_shader.shader_path;
-        if (ImGui::InputText("Shader Path", &shader_path)) {
-          custom_shader.shader_path = shader_path;
-          return;
+        if (!shader_instance) {
+          ImGui::Selectable("Shader Path");
+        } else {
+          ImGui::InputText("Shader", &shader_instance->name,
+                           ImGuiInputTextFlags_ReadOnly);
         }
 
-        for (auto& uniform : custom_shader.uniforms) {
-          DrawUniformField(uniform);
+        if (ImGui::BeginDragDropSource(
+                ImGuiDragDropFlags_SourceNoDisableHover ||
+                ImGuiDragDropFlags_SourceNoPreviewTooltip)) {
+          ImGui::SetDragDropPayload("DND_PAYLOAD_SHADER",
+                                    &shader_instance->handle,
+                                    sizeof(AssetHandle));
+          ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+          if (const ImGuiPayload* payload =
+                  ImGui::AcceptDragDropPayload("DND_PAYLOAD_SHADER")) {
+            const AssetHandle handle = *(const AssetHandle*)payload->Data;
+            if (AssetRegistry::Exists(handle)) {
+              material.shader = handle;
+              modify_info.SetModified();
+            }
+          }
+          ImGui::EndDragDropTarget();
+        }
+
+        if (shader_instance) {
+          for (auto& uniform : shader_instance->uniforms) {
+            DrawUniformField(uniform);
+          }
         }
       });
 

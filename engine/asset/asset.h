@@ -17,6 +17,7 @@ enum class AssetType {
   kScene,
   kStaticMesh,
   kScript,
+  kMaterial,
   kShader,
 };
 

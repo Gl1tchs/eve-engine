@@ -24,6 +24,10 @@ std::string GetAssetTypeString(AssetType type) {
       return "MESH";
     case AssetType::kScript:
       return "SCRIPT";
+    case AssetType::kMaterial:
+      return "MATERIAL";
+    case AssetType::kShader:
+      return "SHADER";
     default:
       return "";
   }
@@ -41,15 +45,13 @@ ContentBrowserPanel::ContentBrowserPanel()
   if (!Project::GetActive()) {
     return;
   }
-
-  Reload();
-
-  RefreshAssetTree();
 }
 
 void ContentBrowserPanel::Reload() {
   base_directory_ = Project::GetAssetDirectory();
   current_directory_ = base_directory_;
+
+  RefreshAssetTree();
 }
 
 void ContentBrowserPanel::Draw() {

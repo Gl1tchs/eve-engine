@@ -11,13 +11,6 @@
 
 namespace eve {
 
-struct Material {
-  Color albedo;
-  float metallic;
-  float roughness;
-  float ao;
-};
-
 enum class ShaderUniformType {
   kNone,
   kFloat,
@@ -50,10 +43,21 @@ int GetUniformSize(const ShaderUniformType& uniform_type);
 
 ShaderValueVariant GetDefaultShaderValue(const ShaderUniformType& type);
 
-struct CustomShaderComponent {
-  UUID id;
-  std::string shader_path = "";
+struct ShaderInstance : public Asset {
   std::vector<ShaderUniform> uniforms{};
+
+  IMPL_ASSET(AssetType::kShader)
+};
+
+// TODO make this work as an asset
+struct Material : public Asset {
+  Color albedo;
+  float metallic;
+  float roughness;
+  float ao;
+  AssetHandle shader = 0;
+
+  IMPL_ASSET(AssetType::kMaterial)
 };
 
 }  // namespace eve

@@ -38,5 +38,5 @@ template <typename... Component>
 struct ComponentGroup {};
 
 using AllComponents = ComponentGroup<Transform, CameraComponent, ModelComponent,
-                                     Material, CustomShaderComponent, ScriptComponent>;
+                                     Material, ScriptComponent>;
 }  // namespace eve

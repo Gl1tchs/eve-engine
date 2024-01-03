@@ -39,7 +39,7 @@ class Renderer final {
             const Ref<Texture>& texture);
 
   void Draw(const Ref<Model>& model, const Transform& transform,
-            const Material& material, CustomShaderComponent* custom_shader);
+            const Material& material);
 
   void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
                 const glm::vec4& color);
@@ -69,15 +69,15 @@ class Renderer final {
 
   void NextBatch();
 
-  Ref<MeshPrimitive> AddMeshPrimitiveIfNotExists(
-      CustomShaderComponent* custom_shader);
+  Ref<MeshPrimitive> AddMeshPrimitiveIfNotExists(AssetHandle shader);
 
  private:
   Ref<GraphicsContext> graphics_context_;
 
   // Renderer Data
   Ref<MeshPrimitive> mesh_data_;
-  std::unordered_map<UUID, Ref<MeshPrimitive>> custom_meshes_;
+  std::unordered_map<AssetHandle, Ref<MeshPrimitive>> custom_meshes_;
+  
   Scope<LinePrimitive> line_data_;
 
   // Camera stuff

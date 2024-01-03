@@ -35,28 +35,23 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
 void EditorLayer::OnStart() {
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
-  toolbar_panel_ = CreateScope<ToolbarPanel>();
-  {
-    toolbar_panel_->on_play = BIND_FUNC(OnScenePlay);
-    toolbar_panel_->on_stop = BIND_FUNC(OnSceneStop);
-    toolbar_panel_->on_pause = BIND_FUNC(OnScenePause);
-    toolbar_panel_->on_resume = BIND_FUNC(OnSceneResume);
-    toolbar_panel_->on_step = BIND_FUNC(OnSceneStep);
-    toolbar_panel_->on_eject = BIND_FUNC(OnSceneEject);
-  }
-
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
                                                &editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
 
-  console_panel_ = CreateScope<ConsolePanel>();
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
 
-  content_browser_ = CreateScope<ContentBrowserPanel>();
-  content_browser_->on_scene_open = BIND_FUNC(OpenScene);
+  {
+    toolbar_panel_.on_play = BIND_FUNC(OnScenePlay);
+    toolbar_panel_.on_stop = BIND_FUNC(OnSceneStop);
+    toolbar_panel_.on_pause = BIND_FUNC(OnScenePause);
+    toolbar_panel_.on_resume = BIND_FUNC(OnSceneResume);
+    toolbar_panel_.on_step = BIND_FUNC(OnSceneStep);
+    toolbar_panel_.on_eject = BIND_FUNC(OnSceneEject);
+  }
 
-  about_panel_ = CreateScope<AboutPanel>();
+  content_browser_.on_scene_open = BIND_FUNC(OpenScene);
 
   // If scene alredy loaded register it.
   if (auto& active_scene = SceneManager::GetActive(); active_scene) {
@@ -64,12 +59,6 @@ void EditorLayer::OnStart() {
 
     editor_scene_ = SceneManager::GetActive();
     editor_scene_path_ = SceneManager::GetActivePath();
-
-    // Content browser depends on project
-    if (!content_browser_) {
-      content_browser_ = CreateScope<ContentBrowserPanel>();
-      content_browser_->on_scene_open = BIND_FUNC(OpenScene);
-    }
   }
 
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
@@ -96,20 +85,20 @@ void EditorLayer::OnGUI(float ds) {
   {
     menu_bar_.Draw();
 
-    about_panel_->Render();
-
     if (!SceneManager::GetActive()) {
       DockSpace::End();
       return;
     }
 
     // Render panels
-    toolbar_panel_->Render();
+    toolbar_panel_.Render();
+    console_panel_.Render();
+    content_browser_.Render();
+    about_panel_.Render();
+
     viewport_panel_->Render();
     hierarchy_panel_->Render();
     inspector_panel_->Render();
-    content_browser_->Render();
-    console_panel_->Render();
     debug_info_panel_->Render();
 
     // Render modals
@@ -304,7 +293,7 @@ void EditorLayer::OpenProject() {
       NewScene();
     }
 
-    content_browser_->Reload();
+    content_browser_.Reload();
   }
 }
 
@@ -452,7 +441,7 @@ void EditorLayer::OnSceneEject() {
 
 void EditorLayer::SetSceneState(SceneState state) {
   scene_state_ = state;
-  toolbar_panel_->SetState(state);
+  toolbar_panel_.SetState(state);
 }
 
 void EditorLayer::Exit(bool force) {
@@ -593,12 +582,11 @@ void EditorLayer::SetupMenubar() {
                          [this]() { inspector_panel_->SetActive(true); });
       base_group.PushMenuItem(inspector);
 
-      MenuItem console("Console",
-                       [this]() { console_panel_->SetActive(true); });
+      MenuItem console("Console", [this]() { console_panel_.SetActive(true); });
       base_group.PushMenuItem(console);
 
       MenuItem content_browser("Content Browser",
-                               [this]() { content_browser_->SetActive(true); });
+                               [this]() { content_browser_.SetActive(true); });
       base_group.PushMenuItem(content_browser);
 
       MenuItem advanced_inspector("Advanced Inspector", [this]() {
@@ -625,7 +613,7 @@ void EditorLayer::SetupMenubar() {
   {
     MenuItemGroup base_group;
     {
-      MenuItem inspector("About", [this]() { about_panel_->SetActive(true); });
+      MenuItem inspector("About", [this]() { about_panel_.SetActive(true); });
       base_group.PushMenuItem(inspector);
 
       help_menu.PushItemGroup(base_group);

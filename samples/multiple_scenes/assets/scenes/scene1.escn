@@ -6,13 +6,13 @@
         "is_orthographic": false,
         "is_primary": true,
         "orthographic_camera": {
-          "aspect_ratio": 2.3570094108581543,
+          "aspect_ratio": 2.6107659339904785,
           "far_clip": 1.0,
           "near_clip": -1.0,
           "zoom_level": 1.0
         },
         "perspective_camera": {
-          "aspect_ratio": 2.3570094108581543,
+          "aspect_ratio": 2.6107659339904785,
           "far_clip": 300.0,
           "fov": 45.0,
           "near_clip": 0.10000000149011612
@@ -41,16 +41,6 @@
       }
     },
     {
-      "custom_shader_component": {
-        "shader_path": "res://shaders/custom.glsl",
-        "uniform_fields": [
-          {
-            "name": "square_size",
-            "type": "float",
-            "value": 10.0
-          }
-        ]
-      },
       "id": 3657232952556252100,
       "material_component": {
         "albedo": [
@@ -61,7 +51,15 @@
         ],
         "ao": 1.0,
         "metallic": 0.0,
-        "roughness": 1.0
+        "roughness": 1.0,
+        "shader": 11538066441631967286,
+        "uniform_fields": [
+          {
+            "name": "square_size",
+            "type": "float",
+            "value": 10.0
+          }
+        ]
       },
       "model_component": {
         "model": 11448458562645017180
