@@ -144,33 +144,36 @@ static void SerializeEntity(json& out, Entity entity) {
         {"shader", material.shader},       {"uniform_fields", json::array()}};
 
     Ref<ShaderInstance> shader_instance =
-        AssetRegistry::Get<ShaderInstance>(material.shader);
+        material.shader != 0
+            ? AssetRegistry::Get<ShaderInstance>(material.shader)
+            : nullptr;
 
-    json uniform_fields = json::array();
+    if (shader_instance) {
+      json uniform_fields = json::array();
+      for (auto& uniform : shader_instance->uniforms) {
+        json uniform_json = {{"name", uniform.name},
+                             {"type", ConvertUniformTypeToString(uniform.type)},
+                             {"value", nullptr}};
 
-    for (auto& uniform : shader_instance->uniforms) {
-      json uniform_json = {{"name", uniform.name},
-                           {"type", ConvertUniformTypeToString(uniform.type)},
-                           {"value", nullptr}};
+        std::visit(
+            [&](const auto& val) {
+              using ValueType = std::decay_t<decltype(val)>;
+              if constexpr (std::is_same_v<ValueType, float> ||
+                            std::is_same_v<ValueType, glm::vec2> ||
+                            std::is_same_v<ValueType, glm::vec3> ||
+                            std::is_same_v<ValueType, glm::vec4> ||
+                            std::is_same_v<ValueType, int> ||
+                            std::is_same_v<ValueType, bool>) {
+                uniform_json["value"] = val;
+              }
+            },
+            uniform.value);
 
-      std::visit(
-          [&](const auto& val) {
-            using ValueType = std::decay_t<decltype(val)>;
-            if constexpr (std::is_same_v<ValueType, float> ||
-                          std::is_same_v<ValueType, glm::vec2> ||
-                          std::is_same_v<ValueType, glm::vec3> ||
-                          std::is_same_v<ValueType, glm::vec4> ||
-                          std::is_same_v<ValueType, int> ||
-                          std::is_same_v<ValueType, bool>) {
-              uniform_json["value"] = val;
-            }
-          },
-          uniform.value);
+        uniform_fields.push_back(uniform_json);
+      }
 
-      uniform_fields.push_back(uniform_json);
+      out["material_component"]["uniform_fields"] = uniform_fields;
     }
-
-    out["material_component"]["uniform_fields"] = uniform_fields;
   }
 
   if (entity.HasComponent<ScriptComponent>()) {

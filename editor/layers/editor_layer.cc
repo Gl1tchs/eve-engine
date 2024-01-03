@@ -59,6 +59,8 @@ void EditorLayer::OnStart() {
 
     editor_scene_ = SceneManager::GetActive();
     editor_scene_path_ = SceneManager::GetActivePath();
+
+    content_browser_.Reload();
   }
 
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
