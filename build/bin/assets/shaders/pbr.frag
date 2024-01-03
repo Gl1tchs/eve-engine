@@ -5,23 +5,19 @@
 #include "camera_data.glsl"
 #include "material.glsl"
 
-layout(location = 0) out vec4 o_color;
-
-struct VertexOutput {
-  Material material;
-  vec3 frag_pos;
-  vec3 normal;
-  vec2 tex_coords;
-  float tex_index;
-};
-
-layout(location = 0) in VertexOutput v_input;
-
-uniform sampler2D u_textures[32];
+layout(location = 0) in vec3 FRAG_POS;
+layout(location = 1) in vec3 NORMAL;
+layout(location = 2) in vec2 TEX_COORDS;
+layout(location = 3) in float TEX_INDEX;
+layout(location = 4) in Material MATERIAL;
 
 // here `vec3 fragment(vec3 color_in)` will be defined
 #pragma custom
- 
+
+layout(location = 0) out vec4 o_color;
+
+uniform sampler2D u_textures[32];
+
 const float PI = 3.14159265359;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -66,11 +62,11 @@ void main() {
   vec3 lightColor =
       vec3(1.0, 1.0, 1.0);  // Color of the global directional light
 
-  vec3 N = normalize(v_input.normal);
-  vec3 V = normalize(u_camera.position - v_input.frag_pos);
+  vec3 N = normalize(NORMAL);
+  vec3 V = normalize(CAMERA.position - FRAG_POS);
 
   vec3 F0 = vec3(0.04);
-  F0 = mix(F0, v_input.material.albedo, v_input.material.metallic);
+  F0 = mix(F0, MATERIAL.albedo, MATERIAL.metallic);
 
   vec3 Lo = vec3(0.0);
 
@@ -83,8 +79,8 @@ void main() {
     vec3 radiance = lightColor * attenuation;
 
     // Cook-Torrance BRDF
-    float NDF = DistributionGGX(N, H, v_input.material.roughness);
-    float G = GeometrySmith(N, V, L, v_input.material.roughness);
+    float NDF = DistributionGGX(N, H, MATERIAL.roughness);
+    float G = GeometrySmith(N, V, L, MATERIAL.roughness);
     vec3 F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
 
     vec3 numerator = NDF * G * F;
@@ -94,14 +90,14 @@ void main() {
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - v_input.material.metallic;
+    kD *= 1.0 - MATERIAL.metallic;
 
     float NdotL = max(dot(N, L), 0.0);
 
-    Lo += (kD * v_input.material.albedo / PI + specular) * radiance * NdotL;
+    Lo += (kD * MATERIAL.albedo / PI + specular) * radiance * NdotL;
   }
 
-  vec3 ambient = vec3(0.03) * v_input.material.albedo * v_input.material.ao;
+  vec3 ambient = vec3(0.03) * MATERIAL.albedo * MATERIAL.ao;
 
   vec3 color = ambient + Lo;
 

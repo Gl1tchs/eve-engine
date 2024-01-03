@@ -15,28 +15,25 @@ layout(location = 6) in vec2 a_tex_coords;
 layout(location = 7) in float a_tex_index;
 layout(location = 8) in mat3 a_normal_matrix;
 
-struct VertexOutput {
-  Material material;
-  vec3 frag_pos;
-  vec3 normal;
-  vec2 tex_coords;
-  float tex_index;
-};
-
-layout(location = 0) out VertexOutput v_output;
+layout(location = 0) out vec3 FRAG_POS;
+layout(location = 1) out vec3 NORMAL;
+layout(location = 2) out vec2 TEX_COORDS;
+layout(location = 3) out float TEX_INDEX;
+layout(location = 4) out Material MATERIAL;
 
 void main() {
   // assign material values
   Material material;
   material.albedo = a_albedo.rgb;
+  material.metallic = a_metallic;
   material.roughness = a_roughness;
   material.ao = a_ao;
 
-  v_output.material = material;
-  v_output.frag_pos = a_pos.xyz;
-  v_output.normal = a_normal_matrix * a_normal;
-  v_output.tex_coords = a_tex_coords;
-  v_output.tex_index = a_tex_index;
+  FRAG_POS = a_pos.xyz;
+  NORMAL = a_normal_matrix * a_normal;
+  TEX_COORDS = a_tex_coords;
+  TEX_INDEX = a_tex_index;
+  MATERIAL = material;
 
-  gl_Position = u_camera.proj * u_camera.view * a_pos;
+  gl_Position = CAMERA.proj * CAMERA.view * a_pos;
 }

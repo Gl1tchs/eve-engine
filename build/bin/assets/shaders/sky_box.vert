@@ -10,6 +10,6 @@ layout(location = 0) out vec3 v_tex_coord;
 
 void main() {
   v_tex_coord = a_pos;
-  vec4 pos = u_camera.proj * mat4(mat3(u_camera.view)) * vec4(a_pos, 1.0);
+  vec4 pos = CAMERA.proj * mat4(mat3(CAMERA.view)) * vec4(a_pos, 1.0);
   gl_Position = pos.xyww;
 }

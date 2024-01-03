@@ -8,6 +8,6 @@ layout(std140, binding = 0) uniform Camera {
   mat4 proj;
   vec3 position;
 }
-u_camera;
+CAMERA;
 
 #endif  // CAMERA_DATA_GLSL_
