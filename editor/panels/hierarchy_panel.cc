@@ -36,7 +36,8 @@ void HierarchyPanel::Draw() {
 
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
   if (ImGui::ButtonTransparent(ICON_FA_PLUS, 30, 0)) {
-    scene->CreateEntity();
+    // create entity and set selected to new created entity
+    selected_entity_ = scene->CreateEntity();
     modify_info.SetModified();
   }
 
