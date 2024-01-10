@@ -16,6 +16,7 @@ Renderer::Renderer() {
 
   // Create render datas
   mesh_data_ = CreateRef<MeshPrimitive>();
+  quad_data_ = CreateRef<QuadPrimitive>();
   line_data_ = CreateScope<LinePrimitive>();
 
   // Create uniform buffers
@@ -67,8 +68,8 @@ void Renderer::Draw(const RenderData<MeshVertex>& data,
   stats_.vertex_count += data.vertices.size();
 }
 
-void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
-                    const Material& material) {
+void Renderer::DrawModel(const Ref<Model>& model, const Transform& transform,
+                         const Material& material) {
   if (!model) {
     return;
   }
@@ -83,9 +84,10 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
       NextBatch();
     }
 
+    glm::mat4 model_matrix = transform.GetModelMatrix();
+
     float texture_index = 0.0f;
     for (MeshVertex vertex : mesh.vertices) {
-      glm::mat4 model_matrix = transform.GetModelMatrix();
       vertex.position = model_matrix * vertex.position;
 
       // set material values
@@ -110,6 +112,63 @@ void Renderer::Draw(const Ref<Model>& model, const Transform& transform,
     stats_.index_count += mesh.indices.size();
     stats_.vertex_count += mesh.vertices.size();
   }
+}
+
+void Renderer::DrawQuad(const Transform& transform, const Color& color,
+                        const glm::vec2& tiling, const glm::vec2& offset) {
+  if (quad_data_->NeedsNewBatch()) {
+    NextBatch();
+  }
+
+  const float tex_index = 0.0f;
+  const glm::mat4 model_matrix = transform.GetModelMatrix();
+
+  for (size_t i = 0; i < kQuadVertexCount; i++) {
+    QuadVertex vertex;
+
+    vertex.position = model_matrix * kQuadVertexPositions[i];
+    vertex.tex_coords = kQuadVertexTexCoords[i];
+    vertex.color = color;
+    vertex.tex_index = tex_index;
+    vertex.tex_tiling = tiling;
+    vertex.tex_offset = offset;
+
+    quad_data_->AddVertex(vertex);
+  }
+
+  quad_data_->IncrementIndex();
+
+  stats_.index_count += kQuadIndexCount;
+  stats_.vertex_count += kQuadVertexCount;
+}
+
+void Renderer::DrawQuad(const Transform& transform, const Ref<Texture>& texture,
+                        const Color& color, const glm::vec2& tiling,
+                        const glm::vec2& offset) {
+  if (quad_data_->NeedsNewBatch()) {
+    NextBatch();
+  }
+
+  const float tex_index = quad_data_->FindTexture(texture);
+  const glm::mat4 model_matrix = transform.GetModelMatrix();
+
+  for (size_t i = 0; i < kQuadVertexCount; i++) {
+    QuadVertex vertex;
+
+    vertex.position = model_matrix * kQuadVertexPositions[i];
+    vertex.tex_coords = kQuadVertexTexCoords[i];
+    vertex.color = color;
+    vertex.tex_index = tex_index;
+    vertex.tex_tiling = tiling;
+    vertex.tex_offset = offset;
+
+    quad_data_->AddVertex(vertex);
+  }
+
+  quad_data_->IncrementIndex();
+
+  stats_.index_count += kQuadIndexCount;
+  stats_.vertex_count += kQuadVertexCount;
 }
 
 void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
@@ -167,6 +226,9 @@ void Renderer::BeginBatch() {
     mesh->Reset();
   }
 
+  // Reset quad data
+  quad_data_->Reset();
+
   // Reset line data
   line_data_->Reset();
 }
@@ -176,6 +238,8 @@ void Renderer::Flush() {
   for (auto& [id, mesh] : custom_meshes_) {
     mesh->Render(stats_);
   }
+
+  quad_data_->Render(stats_);
 
   line_data_->Render(stats_);
 }

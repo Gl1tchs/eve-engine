@@ -10,6 +10,9 @@
 - [ ] Sounds
 
 ## Editor
+- [ ] Import asset from editor
+    - [ ] Configure assets from editor like texture repeat mode and such.
+- [ ] CTRL+C CTRL+V copy paste entities
 - [ ] New Project
 - [ ] Inspector script entity field
   - [ ] Prefabs
@@ -40,12 +43,13 @@
 - [ ] API Documentation / code + markdown
 
 ## Renderer
+- [ ] Texture rendering in detail (normal maps, height maps, materials).
+- [ ] HDR Environment maps
 - [ ] Custom shaders with scripting API.
     - [x] Custom shaders
     - [ ] Scripting api (requires proper asset system)
 - [ ] Text rendering
 - [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.)
-- [ ] Texture rendering in detail (normal maps, height maps, materials).
 - [ ] PBR.
 - [ ] Other light sources
 

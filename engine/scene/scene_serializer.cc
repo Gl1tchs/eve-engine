@@ -129,6 +129,15 @@ static void SerializeEntity(json& out, Entity entity) {
              {"is_fixed_aspect_ratio", camera_component.is_fixed_aspect_ratio}};
   }
 
+  if (entity.HasComponent<SpriteRendererComponent>()) {
+    auto& sprite_component = entity.GetComponent<SpriteRendererComponent>();
+
+    out["sprite_component"] = json{{"texture", sprite_component.texture},
+                                   {"color", sprite_component.color},
+                                   {"tex_tiling", sprite_component.tex_tiling},
+                                   {"tex_offset", sprite_component.tex_offset}};
+  }
+
   if (entity.HasComponent<ModelComponent>()) {
     auto& model_component = entity.GetComponent<ModelComponent>();
 
@@ -318,6 +327,19 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       camera_component.is_primary = camera_comp_json["is_primary"].get<bool>();
       camera_component.is_fixed_aspect_ratio =
           camera_comp_json["is_fixed_aspect_ratio"].get<bool>();
+    }
+
+    if (auto sprite_comp_json = entity["sprite_component"];
+        !sprite_comp_json.is_null()) {
+      auto& sprite_component =
+          deserialing_entity.AddComponent<SpriteRendererComponent>();
+
+      sprite_component.texture = sprite_comp_json["texture"].get<UUID>();
+      sprite_component.color = sprite_comp_json["color"].get<Color>();
+      sprite_component.tex_tiling =
+          sprite_comp_json["tex_tiling"].get<glm::vec2>();
+      sprite_component.tex_offset =
+          sprite_comp_json["tex_offset"].get<glm::vec2>();
     }
 
     if (auto model_comp_json = entity["model_component"];

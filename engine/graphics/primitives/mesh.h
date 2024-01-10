@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "pch_shared.h"
+
 #include "graphics/primitives/primitive.h"
 
 #include "graphics/material.h"
@@ -9,6 +11,7 @@
 #include "graphics/vertex_array.h"
 
 namespace eve {
+
 static constexpr size_t kMeshMaxVertexCount = 4000;
 static constexpr size_t kMeshMaxIndexCount = 8000;
 static constexpr size_t kMeshMaxTextures = 32;
@@ -48,13 +51,14 @@ class MeshPrimitive : public Primitive<MeshVertex> {
 
   void AddIndex(uint32_t index);
 
-  void Reset() override;
-
   void SetCustomShader(Ref<ShaderInstance> custom_shader);
 
   void RecompileShaders();
 
   [[nodiscard]] float FindTexture(const Ref<Texture>& texture);
+
+ protected:
+  void OnReset() override;
 
  private:
   Ref<VertexArray> vertex_array_;
@@ -74,4 +78,5 @@ class MeshPrimitive : public Primitive<MeshVertex> {
   std::array<Ref<Texture>, kMeshMaxTextures> texture_slots_;
   uint32_t texture_slot_index_;
 };
+
 }  // namespace eve

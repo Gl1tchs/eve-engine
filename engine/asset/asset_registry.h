@@ -18,6 +18,10 @@ class AssetRegistry {
   template <typename T>
     requires std::is_base_of_v<Asset, T>
   static Ref<T> Get(const AssetHandle& handle) {
+    if (handle == 0) {
+      return nullptr;
+    }
+
     Ref<Asset> asset = Get(handle);
     return std::static_pointer_cast<T>(asset);
   }

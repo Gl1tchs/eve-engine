@@ -51,23 +51,34 @@ class Primitive {
     }
 
     vertices_.push_back(vertex);
+
+    // Call custom beheaviour from child class
+    OnVertexAdd(vertex);
   }
 
   /**
  * @brief Resets and removes all elements from vector if not mutable
  * 
  */
-  virtual void Reset() {
+  void Reset() {
     if (!mutable_) {
       return;
     }
 
     vertices_.clear();
+
+    // Call custom beheaviour from child class
+    OnReset();
   }
 
   [[nodiscard]] size_t BatchCount() const { return vertices_.size(); }
 
   [[nodiscard]] const UUID& GetUUID() const { return id_; }
+
+ protected:
+  virtual void OnReset() {}
+
+  virtual void OnVertexAdd(const VertexType& vertex) {}
 
  private:
   UUID id_;

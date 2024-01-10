@@ -28,6 +28,13 @@ struct CameraComponent {
   bool is_fixed_aspect_ratio = false;
 };
 
+struct SpriteRendererComponent {
+  AssetHandle texture = 0;
+  Color color = kColorWhite;
+  glm::vec2 tex_tiling = {1, 1};
+  glm::vec2 tex_offset = {0, 0};
+};
+
 class Script;
 
 struct ScriptComponent {
@@ -37,6 +44,7 @@ struct ScriptComponent {
 template <typename... Component>
 struct ComponentGroup {};
 
-using AllComponents = ComponentGroup<Transform, CameraComponent, ModelComponent,
-                                     Material, ScriptComponent>;
+using AllComponents =
+    ComponentGroup<Transform, CameraComponent, SpriteRendererComponent,
+                   ModelComponent, Material, ScriptComponent>;
 }  // namespace eve

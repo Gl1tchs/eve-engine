@@ -6,6 +6,7 @@
 #include "core/file_system.h"
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
+#include "mesh.h"
 
 namespace eve {
 MeshPrimitive::MeshPrimitive()
@@ -104,15 +105,6 @@ void MeshPrimitive::AddIndex(uint32_t index) {
   indices_.push_back(index_offset + index);
 }
 
-void MeshPrimitive::Reset() {
-  Primitive<MeshVertex>::Reset();
-
-  indices_.clear();
-  index_offset = 0;
-
-  texture_slot_index_ = 1;
-}
-
 void MeshPrimitive::SetCustomShader(Ref<ShaderInstance> custom_shader) {
   custom_shader_ = custom_shader;
 }
@@ -162,4 +154,12 @@ float MeshPrimitive::FindTexture(const Ref<Texture>& texture) {
 
   return texture_index;
 }
+
+void MeshPrimitive::OnReset() {
+  indices_.clear();
+  index_offset = 0;
+
+  texture_slot_index_ = 1;
+}
+
 }  // namespace eve

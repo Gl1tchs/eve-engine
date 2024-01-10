@@ -39,6 +39,8 @@ void DisplayAddComponentEntry(Entity& selected_entity,
     if (ImGui::MenuItem(component_name.c_str())) {
       selected_entity.AddComponent<T>();
       ImGui::CloseCurrentPopup();
+
+      modify_info.SetModified();
     }
   }
 }
@@ -110,6 +112,8 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
   if (ImGui::BeginPopup("AddComponent")) {
     DisplayAddComponentEntry<CameraComponent>(selected_entity, "Camera");
     DisplayAddComponentEntry<ScriptComponent>(selected_entity, "Script");
+    DisplayAddComponentEntry<SpriteRendererComponent>(selected_entity,
+                                                      "Sprite Renderer");
     DisplayAddComponentEntry<ModelComponent>(selected_entity, "Model");
     DisplayAddComponentEntry<Material>(selected_entity, "Material");
 
@@ -200,6 +204,54 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
             camera_comp.persp_camera.aspect_ratio = aspect_ratio;
             modify_info.SetModified();
           }
+        }
+      });
+
+  DrawComponent<SpriteRendererComponent>(
+      ICON_FA_PICTURE_O " Sprite Renderer Component", selected_entity,
+      [this](SpriteRendererComponent& sprite_comp) {
+        Ref<Texture> texture =
+            sprite_comp.texture != 0
+                ? AssetRegistry::Get<Texture>(sprite_comp.texture)
+                : nullptr;
+
+        if (!texture) {
+          ImGui::Selectable("Texture Path");
+
+          if (ImGui::BeginDragDropSource(
+                  ImGuiDragDropFlags_SourceNoDisableHover ||
+                  ImGuiDragDropFlags_SourceNoPreviewTooltip)) {
+            ImGui::SetDragDropPayload("DND_PAYLOAD_TEXTURE", &texture->handle,
+                                      sizeof(AssetHandle));
+            ImGui::EndDragDropSource();
+          }
+        } else {
+          ImGui::InputText("Texture", &texture->name,
+                           ImGuiInputTextFlags_ReadOnly);
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+          if (const ImGuiPayload* payload =
+                  ImGui::AcceptDragDropPayload("DND_PAYLOAD_TEXTURE")) {
+            const AssetHandle handle = *(const AssetHandle*)payload->Data;
+            if (AssetRegistry::Exists(handle)) {
+              sprite_comp.texture = handle;
+              modify_info.SetModified();
+            }
+          }
+          ImGui::EndDragDropTarget();
+        }
+
+        if (ImGui::ColorEdit4("Color", &sprite_comp.color.r)) {
+          modify_info.SetModified();
+        }
+
+        if (ImGui::DragFloat2("Tiling", &sprite_comp.tex_tiling.x)) {
+          modify_info.SetModified();
+        }
+
+        if (ImGui::DragFloat2("Offset", &sprite_comp.tex_offset.x)) {
+          modify_info.SetModified();
         }
       });
 

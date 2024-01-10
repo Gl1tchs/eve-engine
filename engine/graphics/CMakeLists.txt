@@ -4,6 +4,8 @@ set(SOURCES
   primitives/mesh.cc
   primitives/mesh.h
   primitives/primitive.h
+  primitives/quad.cc
+  primitives/quad.h
   buffer_layout.cc
   buffer_layout.h
   camera.h

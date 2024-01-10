@@ -8,6 +8,7 @@
 #include "graphics/graphics_context.h"
 #include "graphics/primitives/line.h"
 #include "graphics/primitives/mesh.h"
+#include "graphics/primitives/quad.h"
 #include "graphics/texture.h"
 #include "graphics/uniform_buffer.h"
 #include "scene/static_mesh.h"
@@ -38,8 +39,17 @@ class Renderer final {
   void Draw(const RenderData<MeshVertex>& data, const Transform& transform,
             const Ref<Texture>& texture);
 
-  void Draw(const Ref<Model>& model, const Transform& transform,
-            const Material& material);
+  void DrawModel(const Ref<Model>& model, const Transform& transform,
+                 const Material& material);
+
+  void DrawQuad(const Transform& transform, const Color& color,
+                const glm::vec2& tiling = {1, 1},
+                const glm::vec2& offset = {0, 0});
+
+  void DrawQuad(const Transform& transform, const Ref<Texture>& texture,
+                const Color& color = kColorWhite,
+                const glm::vec2& tiling = {1, 1},
+                const glm::vec2& offset = {0, 0});
 
   void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
                 const glm::vec4& color);
@@ -77,7 +87,9 @@ class Renderer final {
   // Renderer Data
   Ref<MeshPrimitive> mesh_data_;
   std::unordered_map<AssetHandle, Ref<MeshPrimitive>> custom_meshes_;
-  
+
+  Ref<QuadPrimitive> quad_data_;
+
   Scope<LinePrimitive> line_data_;
 
   // Camera stuff

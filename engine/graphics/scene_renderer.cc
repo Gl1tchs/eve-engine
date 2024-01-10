@@ -128,13 +128,28 @@ void SceneRenderer::RenderScene() {
   auto& scene = SceneManager::GetActive();
   auto& renderer = state_->renderer;
 
+  scene->GetAllEntitiesWith<Transform, SpriteRendererComponent>().each(
+      [&](entt::entity entity_id, const Transform& transform,
+          const SpriteRendererComponent& sprite) {
+        Entity entity{entity_id, scene.get()};
+
+        if (auto texture = AssetRegistry::Get<Texture>(sprite.texture);
+            texture) {
+          renderer->DrawQuad(transform, texture, sprite.color, sprite.tex_tiling,
+                             sprite.tex_offset);
+        } else {
+          renderer->DrawQuad(transform, sprite.color, sprite.tex_tiling,
+                             sprite.tex_offset);
+        }
+      });
+
   scene->GetAllEntitiesWith<Transform, ModelComponent, Material>().each(
       [&](entt::entity entity_id, const Transform& transform,
           const ModelComponent& model_comp, const Material& material) {
         Entity entity{entity_id, scene.get()};
 
-        renderer->Draw(AssetRegistry::Get<Model>(model_comp.model), transform,
-                       material);
+        renderer->DrawModel(AssetRegistry::Get<Model>(model_comp.model),
+                            transform, material);
       });
 }
 

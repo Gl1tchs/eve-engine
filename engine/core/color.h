@@ -25,15 +25,15 @@ struct Color {
   constexpr Color(const glm::vec4& v4) : r(v4.r), g(v4.g), b(v4.b), a(v4.a) {}
 };
 
-constexpr Color kBlack(0.0f, 0.0f, 0.0f, 1.0f);
-constexpr Color kWhite(1.0f, 1.0f, 1.0f, 1.0f);
-constexpr Color kRed(1.0f, 0.0f, 0.0f, 1.0f);
-constexpr Color kGreen(0.0f, 1.0f, 0.0f, 1.0f);
-constexpr Color kBlue(0.0f, 0.0f, 1.0f, 1.0f);
-constexpr Color kYellow(1.0f, 1.0f, 0.0f, 1.0f);
-constexpr Color kCyan(0.0f, 1.0f, 1.0f, 1.0f);
-constexpr Color kMagenta(1.0f, 0.0f, 1.0f, 1.0f);
-constexpr Color kGray(0.5f, 0.5f, 0.5f, 1.0f);
-constexpr Color kOrange(1.0f, 0.5f, 0.0f, 1.0f);
+constexpr Color kColorBlack(0.0f, 0.0f, 0.0f, 1.0f);
+constexpr Color kColorWhite(1.0f, 1.0f, 1.0f, 1.0f);
+constexpr Color kColorRed(1.0f, 0.0f, 0.0f, 1.0f);
+constexpr Color kColorGreen(0.0f, 1.0f, 0.0f, 1.0f);
+constexpr Color kColorBlue(0.0f, 0.0f, 1.0f, 1.0f);
+constexpr Color kColorYellow(1.0f, 1.0f, 0.0f, 1.0f);
+constexpr Color kColorCyan(0.0f, 1.0f, 1.0f, 1.0f);
+constexpr Color kColorMagenta(1.0f, 0.0f, 1.0f, 1.0f);
+constexpr Color kColorGray(0.5f, 0.5f, 0.5f, 1.0f);
+constexpr Color kColorOrange(1.0f, 0.5f, 0.0f, 1.0f);
 
 }  // namespace eve

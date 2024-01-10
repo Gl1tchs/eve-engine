@@ -34,8 +34,8 @@ Ref<Texture> Texture::Create(const std::filesystem::path& path) {
   metadata.size = glm::ivec2{width, height};
   metadata.min_filter = TextureFilteringMode::kLinear;
   metadata.mag_filter = TextureFilteringMode::kLinear;
-  metadata.wrap_s = TextureWrappingMode::kClampToEdge;
-  metadata.wrap_t = TextureWrappingMode::kClampToEdge;
+  metadata.wrap_s = TextureWrappingMode::kRepeat;
+  metadata.wrap_t = TextureWrappingMode::kRepeat;
   metadata.generate_mipmaps = true;
 
   switch (channels) {
