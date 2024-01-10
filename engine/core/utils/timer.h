@@ -10,7 +10,11 @@ class Timer final {
  public:
   Timer();
 
-  [[nodiscard]] float Tick();
+  [[nodiscard]] float GetElapsedMilliseconds();
+
+  [[nodiscard]] float GetElapsedSeconds();
+
+  [[nodiscard]] float GetDeltaTime();
 
  private:
   std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time_;

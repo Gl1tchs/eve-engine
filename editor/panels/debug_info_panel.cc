@@ -32,32 +32,24 @@ void DebugInfoPanel::Draw() {
   const DeviceInformation info = renderer_->GetContext()->GetDeviceInfo();
   const RenderStats& stats = renderer_->GetStats();
 
-  ImGui::Columns(5, "InfoColumns", false);
-  // ImGui::SetColumnWidth(0, 150);
-
-  ImGui::Text("GPU:");
+  ImGui::SeparatorText("GPU:");
   ImGui::Text("Vendor: %s", info.vendor);
   ImGui::Text("Renderer: %s", info.renderer);
-  ImGui::NextColumn();
 
-  ImGui::Text("CPU:");
+  ImGui::SeparatorText("CPU:");
   ImGui::Text("Vendor: %s", cpu_info_.GetVendor().c_str());
   ImGui::Text("Model: %s", cpu_info_.GetModel().c_str());
   ImGui::Text("Core Count: %d", cpu_info_.GetCores());
   ImGui::Text("Logical CPU Count: %d", cpu_info_.GetLogicalCpuCount());
   ImGui::Text("HyperThread: %d", cpu_info_.IsHyperThreaded());
-  ImGui::NextColumn();
 
-  ImGui::Text("RAM:");
+  ImGui::SeparatorText("RAM:");
   ImGui::Text("Memory: %llu", system_memory_);
-  ImGui::NextColumn();
 
-  ImGui::Text("Renderer Stats:");
+  ImGui::SeparatorText("Renderer Stats:");
+  ImGui::Text("Last Render Duration: %.3f", stats.last_render_duration);
   ImGui::Text("Draw Calls: %d", stats.draw_calls);
   ImGui::Text("Vertex Count: %d", stats.vertex_count);
   ImGui::Text("Index Count: %d", stats.index_count);
-  ImGui::NextColumn();
-
-  ImGui::Columns(1);
 }
 }  // namespace eve

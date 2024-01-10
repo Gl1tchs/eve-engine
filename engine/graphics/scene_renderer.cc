@@ -3,6 +3,7 @@
 #include "graphics/scene_renderer.h"
 
 #include "asset/asset_registry.h"
+#include "core/utils/timer.h"
 #include "graphics/renderer.h"
 #include "scene/entity.h"
 #include "scene/scene_manager.h"
@@ -99,6 +100,8 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
   auto& scene = SceneManager::GetActive();
   auto& renderer = state_->renderer;
 
+  Timer timer;
+
   renderer->BeginScene(data);
 
   DrawGrid();
@@ -112,16 +115,22 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
   RenderScene();
 
   renderer->EndScene();
+
+  renderer->stats_.last_render_duration = timer.GetElapsedMilliseconds();
 }
 
 void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
   auto& renderer = state_->renderer;
+
+  Timer timer;
 
   renderer->BeginScene(data);
 
   RenderScene();
 
   renderer->EndScene();
+
+  renderer->stats_.last_render_duration = timer.GetElapsedMilliseconds();
 }
 
 void SceneRenderer::RenderScene() {
@@ -135,8 +144,8 @@ void SceneRenderer::RenderScene() {
 
         if (auto texture = AssetRegistry::Get<Texture>(sprite.texture);
             texture) {
-          renderer->DrawQuad(transform, texture, sprite.color, sprite.tex_tiling,
-                             sprite.tex_offset);
+          renderer->DrawQuad(transform, texture, sprite.color,
+                             sprite.tex_tiling, sprite.tex_offset);
         } else {
           renderer->DrawQuad(transform, sprite.color, sprite.tex_tiling,
                              sprite.tex_offset);

@@ -22,6 +22,7 @@ struct CameraData final {
 };
 
 struct RenderStats final {
+  float last_render_duration = 0.0f;
   uint32_t draw_calls = 0;
   uint32_t vertex_count = 0;
   uint32_t index_count = 0;
@@ -97,5 +98,7 @@ class Renderer final {
 
   // Misc
   RenderStats stats_;
+
+  friend class SceneRenderer;
 };
 }  // namespace eve

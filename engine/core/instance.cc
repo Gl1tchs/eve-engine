@@ -44,7 +44,7 @@ Instance::~Instance() {
 void Instance::StartEventLoop() {
   Timer timer;
   while (state_->running) {
-    float ds = timer.Tick();
+    float ds = timer.GetDeltaTime();
 
     ProcessMainThreadQueue();
 
