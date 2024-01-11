@@ -50,9 +50,9 @@ class Renderer final {
                 const glm::vec2& offset = {0, 0});
 
   void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
-                const glm::vec4& color);
+                const Color& color);
 
-  void DrawBox(Box box, const glm::vec4& color);
+  void DrawBox(Box box, const Color& color);
 
   [[nodiscard]] const RenderStats& GetStats() const { return stats_; }
 

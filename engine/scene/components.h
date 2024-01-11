@@ -26,6 +26,31 @@ struct CameraComponent {
   // TODO put this in scene
   bool is_primary = true;
   bool is_fixed_aspect_ratio = false;
+
+  inline void SetAspectRatio(const float& ratio) {
+    if (is_fixed_aspect_ratio) {
+      return;
+    }
+
+    persp_camera.aspect_ratio = ratio;
+    ortho_camera.aspect_ratio = ratio;
+  }
+
+  [[nodiscard]] inline glm::mat4 GetProjectionMatrix() const {
+    if (is_orthographic) {
+      return ortho_camera.GetProjectionMatrix();
+    } else {
+      return persp_camera.GetProjectionMatrix();
+    }
+  }
+
+  [[nodiscard]] inline glm::mat4 GetViewMatrix(const Transform& transform) {
+    if (is_orthographic) {
+      return ortho_camera.GetViewMatrix(transform);
+    } else {
+      return persp_camera.GetViewMatrix(transform);
+    }
+  }
 };
 
 struct SpriteRendererComponent {

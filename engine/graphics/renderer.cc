@@ -139,7 +139,7 @@ void Renderer::DrawQuad(const Transform& transform, const Ref<Texture>& texture,
 }
 
 void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
-                        const glm::vec4& color) {
+                        const Color& color) {
   if (line_data_->NeedsNewBatch()) {
     NextBatch();
   }
@@ -157,7 +157,7 @@ void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
   stats_.vertex_count += 2;
 }
 
-void Renderer::DrawBox(Box box, const glm::vec4& color) {
+void Renderer::DrawBox(Box box, const Color& color) {
   DrawLine(box.top_left, box.top_right, color);
   DrawLine(box.top_right, box.bottom_right, color);
   DrawLine(box.bottom_right, box.bottom_left, color);

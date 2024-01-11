@@ -10,7 +10,7 @@ LinePrimitive::LinePrimitive() : Primitive<LineVertex>(kMaxLines) {
   vertex_array_ = VertexArray::Create();
 
   vertex_buffer_ = VertexBuffer::Create(kMaxLines * sizeof(LineVertex));
-  vertex_buffer_->SetLayout({{ShaderDataType::kFloat3, "a_pos"},
+  vertex_buffer_->SetLayout({{ShaderDataType::kFloat3, "a_position"},
                              {ShaderDataType::kFloat4, "a_color"}});
   vertex_array_->AddVertexBuffer(vertex_buffer_);
 

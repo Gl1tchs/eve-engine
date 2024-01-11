@@ -24,5 +24,9 @@ void main() {
   color = fragment(color);
 #endif
 
+  if (color.a < 0.05) {
+    discard;
+  }
+
   o_color = color;
 }

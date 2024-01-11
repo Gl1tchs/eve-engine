@@ -12,18 +12,18 @@ layout(location = 4) in vec2 a_tex_tiling;
 layout(location = 5) in vec2 a_tex_offset;
 
 
-layout(location = 0) out vec4 COLOR;
-layout(location = 1) out vec2 TEX_COORDS;
-layout(location = 2) out float TEX_INDEX;
-layout(location = 3) out vec2 TEX_TILING;
-layout(location = 4) out vec2 TEX_OFFSET;
+layout(location = 0) out vec4 v_color;
+layout(location = 1) out vec2 v_tex_coords;
+layout(location = 2) out float v_tex_index;
+layout(location = 3) out vec2 v_tex_tiling;
+layout(location = 4) out vec2 v_tex_offset;
 
 void main() {
-  COLOR = a_color;
-  TEX_COORDS = a_tex_coords;
-  TEX_INDEX = a_tex_index;
-  TEX_TILING = a_tex_tiling;
-  TEX_OFFSET = a_tex_offset;
+  v_color = a_color;
+  v_tex_coords = a_tex_coords;
+  v_tex_index = a_tex_index;
+  v_tex_tiling = a_tex_tiling;
+  v_tex_offset = a_tex_offset;
 
   gl_Position = CAMERA.proj * CAMERA.view * a_pos;
 }

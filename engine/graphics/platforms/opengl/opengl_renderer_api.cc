@@ -8,6 +8,7 @@ namespace eve {
 
 void OpenGLRendererAPI::Init() {
   glEnable(GL_BLEND);
+  
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);

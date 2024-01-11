@@ -58,19 +58,14 @@ void SceneRenderer::RenderEditor(float ds, Ref<EditorCamera>& editor_camera,
       auto& cc = primary_camera.GetComponent<CameraComponent>();
       auto& tc = primary_camera.GetTransform();
 
-      if (cc.is_orthographic) {
-        data = {cc.ortho_camera.GetViewMatrix(tc),
-                cc.ortho_camera.GetProjectionMatrix(), tc.position};
-      } else {
-        data = {cc.persp_camera.GetViewMatrix(tc),
-                cc.persp_camera.GetProjectionMatrix(), tc.position};
-      }
+      data = {cc.GetViewMatrix(tc), cc.GetProjectionMatrix(), tc.position};
 
       last_primary_transform_ = tc;
       editor_primary_used_ = true;
     }
   } else {
-    data = {editor_camera->GetViewMatrix(), editor_camera->GetProjectionMatrix(),
+    data = {editor_camera->GetViewMatrix(),
+            editor_camera->GetProjectionMatrix(),
             editor_camera->GetTransform().position};
 
     editor_primary_used_ = false;
@@ -90,11 +85,7 @@ void SceneRenderer::OnViewportResize(glm::uvec2 size) {
   // Resize our non-FixedAspectRatio cameras
   scene->GetAllEntitiesWith<CameraComponent>().each(
       [size](entt::entity, CameraComponent& cc) {
-        if (!cc.is_fixed_aspect_ratio) {
-          float ratio = (float)size.x / (float)size.y;
-          cc.persp_camera.aspect_ratio = ratio;
-          cc.ortho_camera.aspect_ratio = ratio;
-        }
+        cc.SetAspectRatio((float)size.x / (float)size.y);
       });
 }
 
@@ -184,40 +175,38 @@ void SceneRenderer::RenderScene() {
 void SceneRenderer::DrawGrid() {
   auto& renderer = state_->renderer;
 
-  const float grid_size = 5.0f;
-  const int num_lines = 101;
+  constexpr float kGridSize = 1.0f;
+  constexpr int kNumLines = 101;
 
-  renderer->DrawLine({-grid_size * num_lines / 2.0f, 0.0f, 0.0f},
-                     {grid_size * num_lines / 2.0f, 0.0f, 0.0f},
+  renderer->DrawLine({-kGridSize * kNumLines / 2.0f, 0.0f, 0.0f},
+                     {kGridSize * kNumLines / 2.0f, 0.0f, 0.0f},
                      {1.0f, 0.0f, 0.0f, 1.0f});  // X-axis (red)
-  renderer->DrawLine({0.0f, -grid_size * num_lines / 2.0f, 0.0f},
-                     {0.0f, grid_size * num_lines / 2.0f, 0.0f},
-                     {0.0f, 1.0f, 0.0f, 1.0f});  // Y-axis (green)
-  renderer->DrawLine({0.0f, 0.0f, -grid_size * num_lines / 2.0f},
-                     {0.0f, 0.0f, grid_size * num_lines / 2.0f},
+
+  renderer->DrawLine({0.0f, 0.0f, -kGridSize * kNumLines / 2.0f},
+                     {0.0f, 0.0f, kGridSize * kNumLines / 2.0f},
                      {0.0f, 0.0f, 1.0f, 1.0f});  // Z-axis (blue)
 
   const glm::vec4 sub_grid_color(0.5f, 0.5f, 0.5f, 1.0f);
 
-  for (int i = -num_lines / 2; i <= num_lines / 2; ++i) {
-    float x_pos = static_cast<float>(i) * grid_size;
+  for (int i = -kNumLines / 2; i <= kNumLines / 2; ++i) {
+    float x_pos = static_cast<float>(i) * kGridSize;
     if (i == 0) {
       continue;
     }
 
-    renderer->DrawLine({x_pos, 0.0f, -grid_size * num_lines / 2.0f},
-                       {x_pos, 0.0f, grid_size * num_lines / 2.0f},
+    renderer->DrawLine({x_pos, 0.0f, -kGridSize * kNumLines / 2.0f},
+                       {x_pos, 0.0f, kGridSize * kNumLines / 2.0f},
                        sub_grid_color);
   }
 
-  for (int i = -num_lines / 2; i <= num_lines / 2; ++i) {
-    float z_pos = static_cast<float>(i) * grid_size;
+  for (int i = -kNumLines / 2; i <= kNumLines / 2; ++i) {
+    float z_pos = static_cast<float>(i) * kGridSize;
     if (i == 0) {
       continue;
     }
 
-    renderer->DrawLine({-grid_size * num_lines / 2.0f, 0.0f, z_pos},
-                       {grid_size * num_lines / 2.0f, 0.0f, z_pos},
+    renderer->DrawLine({-kGridSize * kNumLines / 2.0f, 0.0f, z_pos},
+                       {kGridSize * kNumLines / 2.0f, 0.0f, z_pos},
                        sub_grid_color);
   }
 }
@@ -231,7 +220,7 @@ void SceneRenderer::RenderCameraBounds() {
   CameraComponent& cc = selected_entity.GetComponent<CameraComponent>();
   Transform& tc = selected_entity.GetTransform();
 
-  glm::vec4 color(0.75f, 0.75f, 0.75f, 1.0f);
+  Color color(0.75f, 0.75f, 0.75f, 1.0f);
 
   // Check if the camera is perspective or orthographic
   if (!cc.is_orthographic) {

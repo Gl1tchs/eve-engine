@@ -15,7 +15,7 @@ constexpr size_t kMaxLines = 2000;
 
 struct LineVertex {
   glm::vec3 position;
-  glm::vec4 color;
+  Color color;
 };
 
 template <>

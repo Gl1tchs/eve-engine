@@ -38,4 +38,5 @@ struct Transform final {
 
   [[nodiscard]] glm::vec3 GetDirection() const;
 };
+
 }  // namespace eve
