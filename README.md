@@ -13,6 +13,7 @@
 - Editor application
 - Asset and serialization system
 - C# Mono scripting
+- Custom physics engine.
 - ECS scene system
 - Dynamic batch renderer
 - Event and input system
