@@ -37,6 +37,9 @@
 
 ## Physics
 - [ ] Add trigger functionality to C#.
+- [ ] Capsule and mesh colliders.
+- [ ] Forces and impulses.
+- [ ] Angular velocity and torque.
 
 ## Scripting
 - [ ] Asset system scripting API.

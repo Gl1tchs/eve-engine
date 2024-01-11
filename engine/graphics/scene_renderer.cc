@@ -321,7 +321,7 @@ void SceneRenderer::RenderColliderBounds() {
       [renderer](entt::entity entity_id, Transform& tc, BoxCollider& col) {
         Transform tc_col = tc;
         tc_col.position += col.local_position;
-        tc_col.scale += col.local_scale;
+        tc_col.scale = col.local_scale;
 
         // Render collider bounds as wireframe.
         renderer->DrawCube(tc_col, kColorGreen, PolygonMode::kLine);
