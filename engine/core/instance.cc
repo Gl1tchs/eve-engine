@@ -14,7 +14,17 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   instance_ = this;
 
   state_ = CreateRef<State>();
+}
 
+Instance::~Instance() {
+  if (!ScriptEngine::IsInitialized()) {
+    return;
+  }
+
+  ScriptEngine::Shutdown();
+}
+
+void Instance::Init() {
   // TODO get this from project config
   WindowProps props;
   props.title = specs_.name;
@@ -31,14 +41,6 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
 
   imgui_layer_ = new ImGuiLayer(state_);
   PushOverlay(imgui_layer_);
-}
-
-Instance::~Instance() {
-  if (!ScriptEngine::IsInitialized()) {
-    return;
-  }
-
-  ScriptEngine::Shutdown();
 }
 
 void Instance::StartEventLoop() {
@@ -85,14 +87,6 @@ void Instance::PushLayer(Layer* layer) {
 
 void Instance::PushOverlay(Layer* overlay) {
   layers_.PushOverlay(overlay);
-}
-
-void Instance::PopLayer(Layer* layer) {
-  layers_.PopLayer(layer);
-}
-
-void Instance::PopOverlay(Layer* overlay) {
-  layers_.PopOverlay(overlay);
 }
 
 }  // namespace eve

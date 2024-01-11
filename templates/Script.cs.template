@@ -1,0 +1,19 @@
+using EveEngine;
+
+namespace {{NAMESPACE}}
+{
+  public class {{SCRIPT_CLASS}} : Entity
+  {
+    protected override void OnCreate()
+    {
+    }
+
+    protected override void OnUpdate(float ds)
+    {
+    }
+
+    protected override void OnDestroy()
+    {
+    }
+  }
+}

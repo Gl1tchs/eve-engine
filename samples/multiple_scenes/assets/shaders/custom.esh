@@ -1,8 +1,10 @@
 uniform float square_size;
 
-vec3 fragment(vec3 in_color) {
-  ivec2 grid_color = ivec2(gl_FragCoord.xy / square_size);
-  bool is_black = (grid_color.x + grid_color.y) % 2 == 0;
+vec4 fragment(vec4 in_color) {
+  int x = int(gl_FragCoord.x / square_size);
+  int y = int(gl_FragCoord.y / square_size);
 
-  return mix(in_color, vec3(0), float(is_black));
+  bool is_black = (x + y) % 2 == 0;
+
+  return is_black ? in_color : vec4(0);
 }

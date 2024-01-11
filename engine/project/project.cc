@@ -3,6 +3,7 @@
 #include "project/project.h"
 
 #include "core/event/input.h"
+#include "core/instance.h"
 #include "project/project_serializer.h"
 #include "scene/scene_manager.h"
 
@@ -14,7 +15,6 @@ Ref<Project> Project::New() {
   active_project_ = CreateRef<Project>();
 
   SceneManager::Init(active_project_);
-
   Input::Init();
 
   return active_project_;
@@ -33,7 +33,6 @@ Ref<Project> Project::Load(const fs::path& path) {
     Input::Deserialize(GetKeymapsPath());
 
     AssetRegistry::Deserialize(GetAssetRegistryPath());
-
     SceneManager::Init(active_project_);
 
     return active_project_;
@@ -47,7 +46,6 @@ void Project::SaveActive(const fs::path& path) {
   serializer.Serialize(path);
 
   Input::Serialize(GetKeymapsPath());
-
   AssetRegistry::Serialize(GetAssetRegistryPath());
 
   active_project_->project_dir_ = path.parent_path();

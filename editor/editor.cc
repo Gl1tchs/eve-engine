@@ -13,11 +13,18 @@
 namespace eve {
 class EditorInstance : public Instance {
  public:
-  EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
+  EditorInstance(const InstanceSpecifications& specs, const std::string& path)
+      : Instance(specs) {
     // If default project provided load it.
-    if (Ref<Project> project = Project::GetActive(); project) {
-      ScriptEngine::Init();
-      SceneManager::SetActive(0);
+    if (!path.empty()) {
+      EnqueueMain([this, path] {
+        if (Ref<Project> project = Project::Load(path); project) {
+          ScriptEngine::Init();
+          SceneManager::SetActive(0);
+        } else {
+          LOG_EDITOR_ERROR("Unable to open project from: {}", path);
+        }
+      });
     }
 
     PushLayer<EditorLayer>(GetState());
@@ -30,17 +37,14 @@ Instance* CreateInstance(CommandLineArguments args) {
   specs.description = "Editor application for the eve engine.";
   specs.args = args;
 
-  if (args.argc == 2) {
-    std::string startup_project = args.argv[1];
-    if (!startup_project.empty()) {
-      if (std::isspace(startup_project[0])) {
-        startup_project.erase(0, startup_project.find_first_not_of(" "));
-      }
+  std::string path = args.argc == 2 ? args.argv[1] : "";
 
-      Project::Load(startup_project);
+  if (!path.empty()) {
+    if (std::isspace(path[0])) {
+      path.erase(0, path.find_first_not_of(" "));
     }
   }
 
-  return new EditorInstance(specs);
+  return new EditorInstance(specs, path);
 }
 }  // namespace eve

@@ -9,11 +9,28 @@
 #include "runtime_layer.h"
 
 namespace eve {
+
 class EditorInstance : public Instance {
  public:
-  EditorInstance(const InstanceSpecifications& specs) : Instance(specs) {
-    ScriptEngine::Init(true);
-    SceneManager::SetActive(0);
+  EditorInstance(const InstanceSpecifications& specs,
+                 const std::string& path)
+      : Instance(specs) {
+
+    if (path.empty()) {
+      GetState()->running = false;
+      return;
+    }
+
+    EnqueueMain([this, path]() {
+      Ref<Project> project = Project::Load(path);
+      if (!project) {
+        GetState()->running = false;
+        return;
+      }
+
+      ScriptEngine::Init(true);
+      SceneManager::SetActive(0);
+    });
 
     PushLayer<RuntimeLayer>(GetState());
   }
@@ -38,11 +55,7 @@ Instance* CreateInstance(CommandLineArguments args) {
     project_path.erase(0, project_path.find_first_not_of(" "));
   }
 
-  Ref<Project> project = Project::Load(project_path);
-  if (!project) {
-    return nullptr;
-  }
-
-  return new EditorInstance(specs);
+  return new EditorInstance(specs, project_path);
 }
+
 }  // namespace eve

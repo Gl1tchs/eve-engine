@@ -7,6 +7,7 @@
 #include "scripting/script.h"
 
 namespace eve {
+
 class ScriptEngine {
  public:
   static void Init(bool is_runtime = false);
@@ -66,4 +67,5 @@ class ScriptEngine {
 const char* ScriptFieldTypeToString(ScriptFieldType field_type);
 
 ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type);
+
 }  // namespace eve

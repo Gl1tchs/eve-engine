@@ -157,7 +157,7 @@ std::string OpenGLShader::LoadShaderSource(const fs::path& path,
 
 bool OpenGLShader::ParseCustomShader(const std::string& custom_shader) {
   const std::regex fragment_function_regex(
-      R"(vec3\s+fragment\s*\(\s*vec3\s+\w+\s*\)\s*\{)");
+      R"(vec4\s+fragment\s*\(\s*vec4\s+\w+\s*\)\s*\{)");
 
   if (!std::regex_search(custom_shader, fragment_function_regex)) {
     return false;

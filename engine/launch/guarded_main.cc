@@ -14,7 +14,16 @@ int GuardedMain(CommandLineArguments args) {
 
   Instance* instance = CreateInstance(args);
   if (!instance) {
+    Logger::Deinit();
     return 1;
+  }
+
+  instance->Init();
+
+  if (!instance->GetState()->running) {
+    Logger::Deinit();
+    delete instance;
+    return 0;
   }
 
   instance->StartEventLoop();

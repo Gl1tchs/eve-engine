@@ -1,0 +1,14 @@
+// Custom Shader Template File
+//
+// Public Variables:
+// vec4 v_albedo
+// vec2 v_tex_coords
+// float v_diffuse_index
+// float v_specular_index
+// float v_normal_index
+// float v_height_index
+// sampler2D u_textures[32]
+
+vec4 fragment(vec4 in_color) {
+  return in_color;
+}

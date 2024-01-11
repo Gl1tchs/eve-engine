@@ -111,11 +111,12 @@ class EditorLayer : public Layer {
   Scope<InspectorPanel> inspector_panel_;
   Scope<ViewportPanel> viewport_panel_;
   Ref<SceneSettingsPanel> scene_settings_panel_;
+  // dependent on renderer so can't allocate on stack
+  Scope<ContentBrowserPanel> content_browser_;
 
   AssetRegistryPanel asset_registry_panel_;
   ToolbarPanel toolbar_panel_;
   ConsolePanel console_panel_;
-  ContentBrowserPanel content_browser_;
   ProjectSettingsPanel project_settings_panel_;
   AboutPanel about_panel_;
 

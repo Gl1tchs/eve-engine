@@ -9,9 +9,6 @@
           0.053743790835142136,
           1.0
         ],
-        "ao": 1.0,
-        "metallic": 0.0,
-        "roughness": 1.0,
         "shader": 11538066441631967286,
         "uniform_fields": [
           {
@@ -61,13 +58,13 @@
         "is_orthographic": false,
         "is_primary": true,
         "orthographic_camera": {
-          "aspect_ratio": 1.8139535188674927,
+          "aspect_ratio": 1.7546817064285278,
           "far_clip": 1.0,
           "near_clip": -1.0,
           "zoom_level": 1.0
         },
         "perspective_camera": {
-          "aspect_ratio": 1.8139535188674927,
+          "aspect_ratio": 1.7546817064285278,
           "far_clip": 300.0,
           "fov": 45.0,
           "near_clip": 0.10000000149011612

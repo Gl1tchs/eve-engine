@@ -24,26 +24,8 @@
 
 namespace eve {
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
-  exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer);
-
-  // Remove default beheaviour
-  PopEvent<WindowCloseEvent>();
-  SubscribeEvent<WindowCloseEvent>(
-      [this](const WindowCloseEvent& event) { Exit(); });
-}
-
-void EditorLayer::OnStart() {
-  frame_buffer_ = FrameBuffer::Create({300, 300});
-
-  editor_camera_ = CreateRef<EditorCamera>();
-
-  hierarchy_panel_ = CreateRef<HierarchyPanel>();
-  viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
-                                               editor_camera_);
-  inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
-
-  debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
-
+  // Setup delegates
+  { exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer); }
   {
     toolbar_panel_.on_play = BIND_FUNC(OnScenePlay);
     toolbar_panel_.on_stop = BIND_FUNC(OnSceneStop);
@@ -51,8 +33,29 @@ void EditorLayer::OnStart() {
     toolbar_panel_.on_resume = BIND_FUNC(OnSceneResume);
     toolbar_panel_.on_step = BIND_FUNC(OnSceneStep);
   }
+}
 
-  content_browser_.on_scene_open = BIND_FUNC(OpenScene);
+void EditorLayer::OnStart() {
+  // Remove default beheaviour
+  PopEvent<WindowCloseEvent>();
+  SubscribeEvent<WindowCloseEvent>(
+      [this](const WindowCloseEvent& event) { Exit(); });
+
+  frame_buffer_ = FrameBuffer::Create({300, 300});
+
+  editor_camera_ = CreateRef<EditorCamera>();
+
+  hierarchy_panel_ = CreateRef<HierarchyPanel>();
+
+  viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
+                                               editor_camera_);
+
+  inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
+
+  debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
+
+  content_browser_ = CreateScope<ContentBrowserPanel>();
+  content_browser_->on_scene_open = BIND_FUNC(OpenScene);
 
   // If scene alredy loaded register it.
   if (auto& active_scene = SceneManager::GetActive(); active_scene) {
@@ -61,7 +64,7 @@ void EditorLayer::OnStart() {
     editor_scene_ = SceneManager::GetActive();
     editor_scene_path_ = SceneManager::GetActivePath();
 
-    content_browser_.Reload();
+    content_browser_->Reload();
   }
 
   scene_renderer_ = CreateRef<SceneRenderer>(GetState());
@@ -99,7 +102,7 @@ void EditorLayer::OnGUI(float ds) {
     // Render panels
     toolbar_panel_.Render();
     console_panel_.Render();
-    content_browser_.Render();
+    content_browser_->Render();
     asset_registry_panel_.Render();
     project_settings_panel_.Render();
     about_panel_.Render();
@@ -302,7 +305,7 @@ void EditorLayer::OpenProject() {
       NewScene();
     }
 
-    content_browser_.Reload();
+    content_browser_->Reload();
   }
 }
 
@@ -596,7 +599,7 @@ void EditorLayer::SetupMenubar() {
       base_group.PushMenuItem(console);
 
       MenuItem content_browser("Content Browser",
-                               [this]() { content_browser_.SetActive(true); });
+                               [this]() { content_browser_->SetActive(true); });
       base_group.PushMenuItem(content_browser);
 
       MenuItem asset_registry_panel("Asset Registry", [this]() {

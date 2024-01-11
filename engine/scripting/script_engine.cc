@@ -64,9 +64,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
       mono_debug_open_image_from_memory(
           image, pdb_file_data.As<const mono_byte>(), pdb_file_data.Size());
 
-#ifdef _DEBUG
       LOG_ENGINE_INFO("Loaded PDB {}", pdb_path.string());
-#endif
     }
   }
 
@@ -136,11 +134,7 @@ struct ScriptEngineData {
 
   bool is_runtime = false;
 
-#ifdef _DEBUG
   bool enable_debugging = true;
-#else
-  bool enable_debugging = false;
-#endif
 
   Scene* scene_context = nullptr;
 };

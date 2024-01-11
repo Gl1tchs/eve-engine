@@ -23,6 +23,8 @@ class Instance {
   Instance(const InstanceSpecifications& specs);
   virtual ~Instance();
 
+  void Init();
+
   void StartEventLoop();
 
   void EnqueueMain(const std::function<void()>& function);
@@ -50,9 +52,6 @@ class Instance {
   void PushOverlay(Args&&... args) {
     PushOverlay(new T(args...));
   }
-
-  void PopLayer(Layer* layer);
-  void PopOverlay(Layer* overlay);
 
  private:
   static Instance* instance_;
