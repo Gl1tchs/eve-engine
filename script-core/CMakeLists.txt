@@ -17,6 +17,7 @@ set(SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/KeyCode.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Mathf.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/MouseCode.cs
+    ${CMAKE_CURRENT_LIST_DIR}/src/Rigidbody.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/SceneManager.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Transform.cs
     ${CMAKE_CURRENT_LIST_DIR}/src/Vector2.cs

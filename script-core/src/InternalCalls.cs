@@ -111,6 +111,39 @@ namespace EveEngine
 		internal extern static void Material_SetAlbedo(ulong entityId, ref Color albedo);
 		#endregion
 
+		#region Rigidbody
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetVelocity(ulong entityId, out Vector3 velocity);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetVelocity(ulong entityId, ref Vector3 velocity);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetAcceleration(ulong entityId, out Vector3 acceleration);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetAcceleration(ulong entityId, ref Vector3 acceleration);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetMass(ulong entityId, out float mass);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetMass(ulong entityId, ref float mass);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetUseGravity(ulong entityId, out bool useGravity);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetUseGravity(ulong entityId, ref bool useGravity);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetPositionConstraints(ulong entityId, out RigidbodyPositionConstraints positionConstraints);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetPositionConstraints(ulong entityId, ref RigidbodyPositionConstraints positionConstraints);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_GetRotationConstraints(ulong entityId, out RigidbodyRotationConstraints rotationConstraints);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody_SetRotationConstraints(ulong entityId, ref RigidbodyRotationConstraints rotationConstraints);
+		#endregion
+
+
 		#region SceneManager
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void SceneManager_SetActive(int index);

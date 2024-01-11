@@ -10,6 +10,8 @@
 
 #include "asset/asset_registry.h"
 #include "core/color.h"
+#include "physics/box_collider.h"
+#include "physics/rigidbody.h"
 #include "scene/components.h"
 #include "scene/model.h"
 #include "scene/scene_manager.h"
@@ -116,6 +118,8 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
                                                       "Sprite Renderer");
     DisplayAddComponentEntry<ModelComponent>(selected_entity, "Model");
     DisplayAddComponentEntry<Material>(selected_entity, "Material");
+    DisplayAddComponentEntry<Rigidbody>(selected_entity, "Rigidbody");
+    DisplayAddComponentEntry<BoxCollider>(selected_entity, "BoxCollider");
 
     ImGui::EndPopup();
   }
@@ -139,15 +143,15 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,
       [](Transform& transform) {
-        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position))) {
+        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.1f)) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation))) {
+        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation), 0.1f)) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale))) {
+        if (ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale), 0.1f)) {
           modify_info.SetModified();
         }
       });
@@ -317,6 +321,73 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
           for (auto& uniform : shader_instance->uniforms) {
             DrawUniformField(uniform);
           }
+        }
+      });
+
+  DrawComponent<Rigidbody>("Rigidbody", selected_entity, [](Rigidbody& rb) {
+    if (ImGui::DragFloat3("Velocity", glm::value_ptr(rb.velocity))) {
+      modify_info.SetModified();
+    }
+
+    if (ImGui::DragFloat3("Accelerationm", glm::value_ptr(rb.acceleration))) {
+      modify_info.SetModified();
+    }
+
+    if (ImGui::DragFloat("Mass", &rb.mass)) {
+      modify_info.SetModified();
+    }
+
+    if (ImGui::Checkbox("Use Gravity", &rb.use_gravity)) {
+      modify_info.SetModified();
+    }
+
+    if (ImGui::TreeNode("Position Constraints")) {
+
+      if (ImGui::Checkbox("Freeze X", &rb.position_constraints.freeze_x)) {
+        modify_info.SetModified();
+      }
+      if (ImGui::Checkbox("Freeze Y", &rb.position_constraints.freeze_y)) {
+        modify_info.SetModified();
+      }
+      if (ImGui::Checkbox("Freeze Z", &rb.position_constraints.freeze_z)) {
+        modify_info.SetModified();
+      }
+
+      ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("Rotation Constraints")) {
+
+      if (ImGui::Checkbox("Freeze Pitch",
+                          &rb.rotation_constraints.freeze_pitch)) {
+        modify_info.SetModified();
+      }
+      if (ImGui::Checkbox("Freeze Yaw", &rb.rotation_constraints.freeze_yaw)) {
+        modify_info.SetModified();
+      }
+      if (ImGui::Checkbox("Freeze Roll",
+                          &rb.rotation_constraints.freeze_roll)) {
+        modify_info.SetModified();
+      }
+
+      ImGui::TreePop();
+    }
+  });
+
+  DrawComponent<BoxCollider>(
+      "BoxCollider", selected_entity, [](BoxCollider& col) {
+        if (ImGui::DragFloat3("Local Position",
+                              glm::value_ptr(col.local_position), 0.1f)) {
+          modify_info.SetModified();
+        }
+
+        if (ImGui::DragFloat3("Local Scale", glm::value_ptr(col.local_scale),
+                              0.1f)) {
+          modify_info.SetModified();
+        }
+
+        if (ImGui::Checkbox("Is Trigger", &col.is_trigger)) {
+          modify_info.SetModified();
         }
       });
 

@@ -40,10 +40,6 @@ void ToolbarPanel::Draw() {
         on_step();
       }
       ImGui::SameLine();
-      if (ImGui::ButtonTransparent(ICON_FA_EJECT) && on_eject) {
-        on_eject();
-      }
-      ImGui::SameLine();
       if (ImGui::ButtonTransparent(ICON_FA_STOP) && on_stop) {
         on_stop();
       }

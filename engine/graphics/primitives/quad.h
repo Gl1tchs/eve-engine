@@ -43,7 +43,6 @@ const glm::vec2 kQuadVertexTexCoords[kQuadVertexCount] = {{0.0f, 0.0f},
 
 template <>
 struct RenderData<QuadVertex> {
-  std::string name;
   std::vector<QuadVertex> vertices;
   std::vector<uint32_t> indices;
   Ref<Texture> texture;
@@ -73,12 +72,11 @@ class QuadPrimitive : public Primitive<QuadVertex> {
   uint32_t index_count_;
 
   Ref<Shader> shader_;
-  std::string vertex_path_;
-  std::string fragment_path_;
 
   // Textures
   Ref<Texture> white_texture_;
   std::array<Ref<Texture>, kQuadMaxTextures> texture_slots_;
   uint32_t texture_slot_index_;
 };
+
 }  // namespace eve

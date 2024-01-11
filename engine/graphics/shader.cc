@@ -6,6 +6,7 @@
 #include "graphics/platforms/opengl/opengl_shader.h"
 
 namespace eve {
+
 Ref<Shader> Shader::Create(const std::string& vs_path,
                            const std::string& fs_path,
                            const std::string& custom_shader) {
@@ -20,4 +21,5 @@ Ref<Shader> Shader::Create(const std::string& vs_path,
       return nullptr;
   }
 }
+
 }  // namespace eve

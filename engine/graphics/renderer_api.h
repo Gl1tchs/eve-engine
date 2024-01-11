@@ -17,6 +17,8 @@ enum BufferBits : uint16_t {
 
 enum class DepthFunc { kLess, kLEqual };
 
+enum class PolygonMode { kFill, kLine, kPoint };
+
 class RendererAPI {
  public:
   virtual ~RendererAPI() = default;
@@ -40,6 +42,8 @@ class RendererAPI {
                                    uint32_t instance_count) = 0;
 
   virtual void SetLineWidth(float width) = 0;
+
+  virtual void SetPolygonMode(PolygonMode mode = PolygonMode::kFill) = 0;
 
   virtual void SetDepthFunc(DepthFunc func = DepthFunc::kLess) = 0;
 

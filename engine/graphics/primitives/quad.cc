@@ -20,7 +20,7 @@ QuadPrimitive::QuadPrimitive()
   vertex_buffer_ =
       VertexBuffer::Create(kQuadMaxVertexCount * sizeof(QuadVertex));
   vertex_buffer_->SetLayout({
-      {ShaderDataType::kFloat4, "a_pos"},
+      {ShaderDataType::kFloat4, "a_position"},
       {ShaderDataType::kFloat2, "a_tex_coords"},
       {ShaderDataType::kFloat4, "a_color"},
       {ShaderDataType::kFloat, "a_tex_index"},
@@ -51,9 +51,8 @@ QuadPrimitive::QuadPrimitive()
 
   delete[] indices;
 
-  vertex_path_ = "assets/shaders/sprite.vert";
-  fragment_path_ = "assets/shaders/sprite.frag";
-  shader_ = Shader::Create(vertex_path_, fragment_path_);
+  shader_ = Shader::Create("assets/shaders/sprite.vert",
+                           "assets/shaders/sprite.frag");
 
   // fill the textures with empty values (which is default white texture)
   {

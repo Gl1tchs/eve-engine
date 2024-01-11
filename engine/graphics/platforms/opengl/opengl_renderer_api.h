@@ -27,6 +27,8 @@ class OpenGLRendererAPI final : public RendererAPI {
 
   void SetLineWidth(float width) override;
 
+  void SetPolygonMode(PolygonMode mode = PolygonMode::kFill) override;
+
   void SetDepthFunc(DepthFunc func = DepthFunc::kLess) override;
 
   void SetActiveTexture(uint8_t index = 0) override;

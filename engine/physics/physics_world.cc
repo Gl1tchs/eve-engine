@@ -1,0 +1,104 @@
+// Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
+
+#include "physics/physics_world.h"
+
+#include "physics/box_collider.h"
+#include "physics/rigidbody.h"
+#include "scene/entity.h"
+#include "scene/scene.h"
+
+namespace eve {
+
+Scene* PhysicsWorld::scene_ = nullptr;
+PhysicsWorldSettings PhysicsWorld::settings_;
+
+void ApplyConstraints(glm::vec3& vec, const glm::vec3& vec_before,
+                      glm::bvec3 constraints) {
+  for (int i = 0; i < 3; ++i) {
+    if (constraints[i]) {
+      vec[i] = vec_before[i];
+    }
+  }
+}
+
+void PhysicsWorld::OnStart(Scene* scene) {
+  scene_ = scene;
+
+  if (!scene_) {
+    return;
+  }
+}
+
+void PhysicsWorld::OnUpdate(float ds) {
+  if (!scene_) {
+    return;
+  }
+
+  // TODO If this performs not good with big data consider using Barnes-Hut algorithm
+  // with an Octree
+  for (const auto& entity_id :
+       scene_->GetAllEntitiesWith<Transform, Rigidbody>()) {
+    Entity entity{entity_id, scene_};
+
+    Transform& tc = entity.GetComponent<Transform>();
+    Rigidbody& rb = entity.GetComponent<Rigidbody>();
+
+    Transform tc_before = tc;
+    Rigidbody rb_before = rb;
+
+    tc.position += rb.velocity * ds + 0.5f * rb.acceleration * ds * ds;
+
+    rb.velocity += rb.acceleration * ds;
+    if (rb.use_gravity) {
+      rb.velocity += settings_.gravity * ds;
+    }
+
+    // Apply constraints
+    glm::bvec3 position_constraints;
+    std::memcpy(&position_constraints, &rb.position_constraints,
+                sizeof(glm::bvec3));
+
+    ApplyConstraints(tc.position, tc_before.position, position_constraints);
+    ApplyConstraints(rb.velocity, rb_before.velocity, position_constraints);
+
+    glm::bvec3 rotation_constraints;
+    std::memcpy(&rotation_constraints, &rb.rotation_constraints,
+                sizeof(glm::bvec3));
+
+    ApplyConstraints(tc.rotation, tc_before.rotation, rotation_constraints);
+
+    if (!entity.HasComponent<BoxCollider>()) {
+      continue;
+    }
+
+    BoxCollider& collider = entity.GetComponent<BoxCollider>();
+
+    // Check for collisions with other entities having BoxCollider components
+    scene_->GetAllEntitiesWith<Transform, BoxCollider>().each(
+        [entity_id, &tc, tc_before, &rb, &collider](
+            entt::entity other_id, Transform& other_tc,
+            BoxCollider& other_collider) {
+          if (entity_id == other_id) {
+            return;
+          }
+
+          if (ColliderIntersects(tc, collider, other_tc, other_collider)) {
+            // Resolve collision (adjust positions, velocities, etc.)
+            // You might want to implement more sophisticated collision resolution here
+            // For simplicity, let's just reset positions for now
+            tc = tc_before;
+
+            // rb.velocity =
+            //     -rb.velocity;  // Simple reversal of velocity for demonstration
+          }
+        });
+  }
+}
+
+void PhysicsWorld::OnStop() {
+  if (!scene_) {
+    return;
+  }
+}
+
+}  // namespace eve

@@ -8,7 +8,6 @@ namespace eve {
 
 void OpenGLRendererAPI::Init() {
   glEnable(GL_BLEND);
-  
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
@@ -72,6 +71,23 @@ void OpenGLRendererAPI::DrawArraysInstanced(
 
 void OpenGLRendererAPI::SetLineWidth(float width) {
   glLineWidth(width);
+}
+
+void OpenGLRendererAPI::SetPolygonMode(PolygonMode mode) {
+  switch (mode) {
+    case PolygonMode::kFill:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      return;
+    case PolygonMode::kLine:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      return;
+    case PolygonMode::kPoint:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+      return;
+    default:
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      return;
+  }
 }
 
 void OpenGLRendererAPI::SetDepthFunc(DepthFunc func) {

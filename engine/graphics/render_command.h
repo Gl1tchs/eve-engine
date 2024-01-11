@@ -28,6 +28,8 @@ class RenderCommand final {
 
   static void SetLineWidth(float width);
 
+  static void SetPolygonMode(PolygonMode mode = PolygonMode::kFill);
+
   static void SetDepthFunc(DepthFunc func = DepthFunc::kLess);
 
   static void SetActiveTexture(uint8_t index = 0);

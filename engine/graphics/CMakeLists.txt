@@ -1,4 +1,6 @@
 set(SOURCES
+  primitives/cube.cc
+  primitives/cube.h
   primitives/line.cc
   primitives/line.h
   primitives/mesh.cc

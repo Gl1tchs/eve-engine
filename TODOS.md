@@ -6,7 +6,6 @@
 - [ ] Project opener / creater application
     - Create template scripts
 - [ ] In Game UI
-- [ ] Physics
 - [ ] Sounds
 
 ## Editor
@@ -36,6 +35,9 @@
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
 
+## Physics
+- [ ] Add trigger functionality to C#.
+
 ## Scripting
 - [ ] Asset system scripting API.
 - [ ] Add new scenes to the build on create. 
@@ -52,7 +54,6 @@
     - [x] Custom shaders.
     - [ ] Scripting api (requires proper asset system).
 - [ ] Text rendering.
-- [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.).
 - [ ] PBR.
 - [ ] Other light sources.
 
@@ -83,7 +84,10 @@
   - [x] Name, AssetDirectory, Scenes 
 - [x] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
 - [x] Texture rendering in detail (normal maps, height maps, materials).
-    
+- [x] Add basic shapes to library (cube, plane, pyramid, sphere etc.).
+- [x] Physics
+- [x] Stepping not working
+
 ## Fixed
 - [x] Cannot switch between projects.
 - [x] Editor closes very slowly

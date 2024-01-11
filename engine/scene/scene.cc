@@ -2,6 +2,7 @@
 
 #include "scene/scene.h"
 
+#include "physics/physics_world.h"
 #include "scene/components.h"
 #include "scene/entity.h"
 #include "scene/transform.h"
@@ -85,6 +86,8 @@ bool Scene::OnRuntimeStart() {
 
   ScriptEngine::OnRuntimeStart(this);
 
+  PhysicsWorld::OnStart(this);
+
   auto view = registry_.view<ScriptComponent>();
   for (auto e : view) {
     Entity entity = {e, this};
@@ -104,6 +107,8 @@ void Scene::OnRuntimeStop() {
   }
 
   ScriptEngine::OnRuntimeStop();
+
+  PhysicsWorld::OnStop();
 }
 
 void Scene::OnUpdateRuntime(float ds) {
@@ -116,6 +121,8 @@ void Scene::OnUpdateRuntime(float ds) {
     Entity entity = {e, this};
     ScriptEngine::OnUpdateEntity(entity, ds);
   }
+
+  PhysicsWorld::OnUpdate(ds);
 }
 
 void Scene::Step(int frames) {

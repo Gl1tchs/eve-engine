@@ -6,9 +6,11 @@
 
 #include "core/math/box.h"
 #include "graphics/graphics_context.h"
+#include "graphics/primitives/cube.h"
 #include "graphics/primitives/line.h"
 #include "graphics/primitives/mesh.h"
 #include "graphics/primitives/quad.h"
+#include "graphics/render_command.h"
 #include "graphics/texture.h"
 #include "graphics/uniform_buffer.h"
 #include "scene/model.h"
@@ -49,8 +51,10 @@ class Renderer final {
                 const glm::vec2& tiling = {1, 1},
                 const glm::vec2& offset = {0, 0});
 
-  void DrawLine(const glm::vec3& p0, const glm::vec3& p1,
-                const Color& color);
+  void DrawCube(const Transform& transform, const Color& color,
+                PolygonMode mode = PolygonMode::kFill);
+
+  void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const Color& color);
 
   void DrawBox(Box box, const Color& color);
 
@@ -82,10 +86,14 @@ class Renderer final {
  private:
   Ref<GraphicsContext> graphics_context_;
 
-  // Renderer Data
+  // Renderer datas
   Ref<MeshPrimitive> mesh_data_;
   Ref<QuadPrimitive> quad_data_;
-  Scope<LinePrimitive> line_data_;
+  Ref<CubePrimitive> cube_data_;
+  Ref<LinePrimitive> line_data_;
+
+  // Wireframe renderer datas
+  Ref<CubePrimitive> wireframe_cube_data_;
 
   // Other rendering data
   std::unordered_map<AssetHandle, Ref<MeshPrimitive>> custom_meshes_;

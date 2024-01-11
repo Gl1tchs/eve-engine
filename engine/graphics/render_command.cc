@@ -50,6 +50,10 @@ void RenderCommand::SetLineWidth(float width) {
   renderer_api_->SetLineWidth(width);
 }
 
+void RenderCommand::SetPolygonMode(PolygonMode mode) {
+  renderer_api_->SetPolygonMode(mode);
+}
+
 void RenderCommand::SetDepthFunc(DepthFunc func) {
   renderer_api_->SetDepthFunc(func);
 }

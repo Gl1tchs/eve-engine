@@ -74,8 +74,6 @@ class EditorLayer : public Layer {
 
   void OnSceneStep();
 
-  void OnSceneEject();
-
   void SetSceneState(SceneState state);
 
   void Exit(bool force = false);
@@ -93,7 +91,7 @@ class EditorLayer : public Layer {
  private:
   // rendering
   Ref<FrameBuffer> frame_buffer_;
-  Scope<SceneRenderer> scene_renderer_;
+  Ref<SceneRenderer> scene_renderer_;
 
   Ref<EditorCamera> editor_camera_;
   bool camera_translatable_ = true;
@@ -120,9 +118,6 @@ class EditorLayer : public Layer {
   ContentBrowserPanel content_browser_;
   ProjectSettingsPanel project_settings_panel_;
   AboutPanel about_panel_;
-
-  // is camera ejected
-  bool is_ejected_;
 
   bool unsaved_changes_{false};
   bool show_exit_dialog_{false};

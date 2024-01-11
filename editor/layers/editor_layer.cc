@@ -36,7 +36,6 @@ void EditorLayer::OnStart() {
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
   editor_camera_ = CreateRef<EditorCamera>();
-  scene_settings_panel_ = CreateRef<SceneSettingsPanel>(editor_camera_);
 
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
@@ -51,7 +50,6 @@ void EditorLayer::OnStart() {
     toolbar_panel_.on_pause = BIND_FUNC(OnScenePause);
     toolbar_panel_.on_resume = BIND_FUNC(OnSceneResume);
     toolbar_panel_.on_step = BIND_FUNC(OnSceneStep);
-    toolbar_panel_.on_eject = BIND_FUNC(OnSceneEject);
   }
 
   content_browser_.on_scene_open = BIND_FUNC(OpenScene);
@@ -66,7 +64,10 @@ void EditorLayer::OnStart() {
     content_browser_.Reload();
   }
 
-  scene_renderer_ = CreateScope<SceneRenderer>(GetState());
+  scene_renderer_ = CreateRef<SceneRenderer>(GetState());
+
+  scene_settings_panel_ =
+      CreateRef<SceneSettingsPanel>(scene_renderer_, editor_camera_);
 
   SetupMenubar();
 }
@@ -150,7 +151,6 @@ void EditorLayer::OnRenderScene(float ds) {
   RenderCommand::Clear(BufferBits_kColor | BufferBits_kDepth);
 
   switch (scene_state_) {
-    case SceneState::kPaused:
     case SceneState::kEdit: {
       viewport_panel_->SetShouldDrawGizmos(true);
 
@@ -176,12 +176,13 @@ void EditorLayer::OnRenderScene(float ds) {
         editor_camera_->ResetMousePos();
       }
 
-      scene_renderer_->RenderEditor(ds, editor_camera_, !is_ejected_);
+      scene_renderer_->RenderEditor(ds, editor_camera_);
 
       HandleShortcuts();
 
       break;
     }
+    case SceneState::kPaused:
     case SceneState::kPlay: {
       viewport_panel_->SetShouldDrawGizmos(false);
 
@@ -404,12 +405,9 @@ void EditorLayer::OnScenePlay() {
 
   SceneManager::GetActive() = Scene::Copy(editor_scene_);
 
-  is_ejected_ = false;
-
   // if we encounter with an error stop the scene
   if (!SceneManager::GetActive()->OnRuntimeStart()) {
     SetSceneState(SceneState::kEdit);
-    is_ejected_ = true;
 
     return;
   }
@@ -421,30 +419,20 @@ void EditorLayer::OnSceneStop() {
   SceneManager::GetActive()->OnRuntimeStop();
 
   SceneManager::GetActive() = editor_scene_;
-
-  is_ejected_ = true;
 }
 
 void EditorLayer::OnScenePause() {
   SetSceneState(SceneState::kPaused);
   SceneManager::GetActive()->SetPaused(true);
-
-  is_ejected_ = false;
 }
 
 void EditorLayer::OnSceneResume() {
   SetSceneState(SceneState::kPlay);
   SceneManager::GetActive()->SetPaused(false);
-
-  is_ejected_ = false;
 }
 
 void EditorLayer::OnSceneStep() {
   SceneManager::GetActive()->Step();
-}
-
-void EditorLayer::OnSceneEject() {
-  is_ejected_ = !is_ejected_;
 }
 
 void EditorLayer::SetSceneState(SceneState state) {

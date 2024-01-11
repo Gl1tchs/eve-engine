@@ -9,16 +9,23 @@
 #include "scene/editor_camera.h"
 
 namespace eve {
+
+struct SceneRendererSettings {
+  bool draw_grid = false;
+  bool render_physics_bounds = false;
+};
+
 class SceneRenderer {
  public:
   SceneRenderer(const Ref<State>& state);
 
   void RenderRuntime(float ds);
 
-  void RenderEditor(float ds, Ref<EditorCamera>& editor_camera,
-                    bool use_primary_if_exists = false);
+  void RenderEditor(float ds, Ref<EditorCamera>& editor_camera);
 
   void OnViewportResize(glm::uvec2 size);
+
+  SceneRendererSettings& GetSettings() { return settings_; }
 
  private:
   void RenderSceneEditor(const CameraData& data);
@@ -31,14 +38,15 @@ class SceneRenderer {
 
   void RenderCameraBounds();
 
- private:
-  Ref<State> state_;
+  void RenderColliderBounds();
 
+ private:
+  SceneRendererSettings settings_;
+
+  Ref<State> state_;
   Ref<SkyBox> skybox_;
 
   glm::uvec2 viewport_size_;
-
-  bool editor_primary_used_ = false;
-  Transform last_primary_transform_;
 };
+
 }  // namespace eve

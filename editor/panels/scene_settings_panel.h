@@ -4,9 +4,9 @@
 
 #include "pch.h"
 
+#include "graphics/scene_renderer.h"
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
-
 
 #include "panels/panel.h"
 
@@ -16,13 +16,15 @@ class SceneSettingsPanel : public Panel {
   IMPL_PANEL("Scene Settings")
 
  public:
-  SceneSettingsPanel(Ref<EditorCamera> camera);
+  SceneSettingsPanel(Ref<SceneRenderer> scene_renderer,
+                     Ref<EditorCamera> camera);
 
  protected:
   void Draw() override;
 
  private:
   Ref<Scene> scene_ = nullptr;
+  Ref<SceneRenderer> scene_renderer_;
   Ref<EditorCamera> camera_;
 };
 

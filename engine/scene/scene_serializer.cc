@@ -6,6 +6,7 @@
 
 #include "asset/asset_registry.h"
 #include "core/uuid.h"
+#include "physics/rigidbody.h"
 #include "scene/components.h"
 #include "scene/entity.h"
 #include "scripting/script.h"
@@ -182,6 +183,32 @@ static void SerializeEntity(json& out, Entity entity) {
 
       out["material_component"]["uniform_fields"] = uniform_fields;
     }
+  }
+
+  if (entity.HasComponent<Rigidbody>()) {
+    auto& rb = entity.GetComponent<Rigidbody>();
+
+    out["rigidbody"] =
+        json{{"velocity", rb.velocity},
+             {"acceleration", rb.acceleration},
+             {"mass", rb.mass},
+             {"use_gravity", rb.use_gravity},
+             {"position_constraints",
+              json{{"freeze_x", rb.position_constraints.freeze_x},
+                   {"freeze_y", rb.position_constraints.freeze_y},
+                   {"freeze_z", rb.position_constraints.freeze_z}}},
+             {"rotation_constraints",
+              json{{"freeze_pitch", rb.rotation_constraints.freeze_pitch},
+                   {"freeze_yaw", rb.rotation_constraints.freeze_yaw},
+                   {"freeze_roll", rb.rotation_constraints.freeze_roll}}}};
+  }
+
+  if (entity.HasComponent<BoxCollider>()) {
+    auto& col = entity.GetComponent<BoxCollider>();
+
+    out["box_collider"] = json{{"local_position", col.local_position},
+                               {"local_scale", col.local_scale},
+                               {"is_trigger", col.is_trigger}};
   }
 
   if (entity.HasComponent<ScriptComponent>()) {
@@ -390,6 +417,32 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
           shader_instance->uniforms.push_back(uniform);
         }
       }
+    }
+
+    if (auto rigidbody_json = entity["rigidbody"]; !rigidbody_json.is_null()) {
+      auto& rb = deserialing_entity.AddComponent<Rigidbody>();
+
+      rb.velocity = rigidbody_json["velocity"].get<glm::vec3>();
+      rb.acceleration = rigidbody_json["acceleration"].get<glm::vec3>();
+      rb.mass = rigidbody_json["mass"].get<float>();
+      rb.use_gravity = rigidbody_json["use_gravity"].get<bool>();
+      rb.position_constraints = {
+          rigidbody_json["position_constraints"]["freeze_x"].get<bool>(),
+          rigidbody_json["position_constraints"]["freeze_y"].get<bool>(),
+          rigidbody_json["position_constraints"]["freeze_z"].get<bool>()};
+      rb.rotation_constraints = {
+          rigidbody_json["rotation_constraints"]["freeze_pitch"].get<bool>(),
+          rigidbody_json["rotation_constraints"]["freeze_yaw"].get<bool>(),
+          rigidbody_json["rotation_constraints"]["freeze_roll"].get<bool>()};
+    }
+
+    if (auto box_collider_json = entity["box_collider"];
+        !box_collider_json.is_null()) {
+      auto& col = deserialing_entity.AddComponent<BoxCollider>();
+
+      col.local_position = box_collider_json["local_position"].get<glm::vec3>();
+      col.local_scale = box_collider_json["local_scale"].get<glm::vec3>();
+      col.is_trigger = box_collider_json["is_trigger"].get<bool>();
     }
 
     if (auto script_component_json = entity["script_component"];

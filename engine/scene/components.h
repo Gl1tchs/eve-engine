@@ -8,6 +8,8 @@
 #include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
+#include "physics/box_collider.h"
+#include "physics/rigidbody.h"
 #include "scene/model.h"
 
 namespace eve {
@@ -69,7 +71,9 @@ struct ScriptComponent {
 template <typename... Component>
 struct ComponentGroup {};
 
+// All component types must be registered here in order to use them in scripts and copy between scenes.
 using AllComponents =
     ComponentGroup<Transform, CameraComponent, SpriteRendererComponent,
-                   ModelComponent, Material, ScriptComponent>;
+                   ModelComponent, Material, Rigidbody, BoxCollider,
+                   ScriptComponent>;
 }  // namespace eve

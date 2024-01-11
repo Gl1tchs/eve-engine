@@ -21,7 +21,6 @@ class ToolbarPanel : public Panel {
   std::function<void()> on_pause;
   std::function<void()> on_resume;
   std::function<void()> on_step;
-  std::function<void()> on_eject;
 
   void SetState(SceneState state) { state_ = state; }
 

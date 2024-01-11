@@ -5,7 +5,6 @@
 #include "asset/asset_registry.h"
 #include "graphics/primitives/mesh.h"
 #include "graphics/primitives/primitive.h"
-#include "graphics/render_command.h"
 
 namespace eve {
 Renderer::Renderer() {
@@ -17,7 +16,10 @@ Renderer::Renderer() {
   // Create render datas
   mesh_data_ = CreateRef<MeshPrimitive>();
   quad_data_ = CreateRef<QuadPrimitive>();
-  line_data_ = CreateScope<LinePrimitive>();
+  cube_data_ = CreateRef<CubePrimitive>();
+  line_data_ = CreateRef<LinePrimitive>();
+
+  wireframe_cube_data_ = CreateRef<CubePrimitive>();
 
   // Create uniform buffers
   camera_uniform_buffer_ = UniformBuffer::Create(sizeof(CameraData), 0);
@@ -138,6 +140,33 @@ void Renderer::DrawQuad(const Transform& transform, const Ref<Texture>& texture,
   stats_.vertex_count += kQuadVertexCount;
 }
 
+void Renderer::DrawCube(const Transform& transform, const Color& color,
+                        PolygonMode mode) {
+  Ref<CubePrimitive> cube_data =
+      (mode == PolygonMode::kLine) ? wireframe_cube_data_ : cube_data_;
+
+  if (cube_data->NeedsNewBatch()) {
+    NextBatch();
+  }
+
+  const glm::mat4 model_matrix = transform.GetModelMatrix();
+
+  for (size_t i = 0; i < kCubeVertexCount; i++) {
+    CubeVertex vertex;
+
+    vertex.position = model_matrix * kCubeVertexPositions[i];
+    vertex.tex_coords = kCubeVertexTexCoords[i];
+    vertex.color = color;
+
+    cube_data->AddVertex(vertex);
+  }
+
+  cube_data->IncrementIndex();
+
+  stats_.index_count += kCubeIndexCount;
+  stats_.vertex_count += kCubeVertexCount;
+}
+
 void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1,
                         const Color& color) {
   if (line_data_->NeedsNewBatch()) {
@@ -189,25 +218,35 @@ void Renderer::RecompileShaders() const {
 void Renderer::BeginBatch() {
   // Reset mesh data
   mesh_data_->Reset();
+
   for (auto& [id, mesh] : custom_meshes_) {
     mesh->Reset();
   }
 
-  // Reset quad data
   quad_data_->Reset();
-
-  // Reset line data
+  cube_data_->Reset();
   line_data_->Reset();
+
+  wireframe_cube_data_->Reset();
 }
 
 void Renderer::Flush() {
   mesh_data_->Render(stats_);
+
+  // Render custom meshes
   for (auto& [id, mesh] : custom_meshes_) {
     mesh->Render(stats_);
   }
 
   quad_data_->Render(stats_);
+  cube_data_->Render(stats_);
   line_data_->Render(stats_);
+
+  RenderCommand::SetPolygonMode(PolygonMode::kLine);
+
+  wireframe_cube_data_->Render(stats_);
+
+  RenderCommand::SetPolygonMode(PolygonMode::kFill);
 }
 
 void Renderer::NextBatch() {

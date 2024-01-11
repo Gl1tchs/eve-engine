@@ -4,11 +4,14 @@
 
 #include "asset/asset_registry.h"
 #include "core/utils/timer.h"
+#include "graphics/render_command.h"
 #include "graphics/renderer.h"
 #include "scene/entity.h"
 #include "scene/scene_manager.h"
+#include "scene_renderer.h"
 
 namespace eve {
+
 SceneRenderer::SceneRenderer(const Ref<State>& state) : state_(state) {
   skybox_ = SkyBox::Create("assets/textures/skybox_default.png");
 }
@@ -34,42 +37,18 @@ void SceneRenderer::RenderRuntime(float ds) {
     }
 
     RenderSceneRuntime(data);
-
-    last_primary_transform_ = tc;
-    editor_primary_used_ = true;
   }
 }
 
-void SceneRenderer::RenderEditor(float ds, Ref<EditorCamera>& editor_camera,
-                                 bool use_primary_if_exists) {
+void SceneRenderer::RenderEditor(float ds, Ref<EditorCamera>& editor_camera) {
   auto& scene = SceneManager::GetActive();
   if (!scene) {
     return;
   }
 
-  if (editor_primary_used_) {
-    editor_camera->GetTransform() = last_primary_transform_;
-  }
-
-  CameraData data;
-  if (use_primary_if_exists) {
-    auto primary_camera = scene->GetPrimaryCameraEntity();
-    if (primary_camera && primary_camera.HasComponent<CameraComponent>()) {
-      auto& cc = primary_camera.GetComponent<CameraComponent>();
-      auto& tc = primary_camera.GetTransform();
-
-      data = {cc.GetViewMatrix(tc), cc.GetProjectionMatrix(), tc.position};
-
-      last_primary_transform_ = tc;
-      editor_primary_used_ = true;
-    }
-  } else {
-    data = {editor_camera->GetViewMatrix(),
-            editor_camera->GetProjectionMatrix(),
-            editor_camera->GetTransform().position};
-
-    editor_primary_used_ = false;
-  }
+  CameraData data = {editor_camera->GetViewMatrix(),
+                     editor_camera->GetProjectionMatrix(),
+                     editor_camera->GetTransform().position};
 
   RenderSceneEditor(data);
 }
@@ -97,8 +76,6 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
 
   renderer->BeginScene(data);
 
-  DrawGrid();
-
   // Draw camera bounds if selected
   const Entity selected_entity = scene->GetSelectedEntity();
   if (selected_entity && selected_entity.HasComponent<CameraComponent>()) {
@@ -106,6 +83,9 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
   }
 
   RenderScene();
+
+  DrawGrid();
+  RenderColliderBounds();
 
   renderer->EndScene();
 
@@ -126,6 +106,13 @@ void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
   renderer->BeginScene(data);
 
   RenderScene();
+
+  if (settings_.draw_grid) {
+    DrawGrid();
+  }
+  if (settings_.render_physics_bounds) {
+    RenderColliderBounds();
+  }
 
   renderer->EndScene();
 
@@ -324,4 +311,21 @@ void SceneRenderer::RenderCameraBounds() {
     renderer->DrawLine(near_box.bottom_right, far_box.bottom_right, color);
   }
 }
+
+void SceneRenderer::RenderColliderBounds() {
+  auto& scene = SceneManager::GetActive();
+  auto& renderer = state_->renderer;
+
+  // renderer->DrawBox()
+  scene->GetAllEntitiesWith<Transform, BoxCollider>().each(
+      [renderer](entt::entity entity_id, Transform& tc, BoxCollider& col) {
+        Transform tc_col = tc;
+        tc_col.position += col.local_position;
+        tc_col.scale += col.local_scale;
+
+        // Render collider bounds as wireframe.
+        renderer->DrawCube(tc_col, kColorGreen, PolygonMode::kLine);
+      });
+}
+
 }  // namespace eve

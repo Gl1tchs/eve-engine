@@ -11,6 +11,7 @@
 #include "core/event/input.h"
 #include "core/event/key_code.h"
 #include "core/uuid.h"
+#include "physics/rigidbody.h"
 #include "scene/components.h"
 #include "scene/entity.h"
 #include "scene/scene.h"
@@ -417,6 +418,121 @@ static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
   entity.GetComponent<Material>().albedo = *albedo;
 }
 
+static void Rigidbody_GetVelocity(UUID entity_id, glm::vec3* out_velocity) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_velocity = entity.GetComponent<Rigidbody>().velocity;
+}
+
+static void Rigidbody_SetVelocity(UUID entity_id, glm::vec3* velocity) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().velocity = *velocity;
+}
+
+static void Rigidbody_GetAcceleration(UUID entity_id,
+                                      glm::vec3* out_acceleration) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_acceleration = entity.GetComponent<Rigidbody>().acceleration;
+}
+
+static void Rigidbody_SetAcceleration(UUID entity_id, glm::vec3* acceleration) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().acceleration = *acceleration;
+}
+
+static void Rigidbody_GetMass(UUID entity_id, float* out_mass) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_mass = entity.GetComponent<Rigidbody>().mass;
+}
+
+static void Rigidbody_SetMass(UUID entity_id, float* mass) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().mass = *mass;
+}
+
+static void Rigidbody_GetUseGravity(UUID entity_id, bool* out_use_gravity) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_use_gravity = entity.GetComponent<Rigidbody>().use_gravity;
+}
+
+static void Rigidbody_SetUseGravity(UUID entity_id, bool* use_gravity) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().use_gravity = *use_gravity;
+}
+
+static void Rigidbody_GetPositionConstraints(
+    UUID entity_id, PositionConstraints* out_position_constraints) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_position_constraints =
+      entity.GetComponent<Rigidbody>().position_constraints;
+}
+
+static void Rigidbody_SetPositionConstraints(
+    UUID entity_id, PositionConstraints* position_constraints) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().position_constraints = *position_constraints;
+}
+
+static void Rigidbody_GetRotationConstraints(
+    UUID entity_id, RotationConstraints* out_rotation_constraints) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  *out_rotation_constraints =
+      entity.GetComponent<Rigidbody>().rotation_constraints;
+}
+
+static void Rigidbody_SetRotationConstraints(
+    UUID entity_id, RotationConstraints* rotation_constraints) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  entity.GetComponent<Rigidbody>().rotation_constraints = *rotation_constraints;
+}
+
 static bool Input_IsKeyPressed(KeyCode keycode) {
   return Input::IsKeyPressed(keycode);
 }
@@ -560,6 +676,20 @@ void ScriptGlue::RegisterFunctions() {
   // Begin Material
   ADD_INTERNAL_CALL(Material_GetAlbedo);
   ADD_INTERNAL_CALL(Material_SetAlbedo);
+
+  // Rigidbody
+  ADD_INTERNAL_CALL(Rigidbody_GetVelocity);
+  ADD_INTERNAL_CALL(Rigidbody_SetVelocity);
+  ADD_INTERNAL_CALL(Rigidbody_GetAcceleration);
+  ADD_INTERNAL_CALL(Rigidbody_SetAcceleration);
+  ADD_INTERNAL_CALL(Rigidbody_GetMass);
+  ADD_INTERNAL_CALL(Rigidbody_SetMass);
+  ADD_INTERNAL_CALL(Rigidbody_GetUseGravity);
+  ADD_INTERNAL_CALL(Rigidbody_SetUseGravity);
+  ADD_INTERNAL_CALL(Rigidbody_GetPositionConstraints);
+  ADD_INTERNAL_CALL(Rigidbody_SetPositionConstraints);
+  ADD_INTERNAL_CALL(Rigidbody_GetRotationConstraints);
+  ADD_INTERNAL_CALL(Rigidbody_SetRotationConstraints);
 
   // Begin Scene Manager
   ADD_INTERNAL_CALL(SceneManager_SetActive);
