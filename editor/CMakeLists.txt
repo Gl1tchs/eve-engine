@@ -7,6 +7,8 @@ set(SOURCES
   modals/modal.h
   panels/about_panel.cc
   panels/about_panel.h
+  panels/asset_registry_panel.cc
+  panels/asset_registry_panel.h
   panels/console_panel.cc
   panels/console_panel.h
   panels/content_browser_panel.cc
@@ -19,6 +21,10 @@ set(SOURCES
   panels/inspector_panel.h
   panels/panel.cc
   panels/panel.h
+  panels/project_settings_panel.cc
+  panels/project_settings_panel.h
+  panels/scene_settings_panel.cc
+  panels/scene_settings_panel.h
   panels/toolbar_panel.cc
   panels/toolbar_panel.h
   panels/viewport_panel.cc
@@ -28,8 +34,6 @@ set(SOURCES
   utils/imgui_utils.cc
   utils/imgui_utils.h
   utils/modify_info.h
-  widgets/combo.cc
-  widgets/combo.h
   widgets/dock_space.cc
   widgets/dock_space.h
   widgets/menu_bar.cc

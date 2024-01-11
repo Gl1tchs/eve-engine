@@ -147,10 +147,9 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<Material>()) {
     auto& material = entity.GetComponent<Material>();
 
-    out["material_component"] = json{
-        {"albedo", material.albedo},       {"metallic", material.metallic},
-        {"roughness", material.roughness}, {"ao", material.ao},
-        {"shader", material.shader},       {"uniform_fields", json::array()}};
+    out["material_component"] = json{{"albedo", material.albedo},
+                                     {"shader", material.shader},
+                                     {"uniform_fields", json::array()}};
 
     Ref<ShaderInstance> shader_instance =
         material.shader != 0
@@ -354,9 +353,6 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       auto& material = deserialing_entity.AddComponent<Material>();
 
       material.albedo = material_json["albedo"].get<Color>();
-      material.metallic = material_json["metallic"].get<float>();
-      material.roughness = material_json["roughness"].get<float>();
-      material.ao = material_json["ao"].get<float>();
       if (material_json.contains("shader")) {
         material.shader = material_json["shader"].get<UUID>();
       } else {

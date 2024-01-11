@@ -7,7 +7,7 @@
 #include "asset/asset.h"
 #include "graphics/texture.h"
 #include "scene/components.h"
-#include "scene/static_mesh.h"
+#include "scene/model.h"
 
 namespace eve {
 

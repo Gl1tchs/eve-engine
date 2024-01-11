@@ -10,6 +10,10 @@
 - [ ] Sounds
 
 ## Editor
+- [ ] Texture gizmos for lights and camera.
+- [ ] Scene settings
+  - [ ] Skybox
+  - [x] Editor Camera
 - [ ] Import asset from editor
     - [ ] Configure assets from editor like texture repeat mode and such.
 - [ ] CTRL+C CTRL+V copy paste entities
@@ -18,17 +22,16 @@
   - [ ] Prefabs
   - [ ] Use ImGui::DragAndDropField
 - [ ] Better toolbar.
-- [ ] Add content browser and use id based asset system.
-    - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
-    but should display the name of it based on the asset metadata.
 - [ ] Save editor state with cache and temp files.
 - [ ] While scripts are building show a loading thing for it.
 
 ## Asset
+- [ ] Do not load unusued assets to memory.
 - [ ] Better asset system with proper registry and metadata caching.
 - [ ] Asset compression for shipping.
 
 ## Scene
+- [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Add parent / child entity system.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
@@ -43,18 +46,17 @@
 - [ ] API Documentation / code + markdown
 
 ## Renderer
-- [ ] Texture rendering in detail (normal maps, height maps, materials).
-- [ ] HDR Environment maps
+- [ ] Multiple texture support (multiple diffusion, specular, normal, height).
+- [ ] HDR Environment maps.
 - [ ] Custom shaders with scripting API.
-    - [x] Custom shaders
-    - [ ] Scripting api (requires proper asset system)
-- [ ] Text rendering
-- [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.)
+    - [x] Custom shaders.
+    - [ ] Scripting api (requires proper asset system).
+- [ ] Text rendering.
+- [ ] Add basic shapes to library (cube, plane, pyramid, sphere etc.).
 - [ ] PBR.
-- [ ] Other light sources
+- [ ] Other light sources.
 
 ## Shaders
-- [ ] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
 
 ## Bugs
 - [ ] Scenes that are not in project file couldn't open. 
@@ -73,7 +75,15 @@
 - [x] An runtime application
 - [x] Improve engine api for scripting.
 - [x] Use a custom format rather yaml.
-
+- [x] Add content browser and use id based asset system.
+    - When using an asset inside of the inspector it should keep the id and find that asset in asset manager
+    but should display the name of it based on the asset metadata.
+- [x] Project settings
+  - [x] Asset registry
+  - [x] Name, AssetDirectory, Scenes 
+- [x] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
+- [x] Texture rendering in detail (normal maps, height maps, materials).
+    
 ## Fixed
 - [x] Cannot switch between projects.
 - [x] Editor closes very slowly

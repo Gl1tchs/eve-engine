@@ -5,6 +5,7 @@
 #include "pch_shared.h"
 
 #include "core/state.h"
+#include "graphics/skybox.h"
 #include "scene/editor_camera.h"
 
 namespace eve {
@@ -14,7 +15,7 @@ class SceneRenderer {
 
   void RenderRuntime(float ds);
 
-  void RenderEditor(float ds, EditorCamera& editor_camera,
+  void RenderEditor(float ds, Ref<EditorCamera>& editor_camera,
                     bool use_primary_if_exists = false);
 
   void OnViewportResize(glm::uvec2 size);
@@ -32,6 +33,8 @@ class SceneRenderer {
 
  private:
   Ref<State> state_;
+
+  Ref<SkyBox> skybox_;
 
   glm::uvec2 viewport_size_;
 

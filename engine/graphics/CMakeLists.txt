@@ -32,6 +32,8 @@ set(SOURCES
   scene_renderer.h
   shader.cc
   shader.h
+  skybox.cc
+  skybox.h
   texture.cc
   texture.h
   uniform_buffer.cc
@@ -53,6 +55,8 @@ set(OPENGL_SOURCES
   platforms/opengl/opengl_renderer_api.h
   platforms/opengl/opengl_shader.cc
   platforms/opengl/opengl_shader.h
+  platforms/opengl/opengl_skybox.cc
+  platforms/opengl/opengl_skybox.h
   platforms/opengl/opengl_texture.cc
   platforms/opengl/opengl_texture.h
   platforms/opengl/opengl_uniform_buffer.cc

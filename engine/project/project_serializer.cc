@@ -21,6 +21,7 @@ void ProjectSerializer::Serialize(const fs::path& path) {
   j = json{{"name", config.name},
            {"asset_directory", config.asset_directory},
            {"asset_registry", config.asset_registry},
+           {"keymaps", config.keymaps},
            {"scenes", json::array()}};
 
   for (const auto& scene : config.scenes) {
@@ -44,8 +45,9 @@ bool ProjectSerializer::Deserialize(const fs::path& path) {
   file >> j;
 
   config.name = j["name"].get<std::string>();
-  config.asset_directory = j["asset_directory"].get<fs::path>();
-  config.asset_registry = j["asset_registry"].get<fs::path>();
+  config.asset_directory = j["asset_directory"].get<std::string>();
+  config.asset_registry = j["asset_registry"].get<std::string>();
+  config.keymaps = j["keymaps"].get<std::string>();
 
   auto scenes_json = j["scenes"];
   for (auto& scene : scenes_json) {

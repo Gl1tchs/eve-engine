@@ -35,39 +35,6 @@ void Renderer::EndScene() {
   Flush();
 }
 
-void Renderer::Draw(const RenderData<MeshVertex>& data,
-                    const Transform& transform, const Ref<Texture>& texture) {
-  if (mesh_data_->NeedsNewBatch(data.vertices.size(), data.indices.size())) {
-    NextBatch();
-  }
-
-  float texture_index = mesh_data_->FindTexture(texture);
-
-  for (MeshVertex vertex : data.vertices) {
-    vertex.position = transform.GetModelMatrix() * vertex.position;
-
-    // set material values
-    auto material = data.material;
-    vertex.albedo = material.albedo;
-    vertex.metallic = material.metallic;
-    vertex.roughness = material.roughness;
-    vertex.ao = material.ao;
-
-    vertex.tex_index = texture_index;
-
-    mesh_data_->AddVertex(vertex);
-  }
-
-  for (const uint32_t& index : data.indices) {
-    mesh_data_->AddIndex(index);
-  }
-
-  mesh_data_->index_offset += data.vertices.size();
-
-  stats_.index_count += data.indices.size();
-  stats_.vertex_count += data.vertices.size();
-}
-
 void Renderer::DrawModel(const Ref<Model>& model, const Transform& transform,
                          const Material& material) {
   if (!model) {
@@ -79,26 +46,26 @@ void Renderer::DrawModel(const Ref<Model>& model, const Transform& transform,
           ? mesh_data_
           : AddMeshPrimitiveIfNotExists(material.shader);
 
-  for (auto mesh : model->meshes) {
+  for (RenderData<MeshVertex> mesh : model->meshes) {
     if (mesh_data->NeedsNewBatch(mesh.vertices.size(), mesh.indices.size())) {
       NextBatch();
     }
 
-    glm::mat4 model_matrix = transform.GetModelMatrix();
+    const glm::mat4 model_matrix = transform.GetModelMatrix();
 
-    float texture_index = 0.0f;
+    float diffuse_index = mesh_data_->FindTexture(mesh.diffuse_map);
+    float specular_index = mesh_data_->FindTexture(mesh.specular_map);
+    float normal_index = mesh_data_->FindTexture(mesh.normal_map);
+    float height_index = mesh_data_->FindTexture(mesh.height_map);
+
     for (MeshVertex vertex : mesh.vertices) {
       vertex.position = model_matrix * vertex.position;
-
-      // set material values
       vertex.albedo = material.albedo;
-      vertex.metallic = material.metallic;
-      vertex.roughness = material.roughness;
-      vertex.ao = material.ao;
 
-      vertex.tex_index = texture_index;
-      vertex.normal_matrix =
-          glm::transpose(glm::inverse(glm::mat3(model_matrix)));
+      vertex.diffuse_index = diffuse_index;
+      vertex.specular_index = specular_index;
+      vertex.normal_index = normal_index;
+      vertex.height_index = height_index;
 
       mesh_data->AddVertex(vertex);
     }
@@ -240,7 +207,6 @@ void Renderer::Flush() {
   }
 
   quad_data_->Render(stats_);
-
   line_data_->Render(stats_);
 }
 

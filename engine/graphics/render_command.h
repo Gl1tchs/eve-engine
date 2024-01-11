@@ -5,6 +5,7 @@
 #include "graphics/renderer_api.h"
 
 namespace eve {
+
 class RenderCommand final {
  public:
   static void Init();
@@ -27,7 +28,12 @@ class RenderCommand final {
 
   static void SetLineWidth(float width);
 
+  static void SetDepthFunc(DepthFunc func = DepthFunc::kLess);
+
+  static void SetActiveTexture(uint8_t index = 0);
+
  private:
   static Scope<RendererAPI> renderer_api_;
 };
+
 }  // namespace eve

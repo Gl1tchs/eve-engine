@@ -16,5 +16,11 @@
     "name": "Shader Custom 2",
     "path": "res://shaders/custom2.esh",
     "type": "Shader"
+  },
+  {
+    "handle": 2677285248016495904,
+    "name": "monkey",
+    "path": "res://models\\monkey.obj",
+    "type": "StaticMesh"
   }
 ]

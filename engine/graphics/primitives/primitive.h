@@ -66,6 +66,7 @@ class Primitive {
     }
 
     vertices_.clear();
+    vertices_.reserve(max_elements_);
 
     // Call custom beheaviour from child class
     OnReset();

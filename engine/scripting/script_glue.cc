@@ -19,6 +19,7 @@
 #include "scripting/script_engine.h"
 
 namespace eve {
+
 std::string MonoStringToString(MonoString* string) {
   char* cStr = mono_string_to_utf8(string);
   std::string str(cStr);
@@ -416,74 +417,36 @@ static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
   entity.GetComponent<Material>().albedo = *albedo;
 }
 
-static void Material_GetMetallic(UUID entity_id, float* out_metallic) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  *out_metallic = entity.GetComponent<Material>().metallic;
-}
-
-static void Material_SetMetallic(UUID entity_id, float* metallic) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  entity.GetComponent<Material>().metallic = *metallic;
-}
-
-static void Material_GetRoughness(UUID entity_id, float* out_roughness) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  *out_roughness = entity.GetComponent<Material>().roughness;
-}
-
-static void Material_SetRoughness(UUID entity_id, float* roughness) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  entity.GetComponent<Material>().roughness = *roughness;
-}
-
-static void Material_GetAO(UUID entity_id, float* out_ao) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  *out_ao = entity.GetComponent<Material>().ao;
-}
-
-static void Material_SetAO(UUID entity_id, float* ao) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
-
-  entity.GetComponent<Material>().ao = *ao;
-}
-
 static bool Input_IsKeyPressed(KeyCode keycode) {
   return Input::IsKeyPressed(keycode);
+}
+
+static bool Input_IsKeyPressedString(MonoString* keycode) {
+  return Input::IsKeyPressed(MonoStringToString(keycode));
 }
 
 static bool Input_IsKeyReleased(KeyCode keycode) {
   return Input::IsKeyReleased(keycode);
 }
 
+static bool Input_IsKeyReleasedString(MonoString* keycode) {
+  return Input::IsKeyReleased(MonoStringToString(keycode));
+}
+
 static bool Input_IsMouseButtonPressed(MouseCode mouse_code) {
   return Input::IsMouseButtonPressed(mouse_code);
 }
 
+static bool Input_IsMouseButtonPressedString(MonoString* keycode) {
+  return Input::IsMouseButtonPressed(MonoStringToString(keycode));
+}
+
 static bool Input_IsMouseButtonReleased(MouseCode mouse_code) {
   return Input::IsMouseButtonReleased(mouse_code);
+}
+
+static bool Input_IsMouseButtonReleasedString(MonoString* keycode) {
+  return Input::IsMouseButtonReleased(MonoStringToString(keycode));
 }
 
 static void Input_GetMousePosition(glm::vec2* out_position) {
@@ -511,7 +474,8 @@ static void RegisterComponent() {
         MonoType* managed_type = mono_reflection_type_from_name(
             managed_type_name.data(), ScriptEngine::GetCoreAssemblyImage());
         if (!managed_type) {
-          LOG_ENGINE_ERROR("Could not find component type {}", managed_type_name);
+          LOG_ENGINE_ERROR("Could not find component type {}",
+                           managed_type_name);
           return;
         }
         entity_has_component_funcs[managed_type] = [](Entity entity) {
@@ -597,24 +561,19 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(Material_GetAlbedo);
   ADD_INTERNAL_CALL(Material_SetAlbedo);
 
-  ADD_INTERNAL_CALL(Material_GetMetallic);
-  ADD_INTERNAL_CALL(Material_SetMetallic);
-
-  ADD_INTERNAL_CALL(Material_GetRoughness);
-  ADD_INTERNAL_CALL(Material_SetRoughness);
-
-  ADD_INTERNAL_CALL(Material_GetAO);
-  ADD_INTERNAL_CALL(Material_SetAO);
-
   // Begin Scene Manager
   ADD_INTERNAL_CALL(SceneManager_SetActive);
   ADD_INTERNAL_CALL(SceneManager_GetActiveIndex);
 
   // Begin Input
   ADD_INTERNAL_CALL(Input_IsKeyPressed);
+  ADD_INTERNAL_CALL(Input_IsKeyPressedString);
   ADD_INTERNAL_CALL(Input_IsKeyReleased);
+  ADD_INTERNAL_CALL(Input_IsKeyReleasedString);
   ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
+  ADD_INTERNAL_CALL(Input_IsMouseButtonPressedString);
   ADD_INTERNAL_CALL(Input_IsMouseButtonReleased);
+  ADD_INTERNAL_CALL(Input_IsMouseButtonReleasedString);
   ADD_INTERNAL_CALL(Input_GetMousePosition);
 }
 }  // namespace eve

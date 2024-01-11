@@ -126,6 +126,11 @@ enum class KeyCode : uint32_t {
   kRightAlt = 346,
   kRightSuper = 347,
   kMenu = 348,
+  kLast = kMenu,
 };
 
-}
+std::string GetKeyCodeString(const KeyCode& key_code);
+
+KeyCode GetKeyCode(const std::string& key_code);
+
+}  // namespace eve

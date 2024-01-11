@@ -51,10 +51,7 @@ struct ShaderInstance : public Asset {
 
 // TODO make this work as an asset
 struct Material : public Asset {
-  Color albedo;
-  float metallic;
-  float roughness;
-  float ao;
+  Color albedo = kColorWhite;
   AssetHandle shader = 0;
 
   IMPL_ASSET(AssetType::kMaterial)

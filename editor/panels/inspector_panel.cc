@@ -11,8 +11,8 @@
 #include "asset/asset_registry.h"
 #include "core/color.h"
 #include "scene/components.h"
+#include "scene/model.h"
 #include "scene/scene_manager.h"
-#include "scene/static_mesh.h"
 #include "scripting/script_engine.h"
 
 #include "utils/imgui_utils.h"
@@ -216,15 +216,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
                 : nullptr;
 
         if (!texture) {
-          ImGui::Selectable("Texture Path");
-
-          if (ImGui::BeginDragDropSource(
-                  ImGuiDragDropFlags_SourceNoDisableHover ||
-                  ImGuiDragDropFlags_SourceNoPreviewTooltip)) {
-            ImGui::SetDragDropPayload("DND_PAYLOAD_TEXTURE", &texture->handle,
-                                      sizeof(AssetHandle));
-            ImGui::EndDragDropSource();
-          }
+          ImGui::TextUnformatted("Drag Texture Here");
         } else {
           ImGui::InputText("Texture", &texture->name,
                            ImGuiInputTextFlags_ReadOnly);
@@ -263,15 +255,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
                                : nullptr;
 
         if (!model) {
-          ImGui::Selectable("Model Path");
-
-          if (ImGui::BeginDragDropSource(
-                  ImGuiDragDropFlags_SourceNoDisableHover ||
-                  ImGuiDragDropFlags_SourceNoPreviewTooltip)) {
-            ImGui::SetDragDropPayload("DND_PAYLOAD_MESH", &model->handle,
-                                      sizeof(AssetHandle));
-            ImGui::EndDragDropSource();
-          }
+          ImGui::TextUnformatted("Drag Model Here");
         } else {
           ImGui::InputText("Model", &model->name, ImGuiInputTextFlags_ReadOnly);
         }
@@ -296,25 +280,13 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat("Metallic", &material.metallic)) {
-          modify_info.SetModified();
-        }
-
-        if (ImGui::DragFloat("Roughness", &material.roughness)) {
-          modify_info.SetModified();
-        }
-
-        if (ImGui::DragFloat("AO", &material.ao, 0.05f)) {
-          modify_info.SetModified();
-        }
-
         Ref<ShaderInstance> shader_instance =
             material.shader != 0
                 ? AssetRegistry::Get<ShaderInstance>(material.shader)
                 : nullptr;
 
         if (!shader_instance) {
-          ImGui::Selectable("Shader Path");
+          ImGui::TextUnformatted("Drag Shader Here");
         } else {
           ImGui::InputText("Shader", &shader_instance->name,
                            ImGuiInputTextFlags_ReadOnly);

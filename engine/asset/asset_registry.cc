@@ -20,6 +20,21 @@ NLOHMANN_JSON_SERIALIZE_ENUM(AssetType, {{AssetType::kNone, nullptr},
                                          {AssetType::kMaterial, "Material"},
                                          {AssetType::kShader, "Shader"}});
 
+struct AssetMetadata {
+  std::string name;
+  std::string path;
+  AssetType type = AssetType::kNone;
+};
+
+AssetMetadata GetMetadata(const fs::path& path) {
+  AssetMetadata metadata;
+  metadata.name = path.stem().string();
+  metadata.path = path.string();
+  metadata.type = GetAssetTypeFromExtension(path.extension().string());
+
+  return metadata;
+}
+
 std::unordered_map<AssetHandle, Ref<Asset>> AssetRegistry::assets_ = {};
 
 Ref<Asset> AssetRegistry::Get(const AssetHandle& handle) {
@@ -31,6 +46,20 @@ Ref<Asset> AssetRegistry::Get(const AssetHandle& handle) {
   }
 
   return it->second;
+}
+
+AssetHandle AssetRegistry::GetFromPath(const std::string& path) {
+  const AssetRegistryMap::const_iterator it = std::find_if(
+      assets_.begin(), assets_.end(),
+      [path](const auto& pair) { return path == pair.second->path; });
+
+  // If not exists try to add
+  if (it == assets_.end()) {
+    LOG_ENGINE_ERROR("Unable to get asset from path: {}", path);
+    return 0;
+  }
+
+  return it->first;
 }
 
 void AssetRegistry::Register(Ref<Asset> asset) {
@@ -53,7 +82,7 @@ AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
       asset = AssetLoader::LoadShader(path_abs);
       break;
     default:
-      break;
+      return 0;
   }
 
   if (!asset) {
@@ -70,15 +99,56 @@ AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
   return handle;
 }
 
-void AssetRegistry::Unload(const AssetHandle& handle) {
+AssetHandle AssetRegistry::Load(const std::string& path) {
+  const AssetMetadata asset = GetMetadata(path);
+
+  if (AssetHandle handle = GetFromPath(path); handle != 0) {
+    return handle;
+  }
+
+  if (AssetHandle handle =
+          AssetRegistry::Load(asset.path, asset.type, asset.name);
+      handle) {
+    return handle;
+  } else {
+    LOG_EDITOR_ERROR("Unable to load asset from: {}", asset.path);
+    return 0;
+  }
+}
+
+bool AssetRegistry::Unload(const AssetHandle& handle) {
   const auto it = assets_.find(handle);
   if (it == assets_.end()) {
     LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot remove!",
                        (uint64_t)handle);
-    return;
+    return false;
   }
 
   assets_.erase(it);
+
+  return true;
+}
+
+bool AssetRegistry::Reload(Ref<Asset>& asset) {
+  const AssetHandle handle = asset->handle;
+  const std::string name = asset->name;
+  const std::string path = asset->path;
+  const AssetType type = asset->GetType();
+
+  if (!Unload(asset->handle)) {
+    return false;
+  }
+
+  Load(path, type, name, handle);
+
+  Ref<Asset> new_asset = Get(handle);
+  if (!new_asset) {
+    return false;
+  }
+
+  asset = new_asset;
+
+  return true;
 }
 
 bool AssetRegistry::Exists(const AssetHandle& handle) {
@@ -127,6 +197,29 @@ fs::path AssetRegistry::GetAssetPathTrimmed(std::string relative_path) {
   }
 
   return relative_path;
+}
+
+std::string AssetRegistry::GetRelativePath(const std::string& path) {
+  auto project_dir = Project::GetProjectDirectory();
+  auto asset_dir = Project::GetAssetDirectory();
+
+  fs::path relative_path;
+
+  // Check if the path is inside the asset directory
+  if (path.compare(0, asset_dir.string().length(), asset_dir.string()) == 0) {
+    relative_path = fs::relative(path, asset_dir);
+    return "res://" + relative_path.string();
+  }
+
+  // Check if the path is inside the project directory
+  if (path.compare(0, project_dir.string().length(), project_dir.string()) ==
+      0) {
+    relative_path = fs::relative(path, project_dir);
+    return "prj://" + relative_path.string();
+  }
+
+  // If the path is not inside the project or asset directory, return the original path
+  return path;
 }
 
 bool AssetRegistry::Serialize(const fs::path& path) {

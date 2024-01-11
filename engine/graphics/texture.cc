@@ -23,15 +23,20 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
   }
 }
 
-Ref<Texture> Texture::Create(const std::filesystem::path& path) {
+Ref<Texture> Texture::Create(const fs::path& path, const TextureType& type) {
   int width, height, channels;
   stbi_uc* data =
       stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
-  ASSERT(data, "Failed to load texture!");
+  if (!data) {
+    stbi_image_free(data);
+    LOG_ENGINE_ERROR("Unable to load texture from: {}", path.string());
+    ASSERT(false);
+  }
 
   TextureMetadata metadata;
   metadata.size = glm::ivec2{width, height};
+  metadata.type = type;
   metadata.min_filter = TextureFilteringMode::kLinear;
   metadata.mag_filter = TextureFilteringMode::kLinear;
   metadata.wrap_s = TextureWrappingMode::kRepeat;

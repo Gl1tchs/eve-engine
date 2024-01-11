@@ -5,8 +5,10 @@ set(SOURCES
   event/event_handler.inl
   event/input.cc
   event/input.h
+  event/key_code.cc
   event/key_code.h
   event/key_event.h
+  event/mouse_code.cc
   event/mouse_code.h
   event/mouse_event.h
   event/window_event.h
@@ -43,6 +45,7 @@ module_include_directories(core PUBLIC
 
 module_include_directories(core PRIVATE
   ${VENDOR_DIR}/glfw/include
+  ${VENDOR_DIR}/json/include
   ${VENDOR_DIR}/spdlog/include
 )
 

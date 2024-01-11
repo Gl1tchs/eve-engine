@@ -3,6 +3,7 @@
 #pragma once
 
 namespace eve {
+
 struct SceneModifyInfo {
   bool modified;
 
@@ -11,4 +12,5 @@ struct SceneModifyInfo {
 };
 
 inline SceneModifyInfo modify_info{};
+
 }  // namespace eve

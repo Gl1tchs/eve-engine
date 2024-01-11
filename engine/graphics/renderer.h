@@ -11,7 +11,7 @@
 #include "graphics/primitives/quad.h"
 #include "graphics/texture.h"
 #include "graphics/uniform_buffer.h"
-#include "scene/static_mesh.h"
+#include "scene/model.h"
 #include "scene/transform.h"
 
 namespace eve {
@@ -37,11 +37,8 @@ class Renderer final {
 
   void EndScene();
 
-  void Draw(const RenderData<MeshVertex>& data, const Transform& transform,
-            const Ref<Texture>& texture);
-
   void DrawModel(const Ref<Model>& model, const Transform& transform,
-                 const Material& material);
+                 const Material& material = {});
 
   void DrawQuad(const Transform& transform, const Color& color,
                 const glm::vec2& tiling = {1, 1},
@@ -87,11 +84,11 @@ class Renderer final {
 
   // Renderer Data
   Ref<MeshPrimitive> mesh_data_;
-  std::unordered_map<AssetHandle, Ref<MeshPrimitive>> custom_meshes_;
-
   Ref<QuadPrimitive> quad_data_;
-
   Scope<LinePrimitive> line_data_;
+
+  // Other rendering data
+  std::unordered_map<AssetHandle, Ref<MeshPrimitive>> custom_meshes_;
 
   // Camera stuff
   Ref<UniformBuffer> camera_uniform_buffer_;

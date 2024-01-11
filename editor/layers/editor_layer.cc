@@ -35,9 +35,12 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
 void EditorLayer::OnStart() {
   frame_buffer_ = FrameBuffer::Create({300, 300});
 
+  editor_camera_ = CreateRef<EditorCamera>();
+  scene_settings_panel_ = CreateRef<SceneSettingsPanel>(editor_camera_);
+
   hierarchy_panel_ = CreateRef<HierarchyPanel>();
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
-                                               &editor_camera_);
+                                               editor_camera_);
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
 
   debug_info_panel_ = CreateScope<DebugInfoPanel>(GetState()->renderer);
@@ -96,11 +99,14 @@ void EditorLayer::OnGUI(float ds) {
     toolbar_panel_.Render();
     console_panel_.Render();
     content_browser_.Render();
+    asset_registry_panel_.Render();
+    project_settings_panel_.Render();
     about_panel_.Render();
 
     viewport_panel_->Render();
     hierarchy_panel_->Render();
     inspector_panel_->Render();
+    scene_settings_panel_->Render();
     debug_info_panel_->Render();
 
     // Render modals
@@ -125,7 +131,7 @@ void EditorLayer::BeforeRender() {
       (size.x != viewport_size.x || size.y != viewport_size.y)) {
     frame_buffer_->SetSize(
         {(uint32_t)viewport_size.x, (uint32_t)viewport_size.y});
-    editor_camera_.aspect_ratio = viewport_size.x / viewport_size.y;
+    editor_camera_->aspect_ratio = viewport_size.x / viewport_size.y;
   }
 }
 
@@ -158,7 +164,7 @@ void EditorLayer::OnRenderScene(float ds) {
           old_cursor_state_ = CursorState::kHidden;
           GetState()->window->SetCursorState(old_cursor_state_);
         }
-        editor_camera_.Update(ds);
+        editor_camera_->Update(ds);
       } else {
         camera_translatable_ = false;
 
@@ -167,7 +173,7 @@ void EditorLayer::OnRenderScene(float ds) {
           old_cursor_state_ = CursorState::kNormal;
           GetState()->window->SetCursorState(old_cursor_state_);
         }
-        editor_camera_.ResetMousePos();
+        editor_camera_->ResetMousePos();
       }
 
       scene_renderer_->RenderEditor(ds, editor_camera_, !is_ejected_);
@@ -305,7 +311,7 @@ void EditorLayer::NewScene() {
   editor_scene_path_ = "";
 
   modify_info.SetModified();
-  editor_camera_.ResetTransform();
+  editor_camera_->ResetTransform();
 }
 
 void EditorLayer::SaveScene() {
@@ -369,7 +375,7 @@ void EditorLayer::OpenScene(const fs::path& path) {
 
     editor_scene_path_ = path;
 
-    editor_camera_.ResetTransform();
+    editor_camera_->ResetTransform();
     hierarchy_panel_->selected_entity_ = Entity{};
   }
 }
@@ -390,7 +396,7 @@ void EditorLayer::OpenScene(const uint32_t index) {
   editor_scene_ = SceneManager::GetActive();
   editor_scene_path_ = SceneManager::GetActivePath();
 
-  editor_camera_.ResetTransform();
+  editor_camera_->ResetTransform();
 }
 
 void EditorLayer::OnScenePlay() {
@@ -464,6 +470,10 @@ void EditorLayer::OnSceneModify() {
 }
 
 void EditorLayer::OnSceneSave() {
+  if (auto project = Project::GetActive(); project) {
+    project->SaveActive(project->GetProjectPath());
+  }
+
   SetSceneTitle();
 
   modify_info.OnSave();
@@ -543,6 +553,16 @@ void EditorLayer::SetupMenubar() {
   {
     MenuItemGroup base_group;
     {
+      MenuItem project_settings("Project Settings", [this]() {
+        project_settings_panel_.SetActive(true);
+      });
+      base_group.PushMenuItem(project_settings);
+
+      MenuItem scene_settings("Scene Settings", [this]() {
+        scene_settings_panel_->SetActive(true);
+      });
+      base_group.PushMenuItem(scene_settings);
+
       MenuItem reload_scene("Reload Scene",
                             [this]() { OpenScene(editor_scene_path_); });
       base_group.PushMenuItem(reload_scene);
@@ -590,6 +610,11 @@ void EditorLayer::SetupMenubar() {
       MenuItem content_browser("Content Browser",
                                [this]() { content_browser_.SetActive(true); });
       base_group.PushMenuItem(content_browser);
+
+      MenuItem asset_registry_panel("Asset Registry", [this]() {
+        asset_registry_panel_.SetActive(true);
+      });
+      base_group.PushMenuItem(asset_registry_panel);
 
       MenuItem advanced_inspector("Advanced Inspector", [this]() {
         inspector_panel_->ToggleAdvanced();

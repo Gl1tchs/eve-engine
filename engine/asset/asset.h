@@ -10,7 +10,7 @@ namespace eve {
 
 typedef UUID AssetHandle;
 
-enum class AssetType {
+enum class AssetType : uint8_t {
   kNone = 0,
   kTexture,
   kFont,
@@ -19,19 +19,24 @@ enum class AssetType {
   kScript,
   kMaterial,
   kShader,
+  kAudio,
 };
 
-#define IMPL_ASSET(type)               \
-  AssetType GetType() const override { \
-    return type;                       \
+AssetType GetAssetTypeFromExtension(const std::string& extension);
+
+std::string GetAssetTypeString(AssetType type);
+
+#define IMPL_ASSET(type)                         \
+  constexpr AssetType GetType() const override { \
+    return type;                                 \
   };
 
 struct Asset {
-  AssetHandle handle;
-  std::string name;
-  std::string path;
+  AssetHandle handle = 0;
+  std::string name = "";
+  std::string path = "";
 
-  virtual AssetType GetType() const = 0;
+  virtual constexpr AssetType GetType() const = 0;
 };
 
 }  // namespace eve

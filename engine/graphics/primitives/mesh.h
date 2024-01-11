@@ -19,21 +19,23 @@ static constexpr size_t kMeshMaxTextures = 32;
 struct MeshVertex final {
   glm::vec4 position;
   Color albedo;
-  float metallic;
-  float roughness;
-  float ao;
   glm::vec3 normal;
   glm::vec2 tex_coords;
-  float tex_index = 0.0f;
-  glm::mat3 normal_matrix;
+  float diffuse_index = 0.0f;
+  float specular_index = 0.0f;
+  float normal_index = 0.0f;
+  float height_index = 0.0f;
 };
 
 template <>
 struct RenderData<MeshVertex> {
-  std::string name;
   std::vector<MeshVertex> vertices;
   std::vector<uint32_t> indices;
-  Material material;
+
+  Ref<Texture> diffuse_map = nullptr;
+  Ref<Texture> specular_map = nullptr;
+  Ref<Texture> normal_map = nullptr;
+  Ref<Texture> height_map = nullptr;
 };
 
 class MeshPrimitive : public Primitive<MeshVertex> {

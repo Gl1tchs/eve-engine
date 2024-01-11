@@ -1,3 +1,7 @@
+set(BUILD_SHARED_LIBS OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+
+add_subdirectory(assimp)
 add_subdirectory(entt)
 add_subdirectory(glad)
 add_subdirectory(glfw)

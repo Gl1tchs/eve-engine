@@ -7,8 +7,9 @@
 namespace eve {
 struct ProjectConfig {
   std::string name;
-  fs::path asset_directory;
-  fs::path asset_registry;
+  std::string asset_directory;
+  std::string asset_registry;
+  std::string keymaps;
   std::vector<std::string> scenes;
 };
 
@@ -35,6 +36,11 @@ class Project {
            active_project_->config_.asset_registry;
   }
 
+  [[nodiscard]] static fs::path GetKeymapsPath() {
+    ASSERT(active_project_);
+    return active_project_->project_dir_ / active_project_->config_.keymaps;
+  }
+
   // Relative to project directory
   [[nodiscard]] static fs::path GetAssetDirectory() {
     ASSERT(active_project_);
@@ -57,6 +63,8 @@ class Project {
 
   ProjectConfig config_;
   fs::path project_dir_;
-  fs::path project_path_ = ""; 
+  fs::path project_path_ = "";
+
+  friend class ProjectSettingsPanel;
 };
 }  // namespace eve

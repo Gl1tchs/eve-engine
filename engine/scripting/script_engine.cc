@@ -147,10 +147,6 @@ struct ScriptEngineData {
 
 static ScriptEngineData* data = nullptr;
 
-static void CreateProjectFiles();
-
-static void BuildScripts();
-
 static void OnScriptFileChanged(const std::string& path,
                                 const filewatch::Event change_type) {
   if (data->scene_context && data->scene_context->IsRunning()) {
@@ -165,8 +161,8 @@ static void OnScriptFileChanged(const std::string& path,
         file_watcher.reset();
       }
 
-      CreateProjectFiles();
-      BuildScripts();
+      ScriptEngine::GenerateProjectFiles();
+      ScriptEngine::BuildScripts();
       ScriptEngine::ReloadAssembly();
     });
   }
@@ -185,7 +181,7 @@ void ScriptEngine::Init(bool is_runtime) {
   ScriptGlue::RegisterFunctions();
 
   if (!is_runtime) {
-    CreateProjectFiles();
+    GenerateProjectFiles();
     BuildScripts();
   }
 
@@ -506,7 +502,7 @@ MonoObject* ScriptEngine::InstantiateClass(MonoClass* mono_class) {
   return instance;
 }
 
-void CreateProjectFiles() {
+void ScriptEngine::GenerateProjectFiles() {
   std::ofstream csproj_file(Project::GetProjectDirectory() /
                             (Project::GetProjectName() + ".csproj"));
 
@@ -548,12 +544,12 @@ void CreateProjectFiles() {
   LOG_ENGINE_TRACE("Project files are generated successfully.");
 }
 
-void BuildScripts() {
+void ScriptEngine::BuildScripts() {
   fs::path csproj_path =
       Project::GetProjectDirectory() / (Project::GetProjectName() + ".csproj");
   if (!fs::exists(csproj_path)) {
     LOG_ENGINE_WARNING("Unable to find project files creating...");
-    CreateProjectFiles();
+    GenerateProjectFiles();
   }
 
   int result =

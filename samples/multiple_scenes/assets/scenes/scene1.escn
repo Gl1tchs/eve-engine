@@ -1,46 +1,6 @@
 {
   "entities": [
     {
-      "camera_component": {
-        "is_fixed_aspect_ratio": false,
-        "is_orthographic": false,
-        "is_primary": true,
-        "orthographic_camera": {
-          "aspect_ratio": 2.6107659339904785,
-          "far_clip": 1.0,
-          "near_clip": -1.0,
-          "zoom_level": 1.0
-        },
-        "perspective_camera": {
-          "aspect_ratio": 2.6107659339904785,
-          "far_clip": 300.0,
-          "fov": 45.0,
-          "near_clip": 0.10000000149011612
-        }
-      },
-      "id": 9378468046714055176,
-      "tag_component": {
-        "tag": "Camera"
-      },
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          4.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      }
-    },
-    {
       "id": 3657232952556252100,
       "material_component": {
         "albedo": [
@@ -62,7 +22,7 @@
         ]
       },
       "model_component": {
-        "model": 11448458562645017180
+        "model": 2677285248016495904
       },
       "script_component": {
         "class_name": "MultipleScenes.SceneTranslator",
@@ -92,6 +52,46 @@
           0.25,
           0.25,
           0.25
+        ]
+      }
+    },
+    {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.8139535188674927,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.8139535188674927,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 9378468046714055176,
+      "tag_component": {
+        "tag": "Camera"
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          4.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
         ]
       }
     }

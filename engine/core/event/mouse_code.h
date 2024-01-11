@@ -15,9 +15,14 @@ enum class MouseCode : uint32_t {
   k6 = 5,
   k7 = 6,
   k8 = 7,
+  kNone = 8,
   kLeft = k1,
   kRight = k2,
   kMiddle = k3,
 };
 
-}
+std::string GetMouseCodeString(const MouseCode& mouse_code);
+
+MouseCode GetMouseCode(const std::string& mouse_code);
+
+}  // namespace eve

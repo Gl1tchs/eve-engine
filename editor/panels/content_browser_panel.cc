@@ -5,33 +5,11 @@
 #include <IconsFontAwesome4.h>
 #include <imgui.h>
 
+#include "panels/asset_registry_panel.h"
 #include "project/project.h"
 #include "scene/scene_manager.h"
 
 namespace eve {
-
-std::string GetAssetTypeString(AssetType type) {
-  switch (type) {
-    case AssetType::kNone:
-      return "NONE";
-    case AssetType::kTexture:
-      return "TEXTURE";
-    case AssetType::kFont:
-      return "FONT";
-    case AssetType::kScene:
-      return "SCENE";
-    case AssetType::kStaticMesh:
-      return "MESH";
-    case AssetType::kScript:
-      return "SCRIPT";
-    case AssetType::kMaterial:
-      return "MATERIAL";
-    case AssetType::kShader:
-      return "SHADER";
-    default:
-      return "";
-  }
-}
 
 ContentBrowserPanel::ContentBrowserPanel()
     : Panel(true), base_directory_(""), current_directory_("") {
@@ -50,11 +28,11 @@ ContentBrowserPanel::ContentBrowserPanel()
 void ContentBrowserPanel::Reload() {
   base_directory_ = Project::GetAssetDirectory();
   current_directory_ = base_directory_;
-
-  RefreshAssetTree();
 }
 
 void ContentBrowserPanel::Draw() {
+  RefreshAssetTree();
+
   if (current_directory_.empty() || base_directory_.empty()) {
     return;
   }
@@ -70,27 +48,30 @@ void ContentBrowserPanel::Draw() {
   ImGui::SameLine();
 
   // Render each directory in the path
-  fs::path relative_path = fs::relative(current_directory_, base_directory_);
+  {
+    fs::path relative_path = fs::relative(current_directory_, base_directory_);
 
-  if (current_directory_ != base_directory_) {
-    for (const auto& part : relative_path) {
-      if (ImGui::Button(part.string().c_str())) {
-        std::string rel_string = relative_path.string();
-        const std::string part_str = part.string();
+    if (current_directory_ != base_directory_) {
+      for (const auto& part : relative_path) {
+        if (ImGui::Button(part.string().c_str())) {
+          std::string rel_string = relative_path.string();
+          const std::string part_str = part.string();
 
-        size_t pos = rel_string.find(part_str);
-        if (pos != std::string::npos) {
-          fs::path path_without = rel_string.substr(0, pos + part_str.length());
+          size_t pos = rel_string.find(part_str);
+          if (pos != std::string::npos) {
+            fs::path path_without =
+                rel_string.substr(0, pos + part_str.length());
 
-          // Clicking on a directory navigates into it
-          current_directory_ = base_directory_ / path_without;
+            // Clicking on a directory navigates into it
+            current_directory_ = base_directory_ / path_without;
+          }
         }
+        ImGui::SameLine();
+
+        ImGui::TextUnformatted("/");
+
+        ImGui::SameLine();
       }
-      ImGui::SameLine();
-
-      ImGui::TextUnformatted("/");
-
-      ImGui::SameLine();
     }
   }
 
@@ -143,9 +124,6 @@ void ContentBrowserPanel::Draw() {
       ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
     }
 
-    ImGuiIO& io = ImGui::GetIO();
-    ImFont* originalFont = io.FontDefault;
-
     if (const auto it = asset_paths_.find(directory_entry);
         it != asset_paths_.end()) {
       if (ImGui::ImageButton(
@@ -163,13 +141,29 @@ void ContentBrowserPanel::Draw() {
       }
 
     } else {
+      const bool is_directory = directory_entry.is_directory();
+
       if (ImGui::ImageButton(
-              (ImTextureID)(directory_entry.is_directory()
+              (ImTextureID)(is_directory
                                 ? icon_folder_
-                                : GetFileIcon(path.extension().string()))
+                                : GetFileIcon(GetAssetTypeFromExtension(
+                                      path.extension().string())))
                   ->GetTextureID(),
               ImVec2(thumbnail_size, thumbnail_size))) {
         selected_idx = (selected_idx == i) ? -1 : i;
+      }
+
+      if (!is_directory && ImGui::BeginDragDropSource()) {
+        std::string path_str = AssetRegistry::GetRelativePath(path.string());
+
+        // Store path data in a vector (including null terminator)
+        std::vector<char> path_data(path_str.begin(), path_str.end());
+        path_data.push_back('\0');
+
+        ImGui::SetDragDropPayload("DND_PAYLOAD_PATH", path_data.data(),
+                                  path_data.size(), ImGuiCond_Once);
+
+        ImGui::EndDragDropSource();
       }
 
       if (ImGui::IsItemHovered() &&
@@ -209,24 +203,6 @@ Ref<Texture> ContentBrowserPanel::GetFileIcon(AssetType type) {
       return icon_shader_;
     default:
       return icon_file_;
-  }
-}
-
-Ref<Texture> ContentBrowserPanel::GetFileIcon(const std::string& extension) {
-  if (extension == ".cs") {
-    return icon_script_;
-  } else if (extension == ".obj") {
-    return icon_mesh_;
-  } else if (extension == ".mp3" || extension == ".ogg" ||
-             extension == ".wav" || extension == ".aac") {
-    return icon_audio_;
-  } else if (extension == ".png" || extension == ".jpg" ||
-             extension == ".jpeg" || extension == ".webp") {
-    return icon_texture_;
-  } else if (extension == ".glsl" || extension == ".esh") {
-    return icon_shader_;
-  } else {
-    return icon_file_;
   }
 }
 

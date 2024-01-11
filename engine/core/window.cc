@@ -55,11 +55,6 @@ Window::Window(WindowProps props) {
   SetVsync(props.vsync);
 
   InitEvents();
-
-  glm::dvec2 mouse_pos{};
-  glfwGetCursorPos(window_, &mouse_pos.x, &mouse_pos.y);
-
-  Input::Init(mouse_pos);
 }
 
 Window::~Window() {

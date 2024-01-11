@@ -9,7 +9,9 @@
 #include "scene/scene_manager.h"
 
 namespace eve {
-SceneRenderer::SceneRenderer(const Ref<State>& state) : state_(state) {}
+SceneRenderer::SceneRenderer(const Ref<State>& state) : state_(state) {
+  skybox_ = SkyBox::Create("assets/textures/skybox_default.png");
+}
 
 void SceneRenderer::RenderRuntime(float ds) {
   auto& scene = SceneManager::GetActive();
@@ -38,7 +40,7 @@ void SceneRenderer::RenderRuntime(float ds) {
   }
 }
 
-void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
+void SceneRenderer::RenderEditor(float ds, Ref<EditorCamera>& editor_camera,
                                  bool use_primary_if_exists) {
   auto& scene = SceneManager::GetActive();
   if (!scene) {
@@ -46,7 +48,7 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
   }
 
   if (editor_primary_used_) {
-    editor_camera.GetTransform() = last_primary_transform_;
+    editor_camera->GetTransform() = last_primary_transform_;
   }
 
   CameraData data;
@@ -68,8 +70,8 @@ void SceneRenderer::RenderEditor(float ds, EditorCamera& editor_camera,
       editor_primary_used_ = true;
     }
   } else {
-    data = {editor_camera.GetViewMatrix(), editor_camera.GetProjectionMatrix(),
-            editor_camera.GetTransform().position};
+    data = {editor_camera->GetViewMatrix(), editor_camera->GetProjectionMatrix(),
+            editor_camera->GetTransform().position};
 
     editor_primary_used_ = false;
   }
@@ -116,7 +118,13 @@ void SceneRenderer::RenderSceneEditor(const CameraData& data) {
 
   renderer->EndScene();
 
-  renderer->stats_.last_render_duration = timer.GetElapsedMilliseconds();
+  auto& stats = renderer->stats_;
+
+  // Render skybox in another draw call
+  skybox_->Render();
+  stats.draw_calls++;
+
+  stats.last_render_duration = timer.GetElapsedMilliseconds();
 }
 
 void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
@@ -130,7 +138,13 @@ void SceneRenderer::RenderSceneRuntime(const CameraData& data) {
 
   renderer->EndScene();
 
-  renderer->stats_.last_render_duration = timer.GetElapsedMilliseconds();
+  auto& stats = renderer->stats_;
+
+  // Render skybox in another draw call
+  skybox_->Render();
+  stats.draw_calls++;
+
+  stats.last_render_duration = timer.GetElapsedMilliseconds();
 }
 
 void SceneRenderer::RenderScene() {
@@ -152,10 +166,15 @@ void SceneRenderer::RenderScene() {
         }
       });
 
-  scene->GetAllEntitiesWith<Transform, ModelComponent, Material>().each(
+  scene->GetAllEntitiesWith<Transform, ModelComponent>().each(
       [&](entt::entity entity_id, const Transform& transform,
-          const ModelComponent& model_comp, const Material& material) {
+          const ModelComponent& model_comp) {
         Entity entity{entity_id, scene.get()};
+
+        Material material{};
+        if (entity.HasComponent<Material>()) {
+          material = entity.GetComponent<Material>();
+        }
 
         renderer->DrawModel(AssetRegistry::Get<Model>(model_comp.model),
                             transform, material);

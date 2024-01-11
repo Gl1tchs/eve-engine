@@ -4,14 +4,14 @@ set(SOURCES
   editor_camera.h
   entity.cc
   entity.h
+  model.cc
+  model.h
   scene_manager.cc
   scene_manager.h
   scene_serializer.cc
   scene_serializer.h
   scene.cc
   scene.h
-  static_mesh.cc
-  static_mesh.h
   transform.cc
   transform.h
 )
@@ -23,6 +23,7 @@ module_include_directories(scene PUBLIC
 )
 
 module_include_directories(scene PRIVATE
+  ${VENDOR_DIR}/assimp/include
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/json/include
   ${VENDOR_DIR}/include
@@ -33,6 +34,7 @@ module_link_libraries(scene PRIVATE
   eve::asset
   eve::core
   eve::scripting
+  assimp
   EnTT
 )
 

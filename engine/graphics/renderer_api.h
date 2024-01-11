@@ -15,6 +15,8 @@ enum BufferBits : uint16_t {
   BufferBits_kColor = BIT(1),
 };
 
+enum class DepthFunc { kLess, kLEqual };
+
 class RendererAPI {
  public:
   virtual ~RendererAPI() = default;
@@ -38,6 +40,10 @@ class RendererAPI {
                                    uint32_t instance_count) = 0;
 
   virtual void SetLineWidth(float width) = 0;
+
+  virtual void SetDepthFunc(DepthFunc func = DepthFunc::kLess) = 0;
+
+  virtual void SetActiveTexture(uint8_t index = 0) = 0;
 
   [[nodiscard]] static Scope<RendererAPI> Create();
 };

@@ -39,4 +39,5 @@ std::string FileSystem::ReadFileString(const fs::path& filepath) {
   buffer << t.rdbuf();
   return buffer.str();
 }
+
 }  // namespace eve

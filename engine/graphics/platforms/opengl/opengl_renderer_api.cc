@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 namespace eve {
+
 void OpenGLRendererAPI::Init() {
   glEnable(GL_BLEND);
 
@@ -71,4 +72,26 @@ void OpenGLRendererAPI::DrawArraysInstanced(
 void OpenGLRendererAPI::SetLineWidth(float width) {
   glLineWidth(width);
 }
+
+void OpenGLRendererAPI::SetDepthFunc(DepthFunc func) {
+  int gl_func;
+  switch (func) {
+    case DepthFunc::kLess:
+      gl_func = GL_LESS;
+      break;
+    case DepthFunc::kLEqual:
+      gl_func = GL_LEQUAL;
+      break;
+    default:
+      gl_func = GL_LESS;
+      break;
+  }
+
+  glDepthFunc(gl_func);
+}
+
+void OpenGLRendererAPI::SetActiveTexture(uint8_t index) {
+  glActiveTexture(GL_TEXTURE0 + index);
+}
+
 }  // namespace eve

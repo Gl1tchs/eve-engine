@@ -18,7 +18,7 @@ class ViewportPanel : public Panel {
  public:
   ViewportPanel(Ref<FrameBuffer>& frame_buffer,
                 Ref<HierarchyPanel> hierarchy_panel,
-                EditorCamera* editor_camera);
+                Ref<EditorCamera> editor_camera);
 
   void SetGizmoState(int state) { operation_ = state; }
 
@@ -30,7 +30,7 @@ class ViewportPanel : public Panel {
  private:
   Ref<FrameBuffer> frame_buffer_;
   Ref<HierarchyPanel> hierarchy_panel_;
-  EditorCamera* editor_camera_;
+  Ref<EditorCamera> editor_camera_;
 
   int operation_ = 7;
 

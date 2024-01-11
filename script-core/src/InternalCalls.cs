@@ -109,18 +109,6 @@ namespace EveEngine
 		internal extern static void Material_GetAlbedo(ulong entityId, out Color albedo);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Material_SetAlbedo(ulong entityId, ref Color albedo);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_GetMetallic(ulong entityId, out float metallic);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_SetMetallic(ulong entityId, ref float metallic);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_GetRoughness(ulong entityId, out float roughness);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_SetRoughness(ulong entityI, ref float roughness);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_GetAO(ulong entityId, out float ao);
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Material_SetAO(ulong entityId, ref float ao);
 		#endregion
 
 		#region SceneManager
@@ -134,11 +122,23 @@ namespace EveEngine
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyPressed(KeyCode keyCode);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_IsKeyPressedString(string key);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyReleased(KeyCode keyCode);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_IsKeyReleasedString(string key);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsMouseButtonPressed(MouseCode mouseCode);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_IsMouseButtonPressedString(string key);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsMouseButtonReleased(MouseCode mouseCode);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_IsMouseButtonReleasedString(string key);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Input_GetMousePosition(out Vector2 position);
 		#endregion

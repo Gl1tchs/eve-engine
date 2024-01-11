@@ -12,11 +12,14 @@
 
 #include "modals/exit_modal.h"
 #include "panels/about_panel.h"
+#include "panels/asset_registry_panel.h"
 #include "panels/console_panel.h"
 #include "panels/content_browser_panel.h"
 #include "panels/debug_info_panel.h"
 #include "panels/hierarchy_panel.h"
 #include "panels/inspector_panel.h"
+#include "panels/project_settings_panel.h"
+#include "panels/scene_settings_panel.h"
 #include "panels/toolbar_panel.h"
 #include "panels/viewport_panel.h"
 #include "widgets/menu_bar.h"
@@ -92,8 +95,8 @@ class EditorLayer : public Layer {
   Ref<FrameBuffer> frame_buffer_;
   Scope<SceneRenderer> scene_renderer_;
 
-  EditorCamera editor_camera_;
-  bool camera_translatable_;
+  Ref<EditorCamera> editor_camera_;
+  bool camera_translatable_ = true;
 
   // scene members
   Ref<Scene> editor_scene_;
@@ -109,10 +112,13 @@ class EditorLayer : public Layer {
   Ref<HierarchyPanel> hierarchy_panel_;
   Scope<InspectorPanel> inspector_panel_;
   Scope<ViewportPanel> viewport_panel_;
+  Ref<SceneSettingsPanel> scene_settings_panel_;
 
+  AssetRegistryPanel asset_registry_panel_;
   ToolbarPanel toolbar_panel_;
   ConsolePanel console_panel_;
   ContentBrowserPanel content_browser_;
+  ProjectSettingsPanel project_settings_panel_;
   AboutPanel about_panel_;
 
   // is camera ejected

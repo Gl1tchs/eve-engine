@@ -3,6 +3,7 @@
 #include "graphics/render_command.h"
 
 namespace eve {
+
 Scope<RendererAPI> RenderCommand::renderer_api_ = nullptr;
 
 void RenderCommand::Init() {
@@ -48,4 +49,13 @@ void RenderCommand::DrawArraysInstanced(const Ref<VertexArray>& vertex_array,
 void RenderCommand::SetLineWidth(float width) {
   renderer_api_->SetLineWidth(width);
 }
+
+void RenderCommand::SetDepthFunc(DepthFunc func) {
+  renderer_api_->SetDepthFunc(func);
+}
+
+void RenderCommand::SetActiveTexture(uint8_t index) {
+  renderer_api_->SetActiveTexture(index);
+}
+
 }  // namespace eve

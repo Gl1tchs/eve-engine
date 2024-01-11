@@ -47,6 +47,10 @@ class ScriptEngine {
 
   static MonoString* CreateString(const char* string);
 
+  static void GenerateProjectFiles();
+
+  static void BuildScripts();
+
  private:
   static void InitMono();
   static void ShutdownMono();

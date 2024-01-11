@@ -8,7 +8,7 @@
 #include "graphics/material.h"
 #include "graphics/orthographic_camera.h"
 #include "graphics/perspective_camera.h"
-#include "scene/static_mesh.h"
+#include "scene/model.h"
 
 namespace eve {
 struct IdComponent {

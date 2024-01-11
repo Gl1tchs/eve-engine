@@ -3,6 +3,7 @@ set(SOURCES
   asset_loader.h
   asset_registry.cc
   asset_registry.h
+  asset.cc
   asset.h
 )
 

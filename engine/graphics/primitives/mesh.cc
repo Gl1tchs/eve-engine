@@ -19,24 +19,24 @@ MeshPrimitive::MeshPrimitive()
   vertex_buffer_ =
       VertexBuffer::Create(kMeshMaxVertexCount * sizeof(MeshVertex));
   vertex_buffer_->SetLayout({
-      {ShaderDataType::kFloat4, "a_pos"},
+      {ShaderDataType::kFloat4, "a_position"},
       {ShaderDataType::kFloat4, "a_albedo"},
-      {ShaderDataType::kFloat, "a_metallic"},
-      {ShaderDataType::kFloat, "a_roughness"},
-      {ShaderDataType::kFloat, "a_ao"},
       {ShaderDataType::kFloat3, "a_normal"},
       {ShaderDataType::kFloat2, "a_tex_coords"},
-      {ShaderDataType::kFloat, "a_tex_index"},
-      {ShaderDataType::kMat3, "a_normal_matrix"},
+      {ShaderDataType::kFloat, "a_diffuse_index"},
+      {ShaderDataType::kFloat, "a_specular_index"},
+      {ShaderDataType::kFloat, "a_normal_index"},
+      {ShaderDataType::kFloat, "a_height_index"},
   });
   vertex_array_->AddVertexBuffer(vertex_buffer_);
 
   // initialize index buffer
+  indices_.reserve(kMeshMaxIndexCount);
   index_buffer_ = IndexBuffer::Create(kMeshMaxIndexCount * sizeof(uint32_t));
   vertex_array_->SetIndexBuffer(index_buffer_);
 
-  vertex_path_ = "assets/shaders/pbr.vert";
-  fragment_path_ = "assets/shaders/pbr.frag";
+  vertex_path_ = "assets/shaders/mesh.vert";
+  fragment_path_ = "assets/shaders/mesh.frag";
   shader_ = Shader::Create(vertex_path_, fragment_path_);
 
   // fill the textures with empty values (which is default white texture)
@@ -94,7 +94,8 @@ void MeshPrimitive::Render(RenderStats& stats) {
 bool MeshPrimitive::NeedsNewBatch(uint32_t vertex_size, uint32_t index_size) {
   return BatchCount() + vertex_size >= kMeshMaxVertexCount ||
          indices_.size() + index_size >= kMeshMaxIndexCount ||
-         texture_slot_index_ >= kMeshMaxTextures;
+         texture_slot_index_ + 4 >=
+             kMeshMaxTextures;  // could have diffuse, specular, normal and height maps
 }
 
 void MeshPrimitive::AddIndex(uint32_t index) {
@@ -141,6 +142,11 @@ void MeshPrimitive::RecompileShaders() {
 
 float MeshPrimitive::FindTexture(const Ref<Texture>& texture) {
   float texture_index = 0.0f;
+
+  if (!texture) {
+    return texture_index;
+  }
+
   for (uint32_t i = 1; i < texture_slot_index_; i++) {
     if (texture_slots_[i] == texture) {
       texture_index = (float)i;
@@ -157,8 +163,9 @@ float MeshPrimitive::FindTexture(const Ref<Texture>& texture) {
 
 void MeshPrimitive::OnReset() {
   indices_.clear();
-  index_offset = 0;
+  indices_.reserve(kMeshMaxIndexCount);
 
+  index_offset = 0;
   texture_slot_index_ = 1;
 }
 

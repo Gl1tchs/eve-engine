@@ -26,14 +26,20 @@ class AssetRegistry {
     return std::static_pointer_cast<T>(asset);
   }
 
-  static Ref<Asset> Get(const AssetHandle& id);
+  [[nodiscard]] static Ref<Asset> Get(const AssetHandle& id);
+
+  [[nodiscard]] static AssetHandle GetFromPath(const std::string& path);
 
   static void Register(Ref<Asset> asset);
 
   static AssetHandle Load(const std::string& path, AssetType type,
                           const std::string& name, AssetHandle id = {});
 
-  static void Unload(const AssetHandle& id);
+  static AssetHandle Load(const std::string& path);
+
+  static bool Unload(const AssetHandle& id);
+
+  static bool Reload(Ref<Asset>& asset);
 
   [[nodiscard]] static bool Exists(const AssetHandle& id);
 
@@ -43,6 +49,9 @@ class AssetRegistry {
   [[nodiscard]] static fs::path GetAssetPath(std::string relative_path);
 
   [[nodiscard]] static fs::path GetAssetPathTrimmed(std::string relative_path);
+
+  // Turns absolute path to res:// type of path.
+  [[nodiscard]] static std::string GetRelativePath(const std::string& path);
 
   [[nodiscard]] static AssetRegistryMap& GetRegistryMap() { return assets_; }
 

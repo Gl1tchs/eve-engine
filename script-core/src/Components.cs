@@ -75,41 +75,5 @@
 				InternalCalls.Material_SetAlbedo(Entity.Id, ref value);
 			}
 		}
-		public float Metallic
-		{
-			get
-			{
-				InternalCalls.Material_GetMetallic(Entity.Id, out float metallic);
-				return metallic;
-			}
-			set
-			{
-				InternalCalls.Material_SetMetallic(Entity.Id, ref value);
-			}
-		}
-		public float Roughness
-		{
-			get
-			{
-				InternalCalls.Material_GetRoughness(Entity.Id, out float roughness);
-				return roughness;
-			}
-			set
-			{
-				InternalCalls.Material_SetRoughness(Entity.Id, ref value);
-			}
-		}
-		public float Ao
-		{
-			get
-			{
-				InternalCalls.Material_GetAO(Entity.Id, out float ao);
-				return ao;
-			}
-			set
-			{
-				InternalCalls.Material_SetAO(Entity.Id, ref value);
-			}
-		}
 	}
 }

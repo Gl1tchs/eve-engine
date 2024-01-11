@@ -2,16 +2,20 @@
 
 #include "project/project.h"
 
+#include "core/event/input.h"
 #include "project/project_serializer.h"
 #include "scene/scene_manager.h"
 
 namespace eve {
+
 Ref<Project> Project::active_project_ = nullptr;
 
 Ref<Project> Project::New() {
   active_project_ = CreateRef<Project>();
-  
+
   SceneManager::Init(active_project_);
+
+  Input::Init();
 
   return active_project_;
 }
@@ -24,6 +28,9 @@ Ref<Project> Project::Load(const fs::path& path) {
   if (serializer.Deserialize(path)) {
     project->project_dir_ = path.parent_path();
     active_project_ = project;
+
+    Input::Init();
+    Input::Deserialize(GetKeymapsPath());
 
     AssetRegistry::Deserialize(GetAssetRegistryPath());
 
@@ -38,6 +45,8 @@ Ref<Project> Project::Load(const fs::path& path) {
 void Project::SaveActive(const fs::path& path) {
   ProjectSerializer serializer(active_project_);
   serializer.Serialize(path);
+
+  Input::Serialize(GetKeymapsPath());
 
   AssetRegistry::Serialize(GetAssetRegistryPath());
 

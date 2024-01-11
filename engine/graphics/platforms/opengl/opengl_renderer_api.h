@@ -26,5 +26,9 @@ class OpenGLRendererAPI final : public RendererAPI {
                            uint32_t instance_count) override;
 
   void SetLineWidth(float width) override;
+
+  void SetDepthFunc(DepthFunc func = DepthFunc::kLess) override;
+
+  void SetActiveTexture(uint8_t index = 0) override;
 };
 }  // namespace eve

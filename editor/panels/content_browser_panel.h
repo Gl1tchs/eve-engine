@@ -25,7 +25,6 @@ class ContentBrowserPanel : public Panel {
 
  private:
   Ref<Texture> GetFileIcon(AssetType type);
-  Ref<Texture> GetFileIcon(const std::string& extension);
 
   void RefreshAssetTree();
 
