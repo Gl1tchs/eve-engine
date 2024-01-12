@@ -6,7 +6,7 @@
 
 #include "core/event/key_code.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
@@ -19,7 +19,7 @@ enum class ProjectSettingSection {
 };
 
 class ProjectSettingsPanel : public Panel {
-  IMPL_PANEL("Project Settings")
+  EVE_IMPL_PANEL("Project Settings")
 
  public:
   ProjectSettingsPanel();

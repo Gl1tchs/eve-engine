@@ -17,7 +17,7 @@
 #include "scene/scene_manager.h"
 #include "scripting/script_engine.h"
 
-#include "utils/imgui_utils.h"
+#include "ui/imgui_utils.h"
 #include "utils/modify_info.h"
 
 namespace eve {

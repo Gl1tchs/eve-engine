@@ -230,7 +230,7 @@ void Window::InitEvents() {
 }
 
 void GlfwErrorCallback(int error, const char* description) {
-  LOG_ENGINE_ERROR("GLFW Error: (no:\"{0}\") {1}", error, description);
+  EVE_LOG_ENGINE_ERROR("GLFW Error: (no:\"{0}\") {1}", error, description);
 }
 
 }  // namespace eve

@@ -13,7 +13,7 @@ void RuntimeLayer::OnStart() {
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
 
   if (!SceneManager::GetActive()->OnRuntimeStart()) {
-    LOG_RUNTIME_ERROR("Unable to start scene!");
+    EVE_LOG_RUNTIME_ERROR("Unable to start scene!");
     GetState()->running = false;
   }
 }

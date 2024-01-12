@@ -30,7 +30,7 @@ Ref<Texture> Texture::Create(const fs::path& path, const TextureType& type) {
 
   if (!data) {
     stbi_image_free(data);
-    LOG_ENGINE_ERROR("Unable to load texture from: {}", path.string());
+    EVE_LOG_ENGINE_ERROR("Unable to load texture from: {}", path.string());
     ASSERT(false);
   }
 

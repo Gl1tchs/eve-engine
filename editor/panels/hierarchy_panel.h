@@ -8,11 +8,11 @@
 #include "scene/scene.h"
 #include "scene/scene_manager.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 class HierarchyPanel : public Panel {
-  IMPL_PANEL("Hierarchy")
+  EVE_IMPL_PANEL("Hierarchy")
 
  public:
   HierarchyPanel();

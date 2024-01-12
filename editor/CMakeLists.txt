@@ -3,8 +3,6 @@ set(SOURCES
   layers/editor_layer.h
   modals/exit_modal.cc
   modals/exit_modal.h
-  modals/modal.cc
-  modals/modal.h
   panels/about_panel.cc
   panels/about_panel.h
   panels/asset_registry_panel.cc
@@ -19,8 +17,6 @@ set(SOURCES
   panels/hierarchy_panel.h
   panels/inspector_panel.cc
   panels/inspector_panel.h
-  panels/panel.cc
-  panels/panel.h
   panels/project_settings_panel.cc
   panels/project_settings_panel.h
   panels/scene_settings_panel.cc
@@ -31,8 +27,6 @@ set(SOURCES
   panels/viewport_panel.h
   utils/cpuid.cc
   utils/cpuid.h
-  utils/imgui_utils.cc
-  utils/imgui_utils.h
   utils/modify_info.h
   widgets/dock_space.cc
   widgets/dock_space.h

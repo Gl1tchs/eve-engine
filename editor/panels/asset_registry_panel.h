@@ -6,12 +6,12 @@
 
 #include "asset/asset.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
   
 class AssetRegistryPanel : public Panel {
-  IMPL_PANEL("Asset Registry")
+  EVE_IMPL_PANEL("Asset Registry")
 
  public:
   AssetRegistryPanel();

@@ -8,8 +8,6 @@
 #include "core/layer.h"
 #include "project/project.h"
 
-using namespace eve;
-
 enum class ProjectTemplate : uint32_t { kNone = 0, kBlank = 1 };
 
 struct ProjectTemplateInfo {
@@ -26,9 +24,9 @@ enum class ModalState {
   kEditorFailed
 };
 
-class UiLayer : public Layer {
+class UiLayer : public eve::Layer {
  public:
-  UiLayer(Ref<State> state);
+  UiLayer(eve::Ref<eve::State> state);
 
   void OnStart() override;
 
@@ -48,15 +46,17 @@ class UiLayer : public Layer {
   void RenderEditorFailedPopup();
 
   inline fs::path GetProjectPath() {
-    return fs::path(project_path_) / project_name_;
+    return fs::path(project_directory_) / project_name_;
   }
+
+  bool TryExecuteEditor();
 
  private:
   std::vector<ProjectTemplateInfo> templates_;
   ProjectTemplateInfo selected_info_{};
 
-  std::string project_name_ = "";
-  std::string project_path_ = "";
+  std::string project_name_;
+  std::string project_directory_;
 
   ModalState modal_state_ = ModalState::kNone;
 };

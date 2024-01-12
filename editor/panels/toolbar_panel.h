@@ -4,14 +4,14 @@
 
 #include "pch.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
 enum class SceneState { kEdit, kPlay, kPaused };
 
 class ToolbarPanel : public Panel {
-  IMPL_PANEL("Toolbar")
+  EVE_IMPL_PANEL("Toolbar")
 
  public:
   ToolbarPanel();

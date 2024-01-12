@@ -4,12 +4,12 @@
 
 #include "pch.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
 class AboutPanel : public Panel {
-  IMPL_PANEL("About")
+  EVE_IMPL_PANEL("About")
 
  public:
   AboutPanel();

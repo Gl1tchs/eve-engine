@@ -1,6 +1,12 @@
 set(SOURCES
   imgui_layer.cc
   imgui_layer.h
+  imgui_utils.cc
+  imgui_utils.h
+  modal.cc
+  modal.h
+  panel.cc
+  panel.h
 )
 
 # TODO if using vulkan change this

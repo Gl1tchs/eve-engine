@@ -42,7 +42,7 @@ void AssetRegistryPanel::Draw() {
       if (AssetRegistry::Reload(asset)) {
         modify_info.SetModified();
       } else {
-        LOG_EDITOR_ERROR("Unable to load asset from: {}", asset->path);
+        EVE_LOG_EDITOR_ERROR("Unable to load asset from: {}", asset->path);
       }
     }
 
@@ -71,7 +71,7 @@ void AssetRegistryPanel::Draw() {
       if (AssetHandle handle = AssetRegistry::Load(asset_path); handle) {
         modify_info.SetModified();
       } else {
-        LOG_EDITOR_ERROR("Unable to load asset from: {}", asset_path);
+        EVE_LOG_EDITOR_ERROR("Unable to load asset from: {}", asset_path);
       }
     }
 

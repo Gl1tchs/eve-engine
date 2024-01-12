@@ -8,12 +8,12 @@
 #include "scene/editor_camera.h"
 #include "scene/scene.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
 class SceneSettingsPanel : public Panel {
-  IMPL_PANEL("Scene Settings")
+  EVE_IMPL_PANEL("Scene Settings")
 
  public:
   SceneSettingsPanel(Ref<SceneRenderer> scene_renderer,

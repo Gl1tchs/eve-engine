@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 #include "asset/asset_registry.h"
 #include "graphics/texture.h"
@@ -10,7 +10,7 @@
 namespace eve {
 
 class ContentBrowserPanel : public Panel {
-  IMPL_PANEL("Content Browser")
+  EVE_IMPL_PANEL("Content Browser")
 
  public:
   std::function<void(const fs::path& path)> on_scene_open;

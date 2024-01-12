@@ -287,7 +287,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
   json data;
   std::ifstream file(file_path);
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Failed to load scene file '{0}'", file_path.string());
+    EVE_LOG_ENGINE_ERROR("Failed to load scene file '{0}'", file_path.string());
     return false;
   }
   file >> data;
@@ -297,7 +297,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
   }
 
   std::string scene_name = data["scene"].get<std::string>();
-  LOG_ENGINE_TRACE("Deserializing scene: {0}", scene_name);
+  EVE_LOG_ENGINE_TRACE("Deserializing scene: {0}", scene_name);
 
   scene_->name_ = scene_name;
 

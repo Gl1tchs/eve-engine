@@ -7,11 +7,11 @@
 #include "scene/entity.h"
 
 #include "panels/hierarchy_panel.h"
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 class InspectorPanel : public Panel {
-  IMPL_PANEL("Inspector")
+  EVE_IMPL_PANEL("Inspector")
 
  public:
   InspectorPanel(Ref<HierarchyPanel> hierarchy_panel);

@@ -1,3 +1,5 @@
+// Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
+
 #pragma once
 
 #include "core/core_minimal.h"
@@ -12,39 +14,38 @@
 
 #include "ui_layer.h"
 
-using namespace eve;
-
 int main(int argc, const char* argv[]) {
-  Ref<State> state = CreateRef<State>();
+  eve::Ref<eve::State> state = eve::CreateRef<eve::State>();
   state->running = true;
   state->renderer = nullptr;
 
-  WindowCreateInfo info{};
+  eve::WindowCreateInfo info{};
   info.size = {800, 400};
   info.title = "Eve Project Manager";
   info.vsync = true;
 
-  state->window = CreateRef<Window>(info);
+  state->window = eve::CreateRef<eve::Window>(info);
 
-  SubscribeEvent<WindowCloseEvent>(
-      [&state](const WindowCloseEvent& event) { state->running = false; });
+  eve::SubscribeEvent<eve::WindowCloseEvent>(
+      [&state](const eve::WindowCloseEvent& event) { state->running = false; });
 
-  Ref<GraphicsContext> graphics_context = GraphicsContext::Create();
+  eve::Ref<eve::GraphicsContext> graphics_context =
+      eve::GraphicsContext::Create();
   graphics_context->Init();
 
-  RenderCommand::Init();
+  eve::RenderCommand::Init();
 
-  ImGuiLayer* imgui_layer = new ImGuiLayer(state);
+  eve::ImGuiLayer* imgui_layer = new eve::ImGuiLayer(state);
   UiLayer* ui_layer = new UiLayer(state);
 
-  ImGuiSettings& settings = imgui_layer->GetSettings();
+  eve::ImGuiSettings& settings = imgui_layer->GetSettings();
   settings.enable_docking = false;
   settings.enable_viewports = false;
 
   imgui_layer->OnStart();
   ui_layer->OnStart();
 
-  Timer timer;
+  eve::Timer timer;
   while (state->running) {
 
     float ds = timer.GetDeltaTime();
@@ -54,9 +55,9 @@ int main(int argc, const char* argv[]) {
 
     const auto& window_size = state->window->GetSize();
 
-    RenderCommand::Clear();
-    RenderCommand::SetClearColor(kColorBlack);
-    RenderCommand::SetViewport(0, 0, window_size.x, window_size.y);
+    eve::RenderCommand::Clear();
+    eve::RenderCommand::SetClearColor(eve::kColorBlack);
+    eve::RenderCommand::SetViewport(0, 0, window_size.x, window_size.y);
 
     imgui_layer->Begin();
 

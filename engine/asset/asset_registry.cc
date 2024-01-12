@@ -40,7 +40,7 @@ std::unordered_map<AssetHandle, Ref<Asset>> AssetRegistry::assets_ = {};
 Ref<Asset> AssetRegistry::Get(const AssetHandle& handle) {
   const auto it = assets_.find(handle);
   if (it == assets_.end()) {
-    LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot load!",
+    EVE_LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot load!",
                        (uint64_t)handle);
     return nullptr;
   }
@@ -55,7 +55,7 @@ AssetHandle AssetRegistry::GetFromPath(const std::string& path) {
 
   // If not exists try to add
   if (it == assets_.end()) {
-    LOG_ENGINE_ERROR("Unable to get asset from path: {}", path);
+    EVE_LOG_ENGINE_ERROR("Unable to get asset from path: {}", path);
     return 0;
   }
 
@@ -86,7 +86,7 @@ AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
   }
 
   if (!asset) {
-    LOG_ENGINE_ERROR("Unable to load asset from: {}", path);
+    EVE_LOG_ENGINE_ERROR("Unable to load asset from: {}", path);
     return 0;
   }
 
@@ -111,7 +111,7 @@ AssetHandle AssetRegistry::Load(const std::string& path) {
       handle) {
     return handle;
   } else {
-    LOG_EDITOR_ERROR("Unable to load asset from: {}", asset.path);
+    EVE_LOG_EDITOR_ERROR("Unable to load asset from: {}", asset.path);
     return 0;
   }
 }
@@ -119,7 +119,7 @@ AssetHandle AssetRegistry::Load(const std::string& path) {
 bool AssetRegistry::Unload(const AssetHandle& handle) {
   const auto it = assets_.find(handle);
   if (it == assets_.end()) {
-    LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot remove!",
+    EVE_LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot remove!",
                        (uint64_t)handle);
     return false;
   }
@@ -241,7 +241,7 @@ bool AssetRegistry::Serialize(const fs::path& path) {
 bool AssetRegistry::Deserialize(const fs::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Unable to deserialize asset registry from: {}",
+    EVE_LOG_ENGINE_ERROR("Unable to deserialize asset registry from: {}",
                      path.string());
     return false;
   }
@@ -250,7 +250,7 @@ bool AssetRegistry::Deserialize(const fs::path& path) {
   file >> j;
 
   if (!j.is_array()) {
-    LOG_ENGINE_ERROR("Unable to parse asset registry from: {}", path.string());
+    EVE_LOG_ENGINE_ERROR("Unable to parse asset registry from: {}", path.string());
     return false;
   }
 

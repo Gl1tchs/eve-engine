@@ -22,11 +22,6 @@ void OpenGLContext::Init() {
   glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 #endif
 
-  LOG_ENGINE_TRACE("OpenGL Info:");
-  LOG_ENGINE_TRACE("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
-  LOG_ENGINE_TRACE("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
-  LOG_ENGINE_TRACE("  Version: {0}", (const char*)glGetString(GL_VERSION));
-
   ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
          "Requires at least OpenGL version of 4.5!");
 }
@@ -121,10 +116,10 @@ void GLAPIENTRY OpenGLMessageCallback(uint32_t source, uint32_t type,
       break;
   }
 
-  LOG_ENGINE_TRACE("OpenGL Debug Message:");
-  LOG_ENGINE_TRACE("Source: {0}", source_string);
-  LOG_ENGINE_TRACE("Type: {0}", type_string);
-  LOG_ENGINE_TRACE("ID: {0}", id);
-  LOG_ENGINE_TRACE("Severity: {0}", severity_string);
-  LOG_ENGINE_TRACE("Message: {0}", message);
+  EVE_LOG_ENGINE_TRACE("OpenGL Debug Message:");
+  EVE_LOG_ENGINE_TRACE("Source: {0}", source_string);
+  EVE_LOG_ENGINE_TRACE("Type: {0}", type_string);
+  EVE_LOG_ENGINE_TRACE("ID: {0}", id);
+  EVE_LOG_ENGINE_TRACE("Severity: {0}", severity_string);
+  EVE_LOG_ENGINE_TRACE("Message: {0}", message);
 }

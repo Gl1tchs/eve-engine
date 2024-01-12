@@ -2,12 +2,20 @@
 
 #pragma once
 
-#include "pch.h"
+#include "pch_shared.h"
+
+#define EVE_IMPL_MODAL(name)                     \
+  [[nodiscard]] std::string GetName() override { \
+    return name;                                 \
+  }
 
 namespace eve {
+
 class Modal {
  public:
-  Modal(const std::string name, bool closable = true);
+  // Will state handled by external sources or internal
+  Modal(bool external_state = false);
+
   virtual ~Modal() = default;
 
   void Render();
@@ -21,9 +29,12 @@ class Modal {
   virtual void Draw() = 0;
 
  private:
-  std::string name_;
-  bool closable_;
+  [[nodiscard]] virtual std::string GetName() = 0;
+
+ private:
+  bool external_state_;
   bool should_show_ = false;
   int window_flags_ = 0;
 };
+
 }  // namespace eve

@@ -8,12 +8,12 @@
 #include "scene/editor_camera.h"
 
 #include "panels/hierarchy_panel.h"
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
 class ViewportPanel : public Panel {
-  IMPL_PANEL("Viewport")
+  EVE_IMPL_PANEL("Viewport")
 
  public:
   ViewportPanel(Ref<FrameBuffer>& frame_buffer,

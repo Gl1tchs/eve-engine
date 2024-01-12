@@ -286,7 +286,7 @@ void EditorLayer::OpenProject() {
       "Open Project", "", 1, filter_patterns, "Eve Project Files", 0);
 
   if (!path) {
-    LOG_EDITOR_ERROR("Unable to open project from path.");
+    EVE_LOG_EDITOR_ERROR("Unable to open project from path.");
     return;
   }
 
@@ -335,7 +335,7 @@ void EditorLayer::SaveSceneAs() {
                                            filter_patterns, "Eve Scene Files");
 
   if (!path) {
-    LOG_EDITOR_ERROR("Unable to save scene to path.");
+    EVE_LOG_EDITOR_ERROR("Unable to save scene to path.");
     return;
   }
 
@@ -357,7 +357,7 @@ void EditorLayer::OpenScene() {
                                            "Eve Scene Files", 0);
 
   if (!path) {
-    LOG_EDITOR_ERROR("Unable to open scene from path.");
+    EVE_LOG_EDITOR_ERROR("Unable to open scene from path.");
     return;
   }
 

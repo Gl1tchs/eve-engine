@@ -38,7 +38,7 @@ bool ProjectSerializer::Deserialize(const fs::path& path) {
 
   std::ifstream file(path);
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Failed to load project file from: {}", path.string());
+    EVE_LOG_ENGINE_ERROR("Failed to load project file from: {}", path.string());
     return false;
   }
 

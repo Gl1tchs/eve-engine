@@ -6,12 +6,45 @@
 #include <filesystem>
 #include <fstream>
 
+#if _WIN32
+#include <UserEnv.h>
+#include <Windows.h>
+#else
+#include <pwd.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "ui/imgui_utils.h"
+
 namespace fs = std::filesystem;
 
-UiLayer::UiLayer(Ref<State> state) : Layer(state) {
+static std::string GetUserDirectory() {
+#ifdef _WIN32
+  const char* user_profile = getenv("USERPROFILE");
+  return user_profile != nullptr ? user_profile : "";
+#else
+  const char* home_dir = getenv("HOME");
+  if (home_dir == nullptr) {
+    // If HOME environment variable is not set, try to retrieve it using getpwuid
+    struct passwd* pw = getpwuid(getuid());
+    if (pw != nullptr) {
+      home_dir = pw->pw_dir;
+    }
+  }
+
+  return home_dir != nullptr ? home_dir : "";
+#endif
+}
+
+UiLayer::UiLayer(eve::Ref<eve::State> state)
+    : eve::Layer(state),
+      project_name_("My Eve Project"),
+      project_directory_(GetUserDirectory()) {
+
   selected_info_.type = ProjectTemplate::kNone;
 
   {
@@ -29,41 +62,45 @@ void UiLayer::OnStart() {}
 void UiLayer::OnDestroy() {}
 
 void UiLayer::OnGUI(float ds) {
-  ImGuiIO& io = ImGui::GetIO();
-
   ImGui::SetNextWindowPos(ImVec2(0, 0));
-  ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Always);
   ImGui::Begin("##main_window", nullptr,
                ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse |
                    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
   const ImVec2& window_size = ImGui::GetWindowSize();
 
-  const float content_width = window_size.x * 0.7f;
-  // const float options_width = window_size.x - content_width;
+  const float content_width = window_size.x * 0.65f;
 
   ImGui::BeginChild("Content", ImVec2(content_width, 0), true);
   {
-    float panel_width = ImGui::GetContentRegionAvail().x;
+    ImGui::SeparatorText("Content");
+
+    const float panel_width = ImGui::GetContentRegionAvail().x;
 
     static constexpr uint32_t cell_size = 100;
 
-    uint32_t template_count = templates_.size();
-    uint32_t column_count = static_cast<uint32_t>(panel_width / cell_size);
+    const uint32_t template_count = templates_.size();
+    const uint32_t column_count =
+        static_cast<uint32_t>(panel_width / cell_size);
 
     ImGui::Columns(column_count, 0, false);
 
     for (const ProjectTemplateInfo& info : templates_) {
+      const bool selected = selected_info_.type == info.type;
 
-      ImGui::PushID(info.name.c_str());
+      glm::vec4 button_active_color;
+      static_assert(sizeof(glm::vec4) == sizeof(ImVec4));
+      memcpy(&button_active_color,
+             &ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered],
+             sizeof(glm::vec4));
+
+      ImGui::ScopedStyleColor _color(ImGuiCol_Button, button_active_color,
+                                     selected);
 
       if (ImGui::Button(info.name.c_str(), ImVec2(cell_size, cell_size))) {
         selected_info_ = info;
       }
-
-      ImGui::TextUnformatted(info.name.c_str());
-
-      ImGui::PopID();
     }
 
     ImGui::Columns();
@@ -73,18 +110,22 @@ void UiLayer::OnGUI(float ds) {
   ImGui::SameLine();
 
   ImGui::BeginChild("Options", ImVec2(0, 0), true);
-  if (selected_info_.type != ProjectTemplate::kNone) {
+  {
+    ImGui::SeparatorText("Options");
 
-    ImGui::InputText("Name", &project_name_);
-    ImGui::InputText("Path", &project_path_);
+    if (selected_info_.type != ProjectTemplate::kNone) {
 
-    if (ImGui::Button("Create", ImVec2(-1, 0))) {
-      if (fs::exists(fs::path(project_path_) / project_name_)) {
-        modal_state_ = ModalState::kProjectExists;
-      } else if (CreateProject()) {
-        modal_state_ = ModalState::kProjectSuccess;
-      } else {
-        modal_state_ = ModalState::kProjectFailed;
+      ImGui::InputText("Name", &project_name_);
+      ImGui::InputText("Directory", &project_directory_);
+
+      if (ImGui::Button("Create", ImVec2(-1, 0))) {
+        if (fs::exists(GetProjectPath())) {
+          modal_state_ = ModalState::kProjectExists;
+        } else if (CreateProject()) {
+          modal_state_ = ModalState::kProjectSuccess;
+        } else {
+          modal_state_ = ModalState::kProjectFailed;
+        }
       }
     }
   }
@@ -111,7 +152,7 @@ void UiLayer::OnGUI(float ds) {
 }
 
 bool UiLayer::CreateProject() {
-  if (project_name_.empty() || project_path_.empty()) {
+  if (project_name_.empty() || project_directory_.empty()) {
     std::cerr << "Invalid project name or path." << std::endl;
     return false;
   }
@@ -121,22 +162,21 @@ bool UiLayer::CreateProject() {
     return false;
   }
 
-  fs::path new_path = fs::path(project_path_) / project_name_;
+  fs::path project_path = fs::path(project_directory_) / project_name_;
 
   try {
-    fs::create_directories(new_path);
-    fs::copy(selected_info_.path, new_path, fs::copy_options::recursive);
+    fs::create_directories(project_path);
+    fs::copy(selected_info_.path, project_path, fs::copy_options::recursive);
   } catch (const fs::filesystem_error& e) {
     return false;
   }
 
-  fs::path new_project_path = new_path / std::format("{}.eproj", project_name_);
+  fs::path project_file_path =
+      project_path / std::format("{}.eproj", project_name_);
 
-  fs::rename(new_path / "{{project_name}}.eproj", new_project_path);
+  fs::rename(project_path / "{{project_name}}.eproj", project_file_path);
 
-  const std::string name_key = "{{project_name}}";
-
-  std::ifstream project_in(new_project_path);
+  std::ifstream project_in(project_file_path);
   if (!project_in.is_open()) {
     return false;
   }
@@ -145,12 +185,16 @@ bool UiLayer::CreateProject() {
   text << project_in.rdbuf();
 
   std::string content = text.str();
+
+  // Replace project name
+  const std::string name_key = "{{project_name}}";
   size_t pos = content.find(name_key);
   content.replace(pos, name_key.length(), project_name_);
 
   project_in.close();
 
-  std::ofstream project_out(new_project_path);
+  // Write out the new data
+  std::ofstream project_out(project_file_path);
   if (!project_out.is_open()) {
     return false;
   }
@@ -162,13 +206,13 @@ bool UiLayer::CreateProject() {
 
 void UiLayer::RenderProjectFailedPopup() {
   bool open = true;
-  if (ImGui::BeginPopupModal("failed_popup", &open,
+  if (ImGui::BeginPopupModal("ProjectFailedModal", &open,
                              ImGuiWindowFlags_AlwaysAutoResize |
                                  ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoDecoration |
                                  ImGuiWindowFlags_NoSavedSettings)) {
     ImGui::Text("Unable to create project on specified path: %s",
-                project_path_.c_str());
+                project_directory_.c_str());
     if (ImGui::Button("Close", ImVec2(-1, 0))) {
       modal_state_ = ModalState::kNone;
       ImGui::CloseCurrentPopup();
@@ -177,51 +221,24 @@ void UiLayer::RenderProjectFailedPopup() {
     ImGui::EndPopup();
   }
 
-  ImGui::OpenPopup("failed_popup");
+  ImGui::OpenPopup("ProjectFailedModal");
 }
 
 void UiLayer::RenderProjectSuccessPopup() {
-  bool open = true;
-  if (ImGui::BeginPopupModal("success_popup", &open,
+  if (ImGui::BeginPopupModal("ProjectSuccessModal", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize |
                                  ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoDecoration |
                                  ImGuiWindowFlags_NoSavedSettings)) {
-    ImGui::Text("Project created at: %s\nWould you like to open it?",
-                GetProjectPath().string().c_str());
+
+    ImGui::Text("Project created at: %s", GetProjectPath().string().c_str());
 
     if (ImGui::Button("Open")) {
-      const char* editor_path = getenv("EVE_ROOT");
-      if (editor_path != nullptr) {
-        const auto editor_executable = fs::path(editor_path) / "eve_editor";
-        const auto project = GetProjectPath() / project_name_;
+      TryExecuteEditor();
 
-#if _WIN32
-        bool is_windows = true;
-#else
-        bool is_windows = false;
-#endif
+      modal_state_ = ModalState::kNone;
 
-        std::string command =
-            std::format("{0}{2} {1}.eproj", editor_executable.string(),
-                        project.string(), is_windows ? ".exe" : "");
-
-        // run at background
-        if (is_windows) {
-          command = std::format("start \"\" {}", command);
-        } else {
-          command = std::format("{} &", command);
-        }
-
-        bool success = std::system(command.c_str());
-
-        modal_state_ = ModalState::kNone;
-
-        ImGui::CloseCurrentPopup();
-      } else {
-        modal_state_ = ModalState::kEditorFailed;
-        ImGui::CloseCurrentPopup();
-      }
+      ImGui::CloseCurrentPopup();
     }
 
     ImGui::SameLine();
@@ -234,12 +251,12 @@ void UiLayer::RenderProjectSuccessPopup() {
     ImGui::EndPopup();
   }
 
-  ImGui::OpenPopup("success_popup");
+  ImGui::OpenPopup("ProjectSuccessModal");
 }
 
 void UiLayer::RenderProjectExistsPopup() {
   bool open = true;
-  if (ImGui::BeginPopupModal("project_exists_popup", &open,
+  if (ImGui::BeginPopupModal("ProjectExistsModal", &open,
                              ImGuiWindowFlags_AlwaysAutoResize |
                                  ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoDecoration |
@@ -256,12 +273,12 @@ void UiLayer::RenderProjectExistsPopup() {
     ImGui::EndPopup();
   }
 
-  ImGui::OpenPopup("project_exists_popup");
+  ImGui::OpenPopup("ProjectExistsModal");
 }
 
 void UiLayer::RenderEditorFailedPopup() {
   bool open = true;
-  if (ImGui::BeginPopupModal("editor_failed_popup", &open,
+  if (ImGui::BeginPopupModal("EditorFailedModal", &open,
                              ImGuiWindowFlags_AlwaysAutoResize |
                                  ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoDecoration |
@@ -278,5 +295,38 @@ void UiLayer::RenderEditorFailedPopup() {
     ImGui::EndPopup();
   }
 
-  ImGui::OpenPopup("editor_failed_popup");
+  ImGui::OpenPopup("EditorFailedModal");
+}
+
+bool UiLayer::TryExecuteEditor() {
+  const char* editor_path_cstr = getenv("EVE_ROOT");
+  if (editor_path_cstr == nullptr) {
+    return false;
+  }
+
+  const fs::path editor_path = editor_path_cstr;
+
+  const auto editor_executable = editor_path / "eve_editor";
+  const auto project = GetProjectPath() / project_name_;
+
+#if _WIN32
+  bool is_windows = true;
+#else
+  bool is_windows = false;
+#endif
+
+  std::string command =
+      std::format("{0}{2} \"{1}.eproj\"", editor_executable.string(),
+                  project.string(), is_windows ? ".exe" : "");
+
+  // run at background
+  if (is_windows) {
+    command =
+        std::format("start \"\" /D \"{0}\" {1}", editor_path.string(), command);
+  } else {
+    command =
+        std::format("(cd \"{0}\" ; {1} &)", editor_path.string(), command);
+  }
+
+  return std::system(command.c_str());
 }

@@ -22,7 +22,7 @@ class EditorInstance : public Instance {
           ScriptEngine::Init();
           SceneManager::SetActive(0);
         } else {
-          LOG_EDITOR_ERROR("Unable to open project from: {}", path);
+          EVE_LOG_EDITOR_ERROR("Unable to open project from: {}", path);
         }
       });
     }

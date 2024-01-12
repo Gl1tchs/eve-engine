@@ -6,12 +6,12 @@
 
 #include "graphics/renderer.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 #include "utils/cpuid.h"
 
 namespace eve {
 class DebugInfoPanel : public Panel {
-  IMPL_PANEL("Debug Info")
+  EVE_IMPL_PANEL("Debug Info")
 
  public:
   DebugInfoPanel(Ref<Renderer>& renderer);

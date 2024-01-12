@@ -51,7 +51,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
 
   if (status != MONO_IMAGE_OK) {
     const char* error_message = mono_image_strerror(status);
-    LOG_ENGINE_ERROR("{}", error_message);
+    EVE_LOG_ENGINE_ERROR("{}", error_message);
     return nullptr;
   }
 
@@ -64,7 +64,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
       mono_debug_open_image_from_memory(
           image, pdb_file_data.As<const mono_byte>(), pdb_file_data.Size());
 
-      LOG_ENGINE_INFO("Loaded PDB {}", pdb_path.string());
+      EVE_LOG_ENGINE_INFO("Loaded PDB {}", pdb_path.string());
     }
   }
 
@@ -93,7 +93,7 @@ void PrintAssemblyTypes(MonoAssembly* assembly) {
         mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
 
 #ifdef _DEBUG
-    LOG_ENGINE_TRACE("{}.{}", class_namespace, name);
+    EVE_LOG_ENGINE_TRACE("{}.{}", class_namespace, name);
 #endif
   }
 }
@@ -103,7 +103,7 @@ ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType) {
 
   auto it = script_field_type_map.find(type_name);
   if (it == script_field_type_map.end()) {
-    LOG_ENGINE_ERROR("Unknown type: {}", type_name);
+    EVE_LOG_ENGINE_ERROR("Unknown type: {}", type_name);
     return ScriptFieldType::kNone;
   }
 
@@ -181,7 +181,7 @@ void ScriptEngine::Init(bool is_runtime) {
 
   bool status = LoadAssembly("script-core.dll");
   if (!status) {
-    LOG_ENGINE_ERROR("[ScriptEngine] Could not load script-core assembly.");
+    EVE_LOG_ENGINE_ERROR("[ScriptEngine] Could not load script-core assembly.");
     return;
   }
 
@@ -190,7 +190,7 @@ void ScriptEngine::Init(bool is_runtime) {
       std::format("out/{}.dll", Project::GetProjectName());
   status = LoadAppAssembly(script_module_path);
   if (!status) {
-    LOG_ENGINE_ERROR("[ScriptEngine] Could not load app assembly.");
+    EVE_LOG_ENGINE_ERROR("[ScriptEngine] Could not load app assembly.");
     return;
   }
 
@@ -352,7 +352,7 @@ void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
   if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
     instance->InvokeOnUpdate(ds);
   } else {
-    LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
+    EVE_LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
                      (uint64_t)entity_uuid);
   }
 }
@@ -362,7 +362,7 @@ void ScriptEngine::OnDestroyEntity(Entity entity) {
   if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
     instance->InvokeOnDestroy();
   } else {
-    LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
+    EVE_LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
                      (uint64_t)entity_uuid);
   }
 }
@@ -455,7 +455,7 @@ void ScriptEngine::LoadAssemblyClasses() {
 
     int fieldCount = mono_class_num_fields(mono_class);
 #ifdef _DEBUG
-    LOG_ENGINE_WARNING("{} has {} fields:", class_name, fieldCount);
+    EVE_LOG_ENGINE_WARNING("{} has {} fields:", class_name, fieldCount);
 #endif
     void* iterator = nullptr;
     while (MonoClassField* field =
@@ -466,7 +466,7 @@ void ScriptEngine::LoadAssemblyClasses() {
         MonoType* type = mono_field_get_type(field);
         ScriptFieldType field_type = MonoTypeToScriptFieldType(type);
 #ifdef _DEBUG
-        LOG_ENGINE_WARNING("  {} ({})", field_name,
+        EVE_LOG_ENGINE_WARNING("  {} ({})", field_name,
                            ScriptFieldTypeToString(field_type));
 #endif
         script_class->fields_[field_name] = {field_type, field_name, field};
@@ -503,7 +503,7 @@ void ScriptEngine::GenerateProjectFiles() {
                             (Project::GetProjectName() + ".csproj"));
 
   if (!csproj_file.is_open()) {
-    LOG_ENGINE_ERROR("Error: Unable to create .csproj file");
+    EVE_LOG_ENGINE_ERROR("Error: Unable to create .csproj file");
     return;
   }
 
@@ -537,23 +537,23 @@ void ScriptEngine::GenerateProjectFiles() {
   </ItemGroup>
 </Project>)";
 
-  LOG_ENGINE_TRACE("Project files are generated successfully.");
+  EVE_LOG_ENGINE_TRACE("Project files are generated successfully.");
 }
 
 void ScriptEngine::BuildScripts() {
   fs::path csproj_path =
       Project::GetProjectDirectory() / (Project::GetProjectName() + ".csproj");
   if (!fs::exists(csproj_path)) {
-    LOG_ENGINE_WARNING("Unable to find project files creating...");
+    EVE_LOG_ENGINE_WARNING("Unable to find project files creating...");
     GenerateProjectFiles();
   }
 
   int result =
       std::system(std::format("dotnet build {}", csproj_path.string()).c_str());
   if (result == 0) {
-    LOG_ENGINE_INFO("Scripts built successfully!");
+    EVE_LOG_ENGINE_INFO("Scripts built successfully!");
   } else {
-    LOG_ENGINE_ERROR("Script building process failed!");
+    EVE_LOG_ENGINE_ERROR("Script building process failed!");
   }
 }
 

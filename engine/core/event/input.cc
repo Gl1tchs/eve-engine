@@ -83,7 +83,7 @@ bool Input::IsKeyPressed(const std::string& key) {
                    [key](const auto& pair) { return pair.first == key; });
 
   if (it == key_mappings_.end()) {
-    LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
+    EVE_LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
     return false;
   }
 
@@ -104,7 +104,7 @@ bool Input::IsKeyReleased(const std::string& key) {
                    [key](const auto& pair) { return pair.first == key; });
 
   if (it == key_mappings_.end()) {
-    LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
+    EVE_LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
     return false;
   }
 
@@ -125,7 +125,7 @@ bool Input::IsMouseButtonPressed(const std::string& key) {
                    [key](const auto& pair) { return pair.first == key; });
 
   if (it == mouse_mappings_.end()) {
-    LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
+    EVE_LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
     return false;
   }
 
@@ -146,7 +146,7 @@ bool Input::IsMouseButtonReleased(const std::string& key) {
                    [key](const auto& pair) { return pair.first == key; });
 
   if (it == mouse_mappings_.end()) {
-    LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
+    EVE_LOG_ENGINE_WARNING("KeyMapping for '{}' not found!", key);
     return false;
   }
 
@@ -200,7 +200,7 @@ void Input::Serialize(const fs::path& path) {
 bool Input::Deserialize(const fs::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
-    LOG_ENGINE_ERROR("Failed to deserialize input mappings from: {}",
+    EVE_LOG_ENGINE_ERROR("Failed to deserialize input mappings from: {}",
                      path.string());
     return false;
   }

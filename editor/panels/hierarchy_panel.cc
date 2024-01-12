@@ -7,7 +7,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 #include "scene/scene.h"
-#include "utils/imgui_utils.h"
+#include "ui/imgui_utils.h"
 #include "utils/modify_info.h"
 
 namespace eve {

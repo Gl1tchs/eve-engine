@@ -39,23 +39,23 @@ static MonoObject* GetScriptInstance(UUID entity_id) {
 }
 
 static void Debug_Log(MonoString* string) {
-  LOG_CLIENT_TRACE("{}", MonoStringToString(string));
+  EVE_LOG_CLIENT_TRACE("{}", MonoStringToString(string));
 }
 
 static void Debug_LogInfo(MonoString* string) {
-  LOG_CLIENT_INFO("{}", MonoStringToString(string));
+  EVE_LOG_CLIENT_INFO("{}", MonoStringToString(string));
 }
 
 static void Debug_LogWarning(MonoString* string) {
-  LOG_CLIENT_WARNING("{}", MonoStringToString(string));
+  EVE_LOG_CLIENT_WARNING("{}", MonoStringToString(string));
 }
 
 static void Debug_LogError(MonoString* string) {
-  LOG_CLIENT_ERROR("{}", MonoStringToString(string));
+  EVE_LOG_CLIENT_ERROR("{}", MonoStringToString(string));
 }
 
 static void Debug_LogFatal(MonoString* string) {
-  LOG_CLIENT_FATAL("{}", MonoStringToString(string));
+  EVE_LOG_CLIENT_FATAL("{}", MonoStringToString(string));
 }
 
 static bool Entity_HasComponent(UUID entity_id,
@@ -590,7 +590,7 @@ static void RegisterComponent() {
         MonoType* managed_type = mono_reflection_type_from_name(
             managed_type_name.data(), ScriptEngine::GetCoreAssemblyImage());
         if (!managed_type) {
-          LOG_ENGINE_ERROR("Could not find component type {}",
+          EVE_LOG_ENGINE_ERROR("Could not find component type {}",
                            managed_type_name);
           return;
         }

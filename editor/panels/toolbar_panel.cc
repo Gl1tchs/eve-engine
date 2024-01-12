@@ -5,7 +5,7 @@
 #include <IconsFontAwesome4.h>
 #include <imgui.h>
 
-#include "utils/imgui_utils.h"
+#include "ui/imgui_utils.h"
 
 namespace eve {
 ToolbarPanel::ToolbarPanel() : Panel(true) {

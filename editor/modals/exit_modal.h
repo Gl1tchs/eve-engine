@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "modals/modal.h"
+#include "ui/modal.h"
 
 namespace eve {
+
 enum class ExitModalAnswer {
   kSaveAndExit,
   kExitWithoutSaving,
@@ -12,6 +13,8 @@ enum class ExitModalAnswer {
 };
 
 class ExitModal : public Modal {
+  EVE_IMPL_MODAL("ExitModal")
+
  public:
   ExitModal();
   virtual ~ExitModal() = default;
@@ -21,4 +24,5 @@ class ExitModal : public Modal {
  protected:
   void Draw() override;
 };
+
 }  // namespace eve

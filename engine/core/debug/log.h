@@ -73,67 +73,67 @@ class Logger {
 };
 }  // namespace eve
 
-#define LOG_ENGINE_TRACE(...)                                            \
+#define EVE_LOG_ENGINE_TRACE(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kTrace, \
                      std::format(__VA_ARGS__))
-#define LOG_ENGINE_INFO(...)                                            \
+#define EVE_LOG_ENGINE_INFO(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kInfo, \
                      std::format(__VA_ARGS__))
-#define LOG_ENGINE_WARNING(...)                                            \
+#define EVE_LOG_ENGINE_WARNING(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kWarning, \
                      std::format(__VA_ARGS__))
-#define LOG_ENGINE_ERROR(...)                                            \
+#define EVE_LOG_ENGINE_ERROR(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kError, \
                      std::format(__VA_ARGS__))
-#define LOG_ENGINE_FATAL(...)                                            \
+#define EVE_LOG_ENGINE_FATAL(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEngine, ::eve::LogLevel::kFatal, \
                      std::format(__VA_ARGS__))
 
-#define LOG_EDITOR_TRACE(...)                                            \
+#define EVE_LOG_EDITOR_TRACE(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kTrace, \
                      std::format(__VA_ARGS__))
-#define LOG_EDITOR_INFO(...)                                            \
+#define EVE_LOG_EDITOR_INFO(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kInfo, \
                      std::format(__VA_ARGS__))
-#define LOG_EDITOR_WARNING(...)                                            \
+#define EVE_LOG_EDITOR_WARNING(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kWarning, \
                      std::format(__VA_ARGS__))
-#define LOG_EDITOR_ERROR(...)                                            \
+#define EVE_LOG_EDITOR_ERROR(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kError, \
                      std::format(__VA_ARGS__))
-#define LOG_EDITOR_FATAL(...)                                            \
+#define EVE_LOG_EDITOR_FATAL(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kEditor, ::eve::LogLevel::kFatal, \
                      std::format(__VA_ARGS__))
 
-#define LOG_RUNTIME_TRACE(...)                                            \
+#define EVE_LOG_RUNTIME_TRACE(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kTrace, \
                      std::format(__VA_ARGS__))
-#define LOG_RUNTIME_INFO(...)                                            \
+#define EVE_LOG_RUNTIME_INFO(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kInfo, \
                      std::format(__VA_ARGS__))
-#define LOG_RUNTIME_WARNING(...)                                            \
+#define EVE_LOG_RUNTIME_WARNING(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kWarning, \
                      std::format(__VA_ARGS__))
-#define LOG_RUNTIME_ERROR(...)                                            \
+#define EVE_LOG_RUNTIME_ERROR(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kError, \
                      std::format(__VA_ARGS__))
-#define LOG_RUNTIME_FATAL(...)                                            \
+#define EVE_LOG_RUNTIME_FATAL(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kRuntime, ::eve::LogLevel::kFatal, \
                      std::format(__VA_ARGS__))
 
-#define LOG_CLIENT_TRACE(...)                                            \
+#define EVE_LOG_CLIENT_TRACE(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kTrace, \
                      std::format(__VA_ARGS__))
-#define LOG_CLIENT_INFO(...)                                            \
+#define EVE_LOG_CLIENT_INFO(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kInfo, \
                      std::format(__VA_ARGS__))
-#define LOG_CLIENT_WARNING(...)                                            \
+#define EVE_LOG_CLIENT_WARNING(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kWarning, \
                      std::format(__VA_ARGS__))
-#define LOG_CLIENT_ERROR(...)                                            \
+#define EVE_LOG_CLIENT_ERROR(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kError, \
                      std::format(__VA_ARGS__))
-#define LOG_CLIENT_FATAL(...)                                            \
+#define EVE_LOG_CLIENT_FATAL(...)                                            \
   ::eve::Logger::Log(::eve::LogSender::kClient, ::eve::LogLevel::kFatal, \
                      std::format(__VA_ARGS__))
 
@@ -151,7 +151,7 @@ class Logger {
 
 #define INTERNAL_ASSERT_IMPL(check, msg, ...) \
   if (!(check)) {                             \
-    LOG_ENGINE_FATAL(msg, __VA_ARGS__);       \
+    EVE_LOG_ENGINE_FATAL(msg, __VA_ARGS__);       \
     DEBUGBREAK();                             \
   }
 

@@ -31,7 +31,7 @@ OpenGLSkyBox::OpenGLSkyBox(const fs::path& path) {
 
   if (!data) {
     stbi_image_free(data);
-    LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {0}",
+    EVE_LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {0}",
                      path.string());
     ASSERT(false);
     return;
@@ -135,7 +135,7 @@ OpenGLSkyBox::OpenGLSkyBox(const std::vector<fs::path>& paths) {
                    width, height, 0, internal_format, GL_UNSIGNED_BYTE, data);
       stbi_image_free(data);
     } else {
-      LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {}",
+      EVE_LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {}",
                        paths[i].string());
       stbi_image_free(data);
       ASSERT(false);

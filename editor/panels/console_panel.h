@@ -4,7 +4,7 @@
 
 #include "pch.h"
 
-#include "panels/panel.h"
+#include "ui/panel.h"
 
 namespace eve {
 
@@ -23,7 +23,7 @@ enum LogLevelFilter : uint16_t {
 };
 
 class ConsolePanel : public Panel {
-  IMPL_PANEL("Console")
+  EVE_IMPL_PANEL("Console")
 
  public:
   ConsolePanel();

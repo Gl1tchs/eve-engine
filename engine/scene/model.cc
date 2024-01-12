@@ -28,7 +28,7 @@ Ref<Model> Model::Create(const fs::path& path) {
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       !scene->mRootNode) {
-    LOG_ENGINE_ERROR("Unable to load model: {}", importer.GetErrorString());
+    EVE_LOG_ENGINE_ERROR("Unable to load model: {}", importer.GetErrorString());
     return nullptr;
   }
 
