@@ -1,11 +1,10 @@
 {
   "asset_directory": "assets",
-  "script_directory": "scripts",
+  "script_directory" : "scripts",
   "asset_registry": "config/asset_registry.esf",
   "keymaps": "config/keymaps.esf",
-  "name": "multiple_scenes",
+  "name": "{{project_name}}",
   "scenes": [
-    "res://scenes/scene1.escn",
-    "res://scenes/scene2.escn"
+    "res://blank_scene.escn"
   ]
 }

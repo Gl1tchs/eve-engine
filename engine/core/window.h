@@ -16,7 +16,7 @@ enum class WindowMode {
   kWindowedFullscreen,
 };
 
-struct WindowProps {
+struct WindowCreateInfo {
   std::string title =
       "Eve Project";  // TODO add the rendering api to the title ex: "Eve Project | OpenGL"
   glm::ivec2 size = {800, 600};
@@ -27,7 +27,7 @@ struct WindowProps {
 
 class Window final {
  public:
-  Window(WindowProps props);
+  Window(WindowCreateInfo props);
   ~Window();
 
   [[nodiscard]] bool IsOpen();

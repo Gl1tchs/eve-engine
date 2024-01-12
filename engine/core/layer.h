@@ -13,7 +13,6 @@ class Layer {
   Layer(Ref<State>& state);
   virtual ~Layer() = default;
 
- private:
   virtual void OnStart() {}
 
   virtual void OnDestroy() {}

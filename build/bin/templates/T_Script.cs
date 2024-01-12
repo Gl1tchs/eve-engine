@@ -1,8 +1,8 @@
 using EveEngine;
 
-namespace {{NAMESPACE}}
+namespace {{namespace}}
 {
-  public class {{SCRIPT_CLASS}} : Entity
+  public class {{class_name}} : Entity
   {
     protected override void OnCreate()
     {

@@ -5,20 +5,32 @@
 #include "core/layer.h"
 
 namespace eve {
+
+struct ImGuiSettings {
+  bool enable_viewports = true;
+  bool enable_docking = true;
+};
+
 class ImGuiLayer : public Layer {
  public:
   ImGuiLayer(Ref<State>& state);
   ~ImGuiLayer() = default;
 
-  void Begin();
-
-  void End();
-
- private:
   void OnStart() override;
 
   void OnDestroy() override;
 
+  void Begin();
+
+  void End();
+
+  ImGuiSettings& GetSettings() { return settings_; }
+
+ private:
   void SetDarkThemeColors();
+
+ private:
+  ImGuiSettings settings_{};
 };
+
 }  // namespace eve

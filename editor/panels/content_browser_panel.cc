@@ -26,8 +26,8 @@ ContentBrowserPanel::ContentBrowserPanel()
 }
 
 void ContentBrowserPanel::Reload() {
-  base_directory_ = Project::GetAssetDirectory();
-  current_directory_ = base_directory_;
+  base_directory_ = Project::GetProjectDirectory();
+  current_directory_ = Project::GetAssetDirectory();
 }
 
 void ContentBrowserPanel::Draw() {
@@ -37,7 +37,7 @@ void ContentBrowserPanel::Draw() {
     return;
   }
 
-  if (ImGui::Button("assets")) {
+  if (ImGui::Button(Project::GetProjectName().c_str())) {
     current_directory_ = base_directory_;
   }
 

@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-
-#include "core/utils/memory.h"
+#include "core/color.h"
 #include "graphics/vertex_array.h"
 
 namespace eve {
@@ -26,7 +24,7 @@ class RendererAPI {
   virtual void Init() = 0;
 
   virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) = 0;
-  virtual void SetClearColor(const glm::vec4& color) = 0;
+  virtual void SetClearColor(const Color& color) = 0;
   virtual void Clear(uint16_t bits = BufferBits_kColor) = 0;
 
   virtual void DrawArrays(const Ref<VertexArray>& vertex_array,

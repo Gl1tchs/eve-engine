@@ -11,9 +11,21 @@
 #include <imgui_internal.h>
 
 namespace eve {
+
 ImGuiLayer::ImGuiLayer(Ref<State>& state) : Layer(state) {}
 
 void ImGuiLayer::Begin() {
+  ImGuiIO& io = ImGui::GetIO();
+  if (settings_.enable_docking)
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  else
+    io.ConfigFlags &= ImGuiConfigFlags_DockingEnable;
+
+  if (settings_.enable_viewports)
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+  else
+    io.ConfigFlags &= ImGuiConfigFlags_ViewportsEnable;
+
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
@@ -45,8 +57,12 @@ void ImGuiLayer::OnStart() {
   (void)io;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+  if (settings_.enable_docking)
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+  if (settings_.enable_viewports)
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
   io.FontDefault = io.Fonts->AddFontFromFileTTF(
       "assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
@@ -141,7 +157,7 @@ void ImGuiLayer::SetDarkThemeColors() {
   style.ScrollbarSize = 15;
   style.GrabMinSize = 10;
   style.WindowBorderSize = 0;
-  style.ChildBorderSize = 0;
+  style.ChildBorderSize = 1;
   style.PopupBorderSize = 0;
   style.FrameBorderSize = 0;
   style.TabBorderSize = 1;

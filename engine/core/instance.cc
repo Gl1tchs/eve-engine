@@ -26,7 +26,7 @@ Instance::~Instance() {
 
 void Instance::Init() {
   // TODO get this from project config
-  WindowProps props;
+  WindowCreateInfo props;
   props.title = specs_.name;
   props.size = {1680, 900};
   props.mode = WindowMode::kWindowed;

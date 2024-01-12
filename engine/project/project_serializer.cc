@@ -20,6 +20,7 @@ void ProjectSerializer::Serialize(const fs::path& path) {
 
   j = json{{"name", config.name},
            {"asset_directory", config.asset_directory},
+           {"script_directory", config.script_directory},
            {"asset_registry", config.asset_registry},
            {"keymaps", config.keymaps},
            {"scenes", json::array()}};
@@ -46,6 +47,7 @@ bool ProjectSerializer::Deserialize(const fs::path& path) {
 
   config.name = j["name"].get<std::string>();
   config.asset_directory = j["asset_directory"].get<std::string>();
+  config.script_directory = j["script_directory"].get<std::string>();
   config.asset_registry = j["asset_registry"].get<std::string>();
   config.keymaps = j["keymaps"].get<std::string>();
 

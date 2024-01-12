@@ -20,8 +20,8 @@ void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t w,
   glViewport(x, y, w, h);
 }
 
-void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
-  glClearColor(color.x, color.y, color.z, color.w);
+void OpenGLRendererAPI::SetClearColor(const Color& color) {
+  glClearColor(color.r, color.g, color.b, color.a);
 }
 
 [[nodiscard]] static bool HasFlag(uint16_t flags, BufferBits flag) {

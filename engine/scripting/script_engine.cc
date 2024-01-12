@@ -286,17 +286,19 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
   if (!data->is_runtime) {
     // Create file watchers for script files.
     for (const auto& entry :
-         fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
-      if (entry.is_directory()) {
-        if (std::any_of(fs::directory_iterator(entry.path()),
-                        fs::directory_iterator(), [](const auto& subentry) {
-                          return subentry.path().extension() == ".cs";
-                        })) {
-          data->script_file_watchers.push_back(
-              CreateScope<filewatch::FileWatch<std::string>>(
-                  entry.path().string(), OnScriptFileChanged));
-          data->assembly_reload_pending = false;
-        }
+         fs::recursive_directory_iterator(Project::GetScriptDirectory())) {
+      if (!entry.is_directory()) {
+        continue;
+      }
+
+      if (std::any_of(fs::directory_iterator(entry.path()),
+                      fs::directory_iterator(), [](const auto& subentry) {
+                        return subentry.path().extension() == ".cs";
+                      })) {
+        data->script_file_watchers.push_back(
+            CreateScope<filewatch::FileWatch<std::string>>(
+                entry.path().string(), OnScriptFileChanged));
+        data->assembly_reload_pending = false;
       }
     }
   }
@@ -519,7 +521,7 @@ void ScriptEngine::GenerateProjectFiles() {
                              project_dir);
 
   for (const auto& entry :
-       fs::recursive_directory_iterator(Project::GetAssetDirectory())) {
+       fs::recursive_directory_iterator(Project::GetScriptDirectory())) {
     if (entry.is_regular_file() && entry.path().extension() == ".cs") {
       csproj_file << "       <Compile Include=\"" << entry.path().string()
                   << "\" />";

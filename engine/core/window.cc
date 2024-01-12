@@ -14,7 +14,7 @@ namespace eve {
 
 void GlfwErrorCallback(int error, const char* description);
 
-Window::Window(WindowProps props) {
+Window::Window(WindowCreateInfo props) {
 
   title_ = props.title;
   size_ = props.size;
@@ -58,18 +58,15 @@ Window::Window(WindowProps props) {
 }
 
 Window::~Window() {
-
   glfwDestroyWindow(window_);
   glfwTerminate();
 }
 
 bool Window::IsOpen() {
-
   return !glfwWindowShouldClose(window_);
 }
 
 void Window::SwapBuffers() {
-
   glfwPollEvents();
   glfwSwapBuffers(window_);
 }

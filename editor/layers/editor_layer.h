@@ -30,7 +30,6 @@ class EditorLayer : public Layer {
   EditorLayer(Ref<State>& state);
   virtual ~EditorLayer() = default;
 
- private:
   void OnStart() override;
 
   void OnDestroy() override;
