@@ -2,7 +2,7 @@
 
 # Screenshots
 
-![Editor](.github/editor.png)
+![Editor](.github/editor-ss.png)
 
 ## Table Of Contents:
   - [BUILDING](./BUILDING.md)
