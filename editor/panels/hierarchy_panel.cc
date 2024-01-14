@@ -44,6 +44,8 @@ void HierarchyPanel::Draw() {
     modify_info.SetModified();
   }
 
+  ImGui::Separator();
+
   std::vector<Entity> entities_to_remove{};
 
   for (auto [uuid, entity] : scene->entity_map_) {

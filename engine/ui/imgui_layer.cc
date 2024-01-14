@@ -104,7 +104,7 @@ void ImGuiLayer::SetDarkThemeColors() {
   style.ChildBorderSize = 1;
   style.PopupBorderSize = 0;
   style.FrameBorderSize = 0;
-  style.TabBorderSize = 0;
+  style.TabBorderSize = 1;
   style.WindowRounding = 0;
   style.ChildRounding = 0;
   style.FrameRounding = 0;

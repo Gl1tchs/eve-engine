@@ -540,8 +540,6 @@ void ScriptEngine::GenerateProjectFiles() {
 }
 
 void ScriptEngine::BuildScripts() {
-  return;
-
   fs::path csproj_path =
       Project::GetProjectDirectory() / (Project::GetProjectName() + ".csproj");
   if (!fs::exists(csproj_path)) {
