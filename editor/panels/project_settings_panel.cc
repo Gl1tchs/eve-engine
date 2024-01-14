@@ -82,11 +82,19 @@ void ProjectSettingsPanel::DrawGeneralSettings() {
   if (ImGui::InputText("Name", &config.name)) {
     modify_info.SetModified();
   }
-  ImGui::InputText("Asset Directory", &config.asset_directory,
-                   ImGuiInputTextFlags_ReadOnly);
+
+  if (ImGui::InputText("Asset Directory", &config.asset_directory)) {
+    modify_info.SetModified();
+  }
+
+  if (ImGui::InputText("Script Directory", &config.script_directory)) {
+    modify_info.SetModified();
+  }
+
   if (ImGui::InputText("Asset Registry", &config.asset_registry)) {
     modify_info.SetModified();
   }
+
   if (ImGui::InputText("Keymaps", &config.keymaps)) {
     modify_info.SetModified();
   }

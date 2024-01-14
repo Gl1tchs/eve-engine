@@ -8,6 +8,7 @@
 #include "panels/asset_registry_panel.h"
 #include "project/project.h"
 #include "scene/scene_manager.h"
+#include "ui/imgui_utils.h"
 
 namespace eve {
 
@@ -37,7 +38,7 @@ void ContentBrowserPanel::Draw() {
     return;
   }
 
-  if (ImGui::Button(Project::GetProjectName().c_str())) {
+  if (ImGui::ButtonTransparent(Project::GetProjectName().c_str())) {
     current_directory_ = base_directory_;
   }
 
@@ -53,7 +54,7 @@ void ContentBrowserPanel::Draw() {
 
     if (current_directory_ != base_directory_) {
       for (const auto& part : relative_path) {
-        if (ImGui::Button(part.string().c_str())) {
+        if (ImGui::ButtonTransparent(part.string().c_str())) {
           std::string rel_string = relative_path.string();
           const std::string part_str = part.string();
 
@@ -79,13 +80,14 @@ void ContentBrowserPanel::Draw() {
   static float thumbnail_size = 100.0f;
   float cell_size = padding + thumbnail_size;
 
-  ImGui::SameLine(ImGui::GetContentRegionMax().x -
-                  ImGui::CalcTextSize("Settings").x);
-
   if (ImGui::BeginPopup("Settings")) {
-    ImGui::SliderFloat("Asset Size", &thumbnail_size, 1, 512);
+    ImGui::SliderFloat("Asset Size", &thumbnail_size, 48, 256);
     ImGui::EndPopup();
   }
+
+  ImGui::SameLine(ImGui::GetContentRegionMax().x -
+                  (ImGui::CalcTextSize("Settings").x +
+                   2 * ImGui::GetStyle().FramePadding.x));
 
   if (ImGui::Button("Settings")) {
     ImGui::OpenPopup("Settings");

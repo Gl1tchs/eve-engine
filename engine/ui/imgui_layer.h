@@ -27,7 +27,7 @@ class ImGuiLayer : public Layer {
   ImGuiSettings& GetSettings() { return settings_; }
 
  private:
-  void SetDarkThemeColors();
+  static void SetDarkThemeColors();
 
  private:
   ImGuiSettings settings_{};

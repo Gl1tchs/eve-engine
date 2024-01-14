@@ -7,9 +7,9 @@
 namespace eve {
 void DockSpace::Begin() {
   static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-  ImGuiWindowFlags window_flags =
+  static ImGuiWindowFlags window_flags =
       ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(viewport->Pos);
   ImGui::SetNextWindowSize(viewport->Size);

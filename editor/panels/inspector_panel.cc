@@ -16,8 +16,8 @@
 #include "scene/model.h"
 #include "scene/scene_manager.h"
 #include "scripting/script_engine.h"
-
 #include "ui/imgui_utils.h"
+
 #include "utils/modify_info.h"
 
 namespace eve {
@@ -50,42 +50,51 @@ void DisplayAddComponentEntry(Entity& selected_entity,
 template <typename T, typename UIFunction>
 static void DrawComponent(const std::string& name, Entity entity,
                           UIFunction ui_function) {
-  const ImGuiTreeNodeFlags tree_node_flags =
+  if (!entity.HasComponent<T>()) {
+    return;
+  }
+
+  constexpr ImGuiTreeNodeFlags kTreeNodeFlags =
       ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
       ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
       ImGuiTreeNodeFlags_FramePadding;
-  if (entity.HasComponent<T>()) {
-    auto& component = entity.GetComponent<T>();
-    ImVec2 content_region_available = ImGui::GetContentRegionAvail();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+  auto& component = entity.GetComponent<T>();
+  ImVec2 content_region_available = ImGui::GetContentRegionAvail();
 
-    float line_height = ImGui::GetIO().FontDefault->FontSize +
-                        ImGui::GetStyle().FramePadding.y * 2.0f;
-    ImGui::Separator();
-    bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), tree_node_flags,
-                                  "%s", name.c_str());
-    ImGui::PopStyleVar();
-    ImGui::SameLine(content_region_available.x - line_height * 0.5f);
-    if (ImGui::Button(ICON_FA_ELLIPSIS_H, ImVec2{line_height, line_height})) {
-      ImGui::OpenPopup("ComponentSettings");
-    }
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 
-    bool remove_component = false;
-    if (ImGui::BeginPopup("ComponentSettings")) {
-      if (ImGui::MenuItem("Remove component"))
-        remove_component = true;
+  const auto kFramePadding = ImGui::GetStyle().FramePadding;
 
-      ImGui::EndPopup();
-    }
+  const float kLineHeight =
+      ImGui::GetIO().FontDefault->FontSize + kFramePadding.y * 2.0f;
 
-    if (open) {
-      ui_function(component);
-      ImGui::TreePop();
-    }
+  ImGui::Separator();
+  bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), kTreeNodeFlags,
+                                "%s", name.c_str());
+  ImGui::PopStyleVar();
+  ImGui::SameLine(
+      content_region_available.x -
+      (ImGui::CalcTextSize(ICON_FA_ELLIPSIS_H).x + 2 * kFramePadding.x));
+  if (ImGui::ButtonTransparent(ICON_FA_ELLIPSIS_H, kLineHeight, kLineHeight)) {
+    ImGui::OpenPopup("ComponentSettings");
+  }
 
-    if (remove_component)
-      entity.RemoveComponent<T>();
+  bool remove_component = false;
+  if (ImGui::BeginPopup("ComponentSettings")) {
+    if (ImGui::MenuItem("Remove component"))
+      remove_component = true;
+
+    ImGui::EndPopup();
+  }
+
+  if (open) {
+    ui_function(component);
+    ImGui::TreePop();
+  }
+
+  if (remove_component) {
+    entity.RemoveComponent<T>();
   }
 }
 
@@ -99,16 +108,20 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
         });
   }
 
+  const float kPlusButtonWidth = ImGui::CalcTextSize(ICON_FA_PLUS).x +
+                                 2 * ImGui::GetStyle().FramePadding.x;
+
   if (selected_entity.HasComponent<TagComponent>()) {
     auto& tag_comp = selected_entity.GetComponent<TagComponent>();
+
+    ImGui::PushItemWidth(ImGui::GetContentRegionMax().x - kPlusButtonWidth);
 
     ImGui::InputText("##tag", &tag_comp.tag);
   }
 
-  ImGui::SameLine();
-  ImGui::PushItemWidth(-1);
+  ImGui::SameLine(ImGui::GetContentRegionMax().x - kPlusButtonWidth);
 
-  if (ImGui::Button("Add Component"))
+  if (ImGui::Button(ICON_FA_PLUS))
     ImGui::OpenPopup("AddComponent");
 
   if (ImGui::BeginPopup("AddComponent")) {
@@ -123,8 +136,6 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
 
     ImGui::EndPopup();
   }
-
-  ImGui::PopItemWidth();
 }
 
 static void DrawUniformField(ShaderUniform& uniform);
@@ -143,11 +154,13 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,
       [](Transform& transform) {
-        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.1f)) {
+        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position),
+                              0.1f)) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation), 0.1f)) {
+        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation),
+                              0.1f)) {
           modify_info.SetModified();
         }
 

@@ -11,12 +11,13 @@
 #include "utils/modify_info.h"
 
 namespace eve {
+
 HierarchyPanel::HierarchyPanel() : Panel(true), selected_entity_({}) {}
 
 void HierarchyPanel::SetSelectedEntity(Entity entity) {
   selected_entity_ = entity;
   if (auto& active_scene = SceneManager::GetActive(); active_scene) {
-    active_scene ->selected_entity_ = &selected_entity_;
+    active_scene->selected_entity_ = &selected_entity_;
   }
 }
 
@@ -32,10 +33,12 @@ void HierarchyPanel::Draw() {
     selected_entity_ = Entity{selected_entity_.entity_handle_, scene.get()};
   }
 
-  ImGui::Text("%s", scene->GetName().c_str());
+  ImGui::TextUnformatted(scene->GetName().c_str());
 
-  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
-  if (ImGui::ButtonTransparent(ICON_FA_PLUS, 30, 0)) {
+  ImGui::SameLine(ImGui::GetContentRegionMax().x -
+                  (ImGui::CalcTextSize(ICON_FA_PLUS).x +
+                   2 * ImGui::GetStyle().FramePadding.x));
+  if (ImGui::ButtonTransparent(ICON_FA_PLUS)) {
     // create entity and set selected to new created entity
     selected_entity_ = scene->CreateEntity();
     modify_info.SetModified();
@@ -78,4 +81,5 @@ void HierarchyPanel::Draw() {
     modify_info.SetModified();
   }
 }
+
 }  // namespace eve

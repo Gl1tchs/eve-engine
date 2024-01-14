@@ -179,9 +179,9 @@ void ScriptEngine::Init(bool is_runtime) {
     BuildScripts();
   }
 
-  bool status = LoadAssembly("script-core.dll");
+  bool status = LoadAssembly("script_core.dll");
   if (!status) {
-    EVE_LOG_ENGINE_ERROR("[ScriptEngine] Could not load script-core assembly.");
+    EVE_LOG_ENGINE_ERROR("[ScriptEngine] Could not load script_core assembly.");
     return;
   }
 
@@ -190,7 +190,7 @@ void ScriptEngine::Init(bool is_runtime) {
       std::format("out/{}.dll", Project::GetProjectName());
   status = LoadAppAssembly(script_module_path);
   if (!status) {
-    EVE_LOG_ENGINE_ERROR("[ScriptEngine] Could not load app assembly.");
+    EVE_LOG_ENGINE_ERROR("Could not load app assembly.");
     return;
   }
 
@@ -285,21 +285,20 @@ bool ScriptEngine::LoadAppAssembly(const fs::path& filepath) {
 
   if (!data->is_runtime) {
     // Create file watchers for script files.
-    for (const auto& entry :
-         fs::recursive_directory_iterator(Project::GetScriptDirectory())) {
-      if (!entry.is_directory()) {
-        continue;
-      }
+    const fs::path script_path = Project::GetScriptDirectory();
 
-      if (std::any_of(fs::directory_iterator(entry.path()),
-                      fs::directory_iterator(), [](const auto& subentry) {
-                        return subentry.path().extension() == ".cs";
-                      })) {
-        data->script_file_watchers.push_back(
-            CreateScope<filewatch::FileWatch<std::string>>(
-                entry.path().string(), OnScriptFileChanged));
-        data->assembly_reload_pending = false;
-      }
+    const auto begin = fs::directory_iterator(script_path);
+    const auto end = fs::directory_iterator();
+
+    const auto constraint = [](const auto& subentry) {
+      return subentry.path().extension() == ".cs";
+    };
+
+    if (std::any_of(begin, end, constraint)) {
+      data->script_file_watchers.push_back(
+          CreateScope<filewatch::FileWatch<std::string>>(script_path.string(),
+                                                         OnScriptFileChanged));
+      data->assembly_reload_pending = false;
     }
   }
 
@@ -353,7 +352,7 @@ void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
     instance->InvokeOnUpdate(ds);
   } else {
     EVE_LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
-                     (uint64_t)entity_uuid);
+                         (uint64_t)entity_uuid);
   }
 }
 
@@ -363,7 +362,7 @@ void ScriptEngine::OnDestroyEntity(Entity entity) {
     instance->InvokeOnDestroy();
   } else {
     EVE_LOG_ENGINE_ERROR("Could not find ScriptInstance for entity {}",
-                     (uint64_t)entity_uuid);
+                         (uint64_t)entity_uuid);
   }
 }
 
@@ -467,7 +466,7 @@ void ScriptEngine::LoadAssemblyClasses() {
         ScriptFieldType field_type = MonoTypeToScriptFieldType(type);
 #ifdef _DEBUG
         EVE_LOG_ENGINE_WARNING("  {} ({})", field_name,
-                           ScriptFieldTypeToString(field_type));
+                               ScriptFieldTypeToString(field_type));
 #endif
         script_class->fields_[field_name] = {field_type, field_name, field};
       }
@@ -530,9 +529,9 @@ void ScriptEngine::GenerateProjectFiles() {
 
   csproj_file << R"(</ItemGroup>
   <ItemGroup>
-    <Reference Include="script-core">
+    <Reference Include="script_core">
       <HintPath>)"
-              << fs::current_path().string() << R"(\script-core.dll</HintPath>
+              << fs::current_path().string() << R"(\script_core.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>)";
@@ -541,6 +540,8 @@ void ScriptEngine::GenerateProjectFiles() {
 }
 
 void ScriptEngine::BuildScripts() {
+  return;
+
   fs::path csproj_path =
       Project::GetProjectDirectory() / (Project::GetProjectName() + ".csproj");
   if (!fs::exists(csproj_path)) {

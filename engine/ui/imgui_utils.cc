@@ -2,6 +2,7 @@
 
 #include "ui/imgui_utils.h"
 
+#include <IconsFontAwesome4.h>
 #include <imgui.h>
 
 namespace ImGui {
@@ -45,6 +46,31 @@ bool ButtonTransparent(const std::string& text, float w, float h) {
   ImGui::GetStyle() = backup_style;
 
   return pressed;
+}
+
+void DrawTreeNode(const std::string& text,
+                  std::function<void(void)> ui_function) {
+  constexpr ImGuiTreeNodeFlags kTreeNodeFlags =
+      ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
+      ImGuiTreeNodeFlags_FramePadding;
+
+  ImGui::PushID(text.c_str());
+
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+
+  bool open =
+      ImGui::TreeNodeEx("##tree_node", kTreeNodeFlags, "%s", text.c_str());
+  ImGui::PopStyleVar();
+
+  if (open) {
+    ui_function();
+    ImGui::TreePop();
+  }
+
+  ImGui::PopID();
+
+  ImGui::Separator();
 }
 
 }  // namespace ImGui
