@@ -186,8 +186,8 @@ void ImGuiLayer::SetDarkThemeColors() {
   style.Colors[ImGuiCol_TabUnfocused] = kPrimary;
   style.Colors[ImGuiCol_TabUnfocusedActive] = kSecondary;
 
-  style.Colors[ImGuiCol_DockingPreview] = kPrimary;
-  style.Colors[ImGuiCol_DockingEmptyBg] = kSecondary;
+  style.Colors[ImGuiCol_DockingPreview] = kSecondary;
+  style.Colors[ImGuiCol_DockingEmptyBg] = kPrimary;
 
   style.Colors[ImGuiCol_PlotLines] = kSecondary;
   style.Colors[ImGuiCol_PlotLinesHovered] = kSecondary;
