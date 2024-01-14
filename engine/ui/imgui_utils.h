@@ -4,16 +4,29 @@
 
 #include "pch_shared.h"
 
+#include "core/color.h"
+
 namespace ImGui {
 
 struct ScopedStyleColor {
   ScopedStyleColor() = default;
 
-  ScopedStyleColor(int idx, const glm::vec4& color, bool condition = true);
+  ScopedStyleColor(int idx, const eve::Color& color, bool condition = true);
 
   ScopedStyleColor(int idx, uint32_t color, bool condition = true);
 
   ~ScopedStyleColor();
+
+ private:
+  bool set_ = false;
+};
+
+struct ScopedStyleVar {
+  ScopedStyleVar() = default;
+
+  ScopedStyleVar(int idx, const glm::vec2& var, bool condition = true);
+
+  ~ScopedStyleVar();
 
  private:
   bool set_ = false;

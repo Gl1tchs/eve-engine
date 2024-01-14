@@ -7,7 +7,7 @@
 
 namespace ImGui {
 
-ScopedStyleColor::ScopedStyleColor(int idx, const glm::vec4& color,
+ScopedStyleColor::ScopedStyleColor(int idx, const eve::Color& color,
                                    bool condition)
     : set_(condition) {
   if (condition) {
@@ -25,6 +25,19 @@ ScopedStyleColor::ScopedStyleColor(int idx, uint32_t color, bool condition)
 ScopedStyleColor::~ScopedStyleColor() {
   if (set_) {
     ImGui::PopStyleColor();
+  }
+}
+
+ScopedStyleVar::ScopedStyleVar(int idx, const glm::vec2& var, bool condition)
+    : set_(condition) {
+  if (condition) {
+    ImGui::PushStyleVar(idx, ImVec2(var.x, var.y));
+  }
+}
+
+ScopedStyleVar::~ScopedStyleVar() {
+  if (set_) {
+    ImGui::PopStyleVar();
   }
 }
 

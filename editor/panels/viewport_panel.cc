@@ -25,82 +25,72 @@ ViewportPanel::ViewportPanel(Ref<FrameBuffer>& frame_buffer,
 }
 
 void ViewportPanel::Draw() {
-  // Draw frame buffer image
-  {
-    uint64_t texture_id = frame_buffer_->GetTexture()->GetTextureID();
-    ImGui::Image(reinterpret_cast<void*>(texture_id),
-                 ImVec2{GetSize().x, GetSize().y}, ImVec2{0, 1}, ImVec2{1, 0});
+  DrawFrameBufferImage();
+  DrawUIToolbar();
+  if (should_draw_gizmos_) {
+    DrawGizmos();
   }
+}
 
-  // Draw scene controls
-  {
-    const ImVec2 window_size = ImGui::GetWindowSize();
+void ViewportPanel::DrawFrameBufferImage() {
+  uint64_t texture_id = frame_buffer_->GetTexture()->GetTextureID();
+  ImGui::Image(reinterpret_cast<void*>(texture_id),
+               ImVec2{GetSize().x, GetSize().y}, ImVec2{0, 1}, ImVec2{1, 0});
+}
 
-    const auto style = ImGui::GetStyle();
-    const ImVec2 item_padding = style.FramePadding;
+void ViewportPanel::DrawUIToolbar() {
+  const ImVec2 window_size = ImGui::GetWindowSize();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, ImVec2(10, 10));
+  const ImGui::ScopedStyleVar _frame_padding(ImGuiStyleVar_ItemSpacing, {0, 0});
 
-    static uint32_t button_count = 1;
-    const ImVec2 icon_button_size = ImGui::CalcTextSize(ICON_FA_PLAY);
-    const float item_height = icon_button_size.y + 2 * style.CellPadding.y;
-    const float button_width = icon_button_size.x + 2 * style.FramePadding.x;
+  const auto& style = ImGui::GetStyle();
+  const auto& colors = style.Colors;
+  const ImVec4& button_color = colors[ImGuiCol_Button];
 
-    ImGui::SetCursorPos(ImVec2((window_size.x - button_width) * 0.5f, 50));
+  static uint32_t button_count = 1;
 
-    switch (state_) {
-      case SceneState::kEdit: {
-        if (ImGui::Button(ICON_FA_PLAY, ImVec2(button_width, button_width)) &&
-            on_play) {
-          on_play();
-        }
-        button_count = 1;
-        break;
+  ImGui::SetCursorPos(ImVec2(25, 50));
+
+  switch (state_) {
+    case SceneState::kEdit: {
+      if (ImGui::Button(ICON_FA_PLAY) && on_play) {
+        on_play();
       }
-      case SceneState::kPlay: {
-        if (ImGui::Button(ICON_FA_PAUSE, ImVec2(button_width, button_width)) &&
-            on_pause) {
-          on_pause();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STOP, ImVec2(button_width, button_width)) &&
-            on_stop) {
-          on_stop();
-        }
-
-        button_count = 2;
-        break;
-      }
-      case SceneState::kPaused: {
-        if (ImGui::Button(ICON_FA_PLAY, ImVec2(button_width, button_width)) &&
-            on_resume) {
-          on_resume();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STEP_FORWARD,
-                          ImVec2(button_width, button_width)) &&
-            on_step) {
-          on_step();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STOP, ImVec2(button_width, button_width)) &&
-            on_stop) {
-          on_stop();
-        }
-
-        button_count = 3;
-        break;
-      }
+      button_count = 1;
+      break;
     }
+    case SceneState::kPlay: {
+      if (ImGui::Button(ICON_FA_PAUSE) && on_pause) {
+        on_pause();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_STOP) && on_stop) {
+        on_stop();
+      }
 
-    ImGui::PopStyleVar(2);
+      button_count = 2;
+      break;
+    }
+    case SceneState::kPaused: {
+      if (ImGui::Button(ICON_FA_PLAY) && on_resume) {
+        on_resume();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_STEP_FORWARD) && on_step) {
+        on_step();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button(ICON_FA_STOP) && on_stop) {
+        on_stop();
+      }
+
+      button_count = 3;
+      break;
+    }
   }
+}
 
-  if (!should_draw_gizmos_) {
-    return;
-  }
-
+void ViewportPanel::DrawGizmos() {
   Entity selected_entity = hierarchy_panel_->GetSelectedEntity();
   if (selected_entity && operation_ != -1) {
     ImGuizmo::SetOrthographic(false);

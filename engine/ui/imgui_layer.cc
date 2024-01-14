@@ -128,6 +128,7 @@ void ImGuiLayer::SetDarkThemeColors() {
   constexpr ImVec4 kSecondary(0.26f, 0.18f, 0.36f, 1.0f);
   constexpr ImVec4 kSecondaryHover(0.28f, 0.20f, 0.38f, 1.0f);
   constexpr ImVec4 kSecondaryLight(0.52f, 0.36f, 0.72f, 1.0f);
+  constexpr ImVec4 kSecondaryLightHover(0.55f, 0.39f, 0.75f, 1.0f);
 
   constexpr ImVec4 kTertiary(0.21f, 0.18f, 0.25f, 1.0f);
   constexpr ImVec4 kTertiaryHover(0.23f, 0.20f, 0.27f, 1.0f);
@@ -161,8 +162,8 @@ void ImGuiLayer::SetDarkThemeColors() {
 
   style.Colors[ImGuiCol_CheckMark] = kSecondaryLight;
 
-  style.Colors[ImGuiCol_SliderGrab] = kSecondary;
-  style.Colors[ImGuiCol_SliderGrabActive] = kSecondaryHover;
+  style.Colors[ImGuiCol_SliderGrab] = kSecondaryLight;
+  style.Colors[ImGuiCol_SliderGrabActive] = kSecondaryLightHover;
 
   style.Colors[ImGuiCol_Button] = kPrimary;
   style.Colors[ImGuiCol_ButtonHovered] = kPrimaryHover;

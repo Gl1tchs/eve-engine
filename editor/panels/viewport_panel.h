@@ -37,6 +37,12 @@ class ViewportPanel : public Panel {
  protected:
   void Draw() override;
 
+  void DrawFrameBufferImage();
+
+  void DrawUIToolbar();
+
+  void DrawGizmos();
+
  private:
   Ref<FrameBuffer> frame_buffer_;
   Ref<HierarchyPanel> hierarchy_panel_;
