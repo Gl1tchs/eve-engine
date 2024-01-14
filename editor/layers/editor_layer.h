@@ -20,7 +20,6 @@
 #include "panels/inspector_panel.h"
 #include "panels/project_settings_panel.h"
 #include "panels/scene_settings_panel.h"
-#include "panels/toolbar_panel.h"
 #include "panels/viewport_panel.h"
 #include "widgets/menu_bar.h"
 
@@ -114,7 +113,6 @@ class EditorLayer : public Layer {
   Scope<ContentBrowserPanel> content_browser_;
 
   AssetRegistryPanel asset_registry_panel_;
-  ToolbarPanel toolbar_panel_;
   ConsolePanel console_panel_;
   ProjectSettingsPanel project_settings_panel_;
   AboutPanel about_panel_;

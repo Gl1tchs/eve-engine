@@ -40,22 +40,22 @@ These instructions guide you through the build process of the CMake project. Aft
 
 After successfully building the project, it's important to set the following environment variable to the system:
 
-### EVE_ENGINE_DIR
+### EVE_ROOT
 
-Set `EVE_ENGINE_DIR` to the directory where the built engine resides. This might be the `build` directory or a specified installation directory.
+Set `EVE_ROOT` to the directory where the built engine resides. This might be the `build` directory or a specified installation directory.
 
 For example:
 
 - If the built engine is in the `build` directory of your project:
 
     ```bash
-    export EVE_ENGINE_DIR=/path/to/engine/project/build
+    export EVE_ROOT=/path/to/engine/project/build
     ```
 
 - If the built engine is installed in a different directory:
 
     ```bash
-    export EVE_ENGINE_DIR=/path/to/engine/installation/directory
+    export EVE_ROOT=/path/to/engine/installation/directory
     ```
 
 Remember to adjust the paths based on your specific project structure and the location where your built artifacts and header files are located.

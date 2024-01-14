@@ -2,10 +2,12 @@
 
 #include "panels/viewport_panel.h"
 
+#include <IconsFontAwesome4.h>
 #include <ImGuizmo.h>
 #include <imgui.h>
 
 #include "core/event/input.h"
+#include "ui/imgui_utils.h"
 
 #include "utils/modify_info.h"
 
@@ -28,6 +30,71 @@ void ViewportPanel::Draw() {
     uint64_t texture_id = frame_buffer_->GetTexture()->GetTextureID();
     ImGui::Image(reinterpret_cast<void*>(texture_id),
                  ImVec2{GetSize().x, GetSize().y}, ImVec2{0, 1}, ImVec2{1, 0});
+  }
+
+  // Draw scene controls
+  {
+    const ImVec2 window_size = ImGui::GetWindowSize();
+
+    const auto style = ImGui::GetStyle();
+    const ImVec2 item_padding = style.FramePadding;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, ImVec2(10, 10));
+
+    static uint32_t button_count = 1;
+    const ImVec2 icon_button_size = ImGui::CalcTextSize(ICON_FA_PLAY);
+    const float item_height = icon_button_size.y + 2 * style.CellPadding.y;
+    const float button_width = icon_button_size.x + 2 * style.FramePadding.x;
+
+    ImGui::SetCursorPos(ImVec2((window_size.x - button_width) * 0.5f, 50));
+
+    switch (state_) {
+      case SceneState::kEdit: {
+        if (ImGui::Button(ICON_FA_PLAY, ImVec2(button_width, button_width)) &&
+            on_play) {
+          on_play();
+        }
+        button_count = 1;
+        break;
+      }
+      case SceneState::kPlay: {
+        if (ImGui::Button(ICON_FA_PAUSE, ImVec2(button_width, button_width)) &&
+            on_pause) {
+          on_pause();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON_FA_STOP, ImVec2(button_width, button_width)) &&
+            on_stop) {
+          on_stop();
+        }
+
+        button_count = 2;
+        break;
+      }
+      case SceneState::kPaused: {
+        if (ImGui::Button(ICON_FA_PLAY, ImVec2(button_width, button_width)) &&
+            on_resume) {
+          on_resume();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON_FA_STEP_FORWARD,
+                          ImVec2(button_width, button_width)) &&
+            on_step) {
+          on_step();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON_FA_STOP, ImVec2(button_width, button_width)) &&
+            on_stop) {
+          on_stop();
+        }
+
+        button_count = 3;
+        break;
+      }
+    }
+
+    ImGui::PopStyleVar(2);
   }
 
   if (!should_draw_gizmos_) {

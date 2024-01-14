@@ -26,13 +26,6 @@ namespace eve {
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   // Setup delegates
   { exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer); }
-  {
-    toolbar_panel_.on_play = BIND_FUNC(OnScenePlay);
-    toolbar_panel_.on_stop = BIND_FUNC(OnSceneStop);
-    toolbar_panel_.on_pause = BIND_FUNC(OnScenePause);
-    toolbar_panel_.on_resume = BIND_FUNC(OnSceneResume);
-    toolbar_panel_.on_step = BIND_FUNC(OnSceneStep);
-  }
 }
 
 void EditorLayer::OnStart() {
@@ -49,6 +42,13 @@ void EditorLayer::OnStart() {
 
   viewport_panel_ = CreateScope<ViewportPanel>(frame_buffer_, hierarchy_panel_,
                                                editor_camera_);
+  {
+    viewport_panel_->on_play = BIND_FUNC(OnScenePlay);
+    viewport_panel_->on_stop = BIND_FUNC(OnSceneStop);
+    viewport_panel_->on_pause = BIND_FUNC(OnScenePause);
+    viewport_panel_->on_resume = BIND_FUNC(OnSceneResume);
+    viewport_panel_->on_step = BIND_FUNC(OnSceneStep);
+  }
 
   inspector_panel_ = CreateScope<InspectorPanel>(hierarchy_panel_);
 
@@ -100,7 +100,6 @@ void EditorLayer::OnGUI(float ds) {
     }
 
     // Render panels
-    toolbar_panel_.Render();
     console_panel_.Render();
     content_browser_->Render();
     asset_registry_panel_.Render();
@@ -440,7 +439,7 @@ void EditorLayer::OnSceneStep() {
 
 void EditorLayer::SetSceneState(SceneState state) {
   scene_state_ = state;
-  toolbar_panel_.SetState(state);
+  viewport_panel_->SetState(state);
 }
 
 void EditorLayer::Exit(bool force) {
@@ -640,4 +639,5 @@ void EditorLayer::SetupMenubar() {
     menu_bar_.PushMenu(help_menu);
   }
 }
+
 }  // namespace eve

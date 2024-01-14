@@ -21,8 +21,6 @@ set(SOURCES
   panels/project_settings_panel.h
   panels/scene_settings_panel.cc
   panels/scene_settings_panel.h
-  panels/toolbar_panel.cc
-  panels/toolbar_panel.h
   panels/viewport_panel.cc
   panels/viewport_panel.h
   utils/cpuid.cc
