@@ -46,7 +46,6 @@ module_include_directories(core PUBLIC
 module_include_directories(core PRIVATE
   ${VENDOR_DIR}/glfw/include
   ${VENDOR_DIR}/json/include
-  ${VENDOR_DIR}/spdlog/include
 )
 
 module_link_libraries(core PRIVATE
