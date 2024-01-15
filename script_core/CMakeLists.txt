@@ -31,7 +31,10 @@ set_property(TARGET script_core PROPERTY VS_CONFIGURATION_TYPE ClassLibrary)
 set_property(TARGET script_core PROPERTY VS_DOTNET_REFERENCES
   "System"
   "System.Core"
+  "System.Runtime.InteropServices"
 )
 
 set_property(TARGET script_core PROPERTY DOTNET_TARGET_FRAMEWORK_VERSION "v4.8")
 set_property(TARGET script_core PROPERTY DOTNET_TARGET_LANGUAGE_VERSION "latest")
+
+set_property(TARGET script_core PROPERTY VS_DOTNET_DOCUMENTATION_FILE "${CMAKE_CURRENT_BINARY_DIR}/script_core.xml")
