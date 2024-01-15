@@ -1,21 +1,55 @@
 namespace EveEngine
 {
+  /// <summary>
+  /// Represents constraints for the position of a rigidbody.
+  /// </summary>
   public struct RigidbodyPositionConstraints
   {
+    /// <summary>
+    /// Does physics affect X position on space.
+    /// </summary>
     public bool freezeX;
+
+    /// <summary>
+    /// Does physics affect Y position on space.
+    /// </summary>
     public bool freezeY;
+
+    /// <summary>
+    /// Does physics affect Z position on space.
+    /// </summary>
     public bool freezeZ;
   }
 
+  /// <summary>
+  /// Represents constraints for the rotation of a rigidbody.
+  /// </summary>
   public struct RigidbodyRotationConstraints
   {
+    /// <summary>
+    /// Does physics affect itch rotation on space.
+    /// </summary>
     public bool freezePitch;
+
+    /// <summary>
+    /// Does physics affect yaw rotation on space.
+    /// </summary>
     public bool freezeYaw;
+
+    /// <summary>
+    /// Does physics affect roll rotation on space.
+    /// </summary>
     public bool freezeRoll;
   }
 
+  /// <summary>
+  /// Represents a rigidbody component attached to an entity.
+  /// </summary>
   public class Rigidbody : Component
   {
+    /// <summary>
+    /// Gets or sets the velocity of the rigidbody.
+    /// </summary>
     public Vector3 Velocity
     {
       get
@@ -29,6 +63,9 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Gets or sets the acceleration of the rigidbody.
+    /// </summary>
     public Vector3 Acceleration
     {
       get
@@ -42,6 +79,9 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Gets or sets the mass of the rigidbody.
+    /// </summary>
     public float Mass
     {
       get
@@ -55,6 +95,9 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether gravity affects the rigidbody.
+    /// </summary>
     public bool UseGravity
     {
       get
@@ -68,6 +111,9 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Gets or sets the position constraints for the rigidbody.
+    /// </summary>
     public RigidbodyPositionConstraints PositionConstraints
     {
       get
@@ -81,6 +127,9 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Gets or sets the rotation constraints for the rigidbody.
+    /// </summary>
     public RigidbodyRotationConstraints RotationConstraints
     {
       get
@@ -94,5 +143,4 @@ namespace EveEngine
       }
     }
   };
-
 }

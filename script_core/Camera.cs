@@ -1,20 +1,34 @@
 namespace EveEngine
 {
+  /// <summary>
+  /// Abstract class representing a camera on scene.
+  /// </summary>
   public abstract class Camera
   {
+    /// <summary>
+    /// Aspect ratio of the screen.
+    /// </summary>
     public float AspectRatio;
 
-    protected Entity Entity;
+    /// <summary>
+    /// Entity object which is attached to the camera.
+    /// </summary>
+    protected internal Entity Entity;
 
-    public void SetEntity(Entity entity)
+    internal void SetEntity(Entity entity)
     {
       Entity = entity;
     }
   }
 
+  /// <summary>
+  /// Class representing a orthographic camera on scene.
+  /// </summary>
   public class OrthographicCamera : Camera
   {
-
+    /// <summary>
+    /// Camera frustum box size.
+    /// </summary>
     public float ZoomLevel
     {
       get
@@ -27,6 +41,10 @@ namespace EveEngine
         Interop.CameraComponent_OrthographicCamera_SetAspectRatio(Entity.Id, ref value);
       }
     }
+
+    /// <summary>
+    /// Camera near clip. Objects will appear after this value.
+    /// </summary>
     public float NearClip
     {
       get
@@ -39,6 +57,10 @@ namespace EveEngine
         Interop.CameraComponent_OrthographicCamera_SetNearClip(Entity.Id, ref value);
       }
     }
+
+    /// <summary>
+    /// Camera far clip. Objects will stop appering after this value.
+    /// </summary>
     public float FarClip
     {
       get
@@ -53,8 +75,14 @@ namespace EveEngine
     }
   }
 
+  /// <summary>
+  /// Class representing a perspective camera on scene.
+  /// </summary>
   public class PerspectiveCamera : Camera
   {
+    /// <summary>
+    /// 3D Camera frustum vertical field of view.
+    /// </summary>
     public float Fov
     {
       get
@@ -67,6 +95,10 @@ namespace EveEngine
         Interop.CameraComponent_PerspectiveCamera_SetFov(Entity.Id, ref value);
       }
     }
+
+    /// <summary>
+    /// Camera near clip. Objects will appear after this value.
+    /// </summary>
     public float NearClip
     {
       get
@@ -79,6 +111,11 @@ namespace EveEngine
         Interop.CameraComponent_PerspectiveCamera_SetNearClip(Entity.Id, ref value);
       }
     }
+
+
+    /// <summary>
+    /// Camera far clip. Objects will stop appering after this value.
+    /// </summary>
     public float FarClip
     {
       get

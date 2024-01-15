@@ -1,22 +1,47 @@
-using System;
-
 namespace EveEngine
 {
+  /// <summary>
+  /// Class representing a color value.
+  /// </summary>
   public struct Color
   {
-    public float r, g, b, a;
+    /// <summary>
+    /// Red channel of the color.
+    /// </summary>
+    public float r;
 
-    public static Color Black => new Color(0, 0, 0, 1);
-    public static Color White => new Color(1, 1, 1, 1);
-    public static Color Red => new Color(1, 0, 0, 1);
-    public static Color Green => new Color(0, 1, 0, 1);
-    public static Color Blue => new Color(0, 0, 1, 1);
-    public static Color Yellow => new Color(1, 1, 0, 1);
-    public static Color Cyan => new Color(0, 1, 1, 1);
-    public static Color Magenta => new Color(1, 0, 1, 1);
-    public static Color Gray => new Color(0.5f, 0.5f, 0.5f, 1);
-    public static Color Orange => new Color(1, 0.5f, 0, 1);
+    /// <summary>
+    /// Green channel of the color.
+    /// </summary>
+    public float g;
 
+    /// <summary>
+    /// Blue channel of the color.
+    /// </summary>
+    public float b;
+
+    /// <summary>
+    /// Alpha channel of the color.
+    /// </summary>
+    public float a;
+
+#pragma warning disable CS1591
+    public static Color Black => new(0, 0, 0, 1);
+    public static Color White => new(1, 1, 1, 1);
+    public static Color Red => new(1, 0, 0, 1);
+    public static Color Green => new(0, 1, 0, 1);
+    public static Color Blue => new(0, 0, 1, 1);
+    public static Color Yellow => new(1, 1, 0, 1);
+    public static Color Cyan => new(0, 1, 1, 1);
+    public static Color Magenta => new(1, 0, 1, 1);
+    public static Color Gray => new(0.5f, 0.5f, 0.5f, 1);
+    public static Color Orange => new(1, 0.5f, 0, 1);
+#pragma warning restore CS1591
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Color"/> class with all channels set to the specified value.
+    /// The alpha channel is set to 1.0f.
+    /// </summary>
+    /// <param name="value">The value to set for all color channels.</param>
     public Color(float value)
     {
       r = value;
@@ -25,6 +50,13 @@ namespace EveEngine
       a = 1.0f;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Color"/> class with specific channel values.
+    /// </summary>
+    /// <param name="r">Red channel value.</param>
+    /// <param name="g">Green channel value.</param>
+    /// <param name="b">Blue channel value.</param>
+    /// <param name="a">Alpha channel value (default is 1.0f).</param>
     public Color(float r, float g, float b, float a = 1.0f)
     {
       this.r = r;
@@ -33,6 +65,11 @@ namespace EveEngine
       this.a = a;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Color"/> class from a <see cref="Vector3"/> and alpha.
+    /// </summary>
+    /// <param name="rgb">The <see cref="Vector3"/> representing the RGB channels.</param>
+    /// <param name="a">Alpha channel value (default is 1.0f).</param>
     public Color(Vector3 rgb, float a = 1.0f)
     {
       r = rgb.x;
@@ -41,6 +78,10 @@ namespace EveEngine
       this.a = a;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Color"/> class from a <see cref="Vector4"/>.
+    /// </summary>
+    /// <param name="rgba">The <see cref="Vector4"/> representing the RGBA channels.</param>
     public Color(Vector4 rgba)
     {
       r = rgba.x;
@@ -49,12 +90,12 @@ namespace EveEngine
       a = rgba.w;
     }
 
+    /// <summary>
+    /// Get RGB Vector3 representation of the color.
+    /// </summary>
     public Vector3 RGB
     {
-      get
-      {
-        return new Vector3(r, g, b);
-      }
+      readonly get => new(r, g, b);
       set
       {
         r = value.x;
@@ -63,12 +104,12 @@ namespace EveEngine
       }
     }
 
+    /// <summary>
+    /// Get RGB Vector3 representation of the color.
+    /// </summary>
     public Vector4 RGBA
     {
-      get
-      {
-        return new Vector4(r, g, b, a);
-      }
+      readonly get => new(r, g, b, a);
       set
       {
         r = value.x;
@@ -76,16 +117,6 @@ namespace EveEngine
         b = value.z;
         a = value.w;
       }
-    }
-
-    public string ToHex()
-    {
-      int r = (int)(this.r * 255);
-      int g = (int)(this.g * 255);
-      int b = (int)(this.b * 255);
-      int a = (int)(this.a * 255);
-
-      return $"#{a:X2}{r:X2}{g:X2}{b:X2}";
     }
   }
 }

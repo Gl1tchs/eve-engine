@@ -99,15 +99,6 @@ static void DrawComponent(const std::string& name, Entity entity,
 }
 
 void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
-  if (advanced_) {
-    DrawComponent<IdComponent>(
-        ICON_FA_ID_BADGE " Id Component", selected_entity,
-        [](IdComponent& id_comp) {
-          auto id_str = std::format("%" PRIu64, (uint64_t)id_comp.id);
-          ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
-        });
-  }
-
   const float kPlusButtonWidth = ImGui::CalcTextSize(ICON_FA_PLUS).x +
                                  2 * ImGui::GetStyle().FramePadding.x;
 
@@ -150,6 +141,15 @@ static void DrawScriptFieldRuntime(const std::string& name,
 
 void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   ImGui::PushID((uint32_t)selected_entity);
+
+  if (advanced_) {
+    DrawComponent<IdComponent>(
+        ICON_FA_ID_BADGE " Id Component", selected_entity,
+        [](IdComponent& id_comp) {
+          auto id_str = std::format("{}", (uint64_t)id_comp.id);
+          ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
+        });
+  }
 
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,

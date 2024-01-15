@@ -3,6 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace EveEngine
 {
+  /// <summary>
+  /// Stattic middleware class for C# and C++ communication.
+  /// </summary>
   static partial class Interop
   {
     #region Debug
