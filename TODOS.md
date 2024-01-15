@@ -9,6 +9,7 @@
 - [ ] Sounds
 
 ## Editor
+- [ ] DragFloat3 label's not showing into editor fields.
 - [ ] Texture gizmos for lights and camera.
 - [ ] Scene settings
   - [ ] Skybox

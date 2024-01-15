@@ -7,7 +7,8 @@
 namespace eve {
 
 void PushButtonActivityColor() {
-  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 1));
+  ImGui::PushStyleColor(ImGuiCol_Button,
+                        ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 }
 
 ConsolePanel::ConsolePanel() : Panel(true) {
@@ -152,8 +153,7 @@ void ConsolePanel::Draw() {
       ImGui::EndPopup();
     }
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-                        ImVec2(4, 1));  // Tighten spacing
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
     int i = 0;
     for (const LogMessage& message : *buffer_) {
