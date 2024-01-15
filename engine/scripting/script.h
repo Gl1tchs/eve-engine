@@ -17,6 +17,7 @@ typedef struct _MonoString MonoString;
 }
 
 namespace eve {
+
 enum class ScriptFieldType {
   kNone = 0,
   kFloat,
@@ -146,4 +147,5 @@ class ScriptInstance {
   friend class ScriptEngine;
   friend struct ScriptFieldInstance;
 };
+
 }  // namespace eve

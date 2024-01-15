@@ -46,7 +46,7 @@ class ScriptEngine {
 
   static MonoObject* GetManagedInstance(UUID uuid);
 
-  static MonoString* CreateString(const char* string);
+  static MonoString* CreateMonoString(const char* string);
 
   static void GenerateProjectFiles();
 

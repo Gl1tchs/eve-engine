@@ -11,6 +11,10 @@ namespace eve {
 struct BoxCollider : Collider {
   glm::vec3 local_position = {0, 0, 0};
   glm::vec3 local_scale = {0, 0, 0};
+
+  // TODO add other collider as parameter
+  using TriggerFunc = void (*)(std::string other_name);
+  TriggerFunc on_trigger = nullptr;
 };
 
 template <>

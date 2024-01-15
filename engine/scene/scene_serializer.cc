@@ -206,9 +206,9 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<BoxCollider>()) {
     auto& col = entity.GetComponent<BoxCollider>();
 
-    out["box_collider"] = json{{"local_position", col.local_position},
-                               {"local_scale", col.local_scale},
-                               {"is_trigger", col.is_trigger}};
+    out["box_collider"] = json{{"is_trigger", col.is_trigger},
+                               {"local_position", col.local_position},
+                               {"local_scale", col.local_scale}};
   }
 
   if (entity.HasComponent<ScriptComponent>()) {
@@ -440,9 +440,9 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
         !box_collider_json.is_null()) {
       auto& col = deserialing_entity.AddComponent<BoxCollider>();
 
+      col.is_trigger = box_collider_json["is_trigger"].get<bool>();
       col.local_position = box_collider_json["local_position"].get<glm::vec3>();
       col.local_scale = box_collider_json["local_scale"].get<glm::vec3>();
-      col.is_trigger = box_collider_json["is_trigger"].get<bool>();
     }
 
     if (auto script_component_json = entity["script_component"];

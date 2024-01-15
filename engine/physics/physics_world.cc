@@ -75,21 +75,25 @@ void PhysicsWorld::OnUpdate(float ds) {
 
     // Check for collisions with other entities having BoxCollider components
     scene_->GetAllEntitiesWith<Transform, BoxCollider>().each(
-        [entity_id, &tc, tc_before, &rb, &collider](
-            entt::entity other_id, Transform& other_tc,
+        [&](entt::entity other_id, Transform& other_tc,
             BoxCollider& other_collider) {
+          Entity other_entity{other_id, scene_};
+
           if (entity_id == other_id) {
             return;
           }
 
           if (ColliderIntersects(tc, collider, other_tc, other_collider)) {
-            // Resolve collision (adjust positions, velocities, etc.)
-            // You might want to implement more sophisticated collision resolution here
-            // For simplicity, let's just reset positions for now
+            rb = rb_before;
             tc = tc_before;
 
-            // rb.velocity =
-            //     -rb.velocity;  // Simple reversal of velocity for demonstration
+            if (collider.is_trigger && collider.on_trigger != nullptr) {
+              collider.on_trigger(other_entity.GetName());
+            }
+            if (other_collider.is_trigger &&
+                other_collider.on_trigger != nullptr) {
+              other_collider.on_trigger(entity.GetName());
+            }
           }
         });
   }

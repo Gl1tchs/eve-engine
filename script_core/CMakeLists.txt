@@ -1,19 +1,24 @@
 set(CMAKE_CSharp_FLAGS "/langversion:latest")
 
 set(SOURCE_FILES
+  Components/BoxCollider.cs
+  Components/CameraComponent.cs
+  Components/Component.cs
+  Components/Material.cs
+  Components/Rigidbody.cs
+  Components/ScriptComponent.cs
+  Components/Transform.cs
   Camera.cs
   Color.cs
-  Components.cs
   Debug.cs
   Entity.cs
+  Exceptions.cs
   Input.cs
-  InternalCalls.cs
+  Interop.cs
   KeyCode.cs
   Mathf.cs
   MouseCode.cs
-  Rigidbody.cs
   SceneManager.cs
-  Transform.cs
   Vector2.cs
   Vector3.cs
   Vector4.cs

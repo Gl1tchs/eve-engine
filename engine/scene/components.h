@@ -13,6 +13,7 @@
 #include "scene/model.h"
 
 namespace eve {
+
 struct IdComponent {
   UUID id;
 };

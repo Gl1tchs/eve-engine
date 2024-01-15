@@ -4,12 +4,12 @@ namespace EveEngine
   {
     public static void SetActive(int index)
     {
-      InternalCalls.SceneManager_SetActive(index);
+      Interop.SceneManager_SetActive(index);
     }
 
     public static int GetActiveIndex(int index)
     {
-      return InternalCalls.SceneManager_GetActiveIndex();
+      return Interop.SceneManager_GetActiveIndex();
     }
   }
 }

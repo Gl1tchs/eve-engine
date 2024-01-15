@@ -11,6 +11,8 @@ namespace eve {
 struct Collider {
   bool is_trigger = false;
 
+  // TODO add layers
+
   virtual ~Collider() = default;
 };
 

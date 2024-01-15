@@ -20,7 +20,6 @@
 - [ ] Inspector script entity field
   - [ ] Prefabs
   - [ ] Use ImGui::DragAndDropField
-- [ ] Better toolbar.
 - [ ] Save editor state with cache and temp files.
 - [ ] While scripts are building show a loading thing for it.
 
@@ -30,13 +29,13 @@
 - [ ] Asset compression for shipping.
 
 ## Scene
-- [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Add parent / child entity system.
+- [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
 
 ## Physics
-- [ ] Add trigger functionality to C#.
+- [ ] Collision layers.
 - [ ] Capsule and mesh colliders.
 - [ ] Forces and impulses.
 - [ ] Angular velocity and torque.
@@ -47,10 +46,10 @@
 - [ ] Current way to compile script project is not good.
 - [ ] Script lifetime multiple scenes (kinda like unity's DontDestroyOnLoad)
 - [ ] Add mat4 data type
-- [ ] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
 - [ ] API Documentation / code + markdown
 
 ## Renderer
+- [ ] GPU Particle System
 - [ ] Multiple texture support (multiple diffusion, specular, normal, height).
 - [ ] HDR Environment maps.
 - [ ] Custom shaders with scripting API.
@@ -90,6 +89,9 @@
 - [x] Add basic shapes to library (cube, plane, pyramid, sphere etc.).
 - [x] Physics
 - [x] Stepping not working
+- [x] Better toolbar.
+- [x] Add trigger functionality to C#.
+- [x] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
 
 ## Fixed
 - [x] Cannot switch between projects.

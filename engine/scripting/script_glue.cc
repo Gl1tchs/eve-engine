@@ -4,6 +4,7 @@
 
 #include "scripting/script_glue.h"
 
+#include <mono/metadata/appdomain.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
 
@@ -22,21 +23,26 @@
 namespace eve {
 
 std::string MonoStringToString(MonoString* string) {
-  char* cStr = mono_string_to_utf8(string);
-  std::string str(cStr);
-  mono_free(cStr);
+  char* c_str = mono_string_to_utf8(string);
+  std::string str(c_str);
+  mono_free(c_str);
   return str;
 }
 
 static std::unordered_map<MonoType*, std::function<bool(Entity)>>
     entity_has_component_funcs;
 
+static std::unordered_map<MonoType*, std::function<void(Entity)>>
+    entity_add_component_funcs;
+
 #define ADD_INTERNAL_CALL(Name) \
-  mono_add_internal_call("EveEngine.InternalCalls::" #Name, Name)
+  mono_add_internal_call("EveEngine.Interop::" #Name, Name)
 
 static MonoObject* GetScriptInstance(UUID entity_id) {
   return ScriptEngine::GetManagedInstance(entity_id);
 }
+
+#pragma region Debug
 
 static void Debug_Log(MonoString* string) {
   EVE_LOG_CLIENT_TRACE("{}", MonoStringToString(string));
@@ -58,6 +64,29 @@ static void Debug_LogFatal(MonoString* string) {
   EVE_LOG_CLIENT_FATAL("{}", MonoStringToString(string));
 }
 
+#pragma endregion
+#pragma region Entity
+
+static void Entity_Destroy(UUID entity_id) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  ScriptEngine::OnDestroyEntity(entity);
+
+  scene->DestroyEntity(entity);
+}
+
+static MonoString* Entity_GetName(UUID entity_id) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  return ScriptEngine::CreateMonoString(entity.GetName().c_str());
+}
+
 static bool Entity_HasComponent(UUID entity_id,
                                 MonoReflectionType* component_type) {
   Scene* scene = ScriptEngine::GetSceneContext();
@@ -71,6 +100,20 @@ static bool Entity_HasComponent(UUID entity_id,
   return entity_has_component_funcs.at(managed_type)(entity);
 }
 
+static void Entity_AddComponent(UUID entity_id,
+                                MonoReflectionType* component_type) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  MonoType* managed_type = mono_reflection_type_get_type(component_type);
+  ASSERT(entity_add_component_funcs.find(managed_type) !=
+         entity_add_component_funcs.end());
+
+  entity_add_component_funcs.at(managed_type)(entity);
+}
+
 static uint64_t Entity_TryGetEntityByName(MonoString* name) {
   char* name_cstr = mono_string_to_utf8(name);
 
@@ -79,11 +122,46 @@ static uint64_t Entity_TryGetEntityByName(MonoString* name) {
   auto entity = scene->TryGetEntityByName(name_cstr);
   mono_free(name_cstr);
 
-  if (!entity)
+  if (!entity) {
     return 0;
+  }
 
   return entity.GetUUID();
 }
+
+static uint64_t Entity_Instantiate(MonoString* name, glm::vec3* position,
+                                   glm::vec3* rotation, glm::vec3* scale) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+
+  Entity created_entity = scene->CreateEntity(MonoStringToString(name));
+  if (!created_entity) {
+    return 0;
+  }
+
+  Transform& tc = created_entity.GetTransform();
+  tc.position = *position;
+  tc.rotation = *rotation;
+  tc.scale = *scale;
+
+  return created_entity.GetUUID();
+}
+
+static void Entity_AssignScript(UUID entity_id, MonoString* class_name) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  auto& sc = entity.AddComponent<ScriptComponent>();
+  sc.class_name = MonoStringToString(class_name);
+
+  // Register entity to the scripting engine
+  ScriptEngine::OnCreateEntity(entity);
+}
+
+#pragma endregion
+#pragma region TransformComponent
 
 static void TransformComponent_GetPosition(UUID entity_id,
                                            glm::vec3* out_position) {
@@ -170,6 +248,9 @@ static void TransformComponent_GetUp(UUID entity_id, glm::vec3* out_up) {
 
   *out_up = entity.GetComponent<Transform>().GetUp();
 }
+
+#pragma endregion
+#pragma region CameraComponent
 
 static void CameraComponent_OrthographicCamera_GetAspectRatio(
     UUID entity_id, float* out_aspect_ratio) {
@@ -400,6 +481,9 @@ static void CameraComponent_SetIsFixedAspectRato(UUID entity_id,
       *is_fixed_aspect_ratio;
 }
 
+#pragma endregion
+#pragma region Material
+
 static void Material_GetAlbedo(UUID entity_id, Color* out_albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
   ASSERT(scene);
@@ -417,6 +501,22 @@ static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
 
   entity.GetComponent<Material>().albedo = *albedo;
 }
+
+#pragma endregion
+#pragma region ScriptComponent
+
+static MonoString* ScriptComponent_GetClassName(UUID entity_id) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  const auto& sc = entity.GetComponent<ScriptComponent>();
+  return ScriptEngine::CreateMonoString(sc.class_name.c_str());
+}
+
+#pragma endregion
+#pragma region RigidbodyComponent
 
 static void Rigidbody_GetVelocity(UUID entity_id, glm::vec3* out_velocity) {
   Scene* scene = ScriptEngine::GetSceneContext();
@@ -533,6 +633,103 @@ static void Rigidbody_SetRotationConstraints(
   entity.GetComponent<Rigidbody>().rotation_constraints = *rotation_constraints;
 }
 
+#pragma endregion
+#pragma region BoxCollider
+
+static bool BoxCollider_GetIsTrigger(UUID entity_id) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  return box_collider.is_trigger;
+}
+
+static void BoxCollider_SetIsTrigger(UUID entity_id, bool is_trigger) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  box_collider.is_trigger = is_trigger;
+}
+
+static void BoxCollider_GetLocalPosition(UUID entity_id,
+                                         glm::vec3* out_position) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  *out_position = box_collider.local_position;
+}
+
+static void BoxCollider_SetLocalPosition(UUID entity_id, glm::vec3* position) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  box_collider.local_position = *position;
+}
+
+static void BoxCollider_GetLocalScale(UUID entity_id, glm::vec3* out_scale) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  *out_scale = box_collider.local_scale;
+}
+
+static void BoxCollider_SetLocalScale(UUID entity_id, glm::vec3* scale) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  box_collider.local_scale = *scale;
+}
+
+static void BoxCollider_GetOnTrigger(UUID entity_id,
+                                     BoxCollider::TriggerFunc out_on_trigger) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  out_on_trigger = box_collider.on_trigger;
+}
+
+static void BoxCollider_SetOnTrigger(UUID entity_id,
+                                     BoxCollider::TriggerFunc on_trigger) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  ASSERT(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  ASSERT(entity);
+
+  BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
+
+  box_collider.on_trigger = on_trigger;
+}
+
+#pragma endregion
+#pragma region Input
+
 static bool Input_IsKeyPressed(KeyCode keycode) {
   return Input::IsKeyPressed(keycode);
 }
@@ -569,6 +766,9 @@ static void Input_GetMousePosition(glm::vec2* out_position) {
   *out_position = Input::GetMousePosition();
 }
 
+#pragma endregion
+#pragma region SceneManager
+
 static void SceneManager_SetActive(int index) {
   SceneManager::SetActive(index);
 }
@@ -576,6 +776,8 @@ static void SceneManager_SetActive(int index) {
 static int SceneManager_GetActiveIndex() {
   return SceneManager::GetActiveIndex();
 }
+
+#pragma endregion
 
 template <typename... Component>
 static void RegisterComponent() {
@@ -591,11 +793,15 @@ static void RegisterComponent() {
             managed_type_name.data(), ScriptEngine::GetCoreAssemblyImage());
         if (!managed_type) {
           EVE_LOG_ENGINE_ERROR("Could not find component type {}",
-                           managed_type_name);
+                               managed_type_name);
           return;
         }
         entity_has_component_funcs[managed_type] = [](Entity entity) {
           return entity.HasComponent<Component>();
+        };
+        entity_add_component_funcs[managed_type] = [](Entity entity) {
+          entity.AddComponent<Component>();
+          ASSERT(entity.HasComponent<Component>());
         };
       }(),
       ...);
@@ -622,8 +828,13 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(Debug_LogFatal);
 
   // Begin Entity
+  ADD_INTERNAL_CALL(Entity_Destroy);
+  ADD_INTERNAL_CALL(Entity_GetName);
   ADD_INTERNAL_CALL(Entity_HasComponent);
+  ADD_INTERNAL_CALL(Entity_AddComponent);
   ADD_INTERNAL_CALL(Entity_TryGetEntityByName);
+  ADD_INTERNAL_CALL(Entity_Instantiate);
+  ADD_INTERNAL_CALL(Entity_AssignScript);
 
   // Begin Transform Component
   ADD_INTERNAL_CALL(TransformComponent_GetPosition);
@@ -677,7 +888,10 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(Material_GetAlbedo);
   ADD_INTERNAL_CALL(Material_SetAlbedo);
 
-  // Rigidbody
+  // Begin ScriptComponent
+  ADD_INTERNAL_CALL(ScriptComponent_GetClassName);
+
+  // Begin Rigidbody
   ADD_INTERNAL_CALL(Rigidbody_GetVelocity);
   ADD_INTERNAL_CALL(Rigidbody_SetVelocity);
   ADD_INTERNAL_CALL(Rigidbody_GetAcceleration);
@@ -690,6 +904,16 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(Rigidbody_SetPositionConstraints);
   ADD_INTERNAL_CALL(Rigidbody_GetRotationConstraints);
   ADD_INTERNAL_CALL(Rigidbody_SetRotationConstraints);
+
+  // Begin BoxCollider
+  ADD_INTERNAL_CALL(BoxCollider_GetIsTrigger);
+  ADD_INTERNAL_CALL(BoxCollider_SetIsTrigger);
+  ADD_INTERNAL_CALL(BoxCollider_GetLocalPosition);
+  ADD_INTERNAL_CALL(BoxCollider_SetLocalPosition);
+  ADD_INTERNAL_CALL(BoxCollider_GetLocalScale);
+  ADD_INTERNAL_CALL(BoxCollider_SetLocalScale);
+  ADD_INTERNAL_CALL(BoxCollider_GetOnTrigger);
+  ADD_INTERNAL_CALL(BoxCollider_SetOnTrigger);
 
   // Begin Scene Manager
   ADD_INTERNAL_CALL(SceneManager_SetActive);

@@ -19,36 +19,36 @@ namespace EveEngine
     {
       get
       {
-        InternalCalls.CameraComponent_OrthographicCamera_GetAspectRatio(Entity.Id, out float aspectRatio);
+        Interop.CameraComponent_OrthographicCamera_GetAspectRatio(Entity.Id, out float aspectRatio);
         return aspectRatio;
       }
       set
       {
-        InternalCalls.CameraComponent_OrthographicCamera_SetAspectRatio(Entity.Id, ref value);
+        Interop.CameraComponent_OrthographicCamera_SetAspectRatio(Entity.Id, ref value);
       }
     }
     public float NearClip
     {
       get
       {
-        InternalCalls.CameraComponent_OrthographicCamera_GetNearClip(Entity.Id, out float nearClip);
+        Interop.CameraComponent_OrthographicCamera_GetNearClip(Entity.Id, out float nearClip);
         return nearClip;
       }
       set
       {
-        InternalCalls.CameraComponent_OrthographicCamera_SetNearClip(Entity.Id, ref value);
+        Interop.CameraComponent_OrthographicCamera_SetNearClip(Entity.Id, ref value);
       }
     }
     public float FarClip
     {
       get
       {
-        InternalCalls.CameraComponent_OrthographicCamera_GetFarClip(Entity.Id, out float farClip);
+        Interop.CameraComponent_OrthographicCamera_GetFarClip(Entity.Id, out float farClip);
         return farClip;
       }
       set
       {
-        InternalCalls.CameraComponent_OrthographicCamera_SetFarClip(Entity.Id, ref value);
+        Interop.CameraComponent_OrthographicCamera_SetFarClip(Entity.Id, ref value);
       }
     }
   }
@@ -59,36 +59,36 @@ namespace EveEngine
     {
       get
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_GetFov(Entity.Id, out float fov);
+        Interop.CameraComponent_PerspectiveCamera_GetFov(Entity.Id, out float fov);
         return fov;
       }
       set
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_SetFov(Entity.Id, ref value);
+        Interop.CameraComponent_PerspectiveCamera_SetFov(Entity.Id, ref value);
       }
     }
     public float NearClip
     {
       get
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_GetNearClip(Entity.Id, out float nearClip);
+        Interop.CameraComponent_PerspectiveCamera_GetNearClip(Entity.Id, out float nearClip);
         return nearClip;
       }
       set
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_SetNearClip(Entity.Id, ref value);
+        Interop.CameraComponent_PerspectiveCamera_SetNearClip(Entity.Id, ref value);
       }
     }
     public float FarClip
     {
       get
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_GetFarClip(Entity.Id, out float farClip);
+        Interop.CameraComponent_PerspectiveCamera_GetFarClip(Entity.Id, out float farClip);
         return farClip;
       }
       set
       {
-        InternalCalls.CameraComponent_PerspectiveCamera_SetFarClip(Entity.Id, ref value);
+        Interop.CameraComponent_PerspectiveCamera_SetFarClip(Entity.Id, ref value);
       }
     }
   }

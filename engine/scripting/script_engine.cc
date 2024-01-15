@@ -487,7 +487,7 @@ MonoObject* ScriptEngine::GetManagedInstance(UUID uuid) {
   return data->entity_instances.at(uuid)->GetManagedObject();
 }
 
-MonoString* ScriptEngine::CreateString(const char* string) {
+MonoString* ScriptEngine::CreateMonoString(const char* string) {
   return mono_string_new(data->app_domain, string);
 }
 
@@ -516,25 +516,12 @@ void ScriptEngine::GenerateProjectFiles() {
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
-)",
-                             project_dir);
-
-  for (const auto& entry :
-       fs::recursive_directory_iterator(Project::GetScriptDirectory())) {
-    if (entry.is_regular_file() && entry.path().extension() == ".cs") {
-      csproj_file << "       <Compile Include=\"" << entry.path().string()
-                  << "\" />";
-    }
-  }
-
-  csproj_file << R"(</ItemGroup>
-  <ItemGroup>
     <Reference Include="script_core">
-      <HintPath>)"
-              << fs::current_path().string() << R"(\script_core.dll</HintPath>
+      <HintPath>{}\script_core.dll</HintPath>
     </Reference>
   </ItemGroup>
-</Project>)";
+</Project>)",
+                             project_dir, fs::current_path().string());
 
   EVE_LOG_ENGINE_TRACE("Project files are generated successfully.");
 }
