@@ -3,9 +3,21 @@
 #pragma once
 
 namespace eve {
-class ScriptGlue {
- public:
-  static void RegisterComponents();
-  static void RegisterFunctions();
-};
+
+namespace script_glue {
+
+/**
+ * @brief Register entity component types to mono.
+ * 
+ */
+void RegisterComponents();
+
+/**
+ * @brief Register interop functions between C# and C++
+ * 
+ */
+void RegisterFunctions();
+
+}  // namespace script_glue
+
 }  // namespace eve

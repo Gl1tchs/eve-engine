@@ -93,7 +93,7 @@ void OpenGLTexture2D::SetData(void* data, uint32_t size) {
   int format = DeserializeTextureFormat(metadata_.format);
 
   uint32_t bpp = format == GL_RGBA ? 4 : 3;
-  ASSERT(size == metadata_.size.x * metadata_.size.y * bpp,
+  EVE_ASSERT_ENGINE(size == metadata_.size.x * metadata_.size.y * bpp,
          "Data must be entire texture!")
 
   glTextureSubImage2D(texture_id_, 0, 0, 0, metadata_.size.x, metadata_.size.y,

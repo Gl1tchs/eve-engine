@@ -46,7 +46,7 @@ ShaderValueVariant GetDefaultShaderValue(const ShaderUniformType& type);
 struct ShaderInstance : public Asset {
   std::vector<ShaderUniform> uniforms{};
 
-  IMPL_ASSET(AssetType::kShader)
+  EVE_IMPL_ASSET(AssetType::kShader)
 };
 
 // TODO make this work as an asset
@@ -54,7 +54,7 @@ struct Material : public Asset {
   Color albedo = kColorWhite;
   AssetHandle shader = 0;
 
-  IMPL_ASSET(AssetType::kMaterial)
+  EVE_IMPL_ASSET(AssetType::kMaterial)
 };
 
 }  // namespace eve

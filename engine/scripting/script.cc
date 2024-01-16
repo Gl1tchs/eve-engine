@@ -11,6 +11,7 @@
 #include "scripting/script_engine.h"
 
 namespace eve {
+
 ScriptClass::ScriptClass(const std::string& class_namespace,
                          const std::string& class_name, bool is_core)
     : class_namespace_(class_namespace), class_name_(class_name) {
@@ -93,4 +94,5 @@ bool ScriptInstance::SetFieldValueInternal(const std::string& name,
   mono_field_set_value(instance_, field.class_field, (void*)value);
   return true;
 }
+
 }  // namespace eve

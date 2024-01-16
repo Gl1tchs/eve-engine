@@ -6,15 +6,16 @@
 #include "graphics/platforms/opengl/opengl_index_buffer.h"
 
 namespace eve {
+
 Ref<IndexBuffer> IndexBuffer::Create(uint32_t size) {
   switch (GetGraphicsAPI()) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLIndexBuffer>(size);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }
@@ -24,11 +25,12 @@ Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLIndexBuffer>(indices, count);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }
+
 }  // namespace eve

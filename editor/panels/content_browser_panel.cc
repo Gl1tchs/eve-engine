@@ -136,7 +136,7 @@ void ContentBrowserPanel::Draw() {
 
       if (ImGui::BeginDragDropSource()) {
         std::string payload_name =
-            "DND_PAYLOAD_" + GetAssetTypeString(it->second.type);
+            "DND_PAYLOAD_" + DeserializeAssetType(it->second.type);
         ImGui::SetDragDropPayload(payload_name.c_str(), &it->second.handle,
                                   sizeof(AssetHandle));
         ImGui::EndDragDropSource();

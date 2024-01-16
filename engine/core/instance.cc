@@ -10,7 +10,7 @@ namespace eve {
 Instance* Instance::instance_ = nullptr;
 
 Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
-  ASSERT(!instance_, "Only one instance can exists.");
+  EVE_ASSERT_ENGINE(!instance_, "Only one instance can exists.");
   instance_ = this;
 
   state_ = CreateRef<State>();
@@ -82,11 +82,11 @@ void Instance::ProcessMainThreadQueue() {
 }
 
 void Instance::PushLayer(Layer* layer) {
-  layers_.PushLayer(layer);
+  EnqueueMain([this, layer]() { layers_.PushLayer(layer); });
 }
 
 void Instance::PushOverlay(Layer* overlay) {
-  layers_.PushOverlay(overlay);
+  EnqueueMain([this, overlay]() { layers_.PushOverlay(overlay); });
 }
 
 }  // namespace eve

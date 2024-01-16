@@ -61,7 +61,6 @@ class ScriptEngine {
   static void LoadAssemblyClasses();
 
   friend class ScriptClass;
-  friend class ScriptGlue;
 };
 
 const char* ScriptFieldTypeToString(ScriptFieldType field_type);

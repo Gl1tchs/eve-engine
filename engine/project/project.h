@@ -16,44 +16,22 @@ struct ProjectConfig {
 
 class Project {
  public:
-  [[nodiscard]] static std::string GetProjectName() {
-    ASSERT(active_project_);
-    return active_project_->config_.name;
-  }
+  Project(const fs::path& path);
 
-  [[nodiscard]] static fs::path GetProjectDirectory() {
-    ASSERT(active_project_);
-    return active_project_->project_dir_;
-  }
+  [[nodiscard]] static std::string GetProjectName();
 
-  [[nodiscard]] static fs::path GetProjectPath() {
-    ASSERT(active_project_);
-    return active_project_->project_path_;
-  }
+  [[nodiscard]] static fs::path GetProjectDirectory();
 
-  [[nodiscard]] static fs::path GetScriptDirectory() {
-    ASSERT(active_project_);
-    return active_project_->project_dir_ /
-           active_project_->config_.script_directory;
-  }
+  [[nodiscard]] static fs::path GetProjectPath();
 
-  [[nodiscard]] static fs::path GetAssetRegistryPath() {
-    ASSERT(active_project_);
-    return active_project_->project_dir_ /
-           active_project_->config_.asset_registry;
-  }
+  [[nodiscard]] static fs::path GetScriptDirectory();
 
-  [[nodiscard]] static fs::path GetKeymapsPath() {
-    ASSERT(active_project_);
-    return active_project_->project_dir_ / active_project_->config_.keymaps;
-  }
+  [[nodiscard]] static fs::path GetAssetRegistryPath();
+
+  [[nodiscard]] static fs::path GetKeymapsPath();
 
   // Relative to project directory
-  [[nodiscard]] static fs::path GetAssetDirectory() {
-    ASSERT(active_project_);
-    return active_project_->project_dir_ /
-           active_project_->config_.asset_directory;
-  }
+  [[nodiscard]] static fs::path GetAssetDirectory();
 
   [[nodiscard]] ProjectConfig& GetConfig() { return config_; }
 
@@ -65,12 +43,14 @@ class Project {
 
   static void SaveActive(const fs::path& path);
 
+  static void SetActive(Ref<Project> project) { active_project_ = project; }
+
  private:
   static Ref<Project> active_project_;
 
   ProjectConfig config_;
   fs::path project_dir_;
-  fs::path project_path_ = "";
+  fs::path project_path_;
 
   friend class ProjectSettingsPanel;
 };

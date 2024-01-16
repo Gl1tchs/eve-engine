@@ -11,12 +11,32 @@
 
 namespace eve {
 
-struct AssetLoader {
-  static Ref<Texture> LoadTexture(const fs::path& path);
+namespace asset_loader {
 
-  static Ref<Model> LoadModel(const fs::path& path);
+/**
+ * @brief Load texture asset from a path.
+ * 
+ * @param path Relative path of the asset.
+ * @return Ref<Texture> Newly created asset.
+ */
+Ref<Texture> LoadTexture(const fs::path& path);
 
-  static Ref<ShaderInstance> LoadShader(const fs::path& path);
-};
+/**
+ * @brief Load model asset from a path.
+ * 
+ * @param path Relative path of the asset.
+ * @return Ref<Model> Newly created asset.
+ */
+Ref<Model> LoadModel(const fs::path& path);
+
+/**
+ * @brief Load a shader instance asset from a path.
+ * 
+ * @param path Relative path of the asset.
+ * @return Ref<ShaderInstance> Newly created asset.
+ */
+Ref<ShaderInstance> LoadShader(const fs::path& path);
+
+}  // namespace asset_loader
 
 }  // namespace eve

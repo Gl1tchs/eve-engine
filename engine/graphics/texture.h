@@ -45,7 +45,7 @@ struct TextureMetadata final {
 
 class Texture : public Asset {
  public:
-  IMPL_ASSET(AssetType::kTexture)
+  EVE_IMPL_ASSET(AssetType::kTexture)
 
   virtual const TextureMetadata& GetMetadata() const = 0;
 

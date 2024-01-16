@@ -35,7 +35,7 @@ void AssetRegistryPanel::Draw() {
         modify_info.SetModified();
       }
 
-      auto type_string = GetAssetTypeString(asset->GetType());
+      auto type_string = DeserializeAssetType(asset->GetType());
       ImGui::InputText("Type", &type_string, ImGuiInputTextFlags_ReadOnly);
 
       if (ImGui::InputText("Path", &asset->path)) {

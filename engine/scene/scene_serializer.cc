@@ -91,7 +91,7 @@ void from_json(const json& j, Color& color) {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(json& out, Entity entity) {
-  ASSERT(entity.HasComponent<IdComponent>())
+  EVE_ASSERT_ENGINE(entity.HasComponent<IdComponent>())
 
   out["id"] = entity.GetUUID();
 
@@ -468,7 +468,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
 
             ScriptFieldInstance& field_instance = entity_fields[name];
 
-            ASSERT(fields.find(name) != fields.end());
+            EVE_ASSERT_ENGINE(fields.find(name) != fields.end());
 
             if (fields.find(name) == fields.end()) {
               continue;

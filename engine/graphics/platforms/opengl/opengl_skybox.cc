@@ -33,7 +33,7 @@ OpenGLSkyBox::OpenGLSkyBox(const fs::path& path) {
     stbi_image_free(data);
     EVE_LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {0}",
                      path.string());
-    ASSERT(false);
+    EVE_ASSERT_ENGINE(false);
     return;
   }
 
@@ -52,7 +52,7 @@ OpenGLSkyBox::OpenGLSkyBox(const fs::path& path) {
       internal_format = GL_RGBA;
       break;
     default:
-      ASSERT(false, "Unsupported number of channels in the image");
+      EVE_ASSERT_ENGINE(false, "Unsupported number of channels in the image");
       break;
   }
 
@@ -123,7 +123,7 @@ OpenGLSkyBox::OpenGLSkyBox(const std::vector<fs::path>& paths) {
         internal_format = GL_RGBA;
         break;
       default:
-        ASSERT(false, "Unsupported number of channels in the image");
+        EVE_ASSERT_ENGINE(false, "Unsupported number of channels in the image");
         break;
     }
 
@@ -138,7 +138,7 @@ OpenGLSkyBox::OpenGLSkyBox(const std::vector<fs::path>& paths) {
       EVE_LOG_ENGINE_ERROR("Cubemap texture failed to load at path: {}",
                        paths[i].string());
       stbi_image_free(data);
-      ASSERT(false);
+      EVE_ASSERT_ENGINE(false);
     }
   }
 

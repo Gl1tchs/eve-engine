@@ -14,10 +14,10 @@ Ref<Shader> Shader::Create(const std::string& vs_path,
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLShader>(vs_path, fs_path, custom_shader);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }

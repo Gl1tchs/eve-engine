@@ -41,7 +41,7 @@ Ref<Asset> AssetRegistry::Get(const AssetHandle& handle) {
   const auto it = assets_.find(handle);
   if (it == assets_.end()) {
     EVE_LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot load!",
-                       (uint64_t)handle);
+                           (uint64_t)handle);
     return nullptr;
   }
 
@@ -73,13 +73,13 @@ AssetHandle AssetRegistry::Load(const std::string& path, AssetType type,
   Ref<Asset> asset = nullptr;
   switch (type) {
     case AssetType::kTexture:
-      asset = AssetLoader::LoadTexture(path_abs);
+      asset = asset_loader::LoadTexture(path_abs);
       break;
     case AssetType::kStaticMesh:
-      asset = AssetLoader::LoadModel(path_abs);
+      asset = asset_loader::LoadModel(path_abs);
       break;
     case AssetType::kShader:
-      asset = AssetLoader::LoadShader(path_abs);
+      asset = asset_loader::LoadShader(path_abs);
       break;
     default:
       return 0;
@@ -120,7 +120,7 @@ bool AssetRegistry::Unload(const AssetHandle& handle) {
   const auto it = assets_.find(handle);
   if (it == assets_.end()) {
     EVE_LOG_ENGINE_WARNING("Asset of handle: {} not found thus cannot remove!",
-                       (uint64_t)handle);
+                           (uint64_t)handle);
     return false;
   }
 
@@ -242,7 +242,7 @@ bool AssetRegistry::Deserialize(const fs::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
     EVE_LOG_ENGINE_ERROR("Unable to deserialize asset registry from: {}",
-                     path.string());
+                         path.string());
     return false;
   }
 
@@ -250,7 +250,8 @@ bool AssetRegistry::Deserialize(const fs::path& path) {
   file >> j;
 
   if (!j.is_array()) {
-    EVE_LOG_ENGINE_ERROR("Unable to parse asset registry from: {}", path.string());
+    EVE_LOG_ENGINE_ERROR("Unable to parse asset registry from: {}",
+                         path.string());
     return false;
   }
 

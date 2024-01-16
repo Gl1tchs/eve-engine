@@ -14,7 +14,7 @@ struct aiScene;
 namespace eve {
 
 struct Model : Asset {
-  IMPL_ASSET(AssetType::kStaticMesh)
+  EVE_IMPL_ASSET(AssetType::kStaticMesh)
 
   std::vector<RenderData<MeshVertex>> meshes;
   std::vector<AssetHandle> textures;

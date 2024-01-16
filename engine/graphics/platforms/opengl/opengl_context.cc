@@ -15,14 +15,14 @@ namespace eve {
 void OpenGLContext::Init() {
   // TODO if you add different window classes update this
   int32_t status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-  ASSERT(status, "Failed to initialize Glad!");
+  EVE_ASSERT_ENGINE(status, "Failed to initialize Glad!");
 
 #ifdef _DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 #endif
 
-  ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
+  EVE_ASSERT_ENGINE(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
          "Requires at least OpenGL version of 4.5!");
 }
 

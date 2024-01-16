@@ -11,10 +11,10 @@ Scope<RendererAPI> RendererAPI::Create() {
     case GraphicsAPI::kOpenGL:
       return CreateScope<OpenGLRendererAPI>();
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }

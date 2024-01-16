@@ -15,10 +15,10 @@ Ref<Texture> Texture::Create(const TextureMetadata& metadata,
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLTexture2D>(metadata, pixels);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }
@@ -31,7 +31,7 @@ Ref<Texture> Texture::Create(const fs::path& path, const TextureType& type) {
   if (!data) {
     stbi_image_free(data);
     EVE_LOG_ENGINE_ERROR("Unable to load texture from: {}", path.string());
-    ASSERT(false);
+    EVE_ASSERT_ENGINE(false);
   }
 
   TextureMetadata metadata;
@@ -57,7 +57,7 @@ Ref<Texture> Texture::Create(const fs::path& path, const TextureType& type) {
       metadata.format = TextureFormat::kRGBA;
       break;
     default:
-      ASSERT(false, "Unsupported number of channels in the image");
+      EVE_ASSERT_ENGINE(false, "Unsupported number of channels in the image");
       break;
   }
 

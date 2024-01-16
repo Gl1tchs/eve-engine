@@ -1,3 +1,6 @@
+option(ENABLE_TESTING "Should cmake build tests too?" ON)
+set(ENABLE_TESTING ${ENABLE_TESTING})
+
 # Set the output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/build/bin")

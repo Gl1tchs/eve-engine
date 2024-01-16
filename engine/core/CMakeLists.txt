@@ -58,3 +58,13 @@ module_link_libraries(core PRIVATE
 module_precompile_headers(core PUBLIC ${ENGINE_DIR}/pch_shared.h)
 
 module_compile_definitions(core PRIVATE GLFW_INCLUDE_NONE)
+
+if (ENABLE_TESTING)
+  set(TEST_SOURCES
+    tests/buffer_tests.cc
+    tests/file_system_tests.cc
+    tests/layer_tests.cc
+  )
+
+  module_add_tests(core ${TEST_SOURCES})
+endif()

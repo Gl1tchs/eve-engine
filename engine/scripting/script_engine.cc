@@ -172,7 +172,7 @@ void ScriptEngine::Init(bool is_runtime) {
 
   InitMono();
 
-  ScriptGlue::RegisterFunctions();
+  script_glue::RegisterFunctions();
 
   if (!is_runtime) {
     GenerateProjectFiles();
@@ -196,7 +196,7 @@ void ScriptEngine::Init(bool is_runtime) {
 
   LoadAssemblyClasses();
 
-  ScriptGlue::RegisterComponents();
+  script_glue::RegisterComponents();
 
   // Retrieve and instantiate class
   data->entity_class = ScriptClass("EveEngine", "Entity", true);
@@ -237,7 +237,7 @@ void ScriptEngine::InitMono() {
   }
 
   data->root_domain = mono_jit_init("EveJITRuntime");
-  ASSERT(data->root_domain);
+  EVE_ASSERT_ENGINE(data->root_domain);
 
   if (data->enable_debugging) {
     mono_debug_domain_create(data->root_domain);
@@ -314,7 +314,7 @@ void ScriptEngine::ReloadAssembly() {
   LoadAppAssembly(data->app_assembly_path);
   LoadAssemblyClasses();
 
-  ScriptGlue::RegisterComponents();
+  script_glue::RegisterComponents();
 
   // Retrieve and instantiate class
   data->entity_class = ScriptClass("EveEngine", "Entity", true);
@@ -405,7 +405,7 @@ ScriptEngine::GetEntityClasses() {
 }
 
 ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity) {
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   UUID entity_id = entity.GetUUID();
   return data->entity_script_fields[entity_id];
@@ -483,7 +483,8 @@ MonoImage* ScriptEngine::GetAppAssemblyImage() {
 }
 
 MonoObject* ScriptEngine::GetManagedInstance(UUID uuid) {
-  ASSERT(data->entity_instances.find(uuid) != data->entity_instances.end());
+  EVE_ASSERT_ENGINE(data->entity_instances.find(uuid) !=
+                    data->entity_instances.end());
   return data->entity_instances.at(uuid)->GetManagedObject();
 }
 
@@ -582,7 +583,7 @@ const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
     case ScriptFieldType::kEntity:
       return "Entity";
   }
-  ASSERT(false, "Unknown ScriptFieldType");
+  EVE_ASSERT_ENGINE(false, "Unknown ScriptFieldType");
   return "None";
 }
 
@@ -624,7 +625,8 @@ ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
   if (field_type == "Entity")
     return ScriptFieldType::kEntity;
 
-  ASSERT(false, "Unknown ScriptFieldType");
+  EVE_ASSERT_ENGINE(false, "Unknown ScriptFieldType");
   return ScriptFieldType::kNone;
 }
+
 }  // namespace eve

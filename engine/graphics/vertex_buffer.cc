@@ -11,10 +11,10 @@ Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLVertexBuffer>(size);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }
@@ -24,10 +24,10 @@ Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLVertexBuffer>(vertices, size);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }

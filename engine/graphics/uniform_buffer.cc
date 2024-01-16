@@ -11,10 +11,10 @@ Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
     case GraphicsAPI::kOpenGL:
       return CreateRef<OpenGLUniformBuffer>(size, binding);
     case GraphicsAPI::kVulkan:
-      ASSERT(false, "Vulkan not supported yet!");
+      EVE_ASSERT_ENGINE(false, "Vulkan not supported yet!");
       return nullptr;
     default:
-      ASSERT(false, "Unknown graphics API");
+      EVE_ASSERT_ENGINE(false, "Unknown graphics API");
       return nullptr;
   }
 }

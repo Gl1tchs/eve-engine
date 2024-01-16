@@ -7,6 +7,7 @@
 #include "graphics/primitives/primitive.h"
 
 namespace eve {
+
 Renderer::Renderer() {
   graphics_context_ = GraphicsContext::Create();
   graphics_context_->Init();

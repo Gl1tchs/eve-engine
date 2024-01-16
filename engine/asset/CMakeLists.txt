@@ -11,6 +11,7 @@ add_module(asset STATIC ${SOURCES})
 
 module_include_directories(asset PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
+  ${VENDOR_DIR}/glm
 )
 
 module_include_directories(asset PRIVATE
@@ -25,3 +26,11 @@ module_link_libraries(asset PRIVATE
 )
 
 module_precompile_headers(asset PUBLIC ${ENGINE_DIR}/pch_shared.h)
+
+if (ENABLE_TESTING)
+  set(TEST_SOURCES
+    tests/asset_registry_tests.cc
+  )
+
+  module_add_tests(asset ${TEST_SOURCES})
+endif()

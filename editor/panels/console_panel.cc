@@ -193,8 +193,8 @@ void ConsolePanel::Draw() {
 
       std::string log =
           std::format("[{}] [{}] [{}] {}", message.time_stamp,
-                      GetLogSenderString(message.sender),
-                      GetLogLevelString(message.level), message.string);
+                      DeserializeLogSender(message.sender),
+                      DeserializeLogLevel(message.level), message.string);
       ImGui::PushID(i);
       if (ImGui::Selectable(log.c_str(), selected_log_idx_ == i)) {
         selected_log_idx_ = (selected_log_idx_ == i) ? -1 : i;

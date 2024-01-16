@@ -20,7 +20,7 @@ Window::Window(WindowCreateInfo props) {
   size_ = props.size;
   mode_ = props.mode;
 
-  ASSERT(glfwInit(), "Could not initialize GLFW!");
+  EVE_ASSERT_ENGINE(glfwInit(), "Could not initialize GLFW!");
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -48,7 +48,7 @@ Window::Window(WindowCreateInfo props) {
 
   window_ =
       glfwCreateWindow(size_.x, size_.y, title_.c_str(), monitor, nullptr);
-  ASSERT(window_, "GLFW window could not created!")
+  EVE_ASSERT_ENGINE(window_, "GLFW window could not created!")
 
   glfwMakeContextCurrent(window_);
 
@@ -109,7 +109,7 @@ void Window::SetMode(const WindowMode& mode) {
 
   window_ =
       glfwCreateWindow(size_.x, size_.y, title_.c_str(), monitor, nullptr);
-  ASSERT(window_, "GLFW window could not created!")
+  EVE_ASSERT_ENGINE(window_, "GLFW window could not created!")
 
   mode_ = mode;
 }

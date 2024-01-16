@@ -277,7 +277,7 @@ bool OpenGLShader::CheckCompileErrors(const uint32_t shader,
 
 uint32_t OpenGLShader::CompileShader(const std::string& source,
                                      ShaderType type) {
-  ASSERT(type != ShaderType::kNone)
+  EVE_ASSERT_ENGINE(type != ShaderType::kNone)
 
   const char* source_c_str = source.c_str();
   const uint32_t shader = glCreateShader(GetOpenGLShaderType(type));
@@ -286,7 +286,7 @@ uint32_t OpenGLShader::CompileShader(const std::string& source,
 
   if (!CheckCompileErrors(shader, type)) {
     EVE_LOG_ENGINE_ERROR("Unable to compile shader:\n{0}", source);
-    ASSERT(false);
+    EVE_ASSERT_ENGINE(false);
   }
 
   return shader;

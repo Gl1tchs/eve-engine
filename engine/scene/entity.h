@@ -19,7 +19,7 @@ class Entity {
 
   template <typename T, typename... Args>
   T& AddComponent(Args&&... args) {
-    ASSERT(!HasComponent<T>(), "Entity already has that component!");
+    EVE_ASSERT_ENGINE(!HasComponent<T>(), "Entity already has that component!");
     T& component = scene_->registry_.emplace<T>(entity_handle_,
                                                 std::forward<Args>(args)...);
     return component;
@@ -34,7 +34,7 @@ class Entity {
 
   template <typename T>
   [[nodiscard]] T& GetComponent() {
-    ASSERT(HasComponent<T>(), "Entity does not have component!");
+    EVE_ASSERT_ENGINE(HasComponent<T>(), "Entity does not have component!");
     return scene_->registry_.get<T>(entity_handle_);
   }
 
@@ -45,7 +45,7 @@ class Entity {
 
   template <typename T>
   void RemoveComponent() {
-    ASSERT(HasComponent<T>(), "Entity does not have component!");
+    EVE_ASSERT_ENGINE(HasComponent<T>(), "Entity does not have component!");
     scene_->registry_.remove<T>(entity_handle_);
   }
 

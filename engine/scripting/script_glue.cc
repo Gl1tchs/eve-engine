@@ -69,9 +69,9 @@ static void Debug_LogFatal(MonoString* string) {
 
 static void Entity_Destroy(UUID entity_id) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   ScriptEngine::OnDestroyEntity(entity);
 
@@ -80,9 +80,9 @@ static void Entity_Destroy(UUID entity_id) {
 
 static MonoString* Entity_GetName(UUID entity_id) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   return ScriptEngine::CreateMonoString(entity.GetName().c_str());
 }
@@ -90,26 +90,26 @@ static MonoString* Entity_GetName(UUID entity_id) {
 static bool Entity_HasComponent(UUID entity_id,
                                 MonoReflectionType* component_type) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   MonoType* managed_type = mono_reflection_type_get_type(component_type);
-  ASSERT(entity_has_component_funcs.find(managed_type) !=
-         entity_has_component_funcs.end());
+  EVE_ASSERT_ENGINE(entity_has_component_funcs.find(managed_type) !=
+                    entity_has_component_funcs.end());
   return entity_has_component_funcs.at(managed_type)(entity);
 }
 
 static void Entity_AddComponent(UUID entity_id,
                                 MonoReflectionType* component_type) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   MonoType* managed_type = mono_reflection_type_get_type(component_type);
-  ASSERT(entity_add_component_funcs.find(managed_type) !=
-         entity_add_component_funcs.end());
+  EVE_ASSERT_ENGINE(entity_add_component_funcs.find(managed_type) !=
+                    entity_add_component_funcs.end());
 
   entity_add_component_funcs.at(managed_type)(entity);
 }
@@ -118,7 +118,7 @@ static uint64_t Entity_TryGetEntityByName(MonoString* name) {
   char* name_cstr = mono_string_to_utf8(name);
 
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByName(name_cstr);
   mono_free(name_cstr);
 
@@ -132,7 +132,7 @@ static uint64_t Entity_TryGetEntityByName(MonoString* name) {
 static uint64_t Entity_Instantiate(MonoString* name, glm::vec3* position,
                                    glm::vec3* rotation, glm::vec3* scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
 
   Entity created_entity = scene->CreateEntity(MonoStringToString(name));
   if (!created_entity) {
@@ -149,9 +149,9 @@ static uint64_t Entity_Instantiate(MonoString* name, glm::vec3* position,
 
 static void Entity_AssignScript(UUID entity_id, MonoString* class_name) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   auto& sc = entity.AddComponent<ScriptComponent>();
   sc.class_name = MonoStringToString(class_name);
@@ -166,9 +166,9 @@ static void Entity_AssignScript(UUID entity_id, MonoString* class_name) {
 static void TransformComponent_GetPosition(UUID entity_id,
                                            glm::vec3* out_position) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_position = entity.GetComponent<Transform>().position;
 }
@@ -176,9 +176,9 @@ static void TransformComponent_GetPosition(UUID entity_id,
 static void TransformComponent_SetPosition(UUID entity_id,
                                            glm::vec3* position) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Transform>().position = *position;
 }
@@ -186,9 +186,9 @@ static void TransformComponent_SetPosition(UUID entity_id,
 static void TransformComponent_GetRotation(UUID entity_id,
                                            glm::vec3* out_rotation) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_rotation = entity.GetComponent<Transform>().rotation;
 }
@@ -196,27 +196,27 @@ static void TransformComponent_GetRotation(UUID entity_id,
 static void TransformComponent_SetRotation(UUID entity_id,
                                            glm::vec3* rotation) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Transform>().rotation = *rotation;
 }
 
 static void TransformComponent_GetScale(UUID entity_id, glm::vec3* out_scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_scale = entity.GetComponent<Transform>().scale;
 }
 
 static void TransformComponent_SetScale(UUID entity_id, glm::vec3* scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Transform>().scale = *scale;
 }
@@ -224,27 +224,27 @@ static void TransformComponent_SetScale(UUID entity_id, glm::vec3* scale) {
 static void TransformComponent_GetForward(UUID entity_id,
                                           glm::vec3* out_forward) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_forward = entity.GetComponent<Transform>().GetForward();
 }
 
 static void TransformComponent_GetRight(UUID entity_id, glm::vec3* out_right) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_right = entity.GetComponent<Transform>().GetRight();
 }
 
 static void TransformComponent_GetUp(UUID entity_id, glm::vec3* out_up) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_up = entity.GetComponent<Transform>().GetUp();
 }
@@ -255,9 +255,9 @@ static void TransformComponent_GetUp(UUID entity_id, glm::vec3* out_up) {
 static void CameraComponent_OrthographicCamera_GetAspectRatio(
     UUID entity_id, float* out_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_aspect_ratio =
       entity.GetComponent<CameraComponent>().ortho_camera.aspect_ratio;
@@ -266,9 +266,9 @@ static void CameraComponent_OrthographicCamera_GetAspectRatio(
 static void CameraComponent_OrthographicCamera_SetAspectRatio(
     UUID entity_id, float* aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().ortho_camera.aspect_ratio =
       *aspect_ratio;
@@ -277,9 +277,9 @@ static void CameraComponent_OrthographicCamera_SetAspectRatio(
 static void CameraComponent_OrthographicCamera_GetZoomLevel(
     UUID entity_id, float* out_zoom_level) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_zoom_level =
       entity.GetComponent<CameraComponent>().ortho_camera.zoom_level;
@@ -288,9 +288,9 @@ static void CameraComponent_OrthographicCamera_GetZoomLevel(
 static void CameraComponent_OrthographicCamera_SetZoomLevel(UUID entity_id,
                                                             float* zoom_level) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().ortho_camera.zoom_level = *zoom_level;
 }
@@ -298,9 +298,9 @@ static void CameraComponent_OrthographicCamera_SetZoomLevel(UUID entity_id,
 static void CameraComponent_OrthographicCamera_GetNearClip(
     UUID entity_id, float* out_near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_near_clip =
       entity.GetComponent<CameraComponent>().ortho_camera.near_clip;
@@ -309,9 +309,9 @@ static void CameraComponent_OrthographicCamera_GetNearClip(
 static void CameraComponent_OrthographicCamera_SetNearClip(UUID entity_id,
                                                            float* near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().ortho_camera.near_clip = *near_clip;
 }
@@ -319,9 +319,9 @@ static void CameraComponent_OrthographicCamera_SetNearClip(UUID entity_id,
 static void CameraComponent_OrthographicCamera_GetFarClip(UUID entity_id,
                                                           float* out_far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_far_clip = entity.GetComponent<CameraComponent>().ortho_camera.far_clip;
 }
@@ -329,9 +329,9 @@ static void CameraComponent_OrthographicCamera_GetFarClip(UUID entity_id,
 static void CameraComponent_OrthographicCamera_SetFarClip(UUID entity_id,
                                                           float* far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().ortho_camera.far_clip = *far_clip;
 }
@@ -339,9 +339,9 @@ static void CameraComponent_OrthographicCamera_SetFarClip(UUID entity_id,
 static void CameraComponent_PerspectiveCamera_GetAspectRatio(
     UUID entity_id, float* out_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_aspect_ratio =
       entity.GetComponent<CameraComponent>().persp_camera.aspect_ratio;
@@ -350,9 +350,9 @@ static void CameraComponent_PerspectiveCamera_GetAspectRatio(
 static void CameraComponent_PerspectiveCamera_SetAspectRatio(
     UUID entity_id, float* aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().persp_camera.aspect_ratio =
       *aspect_ratio;
@@ -361,9 +361,9 @@ static void CameraComponent_PerspectiveCamera_SetAspectRatio(
 static void CameraComponent_PerspectiveCamera_GetFov(UUID entity_id,
                                                      float* out_fov) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_fov = entity.GetComponent<CameraComponent>().persp_camera.fov;
 }
@@ -371,9 +371,9 @@ static void CameraComponent_PerspectiveCamera_GetFov(UUID entity_id,
 static void CameraComponent_PerspectiveCamera_SetFov(UUID entity_id,
                                                      float* fov) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().persp_camera.fov = *fov;
 }
@@ -381,9 +381,9 @@ static void CameraComponent_PerspectiveCamera_SetFov(UUID entity_id,
 static void CameraComponent_PerspectiveCamera_GetNearClip(
     UUID entity_id, float* out_near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_near_clip =
       entity.GetComponent<CameraComponent>().persp_camera.near_clip;
@@ -392,9 +392,9 @@ static void CameraComponent_PerspectiveCamera_GetNearClip(
 static void CameraComponent_PerspectiveCamera_SetNearClip(UUID entity_id,
                                                           float* near_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().persp_camera.near_clip = *near_clip;
 }
@@ -402,9 +402,9 @@ static void CameraComponent_PerspectiveCamera_SetNearClip(UUID entity_id,
 static void CameraComponent_PerspectiveCamera_GetFarClip(UUID entity_id,
                                                          float* out_far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_far_clip = entity.GetComponent<CameraComponent>().persp_camera.far_clip;
 }
@@ -412,9 +412,9 @@ static void CameraComponent_PerspectiveCamera_GetFarClip(UUID entity_id,
 static void CameraComponent_PerspectiveCamera_SetFarClip(UUID entity_id,
                                                          float* far_clip) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().persp_camera.far_clip = *far_clip;
   ;
@@ -423,9 +423,9 @@ static void CameraComponent_PerspectiveCamera_SetFarClip(UUID entity_id,
 static void CameraComponent_GetIsOrthographic(UUID entity_id,
                                               float* out_is_orthographic) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_is_orthographic = entity.GetComponent<CameraComponent>().is_orthographic;
 }
@@ -433,9 +433,9 @@ static void CameraComponent_GetIsOrthographic(UUID entity_id,
 static void CameraComponent_SetIsOrthographic(UUID entity_id,
                                               float* is_orthographic) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().is_orthographic = *is_orthographic;
 }
@@ -443,18 +443,18 @@ static void CameraComponent_SetIsOrthographic(UUID entity_id,
 static void CameraComponent_GetIsPrimary(UUID entity_id,
                                          float* out_is_primary) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_is_primary = entity.GetComponent<CameraComponent>().is_primary;
 }
 
 static void CameraComponent_SetIsPrimary(UUID entity_id, float* is_primary) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().is_primary = *is_primary;
 }
@@ -462,9 +462,9 @@ static void CameraComponent_SetIsPrimary(UUID entity_id, float* is_primary) {
 static void CameraComponent_GetIsFixedAspectRato(
     UUID entity_id, float* out_is_fixed_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_is_fixed_aspect_ratio =
       entity.GetComponent<CameraComponent>().is_fixed_aspect_ratio;
@@ -473,9 +473,9 @@ static void CameraComponent_GetIsFixedAspectRato(
 static void CameraComponent_SetIsFixedAspectRato(UUID entity_id,
                                                  float* is_fixed_aspect_ratio) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<CameraComponent>().is_fixed_aspect_ratio =
       *is_fixed_aspect_ratio;
@@ -486,18 +486,18 @@ static void CameraComponent_SetIsFixedAspectRato(UUID entity_id,
 
 static void Material_GetAlbedo(UUID entity_id, Color* out_albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_albedo = entity.GetComponent<Material>().albedo;
 }
 
 static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Material>().albedo = *albedo;
 }
@@ -507,9 +507,9 @@ static void Material_SetAlbedo(UUID entity_id, Color* albedo) {
 
 static MonoString* ScriptComponent_GetClassName(UUID entity_id) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   const auto& sc = entity.GetComponent<ScriptComponent>();
   return ScriptEngine::CreateMonoString(sc.class_name.c_str());
@@ -520,18 +520,18 @@ static MonoString* ScriptComponent_GetClassName(UUID entity_id) {
 
 static void Rigidbody_GetVelocity(UUID entity_id, glm::vec3* out_velocity) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_velocity = entity.GetComponent<Rigidbody>().velocity;
 }
 
 static void Rigidbody_SetVelocity(UUID entity_id, glm::vec3* velocity) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().velocity = *velocity;
 }
@@ -539,54 +539,54 @@ static void Rigidbody_SetVelocity(UUID entity_id, glm::vec3* velocity) {
 static void Rigidbody_GetAcceleration(UUID entity_id,
                                       glm::vec3* out_acceleration) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_acceleration = entity.GetComponent<Rigidbody>().acceleration;
 }
 
 static void Rigidbody_SetAcceleration(UUID entity_id, glm::vec3* acceleration) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().acceleration = *acceleration;
 }
 
 static void Rigidbody_GetMass(UUID entity_id, float* out_mass) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_mass = entity.GetComponent<Rigidbody>().mass;
 }
 
 static void Rigidbody_SetMass(UUID entity_id, float* mass) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().mass = *mass;
 }
 
 static void Rigidbody_GetUseGravity(UUID entity_id, bool* out_use_gravity) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_use_gravity = entity.GetComponent<Rigidbody>().use_gravity;
 }
 
 static void Rigidbody_SetUseGravity(UUID entity_id, bool* use_gravity) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().use_gravity = *use_gravity;
 }
@@ -594,9 +594,9 @@ static void Rigidbody_SetUseGravity(UUID entity_id, bool* use_gravity) {
 static void Rigidbody_GetPositionConstraints(
     UUID entity_id, PositionConstraints* out_position_constraints) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_position_constraints =
       entity.GetComponent<Rigidbody>().position_constraints;
@@ -605,9 +605,9 @@ static void Rigidbody_GetPositionConstraints(
 static void Rigidbody_SetPositionConstraints(
     UUID entity_id, PositionConstraints* position_constraints) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().position_constraints = *position_constraints;
 }
@@ -615,9 +615,9 @@ static void Rigidbody_SetPositionConstraints(
 static void Rigidbody_GetRotationConstraints(
     UUID entity_id, RotationConstraints* out_rotation_constraints) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   *out_rotation_constraints =
       entity.GetComponent<Rigidbody>().rotation_constraints;
@@ -626,9 +626,9 @@ static void Rigidbody_GetRotationConstraints(
 static void Rigidbody_SetRotationConstraints(
     UUID entity_id, RotationConstraints* rotation_constraints) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   entity.GetComponent<Rigidbody>().rotation_constraints = *rotation_constraints;
 }
@@ -638,9 +638,9 @@ static void Rigidbody_SetRotationConstraints(
 
 static bool BoxCollider_GetIsTrigger(UUID entity_id) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -649,9 +649,9 @@ static bool BoxCollider_GetIsTrigger(UUID entity_id) {
 
 static void BoxCollider_SetIsTrigger(UUID entity_id, bool is_trigger) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -661,9 +661,9 @@ static void BoxCollider_SetIsTrigger(UUID entity_id, bool is_trigger) {
 static void BoxCollider_GetLocalPosition(UUID entity_id,
                                          glm::vec3* out_position) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -672,9 +672,9 @@ static void BoxCollider_GetLocalPosition(UUID entity_id,
 
 static void BoxCollider_SetLocalPosition(UUID entity_id, glm::vec3* position) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -683,9 +683,9 @@ static void BoxCollider_SetLocalPosition(UUID entity_id, glm::vec3* position) {
 
 static void BoxCollider_GetLocalScale(UUID entity_id, glm::vec3* out_scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -694,9 +694,9 @@ static void BoxCollider_GetLocalScale(UUID entity_id, glm::vec3* out_scale) {
 
 static void BoxCollider_SetLocalScale(UUID entity_id, glm::vec3* scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -706,9 +706,9 @@ static void BoxCollider_SetLocalScale(UUID entity_id, glm::vec3* scale) {
 static void BoxCollider_GetOnTrigger(UUID entity_id,
                                      BoxCollider::TriggerFunc out_on_trigger) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -718,9 +718,9 @@ static void BoxCollider_GetOnTrigger(UUID entity_id,
 static void BoxCollider_SetOnTrigger(UUID entity_id,
                                      BoxCollider::TriggerFunc on_trigger) {
   Scene* scene = ScriptEngine::GetSceneContext();
-  ASSERT(scene);
+  EVE_ASSERT_ENGINE(scene);
   auto entity = scene->TryGetEntityByUUID(entity_id);
-  ASSERT(entity);
+  EVE_ASSERT_ENGINE(entity);
 
   BoxCollider& box_collider = entity.GetComponent<BoxCollider>();
 
@@ -801,7 +801,7 @@ static void RegisterComponent() {
         };
         entity_add_component_funcs[managed_type] = [](Entity entity) {
           entity.AddComponent<Component>();
-          ASSERT(entity.HasComponent<Component>());
+          EVE_ASSERT_ENGINE(entity.HasComponent<Component>());
         };
       }(),
       ...);
@@ -812,12 +812,14 @@ static void RegisterComponent(ComponentGroup<Component...>) {
   RegisterComponent<Component...>();
 }
 
-void ScriptGlue::RegisterComponents() {
+namespace script_glue {
+
+void RegisterComponents() {
   entity_has_component_funcs.clear();
   RegisterComponent(AllComponents{});
 }
 
-void ScriptGlue::RegisterFunctions() {
+void RegisterFunctions() {
   ADD_INTERNAL_CALL(GetScriptInstance);
 
   // Begin Debug
@@ -930,4 +932,7 @@ void ScriptGlue::RegisterFunctions() {
   ADD_INTERNAL_CALL(Input_IsMouseButtonReleasedString);
   ADD_INTERNAL_CALL(Input_GetMousePosition);
 }
+
+}  // namespace script_glue
+
 }  // namespace eve

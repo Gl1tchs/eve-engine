@@ -28,7 +28,7 @@ AssetType GetAssetTypeFromExtension(const std::string& extension) {
   }
 }
 
-std::string GetAssetTypeString(AssetType type) {
+std::string DeserializeAssetType(AssetType type) {
 
   switch (type) {
     case AssetType::kNone:

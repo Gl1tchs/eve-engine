@@ -4,19 +4,23 @@
 
 namespace eve {
 
-Ref<Texture> AssetLoader::LoadTexture(const fs::path& path) {
+namespace asset_loader {
+
+Ref<Texture> LoadTexture(const fs::path& path) {
   Ref<Texture> texture = Texture::Create(path);
   return texture;
 }
 
-Ref<Model> AssetLoader::LoadModel(const fs::path& path) {
+Ref<Model> LoadModel(const fs::path& path) {
   Ref<Model> model = Model::Create(path);
   return model;
 }
 
-Ref<ShaderInstance> AssetLoader::LoadShader(const fs::path& path) {
+Ref<ShaderInstance> LoadShader(const fs::path& path) {
   Ref<ShaderInstance> shader = CreateRef<ShaderInstance>();
   return shader;
 }
+
+}  // namespace asset_loader
 
 }  // namespace eve

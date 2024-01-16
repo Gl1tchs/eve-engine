@@ -5,7 +5,7 @@
 
 namespace eve {
 
-std::string GetLogLevelString(LogLevel level) {
+std::string DeserializeLogLevel(LogLevel level) {
   switch (level) {
     case LogLevel::kTrace: {
       return "TRACE";
@@ -27,7 +27,7 @@ std::string GetLogLevelString(LogLevel level) {
   }
 }
 
-std::string GetLogSenderString(LogSender sender) {
+std::string DeserializeLogSender(LogSender sender) {
   switch (sender) {
     case LogSender::kEngine:
       return "ENGINE";
@@ -101,7 +101,7 @@ void Logger::Log(LogSender sender, LogLevel level, const std::string& fmt) {
 
   std::string message =
       std::format("[{}] [{}] [{}]: \"{}\"", time_stamp,
-                  GetLogSenderString(sender), GetLogLevelString(level), fmt);
+                  DeserializeLogSender(sender), DeserializeLogLevel(level), fmt);
 
   std::string colored_messages = GetColoredMessage(message, level);
 
