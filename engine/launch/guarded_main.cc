@@ -18,8 +18,6 @@ int GuardedMain(CommandLineArguments args) {
     return 1;
   }
 
-  instance->Init();
-
   if (!instance->GetState()->running) {
     Logger::Deinit();
     delete instance;

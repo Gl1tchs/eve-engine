@@ -96,13 +96,6 @@ class AssetRegistry {
    */
   static bool Reload(Ref<Asset>& asset);
 
-  /**
-   * @brief Check if asset exists at the registry or nor.
-   * 
-   * @param id Id of the asset to check.
-   * @return true If asset exists.
-   * @return false If asset not exists.
-   */
   [[nodiscard]] static bool Exists(const AssetHandle& id);
 
   /**
@@ -136,11 +129,6 @@ class AssetRegistry {
    */
   [[nodiscard]] static std::string GetRelativePath(const std::string& path);
 
-  /**
-   * @brief Get the registry map for the assets.
-   * 
-   * @return AssetRegistryMap& Registry which all assets are stored in.
-   */
   [[nodiscard]] static AssetRegistryMap& GetRegistryMap() { return assets_; }
 
   static bool Serialize(const fs::path& path);

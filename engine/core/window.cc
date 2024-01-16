@@ -14,21 +14,22 @@ namespace eve {
 
 void GlfwErrorCallback(int error, const char* description);
 
-Window::Window(WindowCreateInfo props) {
-
-  title_ = props.title;
-  size_ = props.size;
-  mode_ = props.mode;
-
+Window::Window(WindowCreateInfo props)
+    : window_(nullptr),
+      title_(props.title),
+      size_(props.size),
+      vsync_(props.vsync),
+      mode_(props.mode),
+      cursor_mode_(CursorMode::kNormal) {
   EVE_ASSERT_ENGINE(glfwInit(), "Could not initialize GLFW!");
+
+#if _DEBUG
+  glfwSetErrorCallback(GlfwErrorCallback);
+#endif
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef _DEBUG
-  glfwSetErrorCallback(GlfwErrorCallback);
-#endif
 
   GLFWmonitor* monitor = nullptr;
   if (mode_ != WindowMode::kWindowed) {
@@ -86,7 +87,6 @@ WindowMode Window::GetMode() {
 }
 
 void Window::SetMode(const WindowMode& mode) {
-
   if (window_ != nullptr) {
     glfwDestroyWindow(window_);
   }
@@ -137,13 +137,21 @@ void Window::SetTitle(const std::string& value) {
   title_ = value;
 }
 
-void Window::SetCursorState(CursorState state) {
-  switch (state) {
-    case CursorState::kNormal:
+void Window::SetCursorMode(CursorMode mode) {
+  cursor_mode_ = mode;
+
+  switch (cursor_mode_) {
+    case CursorMode::kNormal:
       glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
       break;
-    case CursorState::kHidden:
+    case CursorMode::kHidden:
+      glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+      break;
+    case CursorMode::kDisabled:
       glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      break;
+    case CursorMode::kCaptured:
+      glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
       break;
     default:
       break;

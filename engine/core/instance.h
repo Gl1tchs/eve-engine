@@ -23,14 +23,14 @@ class Instance {
   Instance(const InstanceSpecifications& specs);
   virtual ~Instance();
 
-  void Init();
-
   void StartEventLoop();
 
   void EnqueueMain(const std::function<void()>& function);
 
   Ref<State> GetState() { return state_; }
   const Ref<State>& GetState() const { return state_; }
+
+  void Quit() { state_->running = false; }
 
   static Instance& Get() { return *instance_; };
 

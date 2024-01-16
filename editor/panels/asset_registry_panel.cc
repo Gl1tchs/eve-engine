@@ -16,10 +16,6 @@ AssetRegistryPanel::AssetRegistryPanel() : Panel(true) {}
 void AssetRegistryPanel::Draw() {
   AssetRegistryMap& registry = AssetRegistry::GetRegistryMap();
 
-  if (registry.empty()) {
-    return;
-  }
-
   for (auto& [handle, asset] : registry) {
     if (!handle || !asset) {
       continue;

@@ -53,15 +53,15 @@ compile_commands.json
 # Imgui files
 imgui.ini
 
-!build/bin/
-build/bin/*
-!build/bin/assets
-!build/bin/docs
-!build/bin/templates
-!build/bin/mono
-!build/bin/mono/lib/mono/4.5/Facades/*.dll
-!build/bin/mono/lib/mono/4.5/*.dll
-!build/bin/imgui.ini
+!bin/
+bin/*
+!bin/assets
+!bin/docs
+!bin/templates
+!bin/mono
+!bin/mono/lib/mono/4.5/Facades/*.dll
+!bin/mono/lib/mono/4.5/*.dll
+!bin/imgui.ini
 
 !thirdparty/mono/bin/*.dll
 !thirdparty/mono/bin/*.pdb

@@ -207,6 +207,11 @@ void ScriptEngine::Reinit() {
     return;
   }
 
+  if (!data->is_runtime) {
+    GenerateProjectFiles();
+    BuildScripts();
+  }
+
   data->app_assembly_path =
       Project::GetProjectDirectory() /
       std::format("out/{}.dll", Project::GetProjectName());
@@ -536,7 +541,7 @@ void ScriptEngine::BuildScripts() {
   }
 
   int result =
-      std::system(std::format("dotnet build {}", csproj_path.string()).c_str());
+      std::system(std::format("dotnet build \"{}\"", csproj_path.string()).c_str());
   if (result == 0) {
     EVE_LOG_ENGINE_INFO("Scripts built successfully!");
   } else {

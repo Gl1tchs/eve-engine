@@ -14,18 +14,7 @@ Instance::Instance(const InstanceSpecifications& specs) : specs_(specs) {
   instance_ = this;
 
   state_ = CreateRef<State>();
-}
 
-Instance::~Instance() {
-  if (!ScriptEngine::IsInitialized()) {
-    return;
-  }
-
-  ScriptEngine::Shutdown();
-}
-
-void Instance::Init() {
-  // TODO get this from project config
   WindowCreateInfo props;
   props.title = specs_.name;
   props.size = {1680, 900};
@@ -41,6 +30,14 @@ void Instance::Init() {
 
   imgui_layer_ = new ImGuiLayer(state_);
   PushOverlay(imgui_layer_);
+}
+
+Instance::~Instance() {
+  if (!ScriptEngine::IsInitialized()) {
+    return;
+  }
+
+  ScriptEngine::Shutdown();
 }
 
 void Instance::StartEventLoop() {

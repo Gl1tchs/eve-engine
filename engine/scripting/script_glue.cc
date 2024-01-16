@@ -11,6 +11,7 @@
 #include "core/color.h"
 #include "core/event/input.h"
 #include "core/event/key_code.h"
+#include "core/instance.h"
 #include "core/uuid.h"
 #include "physics/rigidbody.h"
 #include "scene/components.h"
@@ -42,6 +43,26 @@ static MonoObject* GetScriptInstance(UUID entity_id) {
   return ScriptEngine::GetManagedInstance(entity_id);
 }
 
+#pragma region Application
+
+static void Application_Quit() {
+  Instance::Get().Quit();
+}
+
+#pragma endregion
+#pragma region Window
+
+static CursorMode Window_GetCursorMode() {
+  auto state = Instance::Get().GetState();
+  return state->window->GetCursorMode();
+}
+
+static void Window_SetCursorMode(CursorMode mode) {
+  auto state = Instance::Get().GetState();
+  state->window->SetCursorMode(mode);
+}
+
+#pragma endregion
 #pragma region Debug
 
 static void Debug_Log(MonoString* string) {
@@ -247,6 +268,35 @@ static void TransformComponent_GetUp(UUID entity_id, glm::vec3* out_up) {
   EVE_ASSERT_ENGINE(entity);
 
   *out_up = entity.GetComponent<Transform>().GetUp();
+}
+
+static void TransformComponent_Translate(UUID entity_id,
+                                         glm::vec3* translation) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetTransform().Translate(*translation);
+}
+
+static void TransformComponent_Rotate(UUID entity_id, const float angle,
+                                      glm::vec3* axis) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetTransform().Rotate(angle, *axis);
+}
+
+static void TransformComponent_LookAt(UUID entity_id, glm::vec3* target) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetTransform().LookAt(*target);
 }
 
 #pragma endregion
@@ -822,6 +872,13 @@ void RegisterComponents() {
 void RegisterFunctions() {
   ADD_INTERNAL_CALL(GetScriptInstance);
 
+  // Begin Application
+  ADD_INTERNAL_CALL(Application_Quit);
+
+  // Begin Window
+  ADD_INTERNAL_CALL(Window_GetCursorMode);
+  ADD_INTERNAL_CALL(Window_SetCursorMode);
+
   // Begin Debug
   ADD_INTERNAL_CALL(Debug_Log);
   ADD_INTERNAL_CALL(Debug_LogInfo);
@@ -841,48 +898,38 @@ void RegisterFunctions() {
   // Begin Transform Component
   ADD_INTERNAL_CALL(TransformComponent_GetPosition);
   ADD_INTERNAL_CALL(TransformComponent_SetPosition);
-
   ADD_INTERNAL_CALL(TransformComponent_GetRotation);
   ADD_INTERNAL_CALL(TransformComponent_SetRotation);
-
   ADD_INTERNAL_CALL(TransformComponent_GetScale);
   ADD_INTERNAL_CALL(TransformComponent_SetScale);
-
   ADD_INTERNAL_CALL(TransformComponent_GetForward);
   ADD_INTERNAL_CALL(TransformComponent_GetRight);
   ADD_INTERNAL_CALL(TransformComponent_GetUp);
+  ADD_INTERNAL_CALL(TransformComponent_Translate);
+  ADD_INTERNAL_CALL(TransformComponent_Rotate);
+  ADD_INTERNAL_CALL(TransformComponent_LookAt);
 
   // Begin Camera Component
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetAspectRatio);
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetAspectRatio);
-
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetZoomLevel);
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetZoomLevel);
-
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetNearClip);
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetNearClip);
-
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_GetFarClip);
   ADD_INTERNAL_CALL(CameraComponent_OrthographicCamera_SetFarClip);
-
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetAspectRatio);
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetAspectRatio);
-
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetFov);
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetFov);
-
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetNearClip);
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetNearClip);
-
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_GetFarClip);
   ADD_INTERNAL_CALL(CameraComponent_PerspectiveCamera_SetFarClip);
-
   ADD_INTERNAL_CALL(CameraComponent_GetIsOrthographic);
   ADD_INTERNAL_CALL(CameraComponent_SetIsOrthographic);
-
   ADD_INTERNAL_CALL(CameraComponent_GetIsPrimary);
   ADD_INTERNAL_CALL(CameraComponent_SetIsPrimary);
-
   ADD_INTERNAL_CALL(CameraComponent_GetIsFixedAspectRato);
   ADD_INTERNAL_CALL(CameraComponent_SetIsFixedAspectRato);
 

@@ -42,7 +42,9 @@
 - [ ] Angular velocity and torque.
 
 ## Scripting
+- [ ] Static application and Editor class to handle quit events.
 - [ ] Asset system scripting API.
+- [ ] Build project in release mode when shipping.
 - [ ] Add new scenes to the build on create. 
 - [ ] Current way to compile script project is not good.
 - [ ] Script lifetime multiple scenes (kinda like unity's DontDestroyOnLoad)

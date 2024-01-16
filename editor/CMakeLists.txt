@@ -65,5 +65,5 @@ add_custom_command(TARGET eve_editor PRE_BUILD
 
 add_custom_command(TARGET eve_editor PRE_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${VENDOR_DIR}/mono/bin/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-  COMMENT "Copying LICENSE to the build destination."
+  COMMENT "Copying MonoDLL to the build destination."
 )

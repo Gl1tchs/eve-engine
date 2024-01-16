@@ -33,6 +33,18 @@ void SceneSettingsPanel::Draw() {
     if (ImGui::DragFloat("Far Clip", &camera_->far_clip)) {
       modify_info.SetModified();
     }
+
+    float sensitivity = camera_->GetSensitivity();
+    if (ImGui::DragFloat("Sensitivity", &sensitivity)) {
+      camera_->SetSensitivity(sensitivity);
+      modify_info.SetModified();
+    }
+
+    float speed = camera_->GetSpeed();
+    if (ImGui::DragFloat("Speed", &speed)) {
+      camera_->SetSpeed(speed);
+      modify_info.SetModified();
+    }
   });
 
   ImGui::DrawTreeNode("Scene Renderer", [this]() {

@@ -86,6 +86,8 @@ class EditorLayer : public Layer {
 
   void SetupMenubar();
 
+  void SetCursorMode(CursorMode mode);
+
  private:
   // rendering
   Ref<FrameBuffer> frame_buffer_;
@@ -120,6 +122,6 @@ class EditorLayer : public Layer {
   bool unsaved_changes_{false};
   bool show_exit_dialog_{false};
 
-  CursorState old_cursor_state_ = CursorState::kNormal;
+  CursorMode cursor_mode_ = CursorMode::kNormal;
 };
 }  // namespace eve

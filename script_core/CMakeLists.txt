@@ -8,6 +8,7 @@ set(SOURCE_FILES
   Components/Rigidbody.cs
   Components/ScriptComponent.cs
   Components/Transform.cs
+  Application.cs
   Camera.cs
   Color.cs
   Debug.cs
@@ -22,6 +23,7 @@ set(SOURCE_FILES
   Vector2.cs
   Vector3.cs
   Vector4.cs
+  Window.cs
 )
 
 add_library(script_core SHARED ${SOURCE_FILES})

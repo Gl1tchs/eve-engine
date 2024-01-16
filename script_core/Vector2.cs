@@ -88,6 +88,16 @@ namespace EveEngine
     }
 
     /// <summary>
+    /// Reverses vector's direction.
+    /// </summary>
+    /// <param name="v">Vector to reverse</param>
+    /// <returns>Reversed vector.</returns>
+    public static Vector2 operator -(Vector2 v)
+    {
+      return new Vector2(-v.x, -v.y);
+    }
+
+    /// <summary>
     /// Multiplies a vector by a scalar value.
     /// </summary>
     /// <param name="vector">The vector to multiply.</param>

@@ -23,6 +23,7 @@
 #include "widgets/dock_space.h"
 
 namespace eve {
+
 EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   // Setup delegates
   { exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer); }
@@ -85,6 +86,12 @@ void EditorLayer::OnUpdate(float ds) {
 
   BeforeRender();
   OnRenderScene(ds);
+
+  if (SceneManager::GetActive()->IsRunning()) {
+    if (Input::IsKeyPressed(KeyCode::kEscape)) {
+      SetCursorMode(CursorMode::kNormal);
+    }
+  }
 }
 
 void EditorLayer::OnGUI(float ds) {
@@ -162,18 +169,16 @@ void EditorLayer::OnRenderScene(float ds) {
         camera_translatable_ = true;
 
         // hide the cursor since we are now controlling the camera
-        if (old_cursor_state_ == CursorState::kNormal) {
-          old_cursor_state_ = CursorState::kHidden;
-          GetState()->window->SetCursorState(old_cursor_state_);
+        if (cursor_mode_ == CursorMode::kNormal) {
+          SetCursorMode(CursorMode::kDisabled);
         }
         editor_camera_->Update(ds);
       } else {
         camera_translatable_ = false;
 
         // set cursor to normal again
-        if (old_cursor_state_ == CursorState::kHidden) {
-          old_cursor_state_ = CursorState::kNormal;
-          GetState()->window->SetCursorState(old_cursor_state_);
+        if (cursor_mode_ != CursorMode::kNormal) {
+          SetCursorMode(CursorMode::kNormal);
         }
         editor_camera_->ResetMousePos();
       }
@@ -419,7 +424,6 @@ void EditorLayer::OnSceneStop() {
   SetSceneState(SceneState::kEdit);
 
   SceneManager::GetActive()->OnRuntimeStop();
-
   SceneManager::GetActive() = editor_scene_;
 }
 
@@ -638,6 +642,11 @@ void EditorLayer::SetupMenubar() {
 
     menu_bar_.PushMenu(help_menu);
   }
+}
+
+void EditorLayer::SetCursorMode(CursorMode mode) {
+  cursor_mode_ = mode;
+  GetState()->window->SetCursorMode(cursor_mode_);
 }
 
 }  // namespace eve

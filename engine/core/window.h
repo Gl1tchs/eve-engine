@@ -8,7 +8,12 @@ struct GLFWwindow;
 
 namespace eve {
 
-enum class CursorState { kNormal, kHidden };
+enum class CursorMode : int {
+  kNormal = 0,
+  kHidden = 1,
+  kDisabled = 2,
+  kCaptured = 3,
+};
 
 enum class WindowMode {
   kWindowed,
@@ -48,7 +53,8 @@ class Window final {
   [[nodiscard]] std::string GetTitle();
   void SetTitle(const std::string& value);
 
-  void SetCursorState(CursorState state);
+  [[nodiscard]] CursorMode GetCursorMode() const { return cursor_mode_; }
+  void SetCursorMode(CursorMode mode);
 
   [[nodiscard]] GLFWwindow* GetNativeWindow();
 
@@ -60,6 +66,7 @@ class Window final {
   glm::ivec2 size_;
   bool vsync_;
   WindowMode mode_;
+  CursorMode cursor_mode_;
 };
 
 }  // namespace eve

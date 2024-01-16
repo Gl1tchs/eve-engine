@@ -48,30 +48,67 @@ namespace EveEngine
     /// Gets the forward direction of the transform.
     /// </summary>
     /// <returns>The forward vector.</returns>
-    public Vector3 GetForward()
+    public Vector3 Forward
     {
-      Interop.TransformComponent_GetForward(Entity.Id, out Vector3 forward);
-      return forward;
+      get
+      {
+        Interop.TransformComponent_GetForward(Entity.Id, out Vector3 forward);
+        return forward;
+      }
     }
 
     /// <summary>
     /// Gets the right direction of the transform.
     /// </summary>
     /// <returns>The right vector.</returns>
-    public Vector3 GetRight()
+    public Vector3 Right
     {
-      Interop.TransformComponent_GetRight(Entity.Id, out Vector3 right);
-      return right;
+      get
+      {
+        Interop.TransformComponent_GetRight(Entity.Id, out Vector3 right);
+        return right;
+      }
     }
 
     /// <summary>
     /// Gets the up direction of the transform.
     /// </summary>
     /// <returns>The up vector.</returns>
-    public Vector3 GetUp()
+    public Vector3 Up
     {
-      Interop.TransformComponent_GetUp(Entity.Id, out Vector3 up);
-      return up;
+      get
+      {
+        Interop.TransformComponent_GetUp(Entity.Id, out Vector3 up);
+        return up;
+      }
+    }
+
+    /// <summary>
+    /// Translates the transform by translation.
+    /// </summary>
+    /// <param name="translation">Value to translate for.</param>
+    public void Translate(Vector3 translation)
+    {
+      Interop.TransformComponent_Translate(Entity.Id, ref translation);
+    }
+
+    /// <summary>
+    /// Rotates the transform by angle at <c>axis</c>.
+    /// </summary>
+    /// <param name="angle">Angle to rotate for.</param>
+    /// <param name="axis">Axis to rotate on.</param>
+    public void Rotate(float angle, Vector3 axis)
+    {
+      Interop.TransformComponent_Rotate(Entity.Id, angle, ref axis);
+    }
+
+    /// <summary>
+    /// Makes transform look at the target by rotating.
+    /// </summary>
+    /// <param name="target">Target to look at.</param>
+    public void LookAt(Vector3 target)
+    {
+      Interop.TransformComponent_LookAt(Entity.Id, ref target);
     }
   }
 }

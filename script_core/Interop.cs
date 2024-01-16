@@ -8,6 +8,21 @@ namespace EveEngine
   /// </summary>
   static partial class Interop
   {
+    #region Application
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static CursorMode Application_Quit();
+
+    #endregion
+    #region Window
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static CursorMode Window_GetCursorMode();
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void Window_SetCursorMode(CursorMode mode);
+
+    #endregion
     #region Debug
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -85,6 +100,13 @@ namespace EveEngine
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static void TransformComponent_GetUp(ulong entityId, out Vector3 up);
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_Translate(ulong entityId, ref Vector3 translation);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_Rotate(ulong entityId, float angle, ref Vector3 axis);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_LookAt(ulong entityId, ref Vector3 target);
 
     #endregion
     #region CameraComponent

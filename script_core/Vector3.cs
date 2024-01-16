@@ -29,6 +29,7 @@ namespace EveEngine
     public static Vector3 Back => new(0.0f, 0.0f, 1.0f);
     public static Vector3 Up => new(0.0f, 1.0f, 0.0f);
     public static Vector3 Down => new(0.0f, -1.0f, 0.0f);
+    public static Vector3 Right => new(1.0f, 0.0f, 0.0f);
     public static Vector3 Left => new(-1.0f, 0.0f, 0.0f);
 #pragma warning restore CS1591
 
@@ -110,6 +111,16 @@ namespace EveEngine
     public static Vector3 operator -(Vector3 a, Vector3 b)
     {
       return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+    }
+
+    /// <summary>
+    /// Reverses vector's direction.
+    /// </summary>
+    /// <param name="v">Vector to reverse</param>
+    /// <returns>Reversed vector.</returns>
+    public static Vector3 operator -(Vector3 v)
+    {
+      return new Vector3(-v.x, -v.y, -v.z);
     }
 
     /// <summary>

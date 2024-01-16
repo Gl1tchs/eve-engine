@@ -239,6 +239,8 @@ bool AssetRegistry::Serialize(const fs::path& path) {
 }
 
 bool AssetRegistry::Deserialize(const fs::path& path) {
+  assets_.clear();
+
   std::ifstream file(path);
   if (!file.is_open()) {
     EVE_LOG_ENGINE_ERROR("Unable to deserialize asset registry from: {}",

@@ -28,6 +28,8 @@ struct Transform final {
 
   void Rotate(float angle, glm::vec3 axis);
 
+  void LookAt(const glm::vec3& target);
+
   [[nodiscard]] glm::vec3 GetForward() const;
 
   [[nodiscard]] glm::vec3 GetRight() const;

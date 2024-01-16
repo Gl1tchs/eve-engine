@@ -3,12 +3,23 @@
 #include "scene/transform.h"
 
 namespace eve {
+
 void Transform::Translate(glm::vec3 translation) {
   position += translation;
 }
 
 void Transform::Rotate(const float angle, const glm::vec3 axis) {
   rotation += angle * axis;
+}
+
+void Transform::LookAt(const glm::vec3& target) {
+  glm::vec3 direction = glm::normalize(target - position);
+
+  // Compute pitch and yaw angles using trigonometry
+  float pitch = glm::degrees(asinf(-direction.y));
+  float yaw = glm::degrees(atan2f(-direction.x, -direction.z));
+
+  rotation = glm::vec3(pitch, yaw, 0.0f);
 }
 
 glm::vec3 Transform::GetForward() const {
