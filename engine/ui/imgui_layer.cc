@@ -100,9 +100,9 @@ void ImGuiLayer::SetDarkThemeColors() {
   style.IndentSpacing = 25;
   style.ScrollbarSize = 15;
   style.GrabMinSize = 10;
-  style.WindowBorderSize = 0;
+  style.WindowBorderSize = 1;
   style.ChildBorderSize = 1;
-  style.PopupBorderSize = 0;
+  style.PopupBorderSize = 1;
   style.FrameBorderSize = 0;
   style.TabBorderSize = 1;
   style.WindowRounding = 0;

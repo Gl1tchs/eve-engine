@@ -35,8 +35,9 @@ int main(int argc, const char* argv[]) {
 
   eve::RenderCommand::Init();
 
-  eve::ImGuiLayer* imgui_layer = new eve::ImGuiLayer(state);
-  UiLayer* ui_layer = new UiLayer(state);
+  eve::Scope<eve::ImGuiLayer> imgui_layer =
+      eve::CreateScope<eve::ImGuiLayer>(state);
+  eve::Scope<UiLayer> ui_layer = eve::CreateScope<UiLayer>(state);
 
   eve::ImGuiSettings& settings = imgui_layer->GetSettings();
   settings.enable_docking = false;
