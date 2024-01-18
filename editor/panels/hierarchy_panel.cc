@@ -48,7 +48,7 @@ void HierarchyPanel::Draw() {
 
   entities_to_remove_.clear();
 
-  for (auto [uuid, entity] : scene->entity_map_) {
+  for (auto [uuid, entity] : scene->GetAllEntities()) {
     ImGui::PushID((uint64_t)uuid);
 
     // If entity has not any parent (top level).

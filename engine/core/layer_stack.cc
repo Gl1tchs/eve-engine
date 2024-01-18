@@ -17,13 +17,13 @@ void LayerStack::PushLayer(Layer* layer) {
   layers_.emplace(layers_.begin() + layer_insert_idx_, layer);
   layer_insert_idx_++;
 
-  layer->OnStart();
+  layer->OnCreate();
 }
 
 void LayerStack::PushOverlay(Layer* overlay) {
   layers_.emplace_back(overlay);
 
-  overlay->OnStart();
+  overlay->OnCreate();
 }
 
 }  // namespace eve

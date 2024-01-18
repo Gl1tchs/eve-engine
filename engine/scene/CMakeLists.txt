@@ -12,6 +12,8 @@ set(SOURCES
   scene_serializer.h
   scene.cc
   scene.h
+  system.cc
+  system.h
   transform.cc
   transform.h
 )

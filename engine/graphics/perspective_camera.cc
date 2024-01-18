@@ -3,8 +3,8 @@
 namespace eve {
 
 glm::mat4 PerspectiveCamera::GetViewMatrix(const Transform& transform) {
-  return glm::lookAt(transform.position,
-                     transform.position + transform.GetForward(),
+  return glm::lookAt(transform.GetPosition(),
+                     transform.GetPosition() + transform.GetForward(),
                      transform.GetUp());
 }
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Berke Umut Biricik All Rights Reserved
 
-#include "physics/physics_world.h"
+#include "physics/physics_system.h"
 
 #include "physics/box_collider.h"
 #include "physics/rigidbody.h"
@@ -8,9 +8,6 @@
 #include "scene/scene.h"
 
 namespace eve {
-
-Scene* PhysicsWorld::scene_ = nullptr;
-PhysicsWorldSettings PhysicsWorld::settings_;
 
 void ApplyConstraints(glm::vec3& vec, const glm::vec3& vec_before,
                       glm::bvec3 constraints) {
@@ -21,24 +18,15 @@ void ApplyConstraints(glm::vec3& vec, const glm::vec3& vec_before,
   }
 }
 
-void PhysicsWorld::OnStart(Scene* scene) {
-  scene_ = scene;
+PhysicsSystem::PhysicsSystem()
+    : System(SystemRunType_kRuntime | SystemRunType_kSimulation) {}
 
-  if (!scene_) {
-    return;
-  }
-}
-
-void PhysicsWorld::OnUpdate(float ds) {
-  if (!scene_) {
-    return;
-  }
-
+void PhysicsSystem::OnUpdate(float ds) {
   // TODO If this performs not good with big data consider using Barnes-Hut algorithm
   // with an Octree
   for (const auto& entity_id :
-       scene_->GetAllEntitiesWith<Transform, Rigidbody>()) {
-    Entity entity{entity_id, scene_};
+       GetScene()->GetAllEntitiesWith<Transform, Rigidbody>()) {
+    Entity entity{entity_id, GetScene()};
 
     Transform& tc = entity.GetComponent<Transform>();
     Rigidbody& rb = entity.GetComponent<Rigidbody>();
@@ -46,7 +34,7 @@ void PhysicsWorld::OnUpdate(float ds) {
     Transform tc_before = tc;
     Rigidbody rb_before = rb;
 
-    tc.position += rb.velocity * ds + 0.5f * rb.acceleration * ds * ds;
+    tc.local_position += rb.velocity * ds + 0.5f * rb.acceleration * ds * ds;
 
     rb.velocity += rb.acceleration * ds;
     if (rb.use_gravity) {
@@ -58,14 +46,16 @@ void PhysicsWorld::OnUpdate(float ds) {
     std::memcpy(&position_constraints, &rb.position_constraints,
                 sizeof(glm::bvec3));
 
-    ApplyConstraints(tc.position, tc_before.position, position_constraints);
+    ApplyConstraints(tc.local_position, tc_before.local_position,
+                     position_constraints);
     ApplyConstraints(rb.velocity, rb_before.velocity, position_constraints);
 
     glm::bvec3 rotation_constraints;
     std::memcpy(&rotation_constraints, &rb.rotation_constraints,
                 sizeof(glm::bvec3));
 
-    ApplyConstraints(tc.rotation, tc_before.rotation, rotation_constraints);
+    ApplyConstraints(tc.local_rotation, tc_before.local_rotation,
+                     rotation_constraints);
 
     if (!entity.HasComponent<BoxCollider>()) {
       continue;
@@ -74,10 +64,10 @@ void PhysicsWorld::OnUpdate(float ds) {
     BoxCollider& collider = entity.GetComponent<BoxCollider>();
 
     // Check for collisions with other entities having BoxCollider components
-    scene_->GetAllEntitiesWith<Transform, BoxCollider>().each(
+    GetScene()->GetAllEntitiesWith<Transform, BoxCollider>().each(
         [&](entt::entity other_id, Transform& other_tc,
             BoxCollider& other_collider) {
-          Entity other_entity{other_id, scene_};
+          Entity other_entity{other_id, GetScene()};
 
           if (entity_id == other_id) {
             return;
@@ -96,12 +86,6 @@ void PhysicsWorld::OnUpdate(float ds) {
             }
           }
         });
-  }
-}
-
-void PhysicsWorld::OnStop() {
-  if (!scene_) {
-    return;
   }
 }
 

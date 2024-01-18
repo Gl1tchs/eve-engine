@@ -19,11 +19,10 @@ class Entity {
   Entity(const Entity& other) = default;
 
   template <typename T, typename... Args>
-  T& AddComponent(Args&&... args) {
+  auto& AddComponent(Args&&... args) {
     EVE_ASSERT_ENGINE(!HasComponent<T>(), "Entity already has that component!");
-    T& component = scene_->registry_.emplace<T>(entity_handle_,
-                                                std::forward<Args>(args)...);
-    return component;
+    return scene_->registry_.emplace<T>(entity_handle_,
+                                        std::forward<Args>(args)...);
   }
 
   template <typename T, typename... Args>
@@ -57,11 +56,15 @@ class Entity {
 
   void SetParent(Entity parent);
 
+  [[nodiscard]] bool IsParent();
+
+  [[nodiscard]] bool IsChild();
+
   [[nodiscard]] std::vector<Entity> GetChildren();
 
   bool RemoveChild(Entity child);
 
-  [[nodiscard]] bool IsParentRecursive(Entity parent, Entity child);
+  [[nodiscard]] bool IsParentOfRecursive(Entity parent, Entity child);
 
   [[nodiscard]] const UUID& GetUUID() { return GetComponent<IdComponent>().id; }
   [[nodiscard]] const std::string& GetName() {

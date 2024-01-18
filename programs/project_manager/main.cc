@@ -43,8 +43,8 @@ int main(int argc, const char* argv[]) {
   settings.enable_docking = false;
   settings.enable_viewports = false;
 
-  imgui_layer->OnStart();
-  ui_layer->OnStart();
+  imgui_layer->OnCreate();
+  ui_layer->OnCreate();
 
   eve::Timer timer;
   while (state->running) {

@@ -9,7 +9,7 @@
 namespace eve {
 RuntimeLayer::RuntimeLayer(Ref<State>& state) : Layer(state) {}
 
-void RuntimeLayer::OnStart() {
+void RuntimeLayer::OnCreate() {
   scene_renderer_ = CreateScope<SceneRenderer>(GetState());
 
   if (!SceneManager::GetActive()->OnRuntimeStart()) {

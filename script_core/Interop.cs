@@ -49,6 +49,8 @@ namespace EveEngine
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static string Entity_Destroy(ulong entityId);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static ulong Entity_GetParent(ulong entityId);
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static string Entity_GetName(ulong entityId);
@@ -75,22 +77,28 @@ namespace EveEngine
     #region TransformComponent
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static void TransformComponent_GetPosition(ulong entityId, out Vector3 position);
+    internal extern static void TransformComponent_GetLocalPosition(ulong entityId, out Vector3 position);
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static void TransformComponent_SetPosition(ulong entityId, ref Vector3 position);
+    internal extern static void TransformComponent_SetLocalPosition(ulong entityId, ref Vector3 position);
 
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_GetLocalRotation(ulong entityId, out Vector3 rotation);
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_SetLocalRotation(ulong entityId, ref Vector3 rotation);
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_GetLocalScale(ulong entityId, out Vector3 scale);
+
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_SetLocalScale(ulong entityId, ref Vector3 scale);
+    [MethodImplAttribute(MethodImplOptions.InternalCall)]
+    internal extern static void TransformComponent_GetPosition(ulong entityId, out Vector3 position);
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static void TransformComponent_GetRotation(ulong entityId, out Vector3 rotation);
-
-    [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static void TransformComponent_SetRotation(ulong entityId, ref Vector3 rotation);
-
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static void TransformComponent_GetScale(ulong entityId, out Vector3 scale);
-
-    [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static void TransformComponent_SetScale(ulong entityId, ref Vector3 scale);
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static void TransformComponent_GetForward(ulong entityId, out Vector3 forward);

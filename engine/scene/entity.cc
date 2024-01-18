@@ -13,12 +13,14 @@ RelationComponent& Entity::GetRelation() {
 }
 
 Entity Entity::GetParent() {
-  return scene_->TryGetEntityByUUID(GetRelation().parent_id);
+  const UUID parent_id = GetRelation().parent_id;
+  return parent_id != kInvalidUUID ? scene_->TryGetEntityByUUID(parent_id)
+                                   : kInvalidEntity;
 }
 
 void Entity::SetParent(Entity parent) {
   // check if this is not the parent of "parent"
-  if (IsParentRecursive(*this, parent)) {
+  if (IsParentOfRecursive(*this, parent)) {
     return;
   }
 
@@ -39,8 +41,27 @@ void Entity::SetParent(Entity parent) {
   // Setup relations between components
   RelationComponent& relation = GetRelation();
   relation.parent_id = parent.GetUUID();
-
   parent_children_ids.push_back(GetUUID());
+
+  // Make transform values relative to the new parent.
+  Transform& transform = GetTransform();
+  Transform& parent_transform = parent.GetTransform();
+
+  transform.local_position =
+      transform.GetPosition() - parent_transform.GetPosition();
+  transform.local_rotation =
+      transform.GetRotation() - parent_transform.GetRotation();
+  transform.local_scale = transform.GetScale() / parent_transform.GetScale();
+
+  transform.parent = &parent_transform;
+}
+
+bool Entity::IsParent() {
+  return GetRelation().children_ids.size() > 0;
+}
+
+bool Entity::IsChild() {
+  return GetRelation().parent_id != kInvalidUUID;
 }
 
 std::vector<Entity> eve::Entity::GetChildren() {
@@ -62,6 +83,14 @@ bool Entity::RemoveChild(Entity child) {
       std::find(children_ids.begin(), children_ids.end(), child.GetUUID());
 
   if (it != children_ids.end()) {
+    // Set local positions as the world position
+    Transform& child_transform = child.GetTransform();
+    child_transform.local_position = child_transform.GetPosition();
+    child_transform.local_rotation = child_transform.GetRotation();
+    child_transform.local_scale = child_transform.GetScale();
+
+    child_transform.parent = nullptr;
+
     // move child to top level
     child.GetRelation().parent_id = kInvalidUUID;
     children_ids.erase(it);
@@ -72,7 +101,7 @@ bool Entity::RemoveChild(Entity child) {
   return false;
 }
 
-bool Entity::IsParentRecursive(Entity parent, Entity child) {
+bool Entity::IsParentOfRecursive(Entity parent, Entity child) {
   if (!child) {
     return false;
   }
@@ -90,7 +119,7 @@ bool Entity::IsParentRecursive(Entity parent, Entity child) {
   }
   // otherwise call the function again
   else {
-    return IsParentRecursive(parent, child_parent);
+    return IsParentOfRecursive(parent, child_parent);
   }
 }
 

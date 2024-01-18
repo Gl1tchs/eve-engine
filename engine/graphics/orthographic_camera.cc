@@ -12,7 +12,7 @@ glm::mat4 OrthographicCamera::GetProjectionMatrix() const {
 }
 
 glm::mat4 OrthographicCamera::GetViewMatrix(const Transform& transform) {
-  return glm::inverse(transform.GetModelMatrix());
+  return glm::inverse(transform.GetTransformMatrix());
 }
 
 }  // namespace eve

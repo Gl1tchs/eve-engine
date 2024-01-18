@@ -154,17 +154,18 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
   DrawComponent<Transform>(
       ICON_FA_ARROWS_ALT " Transform", selected_entity,
       [](Transform& transform) {
-        if (ImGui::DragFloat3("Position", glm::value_ptr(transform.position),
-                              0.1f)) {
+        if (ImGui::DragFloat3("Position",
+                              glm::value_ptr(transform.local_position), 0.1f)) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation),
-                              0.1f)) {
+        if (ImGui::DragFloat3("Rotation",
+                              glm::value_ptr(transform.local_rotation), 0.1f)) {
           modify_info.SetModified();
         }
 
-        if (ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale), 0.1f)) {
+        if (ImGui::DragFloat3("Scale", glm::value_ptr(transform.local_scale),
+                              0.1f)) {
           modify_info.SetModified();
         }
       });

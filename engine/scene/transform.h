@@ -5,6 +5,7 @@
 #include "pch_shared.h"
 
 namespace eve {
+
 const glm::vec3 kVec3Up(0.0f, 1.0f, 0.0f);
 const glm::vec3 kVec3Down = -kVec3Up;
 
@@ -20,9 +21,15 @@ const glm::vec3 kVec3One(1.0f, 1.0f, 1.0f);
 const glm::vec3 kWorldUp = kVec3Up;
 
 struct Transform final {
-  glm::vec3 position = kVec3Zero;
-  glm::vec3 rotation = kVec3Zero;
-  glm::vec3 scale = kVec3One;
+  Transform* parent = nullptr;
+
+  glm::vec3 local_position = kVec3Zero;
+  glm::vec3 local_rotation = kVec3Zero;
+  glm::vec3 local_scale = kVec3One;
+
+  [[nodiscard]] glm::vec3 GetPosition() const;
+  [[nodiscard]] glm::vec3 GetRotation() const;
+  [[nodiscard]] glm::vec3 GetScale() const;
 
   void Translate(glm::vec3 translation);
 
@@ -36,7 +43,7 @@ struct Transform final {
 
   [[nodiscard]] glm::vec3 GetUp() const;
 
-  [[nodiscard]] glm::mat4 GetModelMatrix() const;
+  [[nodiscard]] glm::mat4 GetTransformMatrix() const;
 
   [[nodiscard]] glm::vec3 GetDirection() const;
 };

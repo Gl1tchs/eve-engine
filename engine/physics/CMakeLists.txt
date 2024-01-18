@@ -2,8 +2,8 @@ set(SOURCES
   box_collider.cc
   box_collider.h
   collider.h
-  physics_world.cc
-  physics_world.h
+  physics_system.cc
+  physics_system.h
   rigidbody.cc
   rigidbody.h
 )

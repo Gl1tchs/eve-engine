@@ -30,10 +30,10 @@ void SceneRenderer::RenderRuntime(float ds) {
     CameraData data;
     if (cc.is_orthographic) {
       data = {cc.ortho_camera.GetViewMatrix(tc),
-              cc.ortho_camera.GetProjectionMatrix(), tc.position};
+              cc.ortho_camera.GetProjectionMatrix(), tc.GetPosition()};
     } else {
       data = {cc.persp_camera.GetViewMatrix(tc),
-              cc.persp_camera.GetProjectionMatrix(), tc.position};
+              cc.persp_camera.GetProjectionMatrix(), tc.GetPosition()};
     }
 
     RenderSceneRuntime(data);
@@ -48,7 +48,7 @@ void SceneRenderer::RenderEditor(float ds, Ref<EditorCamera>& editor_camera) {
 
   CameraData data = {editor_camera->GetViewMatrix(),
                      editor_camera->GetProjectionMatrix(),
-                     editor_camera->GetTransform().position};
+                     editor_camera->GetTransform().GetPosition()};
 
   RenderSceneEditor(data);
 }
@@ -227,33 +227,33 @@ void SceneRenderer::RenderCameraBounds() {
 
     // Calculate points of the camera's frustum
     Box near_box = {
-        .bottom_left = tc.position - 0.5f * near_height * tc.GetUp() -
+        .bottom_left = tc.GetPosition() - 0.5f * near_height * tc.GetUp() -
                        0.5f * near_width * tc.GetRight() +
                        near_plane * tc.GetForward(),
-        .bottom_right = tc.position - 0.5f * near_height * tc.GetUp() +
+        .bottom_right = tc.GetPosition() - 0.5f * near_height * tc.GetUp() +
                         0.5f * near_width * tc.GetRight() +
                         near_plane * tc.GetForward(),
-        .top_left = tc.position + 0.5f * near_height * tc.GetUp() -
+        .top_left = tc.GetPosition() + 0.5f * near_height * tc.GetUp() -
                     0.5f * near_width * tc.GetRight() +
                     near_plane * tc.GetForward(),
-        .top_right = tc.position + 0.5f * near_height * tc.GetUp() +
+        .top_right = tc.GetPosition() + 0.5f * near_height * tc.GetUp() +
                      0.5f * near_width * tc.GetRight() +
                      near_plane * tc.GetForward(),
     };
 
-    Box far_box = {.bottom_left = tc.position - 0.5f * far_height * tc.GetUp() -
-                                  0.5f * far_width * tc.GetRight() +
-                                  far_plane * tc.GetForward(),
-                   .bottom_right = tc.position -
-                                   0.5f * far_height * tc.GetUp() +
-                                   0.5f * far_width * tc.GetRight() +
-                                   far_plane * tc.GetForward(),
-                   .top_left = tc.position + 0.5f * far_height * tc.GetUp() -
-                               0.5f * far_width * tc.GetRight() +
-                               far_plane * tc.GetForward(),
-                   .top_right = tc.position + 0.5f * far_height * tc.GetUp() +
-                                0.5f * far_width * tc.GetRight() +
-                                far_plane * tc.GetForward()};
+    Box far_box = {
+        .bottom_left = tc.GetPosition() - 0.5f * far_height * tc.GetUp() -
+                       0.5f * far_width * tc.GetRight() +
+                       far_plane * tc.GetForward(),
+        .bottom_right = tc.GetPosition() - 0.5f * far_height * tc.GetUp() +
+                        0.5f * far_width * tc.GetRight() +
+                        far_plane * tc.GetForward(),
+        .top_left = tc.GetPosition() + 0.5f * far_height * tc.GetUp() -
+                    0.5f * far_width * tc.GetRight() +
+                    far_plane * tc.GetForward(),
+        .top_right = tc.GetPosition() + 0.5f * far_height * tc.GetUp() +
+                     0.5f * far_width * tc.GetRight() +
+                     far_plane * tc.GetForward()};
 
     // Draw frustum boxes
     renderer->DrawBox(near_box, color);
@@ -278,26 +278,26 @@ void SceneRenderer::RenderCameraBounds() {
 
     // Calculate points of the camera's frustum
     Box near_box = {
-        .bottom_left = tc.position - half_height * tc.GetUp() -
+        .bottom_left = tc.GetPosition() - half_height * tc.GetUp() -
                        half_width * tc.GetRight() +
                        near_plane * tc.GetForward(),
-        .bottom_right = tc.position - half_height * tc.GetUp() +
+        .bottom_right = tc.GetPosition() - half_height * tc.GetUp() +
                         half_width * tc.GetRight() +
                         near_plane * tc.GetForward(),
-        .top_left = tc.position + half_height * tc.GetUp() -
+        .top_left = tc.GetPosition() + half_height * tc.GetUp() -
                     half_width * tc.GetRight() + near_plane * tc.GetForward(),
-        .top_right = tc.position + half_height * tc.GetUp() +
+        .top_right = tc.GetPosition() + half_height * tc.GetUp() +
                      half_width * tc.GetRight() + near_plane * tc.GetForward()};
 
     Box far_box = {
-        .bottom_left = tc.position - half_height * tc.GetUp() -
+        .bottom_left = tc.GetPosition() - half_height * tc.GetUp() -
                        half_width * tc.GetRight() + far_plane * tc.GetForward(),
-        .bottom_right = tc.position - half_height * tc.GetUp() +
+        .bottom_right = tc.GetPosition() - half_height * tc.GetUp() +
                         half_width * tc.GetRight() +
                         far_plane * tc.GetForward(),
-        .top_left = tc.position + half_height * tc.GetUp() -
+        .top_left = tc.GetPosition() + half_height * tc.GetUp() -
                     half_width * tc.GetRight() + far_plane * tc.GetForward(),
-        .top_right = tc.position + half_height * tc.GetUp() +
+        .top_right = tc.GetPosition() + half_height * tc.GetUp() +
                      half_width * tc.GetRight() + far_plane * tc.GetForward()};
 
     // Draw frustum boxes
@@ -320,8 +320,8 @@ void SceneRenderer::RenderColliderBounds() {
   scene->GetAllEntitiesWith<Transform, BoxCollider>().each(
       [renderer](entt::entity entity_id, Transform& tc, BoxCollider& col) {
         Transform tc_col = tc;
-        tc_col.position += col.local_position;
-        tc_col.scale = col.local_scale;
+        tc_col.local_position += col.local_position;
+        tc_col.local_scale = col.local_scale;
 
         // Render collider bounds as wireframe.
         renderer->DrawCube(tc_col, kColorGreen, PolygonMode::kLine);

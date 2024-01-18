@@ -29,7 +29,7 @@ EditorLayer::EditorLayer(Ref<State>& state) : Layer(state) {
   { exit_modal_.on_answer = BIND_FUNC(OnExitModalAnswer); }
 }
 
-void EditorLayer::OnStart() {
+void EditorLayer::OnCreate() {
   // Remove default beheaviour
   PopEvent<WindowCloseEvent>();
   SubscribeEvent<WindowCloseEvent>(
@@ -183,7 +183,10 @@ void EditorLayer::OnRenderScene(float ds) {
         editor_camera_->ResetMousePos();
       }
 
-      scene_renderer_->RenderEditor(ds, editor_camera_);
+      if (auto& scene = SceneManager::GetActive(); scene) {
+        scene->OnUpdateEditor(ds);
+        scene_renderer_->RenderEditor(ds, editor_camera_);
+      }
 
       HandleShortcuts();
 

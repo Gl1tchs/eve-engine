@@ -106,9 +106,9 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<Transform>()) {
     auto& tc = entity.GetComponent<Transform>();
 
-    json transform_json = {{"position", tc.position},
-                           {"rotation", tc.rotation},
-                           {"scale", tc.scale}};
+    json transform_json = {{"position", tc.local_position},
+                           {"rotation", tc.local_rotation},
+                           {"scale", tc.local_scale}};
 
     out["transform"] = transform_json;
   }
@@ -335,9 +335,9 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
         !transform_json.is_null()) {
       auto& tc = deserialing_entity.GetComponent<Transform>();
 
-      tc.position = transform_json["position"].get<glm::vec3>();
-      tc.rotation = transform_json["rotation"].get<glm::vec3>();
-      tc.scale = transform_json["scale"].get<glm::vec3>();
+      tc.local_position = transform_json["position"].get<glm::vec3>();
+      tc.local_rotation = transform_json["rotation"].get<glm::vec3>();
+      tc.local_scale = transform_json["scale"].get<glm::vec3>();
     }
 
     if (auto camera_comp_json = entity_json["camera_component"];

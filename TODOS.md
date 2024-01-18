@@ -25,15 +25,16 @@
 - [ ] While scripts are building show a loading thing for it.
 
 ## Asset
+- [ ] Make physics settings an asset.
 - [ ] Do not load unusued assets to memory.
 - [ ] Better asset system with proper registry and metadata caching.
 - [ ] Asset compression for shipping.
 
 ## Scene
-- [ ] Add an transform system to handle parent/child transforms.
 - [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
+- [ ] Add new scenes to the build on create. 
 
 ## Physics
 - [ ] Collision layers.
@@ -42,9 +43,10 @@
 - [ ] Angular velocity and torque.
 
 ## Scripting
+- [ ] Get children from scripts.
 - [ ] Asset system scripting API.
+- [ ] Texture and Mesh data structures.
 - [ ] Build project in release mode when shipping.
-- [ ] Add new scenes to the build on create. 
 - [ ] Current way to compile script project is not good.
 - [ ] Script lifetime multiple scenes (kinda like unity's DontDestroyOnLoad)
 - [ ] Add mat4 data type
@@ -64,6 +66,8 @@
 ## Shaders
 
 ## Bugs
+- [ ] There is a problem with sprites I cannot render more then one and
+sometimes it shown half.
 - [ ] Scenes that are not in project file couldn't open. 
 
 ## Done
@@ -96,6 +100,7 @@
 - [x] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
 - [x] Add parent / child entity system.
 - [x] Static application and Editor class to handle quit events.
+- [x] Add an transform system to handle parent/child transforms.
 
 ## Fixed
 - [x] Cannot switch between projects.

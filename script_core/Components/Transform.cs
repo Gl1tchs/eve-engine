@@ -6,16 +6,32 @@ namespace EveEngine
   public class Transform : Component
   {
     /// <summary>
+    /// Parent transform of current's
+    /// </summary>
+    public Transform Parent
+    {
+      get
+      {
+        if (Entity.Parent is null)
+        {
+          return null;
+        }
+
+        return Entity.Parent.GetComponent<Transform>();
+      }
+    }
+
+    /// <summary>
     /// Gets or sets the position of the transform.
     /// </summary>
     public Vector3 Position
     {
       get
       {
-        Interop.TransformComponent_GetPosition(Entity.Id, out Vector3 position);
+        Interop.TransformComponent_GetLocalPosition(Entity.Id, out Vector3 position);
         return position;
       }
-      set => Interop.TransformComponent_SetPosition(Entity.Id, ref value);
+      set => Interop.TransformComponent_SetLocalPosition(Entity.Id, ref value);
     }
 
     /// <summary>
@@ -25,10 +41,10 @@ namespace EveEngine
     {
       get
       {
-        Interop.TransformComponent_GetRotation(Entity.Id, out Vector3 rotation);
+        Interop.TransformComponent_GetLocalRotation(Entity.Id, out Vector3 rotation);
         return rotation;
       }
-      set => Interop.TransformComponent_SetRotation(Entity.Id, ref value);
+      set => Interop.TransformComponent_SetLocalRotation(Entity.Id, ref value);
     }
 
     /// <summary>
@@ -38,11 +54,48 @@ namespace EveEngine
     {
       get
       {
+        Interop.TransformComponent_GetLocalScale(Entity.Id, out Vector3 scale);
+        return scale;
+      }
+      set => Interop.TransformComponent_SetLocalScale(Entity.Id, ref value);
+    }
+
+    /// <summary>
+    /// Gets the world position of the transform.
+    /// </summary>
+    public Vector3 WorldPosition
+    {
+      get
+      {
+        Interop.TransformComponent_GetPosition(Entity.Id, out Vector3 position);
+        return position;
+      }
+    }
+
+    /// <summary>
+    ///  Gets the world rotation of the transform.
+    /// </summary>
+    public Vector3 WorldRotation
+    {
+      get
+      {
+        Interop.TransformComponent_GetRotation(Entity.Id, out Vector3 rotation);
+        return rotation;
+      }
+    }
+
+    /// <summary>
+    ///  Gets the world scale of the transform.
+    /// </summary>
+    public Vector3 WorldScale
+    {
+      get
+      {
         Interop.TransformComponent_GetScale(Entity.Id, out Vector3 scale);
         return scale;
       }
-      set => Interop.TransformComponent_SetScale(Entity.Id, ref value);
     }
+
 
     /// <summary>
     /// Gets the forward direction of the transform.

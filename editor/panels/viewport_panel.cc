@@ -120,8 +120,8 @@ void ViewportPanel::DrawGizmos() {
 
     float tmp_matrix[16];
     ImGuizmo::RecomposeMatrixFromComponents(
-        glm::value_ptr(tc.position), glm::value_ptr(tc.rotation),
-        glm::value_ptr(tc.scale), tmp_matrix);
+        glm::value_ptr(tc.GetPosition()), glm::value_ptr(tc.GetRotation()),
+        glm::value_ptr(tc.GetScale()), tmp_matrix);
 
     ImGuizmo::Manipulate(glm::value_ptr(camera_view),
                          glm::value_ptr(camera_proj),
@@ -136,16 +136,18 @@ void ViewportPanel::DrawGizmos() {
 
       switch (operation_) {
         case ImGuizmo::OPERATION::TRANSLATE: {
-          tc.position = position;
+          glm::vec3 delta_position = position - tc.GetPosition();
+          tc.local_position += delta_position;
           break;
         }
         case ImGuizmo::OPERATION::ROTATE: {
-          glm::vec3 delta_rotation = rotation - tc.rotation;
-          tc.rotation += delta_rotation;
+          glm::vec3 delta_rotation = rotation - tc.GetRotation();
+          tc.local_rotation += delta_rotation;
           break;
         }
         case ImGuizmo::OPERATION::SCALE: {
-          tc.scale = scale;
+          glm::vec3 delta_scale = scale - tc.GetScale();
+          tc.local_scale += delta_scale;
           break;
         }
       }

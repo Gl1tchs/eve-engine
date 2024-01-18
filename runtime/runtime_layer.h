@@ -14,7 +14,7 @@ class RuntimeLayer : public Layer {
 
   virtual ~RuntimeLayer() = default;
 
-  void OnStart() override;
+  void OnCreate() override;
 
   void OnDestroy() override;
 

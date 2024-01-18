@@ -49,7 +49,7 @@ void ImGuiLayer::End() {
   }
 }
 
-void ImGuiLayer::OnStart() {
+void ImGuiLayer::OnCreate() {
   // Setup ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();

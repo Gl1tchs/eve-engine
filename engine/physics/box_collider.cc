@@ -10,9 +10,11 @@ bool ColliderIntersects(const Transform& lhs_transform,
                         const Transform& rhs_transform,
                         const BoxCollider& rhs_collider) {
   // Get world-space properties
-  glm::vec3 lhs_position = lhs_transform.position + lhs_collider.local_position;
+  glm::vec3 lhs_position =
+      lhs_transform.GetPosition() + lhs_collider.local_position;
   glm::vec3 lhs_scale = lhs_collider.local_scale;
-  glm::vec3 rhs_position = rhs_transform.position + rhs_collider.local_position;
+  glm::vec3 rhs_position =
+      rhs_transform.GetPosition() + rhs_collider.local_position;
   glm::vec3 rhs_scale = rhs_collider.local_scale;
 
   // Check for intersection along each axis

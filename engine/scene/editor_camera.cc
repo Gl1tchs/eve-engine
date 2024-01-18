@@ -5,6 +5,7 @@
 #include "core/event/input.h"
 
 namespace eve {
+
 EditorCamera::EditorCamera() : PerspectiveCamera() {
   ResetTransform();
 
@@ -19,49 +20,50 @@ void EditorCamera::Update(float ds) {
   glm::vec2 mouse_delta = Input::GetMousePosition() - last_mouse_pos_;
 
   glm::vec3 new_rotation =
-      transform_.rotation +
+      transform_.local_rotation +
       glm::vec3(-mouse_delta.y, -mouse_delta.x, 0.0f) * sensitivity_;
 
   // clamp between (-90,90) to make it realistic :)
   new_rotation.x = glm::clamp(new_rotation.x, -89.0f, 89.0f);
 
-  transform_.rotation = new_rotation;
+  transform_.local_rotation = new_rotation;
 
   // store last mouse pos to prevent instant rotations
   last_mouse_pos_ = Input::GetMousePosition();
 
   // forward / backward controls
   if (Input::IsKeyPressed(KeyCode::kW)) {
-    transform_.position += transform_.GetForward() * speed_ * ds;
+    transform_.local_position += transform_.GetForward() * speed_ * ds;
   }
   if (Input::IsKeyPressed(KeyCode::kS)) {
-    transform_.position -= transform_.GetForward() * speed_ * ds;
+    transform_.local_position -= transform_.GetForward() * speed_ * ds;
   }
 
   // right / left controls
   if (Input::IsKeyPressed(KeyCode::kD)) {
-    transform_.position += transform_.GetRight() * speed_ * ds;
+    transform_.local_position += transform_.GetRight() * speed_ * ds;
   }
   if (Input::IsKeyPressed(KeyCode::kA)) {
-    transform_.position -= transform_.GetRight() * speed_ * ds;
+    transform_.local_position -= transform_.GetRight() * speed_ * ds;
   }
 
   // up / down controls
   if (Input::IsKeyPressed(KeyCode::kE)) {
-    transform_.position += kWorldUp * speed_ * ds;
+    transform_.local_position += kWorldUp * speed_ * ds;
   }
   if (Input::IsKeyPressed(KeyCode::kQ)) {
-    transform_.position -= kWorldUp * speed_ * ds;
+    transform_.local_position -= kWorldUp * speed_ * ds;
   }
 }
 
 void EditorCamera::ResetTransform() {
-  transform_.position = {-5, 3, 10};
-  transform_.rotation = {-15, -30, 0};
-  transform_.scale = {1, 1, 1};
+  transform_.local_position = {-5, 3, 10};
+  transform_.local_rotation = {-15, -30, 0};
+  transform_.local_scale = {1, 1, 1};
 }
 
 void EditorCamera::ResetMousePos() {
   last_mouse_pos_ = Input::GetMousePosition();
 }
+
 }  // namespace eve

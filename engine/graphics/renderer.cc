@@ -54,7 +54,7 @@ void Renderer::DrawModel(const Ref<Model>& model, const Transform& transform,
       NextBatch();
     }
 
-    const glm::mat4 model_matrix = transform.GetModelMatrix();
+    const glm::mat4 model_matrix = transform.GetTransformMatrix();
 
     float diffuse_index = mesh_data_->FindTexture(mesh.diffuse_map);
     float specular_index = mesh_data_->FindTexture(mesh.specular_map);
@@ -91,7 +91,7 @@ void Renderer::DrawQuad(const Transform& transform, const Color& color,
   }
 
   const float tex_index = 0.0f;
-  const glm::mat4 model_matrix = transform.GetModelMatrix();
+  const glm::mat4 model_matrix = transform.GetTransformMatrix();
 
   for (size_t i = 0; i < kQuadVertexCount; i++) {
     QuadVertex vertex;
@@ -120,7 +120,7 @@ void Renderer::DrawQuad(const Transform& transform, const Ref<Texture>& texture,
   }
 
   const float tex_index = quad_data_->FindTexture(texture);
-  const glm::mat4 model_matrix = transform.GetModelMatrix();
+  const glm::mat4 model_matrix = transform.GetTransformMatrix();
 
   for (size_t i = 0; i < kQuadVertexCount; i++) {
     QuadVertex vertex;
@@ -150,7 +150,7 @@ void Renderer::DrawCube(const Transform& transform, const Color& color,
     NextBatch();
   }
 
-  const glm::mat4 model_matrix = transform.GetModelMatrix();
+  const glm::mat4 model_matrix = transform.GetTransformMatrix();
 
   for (size_t i = 0; i < kCubeVertexCount; i++) {
     CubeVertex vertex;

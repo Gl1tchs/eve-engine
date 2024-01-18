@@ -2,7 +2,7 @@
 
 #include "scene/scene.h"
 
-#include "physics/physics_world.h"
+#include "physics/physics_system.h"
 #include "scene/components.h"
 #include "scene/entity.h"
 #include "scene/transform.h"
@@ -10,88 +10,15 @@
 #include "scripting/script_engine.h"
 
 namespace eve {
-Scene::Scene(Ref<State> state, std::string name) : state_(state), name_(name) {}
 
-template <typename... Component>
-static void CopyComponent(
-    entt::registry& dst, entt::registry& src,
-    const std::unordered_map<UUID, entt::entity>& entt_map) {
-  (
-      [&]() {
-        auto view = src.view<Component>();
-        for (auto src_entity : view) {
-          entt::entity dst_entity =
-              entt_map.at(src.get<IdComponent>(src_entity).id);
-
-          auto& src_component = src.get<Component>(src_entity);
-          dst.emplace_or_replace<Component>(dst_entity, src_component);
-        }
-      }(),
-      ...);
+Scene::Scene(Ref<State> state, std::string name) : state_(state), name_(name) {
+  PushSystem<PhysicsSystem>();
 }
 
-template <typename... Component>
-static void CopyComponent(
-    ComponentGroup<Component...>, entt::registry& dst, entt::registry& src,
-    const std::unordered_map<UUID, entt::entity>& entt_map) {
-  CopyComponent<Component...>(dst, src, entt_map);
-}
-
-template <typename... Component>
-static void CopyComponentIfExists(Entity dst, Entity src) {
-  (
-      [&]() {
-        if (src.HasComponent<Component>())
-          dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
-      }(),
-      ...);
-}
-
-template <typename... Component>
-static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst,
-                                  Entity src) {
-  CopyComponentIfExists<Component...>(dst, src);
-}
-
-Ref<Scene> Scene::Copy(Ref<Scene> src) {
-  Ref<Scene> dst_scene = CreateRef<Scene>(src->state_, src->name_);
-
-  auto& src_scene_registry = src->registry_;
-  auto& dst_scene_registry = dst_scene->registry_;
-  std::unordered_map<UUID, entt::entity> entt_map;
-
-  // Create entities in new scene
-  auto id_view = src_scene_registry.view<IdComponent>();
-  for (auto entity_id : id_view) {
-    UUID uuid = src_scene_registry.get<IdComponent>(entity_id).id;
-    const auto& name = src_scene_registry.get<TagComponent>(entity_id).tag;
-
-    Entity new_entity =
-        dst_scene->CreateEntityWithUUID(uuid, {name, kInvalidUUID});
-
-    // set parent id but do not set children vectors
-    const auto& relation = src_scene_registry.get<RelationComponent>(entity_id);
-    new_entity.GetRelation().parent_id = relation.parent_id;
-
-    entt_map[uuid] = (entt::entity)new_entity;
+Scene::~Scene() {
+  for (auto system : systems_) {
+    delete system;
   }
-
-  // set child/parent relations
-  for (auto& [uuid, entity] : dst_scene->entity_map_) {
-    // Set parent entity
-    auto& relation = entity.GetRelation();
-    if (relation.parent_id) {
-      auto parent_entity = dst_scene->TryGetEntityByUUID(relation.parent_id);
-      if (parent_entity) {
-        entity.SetParent(parent_entity);
-      }
-    }
-  }
-
-  CopyComponent(AllComponents{}, dst_scene_registry, src_scene_registry,
-                entt_map);
-
-  return dst_scene;
 }
 
 bool Scene::OnRuntimeStart() {
@@ -104,29 +31,21 @@ bool Scene::OnRuntimeStart() {
 
   ScriptEngine::OnRuntimeStart(this);
 
-  PhysicsWorld::OnStart(this);
-
   auto view = registry_.view<ScriptComponent>();
   for (auto e : view) {
     Entity entity = {e, this};
     ScriptEngine::OnCreateEntity(entity);
   }
 
-  return true;
-}
+  for (auto system : systems_) {
+    if (!system->IsRuntime()) {
+      continue;
+    }
 
-void Scene::OnRuntimeStop() {
-  is_running_ = false;
-
-  auto view = registry_.view<ScriptComponent>();
-  for (auto e : view) {
-    Entity entity = {e, this};
-    ScriptEngine::OnDestroyEntity(entity);
+    system->OnStart();
   }
 
-  ScriptEngine::OnRuntimeStop();
-
-  PhysicsWorld::OnStop();
+  return true;
 }
 
 void Scene::OnUpdateRuntime(float ds) {
@@ -140,7 +59,43 @@ void Scene::OnUpdateRuntime(float ds) {
     ScriptEngine::OnUpdateEntity(entity, ds);
   }
 
-  PhysicsWorld::OnUpdate(ds);
+  for (auto system : systems_) {
+    if (!system->IsRuntime()) {
+      continue;
+    }
+
+    system->OnUpdate(ds);
+  }
+}
+
+void Scene::OnRuntimeStop() {
+  is_running_ = false;
+
+  auto view = registry_.view<ScriptComponent>();
+  for (auto e : view) {
+    Entity entity = {e, this};
+    ScriptEngine::OnDestroyEntity(entity);
+  }
+
+  ScriptEngine::OnRuntimeStop();
+
+  for (auto system : systems_) {
+    if (!system->IsRuntime()) {
+      continue;
+    }
+
+    system->OnStop();
+  }
+}
+
+void Scene::OnUpdateEditor(float ds) {
+  for (auto system : systems_) {
+    if (!system->IsEditor()) {
+      continue;
+    }
+
+    system->OnUpdate(ds);
+  }
 }
 
 void Scene::Step(int frames) {
@@ -175,14 +130,6 @@ Entity Scene::CreateEntityWithUUID(UUID uuid, const EntityCreateInfo& info) {
   return entity;
 }
 
-bool Scene::Exists(Entity entity) {
-  if (!entity.HasComponent<IdComponent>()) {
-    return false;
-  }
-
-  return entity_map_.find(entity.GetUUID()) != entity_map_.end();
-}
-
 void Scene::DestroyEntity(Entity entity) {
   for (auto child : entity.GetChildren()) {
     DestroyEntity(child);
@@ -194,6 +141,14 @@ void Scene::DestroyEntity(Entity entity) {
 
   entity_map_.erase(entity.GetUUID());
   registry_.destroy(entity);
+}
+
+bool Scene::Exists(Entity entity) {
+  if (!entity.HasComponent<IdComponent>()) {
+    return false;
+  }
+
+  return entity_map_.find(entity.GetUUID()) != entity_map_.end();
 }
 
 Entity Scene::TryGetEntityByUUID(UUID uuid) {
@@ -259,6 +214,88 @@ std::string Scene::GetEntityName(const std::string& name) {
 
     return std::format("Entity ({0})", default_counter);
   }
+}
+
+template <typename... Component>
+static void CopyComponent(
+    entt::registry& dst, entt::registry& src,
+    const std::unordered_map<UUID, entt::entity>& entt_map) {
+  (
+      [&]() {
+        auto view = src.view<Component>();
+        for (auto src_entity : view) {
+          entt::entity dst_entity =
+              entt_map.at(src.get<IdComponent>(src_entity).id);
+
+          auto& src_component = src.get<Component>(src_entity);
+          dst.emplace_or_replace<Component>(dst_entity, src_component);
+        }
+      }(),
+      ...);
+}
+
+template <typename... Component>
+static void CopyComponent(
+    ComponentGroup<Component...>, entt::registry& dst, entt::registry& src,
+    const std::unordered_map<UUID, entt::entity>& entt_map) {
+  CopyComponent<Component...>(dst, src, entt_map);
+}
+
+template <typename... Component>
+static void CopyComponentIfExists(Entity dst, Entity src) {
+  (
+      [&]() {
+        if (src.HasComponent<Component>())
+          dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+      }(),
+      ...);
+}
+
+template <typename... Component>
+static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst,
+                                  Entity src) {
+  CopyComponentIfExists<Component...>(dst, src);
+}
+
+Ref<Scene> Scene::Copy(Ref<Scene> src) {
+  Ref<Scene> dst_scene = CreateRef<Scene>(src->state_, src->name_);
+
+  auto& src_scene_registry = src->registry_;
+  auto& dst_scene_registry = dst_scene->registry_;
+  std::unordered_map<UUID, entt::entity> entt_map;
+
+  // Create entities in new scene
+  auto id_view = src_scene_registry.view<IdComponent>();
+  for (auto entity_id : id_view) {
+    UUID uuid = src_scene_registry.get<IdComponent>(entity_id).id;
+    const auto& name = src_scene_registry.get<TagComponent>(entity_id).tag;
+
+    Entity new_entity =
+        dst_scene->CreateEntityWithUUID(uuid, {name, kInvalidUUID});
+
+    // set parent id but do not set children vectors
+    const auto& relation = src_scene_registry.get<RelationComponent>(entity_id);
+    new_entity.GetRelation().parent_id = relation.parent_id;
+
+    entt_map[uuid] = (entt::entity)new_entity;
+  }
+
+  CopyComponent(AllComponents{}, dst_scene_registry, src_scene_registry,
+                entt_map);
+
+  // set child/parent relations
+  for (auto& [uuid, entity] : dst_scene->entity_map_) {
+    // Set parent entity
+    auto& relation = entity.GetRelation();
+    if (relation.parent_id) {
+      auto parent_entity = dst_scene->TryGetEntityByUUID(relation.parent_id);
+      if (parent_entity) {
+        entity.SetParent(parent_entity);
+      }
+    }
+  }
+
+  return dst_scene;
 }
 
 }  // namespace eve

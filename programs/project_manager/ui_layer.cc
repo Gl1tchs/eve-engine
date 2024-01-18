@@ -57,7 +57,7 @@ UiLayer::UiLayer(eve::Ref<eve::State> state)
   }
 }
 
-void UiLayer::OnStart() {}
+void UiLayer::OnCreate() {}
 
 void UiLayer::OnDestroy() {}
 

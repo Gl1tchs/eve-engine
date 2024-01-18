@@ -16,7 +16,7 @@ class ImGuiLayer : public Layer {
   ImGuiLayer(Ref<State>& state);
   ~ImGuiLayer() = default;
 
-  void OnStart() override;
+  void OnCreate() override;
 
   void OnDestroy() override;
 

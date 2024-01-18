@@ -97,6 +97,17 @@ static void Entity_Destroy(UUID entity_id) {
   scene->DestroyEntity(entity);
 }
 
+static uint64_t Entity_GetParent(UUID entity_id) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  Entity parent_entity = entity.GetParent();
+
+  return parent_entity ? parent_entity.GetUUID() : kInvalidUUID;
+}
+
 static MonoString* Entity_GetName(UUID entity_id) {
   Scene* scene = ScriptEngine::GetSceneContext();
   EVE_ASSERT_ENGINE(scene);
@@ -161,9 +172,9 @@ static uint64_t Entity_Instantiate(MonoString* name, UUID parent_id,
   }
 
   Transform& tc = created_entity.GetTransform();
-  tc.position = *position;
-  tc.rotation = *rotation;
-  tc.scale = *scale;
+  tc.local_position = *position;
+  tc.local_rotation = *rotation;
+  tc.local_scale = *scale;
 
   return created_entity.GetUUID();
 }
@@ -184,6 +195,65 @@ static void Entity_AssignScript(UUID entity_id, MonoString* class_name) {
 #pragma endregion
 #pragma region TransformComponent
 
+static void TransformComponent_GetLocalPosition(UUID entity_id,
+                                                glm::vec3* out_position) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  *out_position = entity.GetComponent<Transform>().local_position;
+}
+
+static void TransformComponent_SetLocalPosition(UUID entity_id,
+                                                glm::vec3* position) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetComponent<Transform>().local_position = *position;
+}
+
+static void TransformComponent_GetLocalRotation(UUID entity_id,
+                                                glm::vec3* out_rotation) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  *out_rotation = entity.GetComponent<Transform>().local_rotation;
+}
+
+static void TransformComponent_SetLocalRotation(UUID entity_id,
+                                                glm::vec3* rotation) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetComponent<Transform>().local_rotation = *rotation;
+}
+
+static void TransformComponent_GetLocalScale(UUID entity_id,
+                                             glm::vec3* out_scale) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  *out_scale = entity.GetComponent<Transform>().local_scale;
+}
+
+static void TransformComponent_SetLocalScale(UUID entity_id, glm::vec3* scale) {
+  Scene* scene = ScriptEngine::GetSceneContext();
+  EVE_ASSERT_ENGINE(scene);
+  auto entity = scene->TryGetEntityByUUID(entity_id);
+  EVE_ASSERT_ENGINE(entity);
+
+  entity.GetComponent<Transform>().local_scale = *scale;
+}
+
 static void TransformComponent_GetPosition(UUID entity_id,
                                            glm::vec3* out_position) {
   Scene* scene = ScriptEngine::GetSceneContext();
@@ -191,17 +261,7 @@ static void TransformComponent_GetPosition(UUID entity_id,
   auto entity = scene->TryGetEntityByUUID(entity_id);
   EVE_ASSERT_ENGINE(entity);
 
-  *out_position = entity.GetComponent<Transform>().position;
-}
-
-static void TransformComponent_SetPosition(UUID entity_id,
-                                           glm::vec3* position) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  EVE_ASSERT_ENGINE(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  EVE_ASSERT_ENGINE(entity);
-
-  entity.GetComponent<Transform>().position = *position;
+  *out_position = entity.GetComponent<Transform>().GetPosition();
 }
 
 static void TransformComponent_GetRotation(UUID entity_id,
@@ -211,17 +271,7 @@ static void TransformComponent_GetRotation(UUID entity_id,
   auto entity = scene->TryGetEntityByUUID(entity_id);
   EVE_ASSERT_ENGINE(entity);
 
-  *out_rotation = entity.GetComponent<Transform>().rotation;
-}
-
-static void TransformComponent_SetRotation(UUID entity_id,
-                                           glm::vec3* rotation) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  EVE_ASSERT_ENGINE(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  EVE_ASSERT_ENGINE(entity);
-
-  entity.GetComponent<Transform>().rotation = *rotation;
+  *out_rotation = entity.GetComponent<Transform>().GetRotation();
 }
 
 static void TransformComponent_GetScale(UUID entity_id, glm::vec3* out_scale) {
@@ -230,16 +280,7 @@ static void TransformComponent_GetScale(UUID entity_id, glm::vec3* out_scale) {
   auto entity = scene->TryGetEntityByUUID(entity_id);
   EVE_ASSERT_ENGINE(entity);
 
-  *out_scale = entity.GetComponent<Transform>().scale;
-}
-
-static void TransformComponent_SetScale(UUID entity_id, glm::vec3* scale) {
-  Scene* scene = ScriptEngine::GetSceneContext();
-  EVE_ASSERT_ENGINE(scene);
-  auto entity = scene->TryGetEntityByUUID(entity_id);
-  EVE_ASSERT_ENGINE(entity);
-
-  entity.GetComponent<Transform>().scale = *scale;
+  *out_scale = entity.GetComponent<Transform>().GetScale();
 }
 
 static void TransformComponent_GetForward(UUID entity_id,
@@ -888,6 +929,7 @@ void RegisterFunctions() {
 
   // Begin Entity
   ADD_INTERNAL_CALL(Entity_Destroy);
+  ADD_INTERNAL_CALL(Entity_GetParent);
   ADD_INTERNAL_CALL(Entity_GetName);
   ADD_INTERNAL_CALL(Entity_HasComponent);
   ADD_INTERNAL_CALL(Entity_AddComponent);
@@ -896,12 +938,15 @@ void RegisterFunctions() {
   ADD_INTERNAL_CALL(Entity_AssignScript);
 
   // Begin Transform Component
+  ADD_INTERNAL_CALL(TransformComponent_GetLocalPosition);
+  ADD_INTERNAL_CALL(TransformComponent_SetLocalPosition);
+  ADD_INTERNAL_CALL(TransformComponent_GetLocalRotation);
+  ADD_INTERNAL_CALL(TransformComponent_SetLocalRotation);
+  ADD_INTERNAL_CALL(TransformComponent_GetLocalScale);
+  ADD_INTERNAL_CALL(TransformComponent_SetLocalScale);
   ADD_INTERNAL_CALL(TransformComponent_GetPosition);
-  ADD_INTERNAL_CALL(TransformComponent_SetPosition);
   ADD_INTERNAL_CALL(TransformComponent_GetRotation);
-  ADD_INTERNAL_CALL(TransformComponent_SetRotation);
   ADD_INTERNAL_CALL(TransformComponent_GetScale);
-  ADD_INTERNAL_CALL(TransformComponent_SetScale);
   ADD_INTERNAL_CALL(TransformComponent_GetForward);
   ADD_INTERNAL_CALL(TransformComponent_GetRight);
   ADD_INTERNAL_CALL(TransformComponent_GetUp);

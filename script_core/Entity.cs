@@ -11,6 +11,17 @@ namespace EveEngine
     public ulong Id { get; private set; }
 
     /// <summary>
+    /// Parent entity of current's.
+    /// </summary>
+    public Entity Parent
+    {
+      get
+      {
+        return new Entity(Interop.Entity_GetParent(Id));
+      }
+    }
+
+    /// <summary>
     /// Entity name of the scene.
     /// </summary>
     public string Name

@@ -28,7 +28,7 @@ class UiLayer : public eve::Layer {
  public:
   UiLayer(eve::Ref<eve::State> state);
 
-  void OnStart() override;
+  void OnCreate() override;
 
   void OnDestroy() override;
 
