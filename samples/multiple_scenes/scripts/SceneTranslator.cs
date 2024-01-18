@@ -6,7 +6,6 @@ namespace MultipleScenes
   public class SceneTranslator : Entity
   {
     public bool isScene1 = false;
-
     private bool _keyPressed = false;
 
     protected override void OnCreate()

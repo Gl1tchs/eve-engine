@@ -23,20 +23,20 @@ namespace Simple
 
             if (Input.IsKeyPressed(KeyCode.W))
             {
-                direction += Transform.GetForward();
+                direction += Transform.Forward;
             }
             if (Input.IsKeyPressed(KeyCode.S))
             {
-                direction -= Transform.GetForward();
+                direction -= Transform.Forward;
             }
 
             if (Input.IsKeyPressed(KeyCode.D))
             {
-                direction += Transform.GetRight();
+                direction += Transform.Right;
             }
             if (Input.IsKeyPressed(KeyCode.A))
             {
-                direction -= Transform.GetRight();
+                direction -= Transform.Right;
             }
 
             if (!_spacePressed && Input.IsKeyPressed(KeyCode.Space))

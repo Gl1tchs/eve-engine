@@ -2,6 +2,7 @@
   "entities": [
     {
       "id": 3657232952556252100,
+      "parent_id": 0,
       "material_component": {
         "albedo": [
           0.8042553067207336,
@@ -26,9 +27,7 @@
           }
         ]
       },
-      "tag_component": {
-        "tag": "Cube"
-      },
+      "tag": "Cube",
       "transform": {
         "position": [
           0.0,
@@ -66,9 +65,8 @@
         }
       },
       "id": 9378468046714055176,
-      "tag_component": {
-        "tag": "Camera"
-      },
+      "parent_id": 0,
+      "tag": "Camera",
       "transform": {
         "position": [
           0.0,

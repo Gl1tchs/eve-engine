@@ -43,6 +43,7 @@
 - [ ] Angular velocity and torque.
 
 ## Scripting
+- [ ] Default script fields not working.
 - [ ] Get children from scripts.
 - [ ] Asset system scripting API.
 - [ ] Texture and Mesh data structures.

@@ -2,6 +2,7 @@
   "entities": [
     {
       "id": 8234689535676734320,
+      "parent_id": 0,
       "material_component": {
         "albedo": [
           0.7799227833747864,
@@ -18,9 +19,7 @@
       "model_component": {
         "model": 16996734589929948027
       },
-      "tag_component": {
-        "tag": "Red Monkey"
-      },
+      "tag": "Red Monkey",
       "transform": {
         "position": [
           3.2808175086975098,
@@ -41,6 +40,7 @@
     },
     {
       "id": 323468953567323581,
+      "parent_id": 0,
       "material_component": {
         "albedo": [
           0.007722020149230957,
@@ -57,9 +57,7 @@
       "model_component": {
         "model": 16996734589929948027
       },
-      "tag_component": {
-        "tag": "Monkey"
-      },
+      "tag": "Monkey",
       "transform": {
         "position": [
           -2.535435914993286,
@@ -97,9 +95,8 @@
         }
       },
       "id": 1225455807429653547,
-      "tag_component": {
-        "tag": "Main Camera"
-      },
+      "parent_id": 0,
+      "tag": "Main Camera",
       "transform": {
         "position": [
           -5.630620002746582,

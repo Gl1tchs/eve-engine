@@ -1,11 +1,11 @@
 {
-  "name": "simple",
   "asset_directory": "assets",
-  "script_directory": "scripts",
   "asset_registry": "config/asset_registry.esf",
   "keymaps": "config/keymaps.esf",
-  "scenes": {
-    "scene1": "res://scenes/scene1.escn",
-    "scene2": "res://scenes/scene2.escn"
-  }
+  "name": "simple",
+  "scenes": [
+    "res://scenes/scene1.escn",
+    "res://scenes/scene2.escn"
+  ],
+  "script_directory": "scripts"
 }

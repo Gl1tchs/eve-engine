@@ -1,6 +1,45 @@
 {
   "entities": [
     {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.8304094076156616,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.8304094076156616,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 937846804671,
+      "parent_id": 0,
+      "tag": "Camera",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          4.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
       "id": 3657232952556252100,
       "material_component": {
         "albedo": [
@@ -21,6 +60,7 @@
       "model_component": {
         "model": 2677285248016495904
       },
+      "parent_id": 0,
       "script_component": {
         "class_name": "MultipleScenes.SceneTranslator",
         "script_fields": [
@@ -31,9 +71,7 @@
           }
         ]
       },
-      "tag_component": {
-        "tag": "Cube"
-      },
+      "tag": "Cube",
       "transform": {
         "position": [
           0.0,
@@ -49,46 +87,6 @@
           0.25,
           0.25,
           0.25
-        ]
-      }
-    },
-    {
-      "camera_component": {
-        "is_fixed_aspect_ratio": false,
-        "is_orthographic": false,
-        "is_primary": true,
-        "orthographic_camera": {
-          "aspect_ratio": 1.7546817064285278,
-          "far_clip": 1.0,
-          "near_clip": -1.0,
-          "zoom_level": 1.0
-        },
-        "perspective_camera": {
-          "aspect_ratio": 1.7546817064285278,
-          "far_clip": 300.0,
-          "fov": 45.0,
-          "near_clip": 0.10000000149011612
-        }
-      },
-      "id": 9378468046714055176,
-      "tag_component": {
-        "tag": "Camera"
-      },
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          4.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
         ]
       }
     }
