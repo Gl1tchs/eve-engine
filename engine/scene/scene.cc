@@ -62,14 +62,32 @@ Ref<Scene> Scene::Copy(Ref<Scene> src) {
 
   // Create entities in new scene
   auto id_view = src_scene_registry.view<IdComponent>();
-  for (auto e : id_view) {
-    UUID uuid = src_scene_registry.get<IdComponent>(e).id;
-    const auto& name = src_scene_registry.get<TagComponent>(e).tag;
-    Entity new_entity = dst_scene->CreateEntityWithUUID(uuid, name);
+  for (auto entity_id : id_view) {
+    UUID uuid = src_scene_registry.get<IdComponent>(entity_id).id;
+    const auto& name = src_scene_registry.get<TagComponent>(entity_id).tag;
+
+    Entity new_entity =
+        dst_scene->CreateEntityWithUUID(uuid, {name, kInvalidUUID});
+
+    // set parent id but do not set children vectors
+    const auto& relation = src_scene_registry.get<RelationComponent>(entity_id);
+    new_entity.GetRelation().parent_id = relation.parent_id;
+
     entt_map[uuid] = (entt::entity)new_entity;
   }
 
-  // Copy components (except IdComponent and TagComponent)
+  // set child/parent relations
+  for (auto& [uuid, entity] : dst_scene->entity_map_) {
+    // Set parent entity
+    auto& relation = entity.GetRelation();
+    if (relation.parent_id) {
+      auto parent_entity = dst_scene->TryGetEntityByUUID(relation.parent_id);
+      if (parent_entity) {
+        entity.SetParent(parent_entity);
+      }
+    }
+  }
+
   CopyComponent(AllComponents{}, dst_scene_registry, src_scene_registry,
                 entt_map);
 
@@ -129,35 +147,27 @@ void Scene::Step(int frames) {
   step_frames_ = frames;
 }
 
-Entity Scene::CreateEntity(const std::string& name) {
-  return CreateEntityWithUUID(UUID(), name);
+Entity Scene::CreateEntity(const EntityCreateInfo& info) {
+  return CreateEntityWithUUID(UUID(), info);
 }
 
-Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name) {
+Entity Scene::CreateEntityWithUUID(UUID uuid, const EntityCreateInfo& info) {
   Entity entity = {registry_.create(), this};
+
   entity.AddComponent<IdComponent>(uuid);
   entity.AddComponent<Transform>();
+  entity.AddComponent<RelationComponent>();
+
+  // Set an unique tag
   auto& tag = entity.AddComponent<TagComponent>();
+  tag.tag = GetEntityName(info.name);
 
-  static int default_counter = 0;
-  if (!name.empty()) {
-
-    std::string name_unique = name;
-    int counter = 1;
-
-    while (EntityNameExists(name_unique)) {
-      name_unique = std::format("{0} ({1})", name, counter);
-      counter++;
+  // Set parent if provided.
+  if (info.parent_id) {
+    Entity parent = TryGetEntityByUUID(info.parent_id);
+    if (parent) {
+      entity.SetParent(parent);
     }
-
-    tag.tag = name_unique;
-
-  } else if (name.empty() && default_counter == 0) {
-    tag.tag = "Entity";
-    default_counter++;
-  } else {
-    tag.tag = std::format("Entity ({0})", default_counter);
-    default_counter++;
   }
 
   entity_map_[uuid] = entity;
@@ -174,6 +184,14 @@ bool Scene::Exists(Entity entity) {
 }
 
 void Scene::DestroyEntity(Entity entity) {
+  for (auto child : entity.GetChildren()) {
+    DestroyEntity(child);
+  }
+
+  if (IsRunning()) {
+    ScriptEngine::OnDestroyEntity(entity);
+  }
+
   entity_map_.erase(entity.GetUUID());
   registry_.destroy(entity);
 }
@@ -206,17 +224,41 @@ Entity Scene::GetPrimaryCameraEntity() {
 }
 
 Entity Scene::GetSelectedEntity() {
-  return selected_entity_ != nullptr ? *selected_entity_ : Entity{};
+  return selected_entity_ != nullptr ? *selected_entity_ : kInvalidEntity;
 }
 
 bool Scene::EntityNameExists(const std::string& name) {
-  auto it =
+  const auto it =
       std::find_if(entity_map_.begin(), entity_map_.end(), [&](auto& pair) {
         const auto& tag_comp =
             pair.second.template GetComponent<TagComponent>();
         return tag_comp.tag == name;
       });
   return it != entity_map_.end();
+}
+
+std::string Scene::GetEntityName(const std::string& name) {
+  static int default_counter = 0;
+  if (!name.empty()) {
+
+    std::string name_unique = name;
+    int counter = 1;
+
+    while (EntityNameExists(name_unique)) {
+      name_unique = std::format("{0} ({1})", name, counter);
+      counter++;
+    }
+
+    return name_unique;
+  } else if (name.empty() && default_counter == 0) {
+    default_counter++;
+
+    return "Entity";
+  } else {
+    default_counter++;
+
+    return std::format("Entity ({0})", default_counter);
+  }
 }
 
 }  // namespace eve

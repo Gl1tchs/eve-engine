@@ -14,6 +14,11 @@
 
 namespace eve {
 
+struct RelationComponent {
+  UUID parent_id = 0;
+  std::vector<UUID> children_ids;
+};
+
 struct IdComponent {
   UUID id;
 };

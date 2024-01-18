@@ -315,6 +315,9 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
           ImGui::SetDragDropPayload("DND_PAYLOAD_SHADER",
                                     &shader_instance->handle,
                                     sizeof(AssetHandle));
+
+          ImGui::SetTooltip("%s", shader_instance->name.c_str());
+
           ImGui::EndDragDropSource();
         }
 

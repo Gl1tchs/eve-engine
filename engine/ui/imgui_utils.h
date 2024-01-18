@@ -26,6 +26,8 @@ struct ScopedStyleVar {
 
   ScopedStyleVar(int idx, const glm::vec2& var, bool condition = true);
 
+  ScopedStyleVar(int idx, float var, bool condition = true);
+
   ~ScopedStyleVar();
 
  private:

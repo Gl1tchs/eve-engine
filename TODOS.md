@@ -30,7 +30,7 @@
 - [ ] Asset compression for shipping.
 
 ## Scene
-- [ ] Add parent / child entity system.
+- [ ] Add an transform system to handle parent/child transforms.
 - [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
@@ -42,7 +42,6 @@
 - [ ] Angular velocity and torque.
 
 ## Scripting
-- [ ] Static application and Editor class to handle quit events.
 - [ ] Asset system scripting API.
 - [ ] Build project in release mode when shipping.
 - [ ] Add new scenes to the build on create. 
@@ -95,6 +94,8 @@
 - [x] Better toolbar.
 - [x] Add trigger functionality to C#.
 - [x] Create entities from script (Instantiate<EntityClass> -> EntityClass | Instantiate() -> ScriptEntity)
+- [x] Add parent / child entity system.
+- [x] Static application and Editor class to handle quit events.
 
 ## Fixed
 - [x] Cannot switch between projects.

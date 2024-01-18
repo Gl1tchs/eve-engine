@@ -11,6 +11,7 @@
 #include "scene/scene.h"
 
 namespace eve {
+
 class Entity {
  public:
   Entity() = default;
@@ -49,11 +50,18 @@ class Entity {
     scene_->registry_.remove<T>(entity_handle_);
   }
 
-  operator bool() const {
-    return entity_handle_ != entt::null || scene_ != nullptr;
-  }
-  operator entt::entity() const { return entity_handle_; }
-  operator uint32_t() const { return (uint32_t)entity_handle_; }
+  // Relations
+  [[nodiscard]] RelationComponent& GetRelation();
+
+  [[nodiscard]] Entity GetParent();
+
+  void SetParent(Entity parent);
+
+  [[nodiscard]] std::vector<Entity> GetChildren();
+
+  bool RemoveChild(Entity child);
+
+  [[nodiscard]] bool IsParentRecursive(Entity parent, Entity child);
 
   [[nodiscard]] const UUID& GetUUID() { return GetComponent<IdComponent>().id; }
   [[nodiscard]] const std::string& GetName() {
@@ -61,6 +69,14 @@ class Entity {
   }
 
   [[nodiscard]] Transform& GetTransform() { return GetComponent<Transform>(); }
+
+  operator bool() const {
+    return entity_handle_ != entt::null || scene_ != nullptr;
+  }
+
+  operator entt::entity() const { return entity_handle_; }
+
+  operator uint32_t() const { return (uint32_t)entity_handle_; }
 
   [[nodiscard]] bool operator==(const Entity& other) const {
     return entity_handle_ == other.entity_handle_ && scene_ == other.scene_;
@@ -75,5 +91,9 @@ class Entity {
   Scene* scene_ = nullptr;
 
   friend class HierarchyPanel;
+  friend class Scene;
 };
+
+const Entity kInvalidEntity = Entity{};
+
 }  // namespace eve

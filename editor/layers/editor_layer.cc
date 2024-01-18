@@ -278,7 +278,7 @@ void EditorLayer::HandleShortcuts() {
   if (auto entity = hierarchy_panel_->GetSelectedEntity(); entity) {
     if (Input::IsKeyPressed(KeyCode::kDelete)) {
       SceneManager::GetActive()->DestroyEntity(entity);
-      hierarchy_panel_->SetSelectedEntity(Entity{});
+      hierarchy_panel_->SetSelectedEntity(kInvalidEntity);
       modify_info.SetModified();
     }
   }
@@ -298,7 +298,7 @@ void EditorLayer::OpenProject() {
     if (!ScriptEngine::IsInitialized()) {
       ScriptEngine::Init();
     } else {
-      hierarchy_panel_->SetSelectedEntity(Entity{});
+      hierarchy_panel_->SetSelectedEntity(kInvalidEntity);
       ScriptEngine::Reinit();
     }
 
@@ -384,7 +384,7 @@ void EditorLayer::OpenScene(const fs::path& path) {
     editor_scene_path_ = path;
 
     editor_camera_->ResetTransform();
-    hierarchy_panel_->selected_entity_ = Entity{};
+    hierarchy_panel_->selected_entity_ = kInvalidEntity;
   }
 }
 

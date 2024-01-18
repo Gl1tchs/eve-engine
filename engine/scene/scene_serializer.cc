@@ -91,15 +91,17 @@ void from_json(const json& j, Color& color) {
 SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : scene_(scene) {}
 
 static void SerializeEntity(json& out, Entity entity) {
-  EVE_ASSERT_ENGINE(entity.HasComponent<IdComponent>())
+  bool has_required_components =
+      entity.HasComponent<IdComponent, TagComponent, RelationComponent,
+                          Transform>();
+  EVE_ASSERT_ENGINE(has_required_components);
 
   out["id"] = entity.GetUUID();
 
-  if (entity.HasComponent<TagComponent>()) {
-    auto& tag = entity.GetComponent<TagComponent>().tag;
+  RelationComponent& relation = entity.GetComponent<RelationComponent>();
+  out["parent_id"] = relation.parent_id;
 
-    out["tag_component"] = json{{"tag", tag}};
-  }
+  out["tag"] = entity.GetComponent<TagComponent>().tag;
 
   if (entity.HasComponent<Transform>()) {
     auto& tc = entity.GetComponent<Transform>();
@@ -305,18 +307,32 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
     return false;
   }
 
-  json entities = data["entities"];
-  for (auto entity : entities) {
-    uint64_t uuid = entity["id"].get<UUID>();
+  json entities_json = data["entities"];
 
-    std::string name;
-    if (entity.contains("tag_component")) {
-      name = entity["tag_component"]["tag"].get<std::string>();
+  // Create entities before adding components in order to build parent/child relations.
+  std::vector<Entity> entities;
+  for (const auto& entity_json : entities_json) {
+    UUID uuid = entity_json["id"].get<UUID>();
+    std::string name = entity_json["tag"].get<std::string>();
+    entities.push_back(
+        scene_->CreateEntityWithUUID(uuid, {name, kInvalidUUID}));
+  }
+
+  for (uint32_t i = 0; i < entities.size(); i++) {
+    auto& entity_json = entities_json.at(i);
+    auto& deserialing_entity = entities.at(i);
+
+    // Set parent entity
+    UUID parent_id = entity_json["parent_id"].get<UUID>();
+    if (parent_id) {
+      auto parent_entity = scene_->TryGetEntityByUUID(parent_id);
+      if (parent_entity) {
+        deserialing_entity.SetParent(parent_entity);
+      }
     }
 
-    Entity deserialing_entity = scene_->CreateEntityWithUUID(uuid, name);
-
-    if (auto transform_json = entity["transform"]; !transform_json.is_null()) {
+    if (auto transform_json = entity_json["transform"];
+        !transform_json.is_null()) {
       auto& tc = deserialing_entity.GetComponent<Transform>();
 
       tc.position = transform_json["position"].get<glm::vec3>();
@@ -324,7 +340,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       tc.scale = transform_json["scale"].get<glm::vec3>();
     }
 
-    if (auto camera_comp_json = entity["camera_component"];
+    if (auto camera_comp_json = entity_json["camera_component"];
         !camera_comp_json.is_null()) {
       auto& camera_component =
           deserialing_entity.AddComponent<CameraComponent>();
@@ -355,7 +371,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
           camera_comp_json["is_fixed_aspect_ratio"].get<bool>();
     }
 
-    if (auto sprite_comp_json = entity["sprite_component"];
+    if (auto sprite_comp_json = entity_json["sprite_component"];
         !sprite_comp_json.is_null()) {
       auto& sprite_component =
           deserialing_entity.AddComponent<SpriteRendererComponent>();
@@ -368,14 +384,14 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
           sprite_comp_json["tex_offset"].get<glm::vec2>();
     }
 
-    if (auto model_comp_json = entity["model_component"];
+    if (auto model_comp_json = entity_json["model_component"];
         !model_comp_json.is_null()) {
       auto& model_component = deserialing_entity.AddComponent<ModelComponent>();
 
       model_component.model = model_comp_json["model"].get<UUID>();
     }
 
-    if (auto material_json = entity["material_component"];
+    if (auto material_json = entity_json["material_component"];
         !material_json.is_null()) {
       auto& material = deserialing_entity.AddComponent<Material>();
 
@@ -419,7 +435,8 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       }
     }
 
-    if (auto rigidbody_json = entity["rigidbody"]; !rigidbody_json.is_null()) {
+    if (auto rigidbody_json = entity_json["rigidbody"];
+        !rigidbody_json.is_null()) {
       auto& rb = deserialing_entity.AddComponent<Rigidbody>();
 
       rb.velocity = rigidbody_json["velocity"].get<glm::vec3>();
@@ -436,7 +453,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
           rigidbody_json["rotation_constraints"]["freeze_roll"].get<bool>()};
     }
 
-    if (auto box_collider_json = entity["box_collider"];
+    if (auto box_collider_json = entity_json["box_collider"];
         !box_collider_json.is_null()) {
       auto& col = deserialing_entity.AddComponent<BoxCollider>();
 
@@ -445,7 +462,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       col.local_scale = box_collider_json["local_scale"].get<glm::vec3>();
     }
 
-    if (auto script_component_json = entity["script_component"];
+    if (auto script_component_json = entity_json["script_component"];
         !script_component_json.is_null()) {
       auto& sc = deserialing_entity.AddComponent<ScriptComponent>();
 

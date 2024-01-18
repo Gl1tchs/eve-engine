@@ -24,7 +24,7 @@ void HierarchyPanel::SetSelectedEntity(Entity entity) {
 void HierarchyPanel::Draw() {
   auto& scene = SceneManager::GetActive();
   if (!scene) {
-    selected_entity_ = Entity{};
+    selected_entity_ = kInvalidEntity;
     return;
   }
 
@@ -46,41 +46,126 @@ void HierarchyPanel::Draw() {
 
   ImGui::Separator();
 
-  std::vector<Entity> entities_to_remove{};
+  entities_to_remove_.clear();
 
   for (auto [uuid, entity] : scene->entity_map_) {
-    const std::string& name = entity.GetName();
+    ImGui::PushID((uint64_t)uuid);
 
-    int id = static_cast<int>((uint64_t)uuid);
-
-    ImGui::PushID(id);
-
-    if (ImGui::Selectable(std::format("{0} {1}", ICON_FA_CUBE, name).c_str(),
-                          selected_entity_ == entity)) {
-      SetSelectedEntity(entity);
-    }
-
-    if (ImGui::BeginPopupContextItem()) {
-      if (ImGui::MenuItem("Delete")) {
-        // Handle logic to remove the entity
-        entities_to_remove.push_back(entity);
-      }
-
-      ImGui::EndPopup();
-    }
-
-    if (ImGui::BeginDragDropSource()) {
-      ImGui::SetDragDropPayload("DND_PAYLOAD_ENTITY", &entity.GetUUID(),
-                                sizeof(UUID));
-      ImGui::EndDragDropSource();
+    // If entity has not any parent (top level).
+    if (!entity.GetParent()) {
+      DrawEntity(entity);
     }
 
     ImGui::PopID();
   }
 
-  for (auto entity : entities_to_remove) {
+  ImGui::Dummy(
+      ImVec2(ImGui::GetWindowWidth(), ImGui::GetContentRegionAvail().y));
+
+  // If an item dragged here it will set as top object.
+  DrawEntityDragDropTarget(kInvalidEntity);
+
+  if (ImGui::IsItemClicked()) {
+    selected_entity_ = kInvalidEntity;
+  }
+
+  for (auto entity : entities_to_remove_) {
     scene->DestroyEntity(entity);
     modify_info.SetModified();
+  }
+}
+
+void HierarchyPanel::DrawEntity(Entity& entity, bool is_child) {
+  ImGui::PushID((uint64_t)entity.GetUUID());
+
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{1, 2});
+
+  const std::string hierarchy_name =
+      std::format("{0} {1}", ICON_FA_CUBE, entity.GetName());
+
+  bool node_open = ImGui::TreeNodeEx(
+      hierarchy_name.c_str(),
+      ImGuiTreeNodeFlags_FramePadding |
+          (selected_entity_ == entity ? ImGuiTreeNodeFlags_Selected : 0));
+
+  // Drag and drop source and target to change relations.
+  DrawEntityDragDropSource(entity);
+  DrawEntityDragDropTarget(entity);
+
+  ImGui::PopStyleVar();
+
+  if (ImGui::IsItemClicked()) {
+    SetSelectedEntity(entity);
+  }
+
+  if (node_open) {
+    static float entity_indent = 0.75f;
+
+    ImGui::Indent(entity_indent);
+
+    for (Entity& child : entity.GetChildren()) {
+      DrawEntity(child, true);
+    }
+
+    ImGui::Unindent(entity_indent);
+
+    ImGui::TreePop();
+  }
+
+  DrawEntityContextMenu(entity);
+
+  ImGui::PopID();
+}
+
+void HierarchyPanel::DrawEntityContextMenu(Entity& entity) {
+  auto& scene = SceneManager::GetActive();
+  if (!scene || !entity) {
+    return;
+  }
+
+  if (ImGui::BeginPopupContextItem()) {
+    if (ImGui::MenuItem("Add")) {
+      scene->CreateEntity();
+      modify_info.SetModified();
+    }
+
+    if (ImGui::MenuItem("Add Child")) {
+      scene->CreateEntity({"", entity.GetUUID()});
+      modify_info.SetModified();
+    }
+
+    if (ImGui::MenuItem("Delete")) {
+      // Handle logic to remove the entity
+      entities_to_remove_.push_back(entity);
+      modify_info.SetModified();
+    }
+
+    ImGui::EndPopup();
+  }
+}
+
+void HierarchyPanel::DrawEntityDragDropSource(Entity& entity) {
+  if (ImGui::BeginDragDropSource()) {
+    ImGui::SetDragDropPayload("DND_PAYLOAD_ENTITY", &entity, sizeof(Entity));
+
+    ImGui::SetTooltip("%s %s", ICON_FA_CUBE, entity.GetName().c_str());
+
+    ImGui::EndDragDropSource();
+  }
+}
+
+void HierarchyPanel::DrawEntityDragDropTarget(const Entity& new_parent) {
+  if (ImGui::BeginDragDropTarget()) {
+    if (const ImGuiPayload* payload =
+            ImGui::AcceptDragDropPayload("DND_PAYLOAD_ENTITY")) {
+      Entity* recv_entity = static_cast<Entity*>(payload->Data);
+      if (recv_entity) {
+        recv_entity->SetParent(new_parent);
+        modify_info.SetModified();
+      }
+    }
+
+    ImGui::EndDragDropTarget();
   }
 }
 

@@ -35,6 +35,13 @@ ScopedStyleVar::ScopedStyleVar(int idx, const glm::vec2& var, bool condition)
   }
 }
 
+ScopedStyleVar::ScopedStyleVar(int idx, float var, bool condition)
+    : set_(condition) {
+  if (condition) {
+    ImGui::PushStyleVar(idx, var);
+  }
+}
+
 ScopedStyleVar::~ScopedStyleVar() {
   if (set_) {
     ImGui::PopStyleVar();
@@ -74,6 +81,7 @@ void DrawTreeNode(const std::string& text,
 
   bool open =
       ImGui::TreeNodeEx("##tree_node", kTreeNodeFlags, "%s", text.c_str());
+
   ImGui::PopStyleVar();
 
   if (open) {

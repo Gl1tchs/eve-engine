@@ -21,7 +21,7 @@ class HierarchyPanel : public Panel {
   Entity GetSelectedEntity() {
     if (selected_entity_ &&
         !SceneManager::GetActive()->Exists(selected_entity_)) {
-      return Entity{};
+      return kInvalidEntity;
     }
 
     return selected_entity_;
@@ -31,7 +31,17 @@ class HierarchyPanel : public Panel {
   void Draw() override;
 
  private:
+  void DrawEntity(Entity& entity, bool is_child = false);
+
+  void DrawEntityContextMenu(Entity& entity);
+
+  void DrawEntityDragDropSource(Entity& entity);
+
+  void DrawEntityDragDropTarget(const Entity& new_parent);
+
+ private:
   Entity selected_entity_;
+  std::vector<Entity> entities_to_remove_;
 
   friend class EditorLayer;
 };

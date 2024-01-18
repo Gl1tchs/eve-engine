@@ -22,12 +22,14 @@ class UUID {
   UUID& operator=(uint64_t&& other);
 
   [[nodiscard]] bool IsValid() const { return uuid_ != 0; }
-  
+
   operator uint64_t() const { return uuid_; }
 
  private:
   uint64_t uuid_;
 };
+
+const UUID kInvalidUUID = UUID(0);
 
 }  // namespace eve
 

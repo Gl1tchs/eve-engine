@@ -13,6 +13,11 @@ namespace eve {
 
 class Entity;
 
+struct EntityCreateInfo {
+  std::string name = "";
+  UUID parent_id = 0;
+};
+
 class Scene {
  public:
   Scene(Ref<State> state, std::string name = "untitled");
@@ -20,6 +25,7 @@ class Scene {
 
   static Ref<Scene> Copy(Ref<Scene> other);
 
+  // Runtime
   bool OnRuntimeStart();
 
   void OnRuntimeStop();
@@ -33,8 +39,9 @@ class Scene {
 
   void Step(int frames = 1);
 
-  Entity CreateEntity(const std::string& name = "");
-  Entity CreateEntityWithUUID(UUID uuid, const std::string& name = "");
+  // ECS
+  Entity CreateEntity(const EntityCreateInfo& info = {});
+  Entity CreateEntityWithUUID(UUID uuid, const EntityCreateInfo& info = {});
 
   [[nodiscard]] bool Exists(Entity entity);
 
@@ -57,12 +64,14 @@ class Scene {
  private:
   bool EntityNameExists(const std::string& name);
 
+  [[nodiscard]] std::string GetEntityName(const std::string& name);
+
  private:
   Ref<State> state_;
 
   // ECS stuff
   entt::registry registry_;
-  std::unordered_map<UUID, Entity> entity_map_;
+  std::map<UUID, Entity> entity_map_;
 
   // scene properties
   std::string name_;

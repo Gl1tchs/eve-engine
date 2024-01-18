@@ -147,7 +147,7 @@ namespace EveEngine
     /// <returns>New created entity instance.</returns>
     public T Instantiate<T>(string name, Vector3 position, Vector3 rotation, Vector3 scale) where T : Entity, new()
     {
-      ulong createdId = Interop.Entity_Instantiate(name, ref position, ref rotation);
+      ulong createdId = Interop.Entity_Instantiate(name, 0, ref position, ref rotation, ref scale);
 
       // Only assign script if has it.
       if (typeof(T) != typeof(Entity))
@@ -169,7 +169,7 @@ namespace EveEngine
     /// <returns>New created entity instance.</returns>
     public T Instantiate<T>(string name, Vector3 position, Vector3 rotation) where T : Entity, new()
     {
-      return Instantiate<T>(name, position, rotation, Vector3.One);
+      return Instantiate<T>(name, Entity.InvalidEntity, position, rotation, Vector3.One);
     }
 
     /// <summary>
@@ -196,49 +196,66 @@ namespace EveEngine
     }
 
     /// <summary>
-    /// Instantiates new entity on the scene.
+    /// Instantiates new entity on the scene with a script instance as a child of <c>parent</c>.
     /// </summary>
+    /// <typeparam name="T">Entity script class to create with.</typeparam>
     /// <param name="name">The entity name of the scene.</param>
+    /// <param name="parent">The parent of the entity.</param>
     /// <param name="position">Position of the entity transform.</param>
     /// <param name="rotation">Rotation of the entity transform.</param>
-    /// <param name="scale">Scaleof the entity transform.</param>
+    /// <param name="scale">Scale of the entity transform.</param>
     /// <returns>New created entity instance.</returns>
-    public Entity Instantiate(string name, Vector3 position, Vector3 rotation, Vector3 scale)
+    public T Instantiate<T>(string name, Entity parent, Vector3 position, Vector3 rotation, Vector3 scale) where T : Entity, new()
     {
-      return Instantiate<Entity>(name, position, rotation, scale);
+      ulong createdId = Interop.Entity_Instantiate(name, parent.Id, ref position, ref rotation, ref scale);
+
+      // Only assign script if has it.
+      if (typeof(T) != typeof(Entity))
+      {
+        Interop.Entity_AssignScript(createdId, typeof(T).FullName);
+      }
+
+      Entity createdEntity = new(createdId);
+      return createdEntity as T;
     }
 
     /// <summary>
-    /// Instantiates new entity on the scene.
+    /// Instantiates new entity on the scene with a script instance as a child of <c>parent</c>.
     /// </summary>
+    /// <typeparam name="T">Entity script class to create with.</typeparam>
     /// <param name="name">The entity name of the scene.</param>
+    /// <param name="parent">The parent of the entity.</param>
     /// <param name="position">Position of the entity transform.</param>
     /// <param name="rotation">Rotation of the entity transform.</param>
     /// <returns>New created entity instance.</returns>
-    public Entity Instantiate(string name, Vector3 position, Vector3 rotation)
+    public T Instantiate<T>(string name, Entity parent, Vector3 position, Vector3 rotation) where T : Entity, new()
     {
-      return Instantiate<Entity>(name, position, rotation, Vector3.One);
+      return Instantiate<T>(name, parent, position, rotation, Vector3.One);
     }
 
     /// <summary>
-    /// Instantiates new entity on the scene.
+    /// Instantiates new entity on the scene with a script instance as a child of <c>parent</c>.
     /// </summary>
+    /// <typeparam name="T">Entity script class to create with.</typeparam>
     /// <param name="name">The entity name of the scene.</param>
+    /// <param name="parent">The parent of the entity.</param>
     /// <param name="position">Position of the entity transform.</param>
     /// <returns>New created entity instance.</returns>
-    public Entity Instantiate(string name, Vector3 position)
+    public T Instantiate<T>(string name, Entity parent, Vector3 position) where T : Entity, new()
     {
-      return Instantiate<Entity>(name, position, Vector3.Zero, Vector3.One);
+      return Instantiate<T>(name, parent, position, Vector3.Zero, Vector3.One);
     }
 
     /// <summary>
-    /// Instantiates new entity on the scene.
+    /// Instantiates new entity on the scene with a script instance as a child of <c>parent</c>.
     /// </summary>
+    /// <typeparam name="T">Entity script class to create with.</typeparam>
     /// <param name="name">The entity name of the scene.</param>
+    /// <param name="parent">The parent of the entity.</param>
     /// <returns>New created entity instance.</returns>
-    public Entity Instantiate(string name)
+    public T Instantiate<T>(string name, Entity parent) where T : Entity, new()
     {
-      return Instantiate<Entity>(name, Vector3.Zero, Vector3.Zero, Vector3.One);
+      return Instantiate<T>(name, parent, Vector3.Zero, Vector3.Zero, Vector3.One);
     }
 
     /// <summary>

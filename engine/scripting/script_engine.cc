@@ -540,8 +540,8 @@ void ScriptEngine::BuildScripts() {
     GenerateProjectFiles();
   }
 
-  int result =
-      std::system(std::format("dotnet build \"{}\"", csproj_path.string()).c_str());
+  int result = std::system(
+      std::format("dotnet build \"{}\"", csproj_path.string()).c_str());
   if (result == 0) {
     EVE_LOG_ENGINE_INFO("Scripts built successfully!");
   } else {

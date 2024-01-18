@@ -94,8 +94,6 @@ static void Entity_Destroy(UUID entity_id) {
   auto entity = scene->TryGetEntityByUUID(entity_id);
   EVE_ASSERT_ENGINE(entity);
 
-  ScriptEngine::OnDestroyEntity(entity);
-
   scene->DestroyEntity(entity);
 }
 
@@ -150,12 +148,14 @@ static uint64_t Entity_TryGetEntityByName(MonoString* name) {
   return entity.GetUUID();
 }
 
-static uint64_t Entity_Instantiate(MonoString* name, glm::vec3* position,
-                                   glm::vec3* rotation, glm::vec3* scale) {
+static uint64_t Entity_Instantiate(MonoString* name, UUID parent_id,
+                                   glm::vec3* position, glm::vec3* rotation,
+                                   glm::vec3* scale) {
   Scene* scene = ScriptEngine::GetSceneContext();
   EVE_ASSERT_ENGINE(scene);
 
-  Entity created_entity = scene->CreateEntity(MonoStringToString(name));
+  Entity created_entity =
+      scene->CreateEntity({MonoStringToString(name), parent_id});
   if (!created_entity) {
     return 0;
   }

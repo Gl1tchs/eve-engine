@@ -63,7 +63,7 @@ namespace EveEngine
     internal extern static ulong Entity_TryGetEntityByName(string name);
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static ulong Entity_Instantiate(string name, ref Vector3 position, ref Vector3 rotation);
+    internal extern static ulong Entity_Instantiate(string name, ulong parentId, ref Vector3 position, ref Vector3 rotation, ref Vector3 scale);
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
     internal extern static void Entity_AssignScript(ulong entityId, string name);

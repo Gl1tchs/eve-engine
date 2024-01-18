@@ -139,6 +139,9 @@ void ContentBrowserPanel::Draw() {
             "DND_PAYLOAD_" + DeserializeAssetType(it->second.type);
         ImGui::SetDragDropPayload(payload_name.c_str(), &it->second.handle,
                                   sizeof(AssetHandle));
+
+        ImGui::SetTooltip("%llu", (uint64_t)it->second.type);
+
         ImGui::EndDragDropSource();
       }
 
@@ -164,6 +167,8 @@ void ContentBrowserPanel::Draw() {
 
         ImGui::SetDragDropPayload("DND_PAYLOAD_PATH", path_data.data(),
                                   path_data.size(), ImGuiCond_Once);
+
+        ImGui::SetTooltip("%s", path_str.c_str());
 
         ImGui::EndDragDropSource();
       }
