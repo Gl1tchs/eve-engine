@@ -2,14 +2,12 @@
 
 ## General
 - [ ] Continius integration and testing.
-- [ ] Register eve_editor to windows in order to open .eproject files directly. 
-- [ ] Project opener / creater application
-    - Create template scripts
+- [ ] Register eve_editor to windows in order to open .eproject files directly.
 - [ ] In Game UI
+- [ ] Make mono work on linux.
 - [ ] Sounds
 
 ## Editor
-- [ ] DragFloat3 label's not showing into editor fields.
 - [ ] Texture gizmos for lights and camera.
 - [ ] Scene settings
   - [ ] Skybox
@@ -18,9 +16,6 @@
     - [ ] Configure assets from editor like texture repeat mode and such.
 - [ ] CTRL+C CTRL+V copy paste entities
 - [ ] New Project
-- [ ] Inspector script entity field
-  - [ ] Prefabs
-  - [ ] Use ImGui::DragAndDropField
 - [ ] Save editor state with cache and temp files.
 - [ ] While scripts are building show a loading thing for it.
 
@@ -31,10 +26,11 @@
 - [ ] Asset compression for shipping.
 
 ## Scene
+- [ ] Entity prefabs.
 - [ ] When meshes are loaded create submeshes of that instance.
 - [ ] Hot reload scene.
 - [ ] Make EnTT library private.
-- [ ] Add new scenes to the build on create. 
+- [ ] Add new scenes to the build on create.
 
 ## Physics
 - [ ] Collision layers.
@@ -69,7 +65,7 @@
 ## Bugs
 - [ ] There is a problem with sprites I cannot render more then one and
 sometimes it shown half.
-- [ ] Scenes that are not in project file couldn't open. 
+- [ ] Scenes that are not in project file couldn't open.
 
 ## Done
 - [x] Add engine api to scripting
@@ -90,7 +86,7 @@ sometimes it shown half.
     but should display the name of it based on the asset metadata.
 - [x] Project settings
   - [x] Asset registry
-  - [x] Name, AssetDirectory, Scenes 
+  - [x] Name, AssetDirectory, Scenes
 - [x] Documentate and make shader variables more proper. For example (SCREEN_TEXTURE, VERTEX_POS, WORLD_POS, NORMAL_MATRIX and such.)
 - [x] Texture rendering in detail (normal maps, height maps, materials).
 - [x] Add basic shapes to library (cube, plane, pyramid, sphere etc.).
@@ -102,6 +98,10 @@ sometimes it shown half.
 - [x] Add parent / child entity system.
 - [x] Static application and Editor class to handle quit events.
 - [x] Add an transform system to handle parent/child transforms.
+- [x] Project opener / creater application
+  - Create template scripts
+- [x] DragFloat3 label's not showing into editor fields.
+- [x] Inspector script entity field
 
 ## Fixed
 - [x] Cannot switch between projects.

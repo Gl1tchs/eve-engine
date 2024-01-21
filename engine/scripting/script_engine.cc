@@ -76,40 +76,6 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
   return assembly;
 }
 
-void PrintAssemblyTypes(MonoAssembly* assembly) {
-  MonoImage* image = mono_assembly_get_image(assembly);
-  const MonoTableInfo* type_definitions_table =
-      mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-  int num_types = mono_table_info_get_rows(type_definitions_table);
-
-  for (int i = 0; i < num_types; i++) {
-    uint32_t cols[MONO_TYPEDEF_SIZE];
-    mono_metadata_decode_row(type_definitions_table, i, cols,
-                             MONO_TYPEDEF_SIZE);
-
-    const char* class_namespace =
-        mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-    const char* name =
-        mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-
-#ifdef _DEBUG
-    EVE_LOG_ENGINE_TRACE("{}.{}", class_namespace, name);
-#endif
-  }
-}
-
-ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType) {
-  std::string type_name = mono_type_get_name(monoType);
-
-  auto it = script_field_type_map.find(type_name);
-  if (it == script_field_type_map.end()) {
-    EVE_LOG_ENGINE_ERROR("Unknown type: {}", type_name);
-    return ScriptFieldType::kNone;
-  }
-
-  return it->second;
-}
-
 struct ScriptEngineData {
   MonoDomain* root_domain = nullptr;
   MonoDomain* app_domain = nullptr;
@@ -141,8 +107,20 @@ struct ScriptEngineData {
 
 static ScriptEngineData* data = nullptr;
 
-static void OnScriptFileChanged(const std::string& path,
-                                const filewatch::Event change_type) {
+inline ScriptFieldType MonoTypeToScriptFieldType(MonoType* mono_type) {
+  std::string type_name = mono_type_get_name(mono_type);
+
+  auto it = script_field_type_map.find(type_name);
+  if (it == script_field_type_map.end()) {
+    EVE_LOG_ENGINE_ERROR("Unknown type: {}", type_name);
+    return ScriptFieldType::kNone;
+  }
+
+  return it->second;
+}
+
+inline static void OnScriptFileChanged(const std::string& path,
+                                       const filewatch::Event change_type) {
   if (data->scene_context && data->scene_context->IsRunning()) {
     return;
   }
@@ -215,6 +193,7 @@ void ScriptEngine::Reinit() {
   data->app_assembly_path =
       Project::GetProjectDirectory() /
       std::format("out/{}.dll", Project::GetProjectName());
+
   ReloadAssembly();
 }
 
@@ -329,29 +308,59 @@ bool ScriptEngine::EntityClassExists(const std::string& fullClassName) {
   return data->entity_classes.find(fullClassName) != data->entity_classes.end();
 }
 
-void ScriptEngine::OnCreateEntity(Entity entity) {
+void ScriptEngine::CreateEntityInstance(Entity entity) {
   const auto& sc = entity.GetComponent<ScriptComponent>();
-  if (ScriptEngine::EntityClassExists(sc.class_name)) {
-    UUID entity_id = entity.GetUUID();
+  if (!ScriptEngine::EntityClassExists(sc.class_name)) {
+    return;
+  }
 
-    Ref<ScriptInstance> instance =
-        CreateRef<ScriptInstance>(data->entity_classes[sc.class_name], entity);
-    data->entity_instances[entity_id] = instance;
+  UUID entity_id = entity.GetUUID();
 
-    // Copy field values
-    if (data->entity_script_fields.find(entity_id) !=
-        data->entity_script_fields.end()) {
-      const ScriptFieldMap& field_map =
-          data->entity_script_fields.at(entity_id);
-      for (const auto& [name, field_instance] : field_map)
-        instance->SetFieldValueInternal(name, field_instance.buffer_);
+  Ref<ScriptInstance> instance =
+      CreateRef<ScriptInstance>(data->entity_classes[sc.class_name], entity);
+
+  data->entity_instances[entity_id] = instance;
+
+  if (data->entity_script_fields.find(entity_id) !=
+      data->entity_script_fields.end()) {
+    const ScriptFieldMap& field_map = data->entity_script_fields.at(entity_id);
+    for (const auto& [name, field_instance] : field_map) {
+      if (IsManagedScriptFieldType(field_instance.field.type)) {
+        continue;
+      }
+
+      instance->SetFieldValueInternal(name, field_instance.buffer_);
     }
-
-    instance->InvokeOnCreate();
   }
 }
 
-void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
+void ScriptEngine::SetEntityManagedFieldValues(Entity entity) {
+  UUID entity_id = entity.GetUUID();
+
+  Ref<ScriptInstance> instance = GetEntityScriptInstance(entity_id);
+
+  if (data->entity_script_fields.find(entity_id) !=
+      data->entity_script_fields.end()) {
+    const ScriptFieldMap& field_map = data->entity_script_fields.at(entity_id);
+    for (const auto& [name, field_instance] : field_map) {
+      if (!IsManagedScriptFieldType(field_instance.field.type)) {
+        continue;
+      }
+
+      instance->SetFieldValueInternal(name, field_instance.buffer_);
+    }
+  }
+}
+
+void ScriptEngine::InvokeCreateEntity(Entity entity) {
+  UUID entity_id = entity.GetUUID();
+
+  Ref<ScriptInstance> instance = GetEntityScriptInstance(entity_id);
+
+  instance->InvokeOnCreate();
+}
+
+void ScriptEngine::InvokeUpdateEntity(Entity entity, float ds) {
   UUID entity_uuid = entity.GetUUID();
   if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
     instance->InvokeOnUpdate(ds);
@@ -361,7 +370,7 @@ void ScriptEngine::OnUpdateEntity(Entity entity, float ds) {
   }
 }
 
-void ScriptEngine::OnDestroyEntity(Entity entity) {
+void ScriptEngine::InvokeDestroyEntity(Entity entity) {
   UUID entity_uuid = entity.GetUUID();
   if (auto instance = GetEntityScriptInstance(entity_uuid); instance) {
     instance->InvokeOnDestroy();
@@ -389,8 +398,9 @@ ScriptClass ScriptEngine::GetEntityClass() {
 }
 
 Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name) {
-  if (data->entity_classes.find(name) == data->entity_classes.end())
+  if (data->entity_classes.find(name) == data->entity_classes.end()) {
     return nullptr;
+  }
 
   return data->entity_classes.at(name);
 }
@@ -421,7 +431,9 @@ void ScriptEngine::LoadAssemblyClasses() {
 
   const MonoTableInfo* type_definitions_table =
       mono_image_get_table_info(data->app_assembly_image, MONO_TABLE_TYPEDEF);
+
   int num_types = mono_table_info_get_rows(type_definitions_table);
+
   MonoClass* entity_class =
       mono_class_from_name(data->core_assembly_image, "EveEngine", "Entity");
 
@@ -434,6 +446,7 @@ void ScriptEngine::LoadAssemblyClasses() {
         data->app_assembly_image, cols[MONO_TYPEDEF_NAMESPACE]);
     const char* class_name = mono_metadata_string_heap(data->app_assembly_image,
                                                        cols[MONO_TYPEDEF_NAME]);
+
     std::string full_name;
     if (strlen(class_namespace) != 0) {
       full_name = std::format("{}.{}", class_namespace, class_name);
@@ -443,7 +456,6 @@ void ScriptEngine::LoadAssemblyClasses() {
 
     MonoClass* mono_class = mono_class_from_name(data->app_assembly_image,
                                                  class_namespace, class_name);
-
     if (mono_class == entity_class) {
       continue;
     }
@@ -457,10 +469,12 @@ void ScriptEngine::LoadAssemblyClasses() {
         CreateRef<ScriptClass>(class_namespace, class_name);
     data->entity_classes[full_name] = script_class;
 
-    int fieldCount = mono_class_num_fields(mono_class);
+    int field_count = mono_class_num_fields(mono_class);
+
 #ifdef _DEBUG
-    EVE_LOG_ENGINE_WARNING("{} has {} fields:", class_name, fieldCount);
+    EVE_LOG_ENGINE_WARNING("{} has {} fields:", class_name, field_count);
 #endif
+
     void* iterator = nullptr;
     while (MonoClassField* field =
                mono_class_get_fields(mono_class, &iterator)) {
@@ -468,11 +482,23 @@ void ScriptEngine::LoadAssemblyClasses() {
       uint32_t flags = mono_field_get_flags(field);
       if (flags & FIELD_ATTRIBUTE_PUBLIC) {
         MonoType* type = mono_field_get_type(field);
+
         ScriptFieldType field_type = MonoTypeToScriptFieldType(type);
+
+        // Check if field_type could be an entity
+        if (field_type == ScriptFieldType::kNone) {
+          MonoClass* possible_entity_class = mono_class_from_mono_type(type);
+          if (mono_class_is_subclass_of(possible_entity_class, entity_class,
+                                        false)) {
+            field_type = ScriptFieldType::kEntity;
+          }
+        }
+
 #ifdef _DEBUG
         EVE_LOG_ENGINE_WARNING("  {} ({})", field_name,
-                               ScriptFieldTypeToString(field_type));
+                               SerializeScriptField(field_type));
 #endif
+
         script_class->fields_[field_name] = {field_type, field_name, field};
       }
     }
@@ -488,8 +514,10 @@ MonoImage* ScriptEngine::GetAppAssemblyImage() {
 }
 
 MonoObject* ScriptEngine::GetManagedInstance(UUID uuid) {
-  EVE_ASSERT_ENGINE(data->entity_instances.find(uuid) !=
-                    data->entity_instances.end());
+  if (data->entity_instances.find(uuid) == data->entity_instances.end()) {
+    return nullptr;
+  }
+
   return data->entity_instances.at(uuid)->GetManagedObject();
 }
 
@@ -549,7 +577,12 @@ void ScriptEngine::BuildScripts() {
   }
 }
 
-const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
+bool IsManagedScriptFieldType(ScriptFieldType field_type) {
+  // TODO when components added change this
+  return field_type == ScriptFieldType::kEntity;
+}
+
+const char* SerializeScriptField(ScriptFieldType field_type) {
   switch (field_type) {
     case ScriptFieldType::kNone:
       return "None";
@@ -592,7 +625,7 @@ const char* ScriptFieldTypeToString(ScriptFieldType field_type) {
   return "None";
 }
 
-ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type) {
+ScriptFieldType DeserializeScriptField(std::string_view field_type) {
   if (field_type == "None")
     return ScriptFieldType::kNone;
   if (field_type == "Float")

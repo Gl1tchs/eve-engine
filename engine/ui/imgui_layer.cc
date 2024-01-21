@@ -91,13 +91,13 @@ void ImGuiLayer::OnDestroy() {
 void ImGuiLayer::SetDarkThemeColors() {
   ImGuiStyle& style = ImGui::GetStyle();
 
-  style.WindowPadding = ImVec2(7.00f, 7.00f);
-  style.FramePadding = ImVec2(7.00f, 7.00f);
-  style.CellPadding = ImVec2(6.00f, 6.00f);
-  style.ItemSpacing = ImVec2(6.00f, 6.00f);
-  style.ItemInnerSpacing = ImVec2(6.00f, 6.00f);
+  style.WindowPadding = ImVec2(5.00f, 5.00f);
+  style.FramePadding = ImVec2(5.00f, 5.00f);
+  style.CellPadding = ImVec2(4.00f, 4.00f);
+  style.ItemSpacing = ImVec2(4.00f, 4.00f);
+  style.ItemInnerSpacing = ImVec2(4.00f, 4.00f);
   style.TouchExtraPadding = ImVec2(0.0f, 0.0f);
-  style.IndentSpacing = 25;
+  style.IndentSpacing = 15;
   style.ScrollbarSize = 15;
   style.GrabMinSize = 10;
   style.WindowBorderSize = 1;

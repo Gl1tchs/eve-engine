@@ -37,6 +37,6 @@ struct ScopedStyleVar {
 bool ButtonTransparent(const std::string& text, float w = 0, float h = 0);
 
 void DrawTreeNode(const std::string& text,
-                  std::function<void(void)> ui_function);
+                  std::function<void(void)> ui_function, bool default_open = true);
 
 }  // namespace ImGui

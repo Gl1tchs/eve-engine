@@ -123,4 +123,32 @@ bool Entity::IsParentOfRecursive(Entity parent, Entity child) {
   }
 }
 
+const UUID& Entity::GetUUID() {
+  return GetComponent<IdComponent>().id;
+}
+
+const std::string& Entity::GetName() {
+  return GetComponent<TagComponent>().tag;
+}
+
+Transform& Entity::GetTransform() {
+  return GetComponent<Transform>();
+}
+
+Entity::operator bool() const {
+  return entity_handle_ != entt::null || scene_ != nullptr;
+}
+
+Entity::operator entt::entity() const {
+  return entity_handle_;
+}
+
+bool Entity::operator==(const Entity& other) const {
+  return entity_handle_ == other.entity_handle_ && scene_ == other.scene_;
+}
+
+bool Entity::operator!=(const Entity& other) const {
+  return !(*this == other);
+}
+
 }  // namespace eve

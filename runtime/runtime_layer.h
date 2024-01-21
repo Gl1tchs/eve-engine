@@ -8,6 +8,7 @@
 #include "graphics/scene_renderer.h"
 
 namespace eve {
+
 class RuntimeLayer : public Layer {
  public:
   RuntimeLayer(Ref<State>& state);
@@ -23,4 +24,5 @@ class RuntimeLayer : public Layer {
  private:
   Scope<SceneRenderer> scene_renderer_;
 };
+
 }  // namespace eve

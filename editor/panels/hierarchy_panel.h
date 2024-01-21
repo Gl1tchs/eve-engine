@@ -18,14 +18,8 @@ class HierarchyPanel : public Panel {
   HierarchyPanel();
 
   void SetSelectedEntity(Entity entity);
-  Entity GetSelectedEntity() {
-    if (selected_entity_ &&
-        !SceneManager::GetActive()->Exists(selected_entity_)) {
-      return kInvalidEntity;
-    }
 
-    return selected_entity_;
-  }
+  Entity GetSelectedEntity();
 
  protected:
   void Draw() override;

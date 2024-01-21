@@ -31,10 +31,26 @@ bool Scene::OnRuntimeStart() {
 
   ScriptEngine::OnRuntimeStart(this);
 
-  auto view = registry_.view<ScriptComponent>();
-  for (auto e : view) {
-    Entity entity = {e, this};
-    ScriptEngine::OnCreateEntity(entity);
+  {
+    auto view = registry_.view<ScriptComponent>();
+
+    // entity script instance creation should be done in two iterations
+    // because field type of entity depends on other entities
+    // thats why we are creating the mono instance first and
+    // assign not managed fields, then assigning the managed fields.
+
+    // first iteration create mono instances
+    for (auto entity_id : view) {
+      Entity entity = {entity_id, this};
+      ScriptEngine::CreateEntityInstance(entity);
+    }
+
+    // second iteration set field values and invoke on create
+    for (auto entity_id : view) {
+      Entity entity = {entity_id, this};
+      ScriptEngine::SetEntityManagedFieldValues(entity);
+      ScriptEngine::InvokeCreateEntity(entity);
+    }
   }
 
   for (auto system : systems_) {
@@ -54,9 +70,9 @@ void Scene::OnUpdateRuntime(float ds) {
   }
 
   auto view = registry_.view<ScriptComponent>();
-  for (auto e : view) {
-    Entity entity = {e, this};
-    ScriptEngine::OnUpdateEntity(entity, ds);
+  for (auto entity_id : view) {
+    Entity entity = {entity_id, this};
+    ScriptEngine::InvokeUpdateEntity(entity, ds);
   }
 
   for (auto system : systems_) {
@@ -72,9 +88,9 @@ void Scene::OnRuntimeStop() {
   is_running_ = false;
 
   auto view = registry_.view<ScriptComponent>();
-  for (auto e : view) {
-    Entity entity = {e, this};
-    ScriptEngine::OnDestroyEntity(entity);
+  for (auto entity_id : view) {
+    Entity entity = {entity_id, this};
+    ScriptEngine::InvokeDestroyEntity(entity);
   }
 
   ScriptEngine::OnRuntimeStop();
@@ -136,7 +152,7 @@ void Scene::DestroyEntity(Entity entity) {
   }
 
   if (IsRunning()) {
-    ScriptEngine::OnDestroyEntity(entity);
+    ScriptEngine::InvokeDestroyEntity(entity);
   }
 
   entity_map_.erase(entity.GetUUID());

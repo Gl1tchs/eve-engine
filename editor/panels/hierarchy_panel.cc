@@ -21,6 +21,15 @@ void HierarchyPanel::SetSelectedEntity(Entity entity) {
   }
 }
 
+Entity HierarchyPanel::GetSelectedEntity() {
+  if (selected_entity_ &&
+      !SceneManager::GetActive()->Exists(selected_entity_)) {
+    return kInvalidEntity;
+  }
+
+  return selected_entity_;
+}
+
 void HierarchyPanel::Draw() {
   auto& scene = SceneManager::GetActive();
   if (!scene) {
@@ -78,38 +87,57 @@ void HierarchyPanel::Draw() {
 void HierarchyPanel::DrawEntity(Entity& entity, bool is_child) {
   ImGui::PushID((uint64_t)entity.GetUUID());
 
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{1, 2});
-
   const std::string hierarchy_name =
       std::format("{0} {1}", ICON_FA_CUBE, entity.GetName());
 
-  bool node_open = ImGui::TreeNodeEx(
-      hierarchy_name.c_str(),
-      ImGuiTreeNodeFlags_FramePadding |
-          (selected_entity_ == entity ? ImGuiTreeNodeFlags_Selected : 0));
+  const bool is_selected = selected_entity_ == entity;
 
-  // Drag and drop source and target to change relations.
-  DrawEntityDragDropSource(entity);
-  DrawEntityDragDropTarget(entity);
+  static const float entity_indent = 0.75f;
 
-  ImGui::PopStyleVar();
+  if (!entity.IsParent()) {
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{1, 2});
 
-  if (ImGui::IsItemClicked()) {
-    SetSelectedEntity(entity);
-  }
+    ImGui::Bullet();
 
-  if (node_open) {
-    static float entity_indent = 0.75f;
-
-    ImGui::Indent(entity_indent);
-
-    for (Entity& child : entity.GetChildren()) {
-      DrawEntity(child, true);
+    if (ImGui::Selectable(hierarchy_name.c_str(), is_selected)) {
+      SetSelectedEntity(entity);
     }
 
-    ImGui::Unindent(entity_indent);
+    ImGui::PopStyleVar();
 
-    ImGui::TreePop();
+    // Drag and drop source and target to change relations.
+    DrawEntityDragDropSource(entity);
+    DrawEntityDragDropTarget(entity);
+  } else {
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{1, 2});
+
+    bool node_open = ImGui::TreeNodeEx(
+        hierarchy_name.c_str(),
+        ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow |
+            (is_selected ? ImGuiTreeNodeFlags_Selected : 0));
+
+    ImGui::PopStyleVar();
+
+    // Drag and drop source and target to change relations.
+    DrawEntityDragDropSource(entity);
+    DrawEntityDragDropTarget(entity);
+
+    if (!ImGui::IsMouseDragging(ImGuiMouseButton_Left) &&
+        ImGui::IsItemClicked()) {
+      SetSelectedEntity(entity);
+    }
+
+    if (node_open) {
+      ImGui::Indent(entity_indent);
+
+      for (Entity& child : entity.GetChildren()) {
+        DrawEntity(child, true);
+      }
+
+      ImGui::Unindent(entity_indent);
+
+      ImGui::TreePop();
+    }
   }
 
   DrawEntityContextMenu(entity);
@@ -146,7 +174,8 @@ void HierarchyPanel::DrawEntityContextMenu(Entity& entity) {
 
 void HierarchyPanel::DrawEntityDragDropSource(Entity& entity) {
   if (ImGui::BeginDragDropSource()) {
-    ImGui::SetDragDropPayload("DND_PAYLOAD_ENTITY", &entity, sizeof(Entity));
+    ImGui::SetDragDropPayload("DND_PAYLOAD_ENTITY", &entity.GetUUID(),
+                              sizeof(UUID));
 
     ImGui::SetTooltip("%s %s", ICON_FA_CUBE, entity.GetName().c_str());
 
@@ -158,9 +187,11 @@ void HierarchyPanel::DrawEntityDragDropTarget(const Entity& new_parent) {
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload =
             ImGui::AcceptDragDropPayload("DND_PAYLOAD_ENTITY")) {
-      Entity* recv_entity = static_cast<Entity*>(payload->Data);
-      if (recv_entity) {
-        recv_entity->SetParent(new_parent);
+      UUID recv_id = *static_cast<UUID*>(payload->Data);
+      if (Entity recv_entity =
+              SceneManager::GetActive()->TryGetEntityByUUID(recv_id);
+          recv_entity) {
+        recv_entity.SetParent(new_parent);
         modify_info.SetModified();
       }
     }

@@ -69,18 +69,19 @@ bool ButtonTransparent(const std::string& text, float w, float h) {
 }
 
 void DrawTreeNode(const std::string& text,
-                  std::function<void(void)> ui_function) {
-  constexpr ImGuiTreeNodeFlags kTreeNodeFlags =
-      ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
-      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
-      ImGuiTreeNodeFlags_FramePadding;
+                  std::function<void(void)> ui_function, bool default_open) {
+  ImGuiTreeNodeFlags flags =
+      ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap;
+
+  if (default_open) {
+    flags |= ImGuiTreeNodeFlags_DefaultOpen;
+  }
 
   ImGui::PushID(text.c_str());
 
   ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 
-  bool open =
-      ImGui::TreeNodeEx("##tree_node", kTreeNodeFlags, "%s", text.c_str());
+  bool open = ImGui::TreeNodeEx("##TreeNode", flags, "%s", text.c_str());
 
   ImGui::PopStyleVar();
 
@@ -90,8 +91,6 @@ void DrawTreeNode(const std::string& text,
   }
 
   ImGui::PopID();
-
-  ImGui::Separator();
 }
 
 }  // namespace ImGui

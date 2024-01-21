@@ -28,9 +28,15 @@ class ScriptEngine {
 
   static bool EntityClassExists(const std::string& full_class_name);
 
-  static void OnCreateEntity(Entity entity);
-  static void OnUpdateEntity(Entity entity, float ds);
-  static void OnDestroyEntity(Entity entity);
+  static void CreateEntityInstance(Entity entity);
+
+  static void SetEntityManagedFieldValues(Entity entity);
+
+  static void InvokeCreateEntity(Entity entity);
+
+  static void InvokeUpdateEntity(Entity entity, float ds);
+
+  static void InvokeDestroyEntity(Entity entity);
 
   static Scene* GetSceneContext();
   static Ref<ScriptInstance> GetEntityScriptInstance(UUID entity_id);
@@ -38,6 +44,7 @@ class ScriptEngine {
   static ScriptClass GetEntityClass();
   static Ref<ScriptClass> GetEntityClass(const std::string& name);
   static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
+
   static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
   static MonoImage* GetCoreAssemblyImage();
@@ -63,8 +70,10 @@ class ScriptEngine {
   friend class ScriptClass;
 };
 
-const char* ScriptFieldTypeToString(ScriptFieldType field_type);
+[[nodiscard]] bool IsManagedScriptFieldType(ScriptFieldType field_type);
 
-ScriptFieldType ScriptFieldTypeFromString(std::string_view field_type);
+const char* SerializeScriptField(ScriptFieldType field_type);
+
+ScriptFieldType DeserializeScriptField(std::string_view field_type);
 
 }  // namespace eve

@@ -56,46 +56,53 @@ static void DrawComponent(const std::string& name, Entity entity,
 
   constexpr ImGuiTreeNodeFlags kTreeNodeFlags =
       ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
-      ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
-      ImGuiTreeNodeFlags_FramePadding;
+      ImGuiTreeNodeFlags_AllowItemOverlap;
 
-  auto& component = entity.GetComponent<T>();
-  ImVec2 content_region_available = ImGui::GetContentRegionAvail();
+  const ImVec2 avail_region_before = ImGui::GetContentRegionAvail();
+
+  ImGui::PushID(name.c_str());
 
   ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 
   const auto kFramePadding = ImGui::GetStyle().FramePadding;
-
   const float kLineHeight =
       ImGui::GetIO().FontDefault->FontSize + kFramePadding.y * 2.0f;
 
-  ImGui::Separator();
-  bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), kTreeNodeFlags,
-                                "%s", name.c_str());
+  bool open = ImGui::TreeNodeEx("##ComponentTreeNode", kTreeNodeFlags, "%s",
+                                name.c_str());
+
   ImGui::PopStyleVar();
-  ImGui::SameLine(
-      content_region_available.x -
-      (ImGui::CalcTextSize(ICON_FA_ELLIPSIS_H).x + 2 * kFramePadding.x));
-  if (ImGui::ButtonTransparent(ICON_FA_ELLIPSIS_H, kLineHeight, kLineHeight)) {
-    ImGui::OpenPopup("ComponentSettings");
-  }
 
   bool remove_component = false;
-  if (ImGui::BeginPopup("ComponentSettings")) {
-    if (ImGui::MenuItem("Remove component"))
-      remove_component = true;
 
-    ImGui::EndPopup();
+  {
+    ImGui::SameLine(
+        avail_region_before.x -
+        (ImGui::CalcTextSize(ICON_FA_ELLIPSIS_H).x + 2 * kFramePadding.x));
+
+    if (ImGui::ButtonTransparent(ICON_FA_ELLIPSIS_H, kLineHeight,
+                                 kLineHeight)) {
+      ImGui::OpenPopup("ComponentSettingsPopup");
+    }
+
+    if (ImGui::BeginPopup("ComponentSettingsPopup")) {
+      if (ImGui::MenuItem("Remove component"))
+        remove_component = true;
+
+      ImGui::EndPopup();
+    }
   }
 
   if (open) {
-    ui_function(component);
+    ui_function(entity.GetComponent<T>());
     ImGui::TreePop();
   }
 
   if (remove_component) {
     entity.RemoveComponent<T>();
   }
+
+  ImGui::PopID();
 }
 
 void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
@@ -108,14 +115,17 @@ void InspectorPanel::RenderEntityHeader(Entity selected_entity) {
     ImGui::PushItemWidth(ImGui::GetContentRegionMax().x - kPlusButtonWidth);
 
     ImGui::InputText("##tag", &tag_comp.tag);
+
+    ImGui::PopItemWidth();
   }
 
   ImGui::SameLine(ImGui::GetContentRegionMax().x - kPlusButtonWidth);
 
-  if (ImGui::Button(ICON_FA_PLUS))
-    ImGui::OpenPopup("AddComponent");
+  if (ImGui::Button(ICON_FA_PLUS)) {
+    ImGui::OpenPopup("AddComponentPopup");
+  }
 
-  if (ImGui::BeginPopup("AddComponent")) {
+  if (ImGui::BeginPopup("AddComponentPopup")) {
     DisplayAddComponentEntry<CameraComponent>(selected_entity, "Camera");
     DisplayAddComponentEntry<ScriptComponent>(selected_entity, "Script");
     DisplayAddComponentEntry<SpriteRendererComponent>(selected_entity,
@@ -146,7 +156,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
     DrawComponent<IdComponent>(
         ICON_FA_ID_BADGE " Id Component", selected_entity,
         [](IdComponent& id_comp) {
-          auto id_str = std::format("{}", (uint64_t)id_comp.id);
+          std::string id_str = std::to_string((uint64_t)id_comp.id);
           ImGui::InputText("ID", &id_str, ImGuiInputTextFlags_ReadOnly);
         });
   }
@@ -346,7 +356,7 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       modify_info.SetModified();
     }
 
-    if (ImGui::DragFloat3("Accelerationm", glm::value_ptr(rb.acceleration))) {
+    if (ImGui::DragFloat3("Acceleration", glm::value_ptr(rb.acceleration))) {
       modify_info.SetModified();
     }
 
@@ -358,37 +368,38 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
       modify_info.SetModified();
     }
 
-    if (ImGui::TreeNode("Position Constraints")) {
+    ImGui::DrawTreeNode(
+        "Position Constraints",
+        [&]() {
+          if (ImGui::Checkbox("Freeze X", &rb.position_constraints.freeze_x)) {
+            modify_info.SetModified();
+          }
+          if (ImGui::Checkbox("Freeze Y", &rb.position_constraints.freeze_y)) {
+            modify_info.SetModified();
+          }
+          if (ImGui::Checkbox("Freeze Z", &rb.position_constraints.freeze_z)) {
+            modify_info.SetModified();
+          }
+        },
+        false);
 
-      if (ImGui::Checkbox("Freeze X", &rb.position_constraints.freeze_x)) {
-        modify_info.SetModified();
-      }
-      if (ImGui::Checkbox("Freeze Y", &rb.position_constraints.freeze_y)) {
-        modify_info.SetModified();
-      }
-      if (ImGui::Checkbox("Freeze Z", &rb.position_constraints.freeze_z)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("Rotation Constraints")) {
-
-      if (ImGui::Checkbox("Freeze Pitch",
-                          &rb.rotation_constraints.freeze_pitch)) {
-        modify_info.SetModified();
-      }
-      if (ImGui::Checkbox("Freeze Yaw", &rb.rotation_constraints.freeze_yaw)) {
-        modify_info.SetModified();
-      }
-      if (ImGui::Checkbox("Freeze Roll",
-                          &rb.rotation_constraints.freeze_roll)) {
-        modify_info.SetModified();
-      }
-
-      ImGui::TreePop();
-    }
+    ImGui::DrawTreeNode(
+        "Rotation Constraints",
+        [&]() {
+          if (ImGui::Checkbox("Freeze Pitch",
+                              &rb.rotation_constraints.freeze_pitch)) {
+            modify_info.SetModified();
+          }
+          if (ImGui::Checkbox("Freeze Yaw",
+                              &rb.rotation_constraints.freeze_yaw)) {
+            modify_info.SetModified();
+          }
+          if (ImGui::Checkbox("Freeze Roll",
+                              &rb.rotation_constraints.freeze_roll)) {
+            modify_info.SetModified();
+          }
+        },
+        false);
   });
 
   DrawComponent<BoxCollider>(
@@ -427,36 +438,40 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
         }
 
         // Fields
-        bool is_scene_running = scene->IsRunning();
-        if (is_scene_running) {
-          Ref<ScriptInstance> script_instance =
-              ScriptEngine::GetEntityScriptInstance(selected_entity.GetUUID());
-          if (script_instance) {
-            const auto& fields = script_instance->GetScriptClass()->GetFields();
+        ImGui::DrawTreeNode("Script Fields", [&]() {
+          bool is_scene_running = scene->IsRunning();
+          if (is_scene_running) {
+            Ref<ScriptInstance> script_instance =
+                ScriptEngine::GetEntityScriptInstance(
+                    selected_entity.GetUUID());
+            if (script_instance) {
+              const auto& fields =
+                  script_instance->GetScriptClass()->GetFields();
+              for (const auto& [name, field] : fields) {
+                DrawScriptFieldRuntime(name, field, script_instance);
+              }
+            }
+          } else if (!is_scene_running && script_class_exists) {
+            Ref<ScriptClass> entity_class =
+                ScriptEngine::GetEntityClass(component.class_name);
+            const auto& fields = entity_class->GetFields();
+
+            auto& entity_fields =
+                ScriptEngine::GetScriptFieldMap(selected_entity);
             for (const auto& [name, field] : fields) {
-              DrawScriptFieldRuntime(name, field, script_instance);
+              // Field has been set in editor
+              if (entity_fields.find(name) != entity_fields.end()) {
+                ScriptFieldInstance& script_field = entity_fields.at(name);
+                DrawScriptField(name, script_field);
+              } else {
+                ScriptFieldInstance& script_field = entity_fields[name];
+                script_field.field = field;
+
+                DrawScriptField(name, script_field, true);
+              }
             }
           }
-        } else if (!is_scene_running && script_class_exists) {
-          Ref<ScriptClass> entity_class =
-              ScriptEngine::GetEntityClass(component.class_name);
-          const auto& fields = entity_class->GetFields();
-
-          auto& entity_fields =
-              ScriptEngine::GetScriptFieldMap(selected_entity);
-          for (const auto& [name, field] : fields) {
-            // Field has been set in editor
-            if (entity_fields.find(name) != entity_fields.end()) {
-              ScriptFieldInstance& script_field = entity_fields.at(name);
-              DrawScriptField(name, script_field);
-            } else {
-              ScriptFieldInstance& script_field = entity_fields[name];
-              script_field.field = field;
-
-              DrawScriptField(name, script_field, true);
-            }
-          }
-        }
+        });
       });
 
   ImGui::PopID();
@@ -643,6 +658,25 @@ void DrawScriptField(const std::string& name, ScriptFieldInstance& script_field,
       break;
     }
     case ScriptFieldType::kEntity: {
+      UUID uuid = script_field.GetValue<UUID>();
+      Entity entity = SceneManager::GetActive()->TryGetEntityByUUID(uuid);
+
+      {
+        std::string name_string =
+            (!use_default && entity) ? entity.GetName() : "Invalid Entity";
+        ImGui::InputText(name.c_str(), &name_string,
+                         ImGuiInputTextFlags_ReadOnly);
+      }
+
+      if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload =
+                ImGui::AcceptDragDropPayload("DND_PAYLOAD_ENTITY")) {
+          UUID recv_id = *(const UUID*)payload->Data;
+          script_field.SetValue(recv_id);
+          modify_info.SetModified();
+        }
+        ImGui::EndDragDropTarget();
+      }
       break;
     }
   }
@@ -776,8 +810,27 @@ void DrawScriptFieldRuntime(const std::string& name, const ScriptField& field,
       break;
     }
     case ScriptFieldType::kEntity: {
+      UUID uuid = script_instance->GetFieldValue<UUID>(name);
+      Entity entity = SceneManager::GetActive()->TryGetEntityByUUID(uuid);
+
+      {
+        std::string name_string = entity ? entity.GetName() : "Invalid Entity";
+        ImGui::InputText(name.c_str(), &name_string,
+                         ImGuiInputTextFlags_ReadOnly);
+      }
+
+      if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload =
+                ImGui::AcceptDragDropPayload("DND_PAYLOAD_ENTITY")) {
+          UUID recv_id = *(const UUID*)payload->Data;
+          script_instance->SetFieldValue(name, recv_id);
+          modify_info.SetModified();
+        }
+        ImGui::EndDragDropTarget();
+      }
       break;
     }
   }
 }
+
 }  // namespace eve

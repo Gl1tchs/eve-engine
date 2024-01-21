@@ -39,6 +39,8 @@ enum class ScriptFieldType {
   kEntity
 };
 
+[[nodiscard]] size_t GetFieldTypeSize(ScriptFieldType type);
+
 struct ScriptField {
   ScriptFieldType type;
   std::string name;
@@ -80,13 +82,17 @@ class ScriptClass {
               bool is_core = false);
 
   MonoObject* Instantiate();
+
   MonoMethod* GetMethod(const std::string& name, int param_count);
+
   MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* method,
                            void** params = nullptr);
 
   const std::unordered_map<std::string, ScriptField>& GetFields() const {
     return fields_;
   }
+
+  MonoClass* GetMonoClass() { return mono_class_; }
 
  private:
   std::string class_namespace_;
@@ -101,10 +107,13 @@ class ScriptClass {
 
 class ScriptInstance {
  public:
+  ScriptInstance(Ref<ScriptClass> script_class, MonoObject* managed_object);
   ScriptInstance(Ref<ScriptClass> script_class, Entity entity);
 
   void InvokeOnCreate();
-  void InvokeOnUpdate(float ts);
+
+  void InvokeOnUpdate(float ds);
+
   void InvokeOnDestroy();
 
   Ref<ScriptClass> GetScriptClass() { return script_class_; }
@@ -114,8 +123,9 @@ class ScriptInstance {
     static_assert(sizeof(T) <= 16, "Type too large!");
 
     bool success = GetFieldValueInternal(name, field_value_buffer_);
-    if (!success)
+    if (!success) {
       return T();
+    }
 
     return *(T*)field_value_buffer_;
   }

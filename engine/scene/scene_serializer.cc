@@ -228,7 +228,7 @@ static void SerializeEntity(json& out, Entity entity) {
         if (entity_fields.find(name) != entity_fields.end()) {
           json script_field_json = {
               {"name", name},
-              {"type", ScriptFieldTypeToString(field.type)},
+              {"type", SerializeScriptField(field.type)},
               {"data", nullptr}  // Placeholder for the data
           };
 
@@ -481,7 +481,7 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
             std::string name = script_field_json["name"].get<std::string>();
             std::string type_string =
                 script_field_json["type"].get<std::string>();
-            ScriptFieldType type = ScriptFieldTypeFromString(type_string);
+            ScriptFieldType type = DeserializeScriptField(type_string);
 
             ScriptFieldInstance& field_instance = entity_fields[name];
 

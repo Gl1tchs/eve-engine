@@ -189,7 +189,9 @@ static void Entity_AssignScript(UUID entity_id, MonoString* class_name) {
   sc.class_name = MonoStringToString(class_name);
 
   // Register entity to the scripting engine
-  ScriptEngine::OnCreateEntity(entity);
+  ScriptEngine::CreateEntityInstance(entity);
+  // ScriptEngine::SetEntityFieldValues(entity);
+  ScriptEngine::InvokeCreateEntity(entity);
 }
 
 #pragma endregion

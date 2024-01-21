@@ -64,30 +64,23 @@ class Entity {
 
   bool RemoveChild(Entity child);
 
-  [[nodiscard]] bool IsParentOfRecursive(Entity parent, Entity child);
+  [[nodiscard]] static bool IsParentOfRecursive(Entity parent, Entity child);
 
-  [[nodiscard]] const UUID& GetUUID() { return GetComponent<IdComponent>().id; }
-  [[nodiscard]] const std::string& GetName() {
-    return GetComponent<TagComponent>().tag;
-  }
+  [[nodiscard]] const UUID& GetUUID();
 
-  [[nodiscard]] Transform& GetTransform() { return GetComponent<Transform>(); }
+  [[nodiscard]] const std::string& GetName();
 
-  operator bool() const {
-    return entity_handle_ != entt::null || scene_ != nullptr;
-  }
+  [[nodiscard]] Transform& GetTransform();
 
-  operator entt::entity() const { return entity_handle_; }
+  operator bool() const;
+
+  operator entt::entity() const;
 
   operator uint32_t() const { return (uint32_t)entity_handle_; }
 
-  [[nodiscard]] bool operator==(const Entity& other) const {
-    return entity_handle_ == other.entity_handle_ && scene_ == other.scene_;
-  }
+  [[nodiscard]] bool operator==(const Entity& other) const;
 
-  [[nodiscard]] bool operator!=(const Entity& other) const {
-    return !(*this == other);
-  }
+  [[nodiscard]] bool operator!=(const Entity& other) const;
 
  private:
   entt::entity entity_handle_{entt::null};
