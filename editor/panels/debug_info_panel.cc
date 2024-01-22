@@ -13,7 +13,7 @@
 namespace eve {
 
 DebugInfoPanel::DebugInfoPanel(Ref<Renderer>& renderer)
-    : Panel(false), renderer_(renderer) {
+    : Panel(true), renderer_(renderer) {
   SetFlags(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
 
 #if _WIN32

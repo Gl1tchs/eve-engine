@@ -623,7 +623,7 @@ void EditorLayer::SetupMenubar() {
 
     MenuItemGroup renderer_group;
     {
-      MenuItem debug_info("Render Stats",
+      MenuItem debug_info("Debug Info",
                           [this]() { debug_info_panel_->SetActive(true); });
       renderer_group.PushMenuItem(debug_info);
 

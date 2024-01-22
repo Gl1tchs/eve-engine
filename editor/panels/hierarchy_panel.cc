@@ -85,6 +85,10 @@ void HierarchyPanel::Draw() {
 }
 
 void HierarchyPanel::DrawEntity(Entity& entity, bool is_child) {
+  if (!entity) {
+    return;
+  }
+
   ImGui::PushID((uint64_t)entity.GetUUID());
 
   const std::string hierarchy_name =
