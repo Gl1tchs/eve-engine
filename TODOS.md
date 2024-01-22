@@ -6,6 +6,7 @@
 - [ ] In Game UI
 - [ ] Make mono work on linux.
 - [ ] Sounds
+- [ ] Engine plugins C#/C++
 
 ## Editor
 - [ ] Texture gizmos for lights and camera.
@@ -52,6 +53,7 @@
 - [ ] API Documentation / code + markdown
 
 ## Renderer
+- [ ] Add render passes.
 - [ ] GPU Particle System
 - [ ] Multiple texture support (multiple diffusion, specular, normal, height).
 - [ ] HDR Environment maps.
