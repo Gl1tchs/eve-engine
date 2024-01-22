@@ -4,13 +4,16 @@
 
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
+#include "line.h"
 
 namespace eve {
-  
-LinePrimitive::LinePrimitive() : Primitive<LineVertex>(kMaxLines) {
+
+LinePrimitive::LinePrimitive() {
   vertex_array_ = VertexArray::Create();
 
-  vertex_buffer_ = VertexBuffer::Create(kMaxLines * sizeof(LineVertex));
+  vertices_.Allocate(kMaxLineVertexCount);
+
+  vertex_buffer_ = VertexBuffer::Create(vertices_.GetSize());
   vertex_buffer_->SetLayout({{ShaderDataType::kFloat3, "a_position"},
                              {ShaderDataType::kFloat4, "a_color"}});
   vertex_array_->AddVertexBuffer(vertex_buffer_);
@@ -20,23 +23,38 @@ LinePrimitive::LinePrimitive() : Primitive<LineVertex>(kMaxLines) {
 }
 
 void LinePrimitive::Render(RenderStats& stats) {
-  const size_t& batch_count = BatchCount();
-
-  if (batch_count <= 0) {
+  if (vertices_.GetCount() <= 0) {
     return;
   }
 
-  vertex_buffer_->SetData(GetBatches(), batch_count * sizeof(LineVertex));
+  vertex_buffer_->SetData(vertices_.GetData(), vertices_.GetSize());
 
   shader_->Bind();
   RenderCommand::SetLineWidth(line_width);
-  RenderCommand::DrawLines(vertex_array_, batch_count);
+  RenderCommand::DrawLines(vertex_array_, vertices_.GetCount());
 
   stats.draw_calls++;
 }
 
+void LinePrimitive::Reset() {
+  vertices_.ResetIndex();
+}
+
+void LinePrimitive::AddInstance(const glm::vec3& p0, const glm::vec3& p1,
+                                const Color& color) {
+  LineVertex v0;
+  v0.position = p0;
+  v0.color = color;
+  vertices_.Add(v0);
+
+  LineVertex v1;
+  v1.position = p1;
+  v1.color = color;
+  vertices_.Add(v1);
+}
+
 bool LinePrimitive::NeedsNewBatch() {
-  return (BatchCount() + 2) >= kMaxLines;
+  return vertices_.GetCount() + 2 >= kMaxLineVertexCount;
 }
 
 }  // namespace eve

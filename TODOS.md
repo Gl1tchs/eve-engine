@@ -20,6 +20,8 @@
 - [ ] While scripts are building show a loading thing for it.
 
 ## Asset
+- [ ] Remove requirement of asset registry window on editor.
+- [ ] Assets should be scene only and only the ones on the scene should be loaded.
 - [ ] Make physics settings an asset.
 - [ ] Do not load unusued assets to memory.
 - [ ] Better asset system with proper registry and metadata caching.
@@ -63,8 +65,7 @@
 ## Shaders
 
 ## Bugs
-- [ ] There is a problem with sprites I cannot render more then one and
-sometimes it shown half.
+- [ ] Make mesh renderer to use batches in order to render millions of indices.
 - [ ] Scenes that are not in project file couldn't open.
 
 ## Done
@@ -106,3 +107,5 @@ sometimes it shown half.
 ## Fixed
 - [x] Cannot switch between projects.
 - [x] Editor closes very slowly
+- [x] There is a problem with sprites I cannot render more then one and
+sometimes it shown half.

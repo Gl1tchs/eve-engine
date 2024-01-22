@@ -5,7 +5,6 @@ set(SOURCES
   primitives/line.h
   primitives/mesh.cc
   primitives/mesh.h
-  primitives/primitive.h
   primitives/quad.cc
   primitives/quad.h
   buffer_layout.cc
@@ -78,7 +77,7 @@ module_include_directories(graphics PUBLIC
   ${CMAKE_SOURCE_DIR}/engine
   ${VENDOR_DIR}/glm
 )
-  
+
 module_include_directories(graphics PRIVATE
   ${VENDOR_DIR}/entt/src
   ${VENDOR_DIR}/glad/include/
@@ -87,7 +86,7 @@ module_include_directories(graphics PRIVATE
 )
 
 module_link_libraries(graphics PRIVATE
-  eve::asset 
+  eve::asset
   eve::core
   eve::scene
   glm

@@ -1,45 +1,6 @@
 {
   "entities": [
     {
-      "camera_component": {
-        "is_fixed_aspect_ratio": false,
-        "is_orthographic": false,
-        "is_primary": true,
-        "orthographic_camera": {
-          "aspect_ratio": 1.8304094076156616,
-          "far_clip": 1.0,
-          "near_clip": -1.0,
-          "zoom_level": 1.0
-        },
-        "perspective_camera": {
-          "aspect_ratio": 1.8304094076156616,
-          "far_clip": 300.0,
-          "fov": 45.0,
-          "near_clip": 0.10000000149011612
-        }
-      },
-      "id": 1225455807429653547,
-      "parent_id": 0,
-      "tag": "Main Camera",
-      "transform": {
-        "position": [
-          -5.630620002746582,
-          2.872159481048584,
-          11.092264175415039
-        ],
-        "rotation": [
-          -8.8610200881958,
-          -29.99997901916504,
-          8.439287171313481e-07
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      }
-    },
-    {
       "id": 490489011960975594,
       "material_component": {
         "albedo": [
@@ -90,6 +51,45 @@
       }
     },
     {
+      "camera_component": {
+        "is_fixed_aspect_ratio": false,
+        "is_orthographic": false,
+        "is_primary": true,
+        "orthographic_camera": {
+          "aspect_ratio": 1.5681818723678589,
+          "far_clip": 1.0,
+          "near_clip": -1.0,
+          "zoom_level": 1.0
+        },
+        "perspective_camera": {
+          "aspect_ratio": 1.5681818723678589,
+          "far_clip": 300.0,
+          "fov": 45.0,
+          "near_clip": 0.10000000149011612
+        }
+      },
+      "id": 1225455807429653547,
+      "parent_id": 0,
+      "tag": "Main Camera",
+      "transform": {
+        "position": [
+          -5.630620002746582,
+          2.872159481048584,
+          11.092264175415039
+        ],
+        "rotation": [
+          -8.8610200881958,
+          -29.99997901916504,
+          8.439287171313481e-07
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
       "id": 4147500373297138652,
       "material_component": {
         "albedo": [
@@ -118,9 +118,9 @@
       "tag": "Cube",
       "transform": {
         "position": [
-          2.7812576293945313,
+          2.88261342048645,
           -0.2859038710594177,
-          1.6942291259765625
+          1.6942262649536133
         ],
         "rotation": [
           0.0,

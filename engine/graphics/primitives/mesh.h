@@ -4,16 +4,17 @@
 
 #include "pch_shared.h"
 
-#include "graphics/primitives/primitive.h"
-
+#include "core/buffer.h"
 #include "graphics/material.h"
 #include "graphics/shader.h"
 #include "graphics/vertex_array.h"
 
 namespace eve {
 
-static constexpr size_t kMeshMaxVertexCount = 4000;
-static constexpr size_t kMeshMaxIndexCount = 8000;
+struct RenderStats;
+
+static constexpr size_t kMeshMaxVertexCount = 10000;
+static constexpr size_t kMeshMaxIndexCount = 10000;
 static constexpr size_t kMeshMaxTextures = 32;
 
 struct MeshVertex final {
@@ -22,36 +23,28 @@ struct MeshVertex final {
   glm::vec3 normal;
   glm::vec2 tex_coords;
   float diffuse_index = 0.0f;
-  float specular_index = 0.0f;
-  float normal_index = 0.0f;
-  float height_index = 0.0f;
 };
 
-template <>
-struct RenderData<MeshVertex> {
+struct MeshData {
   std::vector<MeshVertex> vertices;
   std::vector<uint32_t> indices;
 
   Ref<Texture> diffuse_map = nullptr;
-  Ref<Texture> specular_map = nullptr;
-  Ref<Texture> normal_map = nullptr;
-  Ref<Texture> height_map = nullptr;
 };
 
-class MeshPrimitive : public Primitive<MeshVertex> {
+class MeshPrimitive {
  public:
-  uint32_t index_offset;
-
   MeshPrimitive();
+  ~MeshPrimitive();
 
-  virtual ~MeshPrimitive() = default;
+  void Render(RenderStats& stats);
 
-  void Render(RenderStats& stats) override;
+  void Reset();
 
-  [[nodiscard]] bool NeedsNewBatch(uint32_t vertex_size,
-                                   uint32_t index_size) override;
+  void AddInstance(const MeshData& mesh, const glm::mat4& transform,
+                   const Material& material);
 
-  void AddIndex(uint32_t index);
+  [[nodiscard]] bool NeedsNewBatch(uint32_t vertex_size, uint32_t index_size);
 
   void SetCustomShader(Ref<ShaderInstance> custom_shader);
 
@@ -59,26 +52,26 @@ class MeshPrimitive : public Primitive<MeshVertex> {
 
   [[nodiscard]] float FindTexture(const Ref<Texture>& texture);
 
- protected:
-  void OnReset() override;
-
  private:
   Ref<VertexArray> vertex_array_;
   Ref<VertexBuffer> vertex_buffer_;
   Ref<IndexBuffer> index_buffer_;
-
   Ref<Shader> shader_;
+
+  // Render data
+  BufferArray<MeshVertex> vertices_;
+  BufferArray<uint32_t> indices_;
+  uint32_t index_offset_ = 0;
+
+  // Custom shader
   std::string vertex_path_;
   std::string fragment_path_;
-
   Ref<ShaderInstance> custom_shader_ = nullptr;
-
-  std::vector<uint32_t> indices_;
 
   // Textures
   Ref<Texture> white_texture_;
   std::array<Ref<Texture>, kMeshMaxTextures> texture_slots_;
-  uint32_t texture_slot_index_;
+  uint32_t texture_slot_index_ = 0;
 };
 
 }  // namespace eve

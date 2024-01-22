@@ -1,14 +1,14 @@
 [
   {
-    "handle": 16996734589929948027,
-    "name": "Monkey",
-    "path": "res://models/monkey.obj",
-    "type": "StaticMesh"
-  },
-  {
     "handle": 5585700724317691323,
     "name": "Cube",
     "path": "res://models/cube.obj",
+    "type": "StaticMesh"
+  },
+  {
+    "handle": 16996734589929948027,
+    "name": "Monkey",
+    "path": "res://models/monkey.obj",
     "type": "StaticMesh"
   },
   {

@@ -63,7 +63,7 @@ void main() {
       vec3(1.0, 1.0, 1.0);  // Color of the global directional light
 
   vec3 N = normalize(NORMAL);
-  vec3 V = normalize(CAMERA.position - FRAG_POS);
+  vec3 V = normalize(u_camera.position - FRAG_POS);
 
   vec3 F0 = vec3(0.04);
   F0 = mix(F0, MATERIAL.albedo, MATERIAL.metallic);

@@ -42,14 +42,9 @@ class Renderer final {
   void DrawModel(const Ref<Model>& model, const Transform& transform,
                  const Material& material = {});
 
-  void DrawQuad(const Transform& transform, const Color& color,
-                const glm::vec2& tiling = {1, 1},
-                const glm::vec2& offset = {0, 0});
-
-  void DrawQuad(const Transform& transform, const Ref<Texture>& texture,
-                const Color& color = kColorWhite,
-                const glm::vec2& tiling = {1, 1},
-                const glm::vec2& offset = {0, 0});
+  void DrawQuad(const Transform& transform, const Color& color = kColorWhite,
+                const Ref<Texture>& texture = nullptr,
+                const glm::vec2& tiling = {1, 1});
 
   void DrawCube(const Transform& transform, const Color& color,
                 PolygonMode mode = PolygonMode::kFill);

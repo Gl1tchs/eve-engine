@@ -16,5 +16,5 @@ void main() {
   v_color = a_color;
   v_tex_coords = a_tex_coords;
 
-  gl_Position = CAMERA.proj * CAMERA.view * a_position;
+  gl_Position = u_camera.proj * u_camera.view * a_position;
 }

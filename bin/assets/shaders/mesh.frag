@@ -5,9 +5,6 @@
 layout(location = 0) in vec4 v_albedo;
 layout(location = 1) in vec2 v_tex_coords;
 layout(location = 2) in float v_diffuse_index;
-layout(location = 3) in float v_specular_index;
-layout(location = 4) in float v_normal_index;
-layout(location = 5) in float v_height_index;
 
 uniform sampler2D u_textures[32];
 

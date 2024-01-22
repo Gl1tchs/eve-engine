@@ -16,7 +16,7 @@ namespace eve {
 struct Model : Asset {
   EVE_IMPL_ASSET(AssetType::kStaticMesh)
 
-  std::vector<RenderData<MeshVertex>> meshes;
+  std::vector<MeshData> meshes;
   std::vector<AssetHandle> textures;
 
   static Ref<Model> Create(const fs::path& path);
@@ -24,7 +24,7 @@ struct Model : Asset {
  private:
   void ProcessNode(aiNode* node, const aiScene* scene);
 
-  RenderData<MeshVertex> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+  MeshData ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
  private:
   fs::path directory_;

@@ -269,10 +269,6 @@ void InspectorPanel::RenderComponentProperties(Entity selected_entity) {
         if (ImGui::DragFloat2("Tiling", &sprite_comp.tex_tiling.x)) {
           modify_info.SetModified();
         }
-
-        if (ImGui::DragFloat2("Offset", &sprite_comp.tex_offset.x)) {
-          modify_info.SetModified();
-        }
       });
 
   DrawComponent<ModelComponent>(

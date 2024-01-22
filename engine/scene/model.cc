@@ -52,7 +52,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene) {
   }
 }
 
-RenderData<MeshVertex> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
+MeshData Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
   std::vector<MeshVertex> vertices;
 
   // walk through each of the mesh's vertices
@@ -122,21 +122,21 @@ RenderData<MeshVertex> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
   // specular: texture_specularN
   // normal: texture_normalN
 
-  RenderData<MeshVertex> render_data;
+  MeshData render_data;
   render_data.vertices = vertices;
   render_data.indices = indices;
 
   render_data.diffuse_map = LoadMaterialTextures(
       material, aiTextureType_DIFFUSE, TextureType::kDiffuse, directory_);
 
-  render_data.specular_map = LoadMaterialTextures(
-      material, aiTextureType_SPECULAR, TextureType::kSpecular, directory_);
+  // render_data.specular_map = LoadMaterialTextures(
+  //     material, aiTextureType_SPECULAR, TextureType::kSpecular, directory_);
 
-  render_data.normal_map = LoadMaterialTextures(
-      material, aiTextureType_HEIGHT, TextureType::kNormal, directory_);
+  // render_data.normal_map = LoadMaterialTextures(
+  //     material, aiTextureType_HEIGHT, TextureType::kNormal, directory_);
 
-  render_data.height_map = LoadMaterialTextures(
-      material, aiTextureType_AMBIENT, TextureType::kHeight, directory_);
+  // render_data.height_map = LoadMaterialTextures(
+  //     material, aiTextureType_AMBIENT, TextureType::kHeight, directory_);
 
   return render_data;
 }

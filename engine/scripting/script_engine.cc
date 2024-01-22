@@ -47,7 +47,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
   // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
   MonoImageOpenStatus status;
   MonoImage* image = mono_image_open_from_data_full(
-      file_data.As<char>(), file_data.Size(), 1, &status, 0);
+      file_data.As<char>(), file_data.GetSize(), 1, &status, 0);
 
   if (status != MONO_IMAGE_OK) {
     const char* error_message = mono_image_strerror(status);
@@ -62,7 +62,7 @@ static MonoAssembly* LoadMonoAssembly(const fs::path& assembly_path,
     if (fs::exists(pdb_path)) {
       ScopedBuffer pdb_file_data = FileSystem::ReadFileBinary(pdb_path);
       mono_debug_open_image_from_memory(
-          image, pdb_file_data.As<const mono_byte>(), pdb_file_data.Size());
+          image, pdb_file_data.As<const mono_byte>(), pdb_file_data.GetSize());
 
       EVE_LOG_ENGINE_INFO("Loaded PDB {}", pdb_path.string());
     }

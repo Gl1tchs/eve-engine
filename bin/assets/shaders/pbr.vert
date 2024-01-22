@@ -35,5 +35,5 @@ void main() {
   TEX_INDEX = a_tex_index;
   MATERIAL = material;
 
-  gl_Position = CAMERA.proj * CAMERA.view * a_pos;
+  gl_Position = u_camera.proj * u_camera.view * a_pos;
 }

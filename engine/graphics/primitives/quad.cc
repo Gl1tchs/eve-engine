@@ -10,22 +10,19 @@
 
 namespace eve {
 
-QuadPrimitive::QuadPrimitive()
-    : Primitive<QuadVertex>(kQuadMaxVertexCount),
-      index_count_(0),
-      texture_slot_index_(0) {
+QuadPrimitive::QuadPrimitive() {
   vertex_array_ = VertexArray::Create();
 
   // initialize vertex buffer
-  vertex_buffer_ =
-      VertexBuffer::Create(kQuadMaxVertexCount * sizeof(QuadVertex));
+  vertices_.Allocate(kQuadMaxVertexCount);
+
+  vertex_buffer_ = VertexBuffer::Create(vertices_.GetSize());
   vertex_buffer_->SetLayout({
       {ShaderDataType::kFloat4, "a_position"},
       {ShaderDataType::kFloat2, "a_tex_coords"},
       {ShaderDataType::kFloat4, "a_color"},
       {ShaderDataType::kFloat, "a_tex_index"},
       {ShaderDataType::kFloat2, "a_tex_tiling"},
-      {ShaderDataType::kFloat2, "a_tex_offset"},
   });
   vertex_array_->AddVertexBuffer(vertex_buffer_);
 
@@ -80,12 +77,14 @@ QuadPrimitive::QuadPrimitive()
             white_texture_);
 }
 
+QuadPrimitive::~QuadPrimitive() {}
+
 void QuadPrimitive::Render(RenderStats& stats) {
   if (index_count_ <= 0) {
     return;
   }
 
-  vertex_buffer_->SetData(GetBatches(), BatchCount() * sizeof(QuadVertex));
+  vertex_buffer_->SetData(vertices_.GetData(), vertices_.GetSize());
 
   // Bind textures
   for (uint32_t i = 0; i <= texture_slot_index_; i++) {
@@ -98,8 +97,35 @@ void QuadPrimitive::Render(RenderStats& stats) {
   stats.draw_calls++;
 }
 
+void QuadPrimitive::Reset() {
+  vertices_.ResetIndex();
+  index_count_ = 0;
+  texture_slot_index_ = 1;
+}
+
+void QuadPrimitive::AddInstance(const Transform& transform, const Color& color,
+                                const Ref<Texture>& texture,
+                                const glm::vec2& tiling) {
+  const float tex_index = texture ? FindTexture(texture) : 0.0f;
+  const glm::mat4 transform_matrix = transform.GetTransformMatrix();
+
+  for (size_t i = 0; i < kQuadVertexCount; i++) {
+    QuadVertex vertex;
+
+    vertex.position = transform_matrix * kQuadVertexPositions[i];
+    vertex.tex_coords = kQuadVertexTexCoords[i];
+    vertex.color = color;
+    vertex.tex_index = tex_index;
+    vertex.tex_tiling = tiling;
+
+    vertices_.Add(vertex);
+  }
+
+  index_count_ += kQuadIndexCount;
+}
+
 bool QuadPrimitive::NeedsNewBatch() {
-  return BatchCount() + kQuadVertexCount >= kQuadMaxVertexCount ||
+  return vertices_.GetCount() + kQuadVertexCount >= kQuadMaxVertexCount ||
          texture_slot_index_ >= kQuadMaxTextures;
 }
 
@@ -117,11 +143,6 @@ float QuadPrimitive::FindTexture(const Ref<Texture>& texture) {
   }
 
   return texture_index;
-}
-
-void QuadPrimitive::OnReset() {
-  index_count_ = 0;
-  texture_slot_index_ = 1;
 }
 
 }  // namespace eve

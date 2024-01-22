@@ -2,21 +2,19 @@
 
 #include "graphics/primitives/cube.h"
 
-#include "asset/asset_registry.h"
-#include "core/file_system.h"
 #include "graphics/primitives/quad.h"
 #include "graphics/render_command.h"
 #include "graphics/renderer.h"
 
 namespace eve {
 
-CubePrimitive::CubePrimitive()
-    : Primitive<CubeVertex>(kCubeMaxVertexCount), index_count_(0) {
+CubePrimitive::CubePrimitive() {
   vertex_array_ = VertexArray::Create();
 
   // initialize vertex buffer
-  vertex_buffer_ =
-      VertexBuffer::Create(kCubeMaxVertexCount * sizeof(CubeVertex));
+  vertices_.Allocate(kCubeMaxVertexCount);
+
+  vertex_buffer_ = VertexBuffer::Create(vertices_.GetSize());
   vertex_buffer_->SetLayout({
       {ShaderDataType::kFloat4, "a_position"},
       {ShaderDataType::kFloat2, "a_tex_coords"},
@@ -57,7 +55,7 @@ void CubePrimitive::Render(RenderStats& stats) {
     return;
   }
 
-  vertex_buffer_->SetData(GetBatches(), BatchCount() * sizeof(CubeVertex));
+  vertex_buffer_->SetData(vertices_.GetData(), vertices_.GetSize());
 
   shader_->Bind();
   RenderCommand::DrawIndexed(vertex_array_, index_count_);
@@ -65,12 +63,30 @@ void CubePrimitive::Render(RenderStats& stats) {
   stats.draw_calls++;
 }
 
-bool CubePrimitive::NeedsNewBatch() {
-  return BatchCount() + kCubeVertexCount >= kCubeMaxVertexCount;
+void CubePrimitive::Reset() {
+  vertices_.ResetIndex();
+  index_count_ = 0;
 }
 
-void CubePrimitive::OnReset() {
-  index_count_ = 0;
+void CubePrimitive::AddInstance(const Transform& transform,
+                                const Color& color) {
+  const glm::mat4 model_matrix = transform.GetTransformMatrix();
+
+  for (size_t i = 0; i < kCubeVertexCount; i++) {
+    CubeVertex vertex;
+
+    vertex.position = model_matrix * kCubeVertexPositions[i];
+    vertex.tex_coords = kCubeVertexTexCoords[i];
+    vertex.color = color;
+
+    vertices_.Add(vertex);
+  }
+
+  index_count_ += kCubeIndexCount;
+}
+
+bool CubePrimitive::NeedsNewBatch() {
+  return vertices_.GetCount() + kCubeVertexCount >= kCubeMaxVertexCount;
 }
 
 }  // namespace eve

@@ -134,14 +134,8 @@ void SceneRenderer::RenderScene() {
           const SpriteRendererComponent& sprite) {
         Entity entity{entity_id, scene.get()};
 
-        if (auto texture = AssetRegistry::Get<Texture>(sprite.texture);
-            texture) {
-          renderer->DrawQuad(transform, texture, sprite.color,
-                             sprite.tex_tiling, sprite.tex_offset);
-        } else {
-          renderer->DrawQuad(transform, sprite.color, sprite.tex_tiling,
-                             sprite.tex_offset);
-        }
+        Ref<Texture> texture = AssetRegistry::Get<Texture>(sprite.texture);
+        renderer->DrawQuad(transform, sprite.color, texture, sprite.tex_tiling);
       });
 
   scene->GetAllEntitiesWith<Transform, ModelComponent>().each(

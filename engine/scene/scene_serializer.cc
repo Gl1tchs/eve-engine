@@ -135,10 +135,11 @@ static void SerializeEntity(json& out, Entity entity) {
   if (entity.HasComponent<SpriteRendererComponent>()) {
     auto& sprite_component = entity.GetComponent<SpriteRendererComponent>();
 
-    out["sprite_component"] = json{{"texture", sprite_component.texture},
-                                   {"color", sprite_component.color},
-                                   {"tex_tiling", sprite_component.tex_tiling},
-                                   {"tex_offset", sprite_component.tex_offset}};
+    out["sprite_component"] = json{
+        {"texture", sprite_component.texture},
+        {"color", sprite_component.color},
+        {"tex_tiling", sprite_component.tex_tiling},
+    };
   }
 
   if (entity.HasComponent<ModelComponent>()) {
@@ -380,8 +381,6 @@ bool SceneSerializer::Deserialize(const fs::path& file_path) {
       sprite_component.color = sprite_comp_json["color"].get<Color>();
       sprite_component.tex_tiling =
           sprite_comp_json["tex_tiling"].get<glm::vec2>();
-      sprite_component.tex_offset =
-          sprite_comp_json["tex_offset"].get<glm::vec2>();
     }
 
     if (auto model_comp_json = entity_json["model_component"];

@@ -65,7 +65,6 @@ struct SpriteRendererComponent {
   AssetHandle texture = 0;
   Color color = kColorWhite;
   glm::vec2 tex_tiling = {1, 1};
-  glm::vec2 tex_offset = {0, 0};
 };
 
 class Script;

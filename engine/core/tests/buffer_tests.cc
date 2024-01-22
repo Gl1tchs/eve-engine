@@ -35,8 +35,8 @@ TEST_CASE("ScopedBuffer Construction and Destruction", "[ScopedBuffer]") {
   ScopedBuffer scoped_buffer(50);
 
   REQUIRE(scoped_buffer);
-  REQUIRE(scoped_buffer.Data() != nullptr);
-  REQUIRE(scoped_buffer.Size() == 50);
+  REQUIRE(scoped_buffer.GetData() != nullptr);
+  REQUIRE(scoped_buffer.GetSize() == 50);
 }
 
 TEST_CASE("ScopedBuffer Type Conversion", "[ScopedBuffer]") {
@@ -45,4 +45,32 @@ TEST_CASE("ScopedBuffer Type Conversion", "[ScopedBuffer]") {
   int* int_ptr = scoped_buffer.As<int>();
 
   REQUIRE(int_ptr != nullptr);
+}
+
+TEST_CASE("BufferArray Creation and Indexing", "[BufferArray]") {
+  BufferArray<int> array(5);
+  REQUIRE(array);
+
+  REQUIRE(array.GetSize() == 5 * sizeof(int));
+  REQUIRE(array.GetCount() == 0);
+
+  for (int i = 0; i < 5; i++) {
+    array.Add(i);
+  }
+
+  REQUIRE(array.GetCount() == 5);
+
+  for (int i = 0; i < 5; i++) {
+    REQUIRE(array[i] == i);
+  }
+
+  array.ResetIndex();
+
+  array.Add(9);
+
+  REQUIRE(array[0] == 9);
+
+  array.Release();
+
+  REQUIRE(!array);
 }
