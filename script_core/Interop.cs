@@ -11,7 +11,7 @@ namespace EveEngine
     #region Application
 
     [MethodImplAttribute(MethodImplOptions.InternalCall)]
-    internal extern static CursorMode Application_Quit();
+    internal extern static void Application_Quit();
 
     #endregion
     #region Window
